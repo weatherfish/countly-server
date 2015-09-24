@@ -1,0 +1,573 @@
+@animation_duration : 0.2s;
+@animation_timing   : ease-in-out;
+
+@font-face {
+    font-family: Lato-Light;
+    src: url(../fonts/Lato-Light/Lato-Light.woff);
+    src: local("Lato-Light"), url("../fonts/Lato-Light/Lato-Light.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: Lato-Regular;
+    src: url(../fonts/Lato-Regular/Lato-Regular.woff);
+    src: local("Lato-Regular"), url("../fonts/Lato-Regular/Lato-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: Lato-Semibold;
+    src: url(../fonts/Lato-Semibold/Lato-Semibold.woff);
+    src: local("Lato-Semibold"), url("../fonts/Lato-Semibold/Lato-Semibold.ttf") format("truetype");
+}
+
+/************************** TOP *************************/
+
+#sidebar_top {
+    background-color : #03CF57;
+    height           : 60px;
+    cursor           : pointer;
+    width            : 240px;
+}
+
+#sidebar_top.active {
+    background-color : #00BD4E;
+}
+
+#sidebar_top div.app_data {
+    display     : inline-block;
+    width       : 145px;
+    height      : 40px;
+    margin-left : 10px;
+    color       : white;
+    position    : relative;
+    top         : -2px;
+}
+
+#sidebar_top img {
+    width       : 30px;
+    height      : 30px;
+    margin-left : 15px;
+    margin-top  : 15px;
+}
+
+#sidebar_top span.name {
+    display        : block;
+    font-family    : Lato-Regular;
+    font-size      : 16px;
+    color          : #FFFFFF;
+    letter-spacing : 0.6px;
+    text-shadow    : 0px 1px 0px rgba(158,158,158,0.50);
+}
+
+#sidebar_top span.type {
+    display        : block;
+    font-family    : Lato-Semibold;
+    font-size      : 9px;
+    color          : #EAEAEA;
+    letter-spacing : 0.74px;
+}
+
+#sidebar_top .down_arrow {
+    position : relative;
+    top      : -4px;
+    display  : inline-block;
+    width    : 40px;
+    height   : 40px;
+}
+
+#sidebar_top .down_arrow span {
+    display : inline-block;
+    width   : 20px;
+    height  : 20px;
+
+    animation-duration : @animation_duration;
+    animation-timing-function : @animation_timing;
+}
+
+#sidebar_top .down_arrow span.left_part {
+    position : relative;
+    background-image    : url('../images/arrow_part.png');
+    background-repeat   : no-repeat;
+    background-position : center;
+}
+
+#sidebar_top .down_arrow span.right_part {
+    position: relative;
+    left: -14px;
+    background-image    : url('../images/arrow_part.png');
+
+    -ms-transform: rotate(90deg); /* IE 9 */
+    -webkit-transform: rotate(90deg); /* Chrome, Safari, Opera */
+    transform: rotate(90deg);
+}
+
+#sidebar_top.pushed .down_arrow span.left_part {
+    animation-name     : slide_arrow_left;
+    /*animation-duration : @animation_duration;*/
+    /*animation-timing-function : @animation_timing;*/
+    animation-fill-mode : forwards;
+    animation-direction : normal;
+
+}
+
+#sidebar_top.pushed .down_arrow span.right_part {
+    animation-name     : slide_arrow_right;
+    animation-fill-mode : forwards;
+    animation-direction : normal;
+}
+
+#sidebar_top.closed .down_arrow span.left_part {
+    animation-name     : slide_arrow_return_left;
+    /*animation-duration : @animation_duration;*/
+    /*animation-timing-function : @animation_timing;*/
+    animation-fill-mode : forwards;
+    animation-direction : normal;
+}
+
+#sidebar_top.closed .down_arrow span.right_part {
+    animation-name     : slide_arrow_return_right;
+    /*animation-timing-function : @animation_timing;*/
+    animation-fill-mode : forwards;
+    animation-direction : normal;
+}
+
+@keyframes slide_arrow_left {
+    from { left : 0px; }
+    to   { left : 5px; }
+}
+
+@keyframes slide_arrow_return_left {
+    from { left : 5px; }
+    to   { left : 0px; }
+}
+
+@keyframes slide_arrow_right {
+    from { left : -14px; }
+    to   { left : -20px; }
+}
+@keyframes slide_arrow_return_right {
+    from { left : -20px; }
+    to   { left : -14px; }
+}
+
+/* sidebar */
+
+#sidebar {
+    width       : 240px;
+    font-family : Lato-Light;
+    font-size   : 14px;
+    color       : #B8B8B8;
+    z-index     : 20;
+    letter-spacing : 0.4px;
+}
+
+#sidebar .wrapper {
+    display : block;
+    width   : 240px;
+    height  : 1000px;
+}
+
+#sidebar .head {
+    margin-top : 10px;
+}
+
+#sidebar .head .sign {
+
+    display     : inline-block;
+    position    : relative;
+    top         : 50%;
+    transform   : translateY(-50%);
+    width       : 128px;
+    color       : white;
+    font-family : Lato-Regular;
+    font-size   : 14px;
+    color       : #FFFFFF;
+    font-weight : bold;
+    letter-spacing : 0.4px;
+
+}
+
+.dashboard_sign {
+    font-family        : Lato-Regular;
+    background-color   : #2d404e;
+    border-bottom      : 1px solid #324656 !important;
+    transition         : all @animation_duration @animation_timing;
+    -moz-transition    : all @animation_duration @animation_timing;
+    -webkit-transition : all @animation_duration @animation_timing;
+}
+
+.dashboard_sign.selected {
+    background-color : #132737 !important;
+    border-bottom    : 1px solid #132737;
+}
+
+.dashboard_sign div.icon {
+    background-color : #2d404e !important;
+}
+
+.dashboard_sign.selected div.icon {
+    background-color : #132737 !important;
+}
+
+#sidebar #left_part {
+    display : block;
+
+    float    : left;
+
+    color : white;
+
+    border-top : 20px solid #273743;
+    z-index : 20;
+}
+
+#sidebar #left_part > div.navitem {
+
+    width            : 50px;
+    height           : 1500px;
+
+    background-color: #2d404e;
+
+    transition         : all @animation_duration @animation_timing;
+    -moz-transition    : all @animation_duration @animation_timing;
+    -webkit-transition : all @animation_duration @animation_timing;
+
+}
+
+#sidebar #left_part div.navitem.active {
+    width : 240px;
+}
+
+#sidebar #left_part .item_wrap {
+    border-bottom    : 1px solid #324656;
+    height           : 50px;
+    background-color : #2D404E;
+    position         : relative;
+}
+
+#sidebar #left_part .item_wrap.hoverable {
+    cursor        : pointer;
+    transition         : all @animation_duration @animation_timing;
+    -moz-transition    : all @animation_duration @animation_timing;
+    -webkit-transition : all @animation_duration @animation_timing;
+}
+
+#sidebar #left_part div.navitem.maximized .item_wrap.hoverable:hover {
+    /* -- */
+}
+
+#sidebar #left_part .item_wrap.active {
+    background-color : #132737 !important;
+}
+
+#sidebar #left_part .item_wrap.hoverable:hover .menu_sign span {
+    color    : white !important;
+    position : relative;
+}
+
+#sidebar #left_part .item_wrap.hoverable:hover .icon {
+    background-image : url('../images/icon2_active.png');
+}
+
+#sidebar #left_part .icon {
+    display : inline-block;
+    width   : 50px;
+    height  : 50px;
+    background-repeat   : no-repeat;
+    background-position : center;
+    background-color    : #2D404E;
+
+    transition         : all @animation_duration @animation_timing;
+    -moz-transition    : all @animation_duration @animation_timing;
+    -webkit-transition : all @animation_duration @animation_timing;
+
+}
+
+#sidebar #left_part .icon.active {
+    background-color : #132737;
+}
+
+#sidebar #left_part div.navitem .menu_sign {
+    display  : inline-block;
+    position : absolute; /* todo */
+    top      : 16px;
+
+    opacity : 0;
+
+    white-space : nowrap;
+
+    transition         : all @animation_duration @animation_timing;
+    -moz-transition    : all @animation_duration @animation_timing;
+    -webkit-transition : all @animation_duration @animation_timing;
+}
+
+#sidebar #left_part div.navitem.active .menu_sign {
+    opacity : 1;
+}
+
+#sidebar #left_part .menu_sign span {
+    display   : inline-block;
+    font-size : 14px !important;
+}
+
+#sidebar #left_part > div > div.full {
+    width : 240px !important;
+    background-position : left;
+}
+
+#sidebar #left_part div.app1 {
+    background-image : url('../images/icon1.png');
+}
+
+#sidebar #left_part div.app1_active {
+    background-image : url('../images/icon2_active.png');
+
+}
+
+#sidebar #left_part div.app2 {
+    background-image : url('../images/icon2.png');
+}
+
+#sidebar #left_part div.app2_active {
+    background-image : url('../images/icon2_active.png');
+}
+
+/** right part **/
+
+#sidebar #right_part {
+    position : relative;
+    border-top: 20px solid #273743;
+    z-index: 300px;
+}
+
+#sidebar #right_part div.navitem {
+
+    position : absolute;
+
+    animation-duration  : @animation_duration;
+    animation-timing-function : @animation_timing;
+    animation-fill-mode : forwards;
+    animation-direction : normal;
+
+    animation-name : slide_right;
+}
+
+#sidebar #right_part div.navitem.active {
+    animation-name : slide_left;
+}
+
+#sidebar #right_part div.navitem.closed {
+    animation-name : slide_right;
+}
+
+@keyframes slide_left {
+    from { left : 240px; }
+    to   { left : 50px; }
+}
+
+@keyframes slide_right {
+    from { left : 50px; }
+    to   { left : 240px; }
+}
+
+#sidebar #right_part div.navitem {
+    background-color : #132737;
+    height           : 1500px;
+}
+
+#sidebar #right_part div.navitem div {
+
+    margin-left        : 20px;
+
+    opacity            : 1;
+
+    transition         : opacity @animation_duration @animation_timing !important;
+    -moz-transition    : opacity @animation_duration @animation_timing !important;
+    -webkit-transition : opacity @animation_duration @animation_timing !important;
+
+}
+
+#sidebar #right_part div.navitem div.head {
+    width: 170px;
+}
+
+#sidebar #right_part div.navitem .close_icon {
+    background-image : url('../images/icon_close.png');
+    background-repeat   : no-repeat;
+    background-position : center;
+    display : inline-block;
+    width   : 30px;
+    height  : 30px;
+    cursor  : pointer;
+}
+
+#sidebar #right_part div.navitem div.menu_element {
+
+    padding-top    : 10px;
+    padding-bottom : 10px;
+    color          : #B8B8B8;
+}
+
+#sidebar #right_part div.navitem div.menu_element:hover {
+    text-decoration  : none;
+    cursor           : pointer;
+    color            : white;
+}
+
+#sidebar #right_part div.navitem div.transition {
+    opacity: 0.3;
+    transition         : opacity @animation_duration @animation_timing !important;
+    -moz-transition    : opacity @animation_duration @animation_timing !important;
+    -webkit-transition : opacity @animation_duration @animation_timing !important;
+}
+
+#sidebar #right_part .navitem div a {
+    font-size   : 14px !important;
+}
+
+#sidebar #right_part .description span {
+    display     : block;
+    font-size   : 12px;
+    color       : #B8B8B8;
+}
+
+/************************** APPS *************************/
+
+#app_info {
+    position : relative;
+    top      : 50px;
+    width    : 240px;
+    display  : none;
+    z-index  : 600;
+}
+
+#app_info .search {
+    position : relative;
+    top      : -48px;
+    z-index  : 400;
+    left     : 2px;
+    font-size : 16px !important;
+}
+
+#app_info .search .search_icon {
+
+    position : absolute;
+    top      : 18px;
+    left     : 15px;
+    height   : 14px;
+    width    : 14px;
+
+    background-image    : url('../images/search_icon.png');
+    background-repeat   : no-repeat;
+    background-position : center;
+
+}
+
+#app_info .search input {
+    height : 50px;
+    width  : 200px;
+    background-color : #1EB65D;
+    color          : white;
+    border         : 0px;
+    padding        : 0 0 0 40px;
+    font-family    : Lato-Light;
+    color          : #B8B8B8;
+    letter-spacing : 0.4px;
+    font-size: 18px !important;
+}
+
+#app_info .app_list {
+    position : relative;
+    top      : -46px;
+    left     : 1px;
+}
+
+#app_info div {
+    cursor : pointer;
+}
+
+#app_info .transparent {
+    position : absolute;
+    top      : -50px;
+    left     : 0px;
+    width    : 240px;
+}
+
+#app_info .transparent div {
+    background-color : #f5f5f5;
+    display          : none;
+    height           : 50px;
+}
+
+#app_info .app_list div {
+    display          : none;
+    background-color : #19CC63;
+    height           : 50px;
+    margin-bottom    : 1px;
+    width            : 240px;
+}
+
+#app_info .app_list div.search_result {
+    display : block;
+}
+
+#app_info .app_list div:hover {
+    /*background-color : #00BD4E;*/
+    /*font-weight : bold !important;
+    font-size   : 15px;*/
+}
+
+/* todo: change to "sign" */
+#app_info div span {
+    display       : inline-block;
+    padding-left  : 10px;
+    margin-bottom : 10px;
+    color         : white;
+    font-weight   : bold;
+    font-size     : 14px;
+    position      : relative;
+  	transform     : translateY(-50%);
+}
+
+#app_info .app_list img {
+    position : relative;
+    top      : 5px;
+    left     : 5px;
+    width    : 40px;
+    height   : 40px;
+}
+
+#app_info .app_list .cover {
+    height   : 50px;
+    position : relative;
+    left     : -1px;
+    margin-bottom: 0px;
+}
+
+#sidebar #countly_logo_side {
+    position : absolute;
+    bottom   : 0px;
+    left     : 0px;
+    height   : 50px;
+    width    : 240px;
+    background-color: #273743;
+    z-index  : 700;
+}
+
+#sidebar #countly_logo {
+    position : absolute;
+    bottom   : 10px;
+    left     : 10px;
+    background-image : url('../images/countly_logo.png') !important;
+    width    : 100px;
+    height   : 30px;
+    z-index  : 701;
+}
+
+#right_part_back {
+    position : absolute;
+    top      : 60px;
+    left     : 240px;
+    width    : 500px;
+    height   : 1500px;
+    background-color: #f5f5f5;
+    z-index  : 300;
+}
