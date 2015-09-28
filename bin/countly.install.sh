@@ -88,6 +88,12 @@ fi
 #install plugins
 bash $DIR/scripts/countly.install.plugins.sh
 
+#install less
+npm install -g less
+
+#compile less
+lessc $DIR/../frontend/express/public/stylesheets/ui.v2.less $DIR/../frontend/express/public/stylesheets/ui.v2.css
+
 #compile scripts for production
 cd $DIR && grunt dist-all
 
