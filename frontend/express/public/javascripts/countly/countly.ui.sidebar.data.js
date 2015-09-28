@@ -1,33 +1,74 @@
 var navigation = [
     {
-        key         : 'Metrics',
-        icon        : 'app2',
+        key         : 'User profiles',
+        icon        : 'user',
         description : 'Metrics offer you a wide overwiew about your apps performance',
-        items       : ["App versions1", "Carriers1", "Sessions1", "Countries1", "Users1", "Devices1", "Resolutions1", "Browsers1", "Settings1"]
+        items       : [
+                        ["Countries",   "/analytics/countries"],
+                        ["Loyalty",     "/analytics/loyalty"],
+                        ["Devices",     "/analytics/devices"],
+                        ["Platforms",   "/analytics/platforms"],
+                        ["Versions",    "/analytics/versions"],
+                        ["Carriers",    "/analytics/carriers"],
+                        ["Frequency",   "/analytics/frequency"],
+                        ["Events",      "/analytics/events"],
+                        ["Resolutions", "/analytics/resolutions"],
+                        ["Durations",   "/analytics/durations"],
+                      ]
     },
     {
-        key: 'User profiles',
-        icon        : 'app2',
+        key         : 'Metrics',
+        icon        : 'metrics',
         description : 'User profiles offer you a wide overwiew about your User profiles',
-        items       : ["Carriers2", "Users2", "Resolutions2", "App versions2",  "Platforms2", "Languages2", "Settings2", "Browsers2"]
+        items       : [
+                        ["Sessions",     "/analytics/sessions"],
+                        ["Devices2",     "/analytics/devices"],
+                        ["Versions2",    "/analytics/versions"],
+                        ["Carriers2",    "/analytics/carriers"],
+                        ["Events2",      "/analytics/events"],
+                        ["Durations2",   "/analytics/durations"],
+                      ]
     },
     {
-        key: 'Management',
-        icon        : 'app2',
+        key: 'Messaging',
+        icon        : 'messaging',
         description : 'Management offer you a wide overwiew about your apps Management',
-        items       : ["Users3", "Countries3", "Resolutions3", "Devices3", "Sessions3"]
+        items       : [
+                        ["Versions3",    "/analytics/versions"],
+                        ["Carriers3",    "/analytics/carriers"],
+                        ["Frequency3",   "/analytics/frequency"],
+                        ["Resolutions3", "/analytics/resolutions"],
+                        ["Durations3",   "/analytics/durations"],
+                      ]
     },
     {
         key: 'Funnels',
-        icon        : 'app2',
+        icon        : 'funnels',
         description : 'Funnels offer you a wide overwiew about Funnels',
-        items       : ["Countries4", "Users4", "App versions4", "Sessions4", "Devices4"]
+        items       : [
+                        ["Events4",      "/analytics/events"],
+                        ["Resolutions4", "/analytics/resolutions"],
+                        ["Durations4",   "/analytics/durations"],
+                        ["Loyalty4",     "/analytics/loyalty"],
+                        ["Devices4",     "/analytics/devices"],
+                        ["Platforms4",   "/analytics/platforms"],
+                      ]
     },
     {
         key: 'Crashes',
-        icon        : 'app2',
+        icon        : 'crashes',
         description : 'Crashes offer you a wide overwiew about your apps Crashes',
-        items       : ["Devices5", "Users5", "Sessions5", "Countries5"]
+        items       : [
+                        ["Loyalty5",     "/analytics/loyalty"],
+                        ["Devices5",     "/analytics/devices"],
+                        ["Platforms5",   "/analytics/platforms"],
+                        ["Versions5",    "/analytics/versions"],
+                        ["Carriers5",    "/analytics/carriers"],
+                        ["Frequency5",   "/analytics/frequency"],
+                        ["Events5",      "/analytics/events"],
+                        ["Resolutions5", "/analytics/resolutions"],
+                        ["Durations5",   "/analytics/durations"],
+                      ]
     }
 ];
 

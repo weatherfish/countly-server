@@ -9,7 +9,7 @@ var LeftPart = React.createClass({
     },
 
     handleClick: function(i) {
-
+        
         this.setState({
             selected : i,
         });
@@ -19,11 +19,15 @@ var LeftPart = React.createClass({
 
     componentDidUpdate: function() {
 
+        // todo: remove jquery
+
+        $(".item_wrap").unbind('mouseenter mouseleave');
+
         $(".item_wrap.hoverable").hover( function (elem) {
             $(elem.currentTarget).children(".menu_sign").css('font-family', "Lato-Regular");
         }, function (elem) {
             $(elem.currentTarget).children(".menu_sign").css('font-family', "Lato-Light");
-        });      
+        });
     },
 
     render : function() {
@@ -81,6 +85,10 @@ var LeftPart = React.createClass({
         if (selected < 0)
         {
             dashboard_sign_class += " selected";
+        }
+        else
+        {
+            dashboard_sign_class += " hoverable";
         }
 
         return (

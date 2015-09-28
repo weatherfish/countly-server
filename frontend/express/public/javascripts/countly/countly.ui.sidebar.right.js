@@ -9,10 +9,9 @@ var RightPart = React.createClass({
     },
 
     /*
-        change menu items animation
+        change right side items animation
         call when transition is finished
     */
-
     transitionEnd: function (event){
 
         if (event.propertyName != "opacity")
@@ -31,20 +30,20 @@ var RightPart = React.createClass({
             return this.props.handle_changed();
         }
 
-        activeEl = document.getElementsByClassName('transition');
+        var active_elements = document.getElementsByClassName('item_transition');
 
-        if (activeEl.length > 0)
+        if (active_elements.length > 0)
         {
+            transitionEvent = this.whichTransitionEvent(active_elements[0]);
 
-            console.log("active elem:", activeEl.length);
-
-            transitionEvent = this.whichTransitionEvent(activeEl[0]);
+            /*
+                need to change menu items style for change opacity
+            */
 
             if(transitionEvent){
-                activeEl[0].addEventListener(transitionEvent, this.transitionEnd);
+                active_elements[0].addEventListener(transitionEvent, this.transitionEnd);
             }
         }
-
     },
 
     render: function() {
@@ -61,10 +60,10 @@ var RightPart = React.createClass({
 
             if (this.props.transition)
             {
-                head_class_name += " transition";
+                head_class_name += " transition_head";
             }
 
-            var head_node = <div key={this.props.nav_key} className={head_class_name}>
+            var head_node = <div key="head_item" className={head_class_name}>
                                 <span className="sign">{this.props.nav_key}</span>
                                 <span className="close_icon" onClick={this.props.handleClose}></span>
                             </div>
@@ -72,24 +71,19 @@ var RightPart = React.createClass({
 
         if (this.props.navigation)
         {
-
             if (this.props.transition)
             {
-                items_class_name += " transition";
+                items_class_name += " item_transition";
             }
-            else
-            {
-                items_class_name += " finish_transition";
-            }
-
-            // <div key={nav_item} className={items_class_name}> todo !
 
             var nav_nodes = this.props.navigation.map(function (nav_item, i) {
 
+                var action_path = "#" + nav_item[1];
+
                 return (
-                    <div className={items_class_name}>
-                        <a className="item">
-                            {nav_item}
+                    <div key={nav_item[0]} className={items_class_name}>
+                        <a href={action_path} className="item">
+                            {nav_item[0]}
                         </a>
                     </div>
                 );
@@ -106,11 +100,19 @@ var RightPart = React.createClass({
             class_name += " transition";
         }
 
+        var screen_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+        var description_bottom = ((1500 - screen_height) + 60 + 40 + 50) + "px";
+
+        var description_style = {
+            bottom : description_bottom
+        };
+
         return (
-            <div className={class_name} ref="test">
+            <div className={class_name}>
                 {head_node}
                 {nav_nodes}
-                <div className="description"><span>{this.props.description}</span></div>
+                <div style={description_style} className="description"><span>{this.props.description}</span></div>
             </div>
         );
     },

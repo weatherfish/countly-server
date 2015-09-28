@@ -1,7 +1,6 @@
 /** @jsx React.DOM */
 
-/* icons preload */
-
+/* icons pre-load */
 applications.forEach(function(app){
     var icon_src = "./images/" + app.icon;
     $(new Image()).attr('src', icon_src).load(function() { });
@@ -14,13 +13,16 @@ var FullSidebar = React.createClass({
             selected_left : -1,
             in_transition : false,
             right_closed  : true,
-            previous_left : -1
+            previous_left : -1,
+            top_active    : false
         };
     },
 
     handle_top_click : function()
     {
-        console.log("top click");
+        this.setState({
+            top_active : !this.state.top_active
+        });
     },
 
     /*
@@ -33,6 +35,11 @@ var FullSidebar = React.createClass({
         if (this.state.selected_left == i) // already selected element
         {
             return true;
+        }
+
+        if (i == -1)
+        {
+            return this.handle_right_close();
         }
 
         if (this.state.selected_left == -1)
@@ -61,6 +68,9 @@ var FullSidebar = React.createClass({
     {
         if (this.state.right_change_i != -1) // second stage of transition - old hidden, new not shown yet
         {
+
+            console.log("second stage:", this.state.right_change_i);
+
             this.setState({
                 selected_left  : this.state.right_change_i,
                 in_transition  : true,
@@ -70,10 +80,16 @@ var FullSidebar = React.createClass({
         }
         else // finish animation
         {
-            this.setState({
-                in_transition  : false,
-                right_change   : false,
-            });
+            console.log("finish st 2:");
+
+            var self = this;
+
+            setTimeout(function(){ // hack - need to change items class name for change opacity from 0(or bigger, doesn't matter) to 1, on new elements immediately after insert to DOM. But function componentDidUpdate call early then in insert to DOM i think.
+                self.setState({
+                    in_transition  : false,
+                    right_change   : false,
+                });
+            }, 10);
         }
     },
 
@@ -140,7 +156,7 @@ var FullSidebar = React.createClass({
 
                 <SidebarTop onClick={this.handle_top_click}/>
 
-                <div id="app_info"></div>
+                <ApplicationsList active={this.state.top_active}/>
 
                 <div id="left_part">
                     <LeftPart navigation={full_navigation} selected_i={this.state.selected_left} is_active={is_left_active} in_transition={this.state.in_transition} handleClick={this.handle_left_click}/>
@@ -159,7 +175,11 @@ var FullSidebar = React.createClass({
     }
 });
 
-React.render(
-    <FullSidebar navigation={navigation} />,
-    document.getElementById("sidebar")
-);
+$(new Image()).attr('src', './images/icon2_active.png').load(function() {
+
+    React.render(
+        <FullSidebar navigation={navigation} />,
+        document.getElementById("sidebar")
+    );
+
+});

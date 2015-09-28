@@ -35,20 +35,18 @@ var AppList = React.createClass({
             }
             else if (self.props.app_filter_text != "")
             {
-                var class_name = "search_result";
+                var class_name = "app search_result";
             }
             else if (self.props.app_filter_text === false)
             {
-                var class_name = "";
+                var class_name = "app ";
             }
             else
             {
-                var class_name = "search_result";
+                var class_name = "app search_result";
             }
 
             var icon_src = "./images/" + app.icon;
-
-            console.log("icon_src:", icon_src);
 
             return (
                 <div className={class_name}>
@@ -57,36 +55,16 @@ var AppList = React.createClass({
                 </div>
             );
         });
-
+/*
         var covers = Array.apply(null, Array(10)).map(function (x, i) {
             return (
                 <div className="cover"></div>
             );
         })
-
+*/
         return (
             <div className="app_list">
                 {app_list}
-                {covers}
-            </div>
-        );
-    }
-});
-
-var SidebarTransparent = React.createClass({
-
-    render: function() {
-
-        var transparent = this.props.applications.map(function (app, i) {
-            return (<div></div>);
-        });
-
-        return (
-            <div className="transparent">
-                {transparent}
-                <div></div>
-                <div></div>
-                <div></div>
             </div>
         );
     }
@@ -96,7 +74,9 @@ var ApplicationsList = React.createClass({
 
     getInitialState: function() {
         return {
-            app_filter_text : false
+            app_filter_text : false,
+            active         : false,
+            showen          : 0
         };
     },
     app_filter: function(filter) {
@@ -105,13 +85,63 @@ var ApplicationsList = React.createClass({
             app_filter_text : filter
         });
     },
+
+    componentDidMount : function()
+    {
+
+        // todo: one time:
+        var screen_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+        var list_height = (screen_height - 60 - 50) + "px";
+
+        document.getElementById('app_info').style.height = list_height;
+
+        var initial_top = 'translate3d(0,-' + ((screen_height - 60 - 50 - 60)) + 'px,0)';
+
+        document.getElementById('app_info').style.webkitTransform = initial_top;
+        document.getElementById('app_info').style.MozTransform    = initial_top;
+        document.getElementById('app_info').style.msTransform     = initial_top;
+        document.getElementById('app_info').style.OTransform      = initial_top;
+        document.getElementById('app_info').style.transform       = initial_top;
+    },
+
+    componentDidUpdate: function() {
+
+        if (this.props.active && !this.state.active && this.state.showen == 0)
+        {
+            this.setState({
+                active : true,
+                showen  : 1
+            });
+        }
+    },
+
     render: function() {
+
+        var class_name = "";
+
+        if (this.state.active && this.props.active)
+        {
+            class_name += " active";
+        }
+
+/*
+        var inline_style = {
+            height : list_height
+        };
+*/
         return (
-            <div className="wrapper">
+            <div id="app_info" className={class_name}>
                 <AppListSearch app_filter={this.app_filter}/>
-                <SidebarTransparent applications={applications}/>
                 <AppList applications={applications} app_filter_text={this.state.app_filter_text}/>
             </div>
         );
+
+        /*return (
+            <div id="app_info" className={class_name}>
+                <AppListSearch app_filter={this.app_filter}/>
+                <AppList applications={applications} app_filter_text={this.state.app_filter_text}/>
+            </div>
+        );*/
     }
 });
