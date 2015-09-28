@@ -1,5 +1,6 @@
 (function (countlyCity, $, undefined) {
 
+
     // Private Properties
     var _periodObj = {},
         _locationsDb = {},
@@ -7,17 +8,21 @@
         _cities = [],
         _chart,
         _dataTable,
+        _chartElementContainer = ".widget-content",
         _chartElementId = "geo-chart",
         _chartOptions = {
-            displayMode:'markers',
-            colorAxis:{minValue:0, colors:['#D7F1D8', '#6BB96E']},
-            resolution:'countries',
-            toolTip:{textStyle:{color:'#FF0000'}, showColorCode:false},
-            legend:"none",
-            backgroundColor:"transparent",
-            datalessRegionColor:"#FFF",
-            region:"TR"
+            borderWidth: 1,
+            borderColor: '#444',
+            popupOnHover: true, //disable the popup while hovering
+            highlightOnHover: true,
+            highlightFillColor: '#ddd',
+            highlightBorderColor: '#444',
+            highlightBorderWidth: 2
         },
+        _defaultFill = "#E6EFF2",
+        _bubblesFill = "#024873",
+        _datamap     = false,
+        _countryMap  = {},
         _initialized = false,
         _period = null;
 
@@ -116,10 +121,52 @@
                 }
             }
 
-            if (google.visualization) {
-                draw(options.metric);
-            } else {
-                google.load('visualization', '1', {'packages':['geochart'], callback:draw});
+            if (options.countryIso3)
+            {
+                return $.ajax({
+                    type:"GET",
+                    url:countlyCommon.API_PARTS.data.r,
+                    data:{
+                        "api_key" : countlyGlobal.member.api_key,
+                        "app_id"  : countlyCommon.ACTIVE_APP_ID,
+                        "method"  : "country_latlon",
+                        "iso3"    : options.countryIso3
+                    },
+                    dataType:"jsonp",
+                    success:function (json) {
+
+                        /*
+                            Get country size for calculate scale
+                        */
+
+                        var lat_size = json.location_box.max_lat - json.location_box.min_lat;
+                        var lon_size = json.location_box.max_lon - json.location_box.min_lon;
+
+                        if (lat_size > lon_size)
+                        {
+                            var max_latlon_size = lat_size;
+                        }
+                        else
+                        {
+                            var max_latlon_size = lon_size;
+                        }
+
+                        var zoomParams = {
+                            "lat"  : json.lon,
+                            "lon"  : json.lat,
+                            "size" : parseInt(json.size),
+                            "max_latlon_size" : max_latlon_size
+                        }
+
+                        draw(options.metric, zoomParams);
+
+                    }
+                });
+            }
+            else
+            {
+                console.log("error");
+                return false;
             }
         };
 
@@ -169,11 +216,30 @@
     };
 
     //Private Methods
-    function draw(ob) {
-        ob = ob || {id:'total', label:jQuery.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
-        var chartData = {cols:[], rows:[]};
 
-        _chart = new google.visualization.GeoChart(document.getElementById(_chartElementId));
+    _chartOptions.popupTemplate = function(geography, data) {
+
+        var string = '<div class="hoverinfo"><strong>return to world map</strong></div>';
+
+        return string;
+    }
+
+    function popupTemplate(geo, data) {
+
+        var cityName = data.name.charAt(0).toUpperCase() + data.name.slice(1);
+
+        var html = "<div class='hoverinfo'>";
+        html += "<div><b>city: " + cityName + "</b></div>";
+        html += "<div>metric: " + data.metric + "</div>lat:" + data.latitude + ", long:" + data.longitude;
+        html += "</div>";
+
+        return html;
+    }
+
+    function formatData(ob){
+
+        ob = ob || {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
+        var chartData = {cols:[], rows:[]};
 
         var tt = countlyCommon.extractTwoLevelData(_locationsDb, _cities, countlyCity.clearLocationObject, [
             {
@@ -191,33 +257,145 @@
             {id:'city', label:"City", type:'string'}
         ];
         chartData.cols.push(ob);
+
+        var maxMetric = 0;
+
         chartData.rows = _.map(tt.chartData, function (value, key, list) {
             if (value.city == "Unknown") {
-                return {c:[
-                    {v:""},
-                    {v:value[ob.metric]}
-                ]};
+                return {};
             }
-            return {c:[
-                {v:value.city},
-                {v:value[ob.metric]}
-            ]};
+
+            if (value[ob.metric] > maxMetric)
+            {
+                maxMetric = value[ob.metric];
+            }
+
+            return {
+                city   : value.city,
+                metric : value[ob.metric]
+            };
         });
 
-        _dataTable = new google.visualization.DataTable(chartData);
+        var linear = d3.scale.linear()
+            .domain([0, maxMetric])
+            .range([5, 20]);
 
-        if (countlyGlobal['apps'][countlyCommon.ACTIVE_APP_ID].country) {
-            _chartOptions['region'] = countlyGlobal['apps'][countlyCommon.ACTIVE_APP_ID].country;
+        var cityPoints = [];
+
+        chartData.rows.forEach(function(cityChartData){
+
+            if (!cityChartData.city)
+            {
+                return false;
+            }
+
+            var cityName   = cityChartData.city.toLowerCase();
+            var coordsData = _locationsDb.citiesData[cityName];
+
+            if (!coordsData)
+            {
+                return false;
+            }
+
+            var linearMetric = parseInt(linear(cityChartData.metric));
+
+            if (!coordsData.lat || !coordsData.lon)
+            {
+                return false;
+            }
+
+            cityPoints.push({
+                name      : cityName,
+                metric    : cityChartData.metric,
+                radius    : linearMetric,
+                fillKey   : 'bubble',
+                latitude  : parseFloat(coordsData.lat),
+                longitude : parseFloat(coordsData.lon)
+            });
+        });
+
+        return cityPoints;
+
+    };
+
+    function draw(ob, zoomParams) {
+
+        if (!zoomParams || !zoomParams.size)
+        {
+            /* todo */
+            countlyLocation.drawGeoChart(false);
+            store.set("countly_location_city", false);
+            return false;
         }
 
-        _chartOptions['resolution'] = 'countries';
-        _chartOptions["displayMode"] = "markers";
+        $("#" + _chartElementId).empty();
 
-        _chart.draw(_dataTable, _chartOptions);
+        var cityPoints = formatData(ob);
+
+        /*
+          create map
+        */
+
+        var containerHeigth = d3.select(_chartElementContainer).node().getBoundingClientRect().height;
+        var containerWidth  = d3.select(_chartElementContainer).node().getBoundingClientRect().width;
+
+        var mapHeight = containerHeigth - 50;
+        var mapWidth  = mapHeight * 1.48;
+
+        $("#" + _chartElementId).css("margin-left", containerWidth/2 * -1); // center the map element
+        $("#" + _chartElementId).css("margin-top", 10);
+
+        var colors = d3.scale.category10();
+
+        //var scale = 1000 - (zoomParams.size * 0.00005);
+        var scale = parseInt(700 - zoomParams.max_latlon_size);
+
+        console.log("country scale:", scale);
+
+        _datamap = new Datamap({
+            element    : document.getElementById(_chartElementId),
+            height     : mapHeight,
+            width      : mapWidth,
+            setProjection: function(element) {
+
+                var projection = d3.geo.mercator()
+                        .center([zoomParams.lat + 25, zoomParams.lon])
+                        /*.rotate([0, -8])*/
+                        .scale(scale)
+                        .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+
+                var path = d3.geo
+                            .path()
+                            .projection(projection);
+
+                return {
+                          "path"       : path,
+                          "projection" : projection
+                       };
+            },
+            fills: {
+                "defaultFill" : _defaultFill,
+                "bubble"      : _bubblesFill,
+            },
+            geographyConfig: _chartOptions,
+        });
+
+        _datamap.bubbles(cityPoints, { "popupTemplate" : popupTemplate });
+
+        _datamap.svg.selectAll('path').on('click', function(elem) {
+            countlyLocation.drawGeoChart(false);
+            store.set("countly_location_city", false);
+            return true;
+        });
+
+        return true;
     }
 
     function reDraw(ob) {
-        ob = ob || {id:'total', label:jQuery.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
+
+        return true;
+
+        ob = ob || {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
         var chartData = {cols:[], rows:[]};
 
         var tt = countlyCommon.extractTwoLevelData(_locationsDb, _cities, countlyCity.clearLocationObject, [
@@ -261,4 +439,4 @@
         }
     }
 
-}(window.countlyCity = window.countlyCity || {}, jQuery));
+}(window.countlyCity = window.countlyCity || {}, $));

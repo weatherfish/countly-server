@@ -6,22 +6,28 @@
         _countries = [],
         _chart,
         _dataTable,
+        _chartElementContainer = ".widget-content",
         _chartElementId = "geo-chart",
+        _activeContainer = false,
         _chartOptions = {
-            displayMode:'region',
-            colorAxis:{minValue:0, colors:['#D7F1D8', '#6BB96E']},
-            resolution:'countries',
-            toolTip:{textStyle:{color:'#FF0000'}, showColorCode:false},
-            legend:"none",
-            backgroundColor:"transparent",
-            datalessRegionColor:"#FFF"
+            borderWidth: 1,
+            borderColor: '#555',
+            popupOnHover: true,
+            highlightOnHover: true,
+            highlightFillColor: "#024873",
+            highlightBorderColor: '#222',
+            highlightBorderWidth: 1
         },
-        _countryMap = {};
+        _defaultFill = "#fff", // fill for countries with empty metrics
+        _basicFill   = "#E6EFF2", // basic fill for countries with non empty metrics
+        _datamap     = false,
+        _countryMap  = {};
 
     // Load local country names
     $.get('localization/countries/' + countlyCommon.BROWSER_LANG_SHORT + '/country.json', function (data) {
         _countryMap = data;
     });
+
 
     // Public Methods
     countlyLocation.initialize = function () {
@@ -56,19 +62,11 @@
             }
         }
 
-        if (google.visualization) {
-            draw(options.metric);
-        } else {
-            google.load('visualization', '1', {'packages':['geochart'], callback:draw});
-        }
+        draw(options.metric);
     };
 
     countlyLocation.refreshGeoChart = function (metric) {
-        if (google.visualization) {
-            reDraw(metric);
-        } else {
-            google.load('visualization', '1', {'packages':['geochart'], callback:draw});
-        }
+        reDraw(metric);
     };
 
     countlyLocation.getLocationData = function (options) {
@@ -122,11 +120,23 @@
     };
 
     countlyLocation.getCountryName = function (cc) {
+
         var countryName = _countryMap[cc.toUpperCase()];
 
         if (countryName) {
             return countryName;
         } else {
+            return "Unknown";
+        }
+    };
+
+    countlyLocation.getCountryCode = function (cc) {
+
+        if (iso3_country_codes[cc]){
+            return iso3_country_codes[cc];
+        }
+        else
+        {
             return "Unknown";
         }
     };
@@ -138,12 +148,53 @@
         });
     };
 
-    //Private Methods
-    function draw(ob) {
-        ob = ob || {id:'total', label:jQuery.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
-        var chartData = {cols:[], rows:[]};
+    _chartOptions.popupTemplate = function(geography, data) {
 
-        _chart = new google.visualization.GeoChart(document.getElementById(_chartElementId));
+        if (data)
+        {
+            var string = '<div class="hoverinfo"><strong>' + geography.properties.name + " : " + data.numberOfThings + '</strong></div>';
+        }
+        else
+        {
+            var string = '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong></div>';
+        }
+
+        return string;
+    }
+
+    //Private Methods
+
+    /*
+       finds the element in which is loaded the map and returns the size
+    */
+    function getContainerSize()
+    {
+
+        if ($(".map-list")[0])
+        {
+            var containerHeigth = d3.select(".map-list").node().getBoundingClientRect().height;
+            var containerWidth  = d3.select(".map-list").node().getBoundingClientRect().width;
+            _activeContainer = ".map-list";
+        }
+        else
+        {
+            var containerHeigth = d3.select(_chartElementContainer).node().getBoundingClientRect().height;
+            var containerWidth  = d3.select(_chartElementContainer).node().getBoundingClientRect().width;
+            _activeContainer = _chartElementContainer;
+        }
+
+        var container_size = {
+            "width"  : containerWidth,
+            "heigth" : containerHeigth
+        }
+
+        return container_size;
+    }
+
+    function formatData(ob){
+
+        ob = ob || {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
+        var chartData = {cols:[], rows:[]};
 
         var tt = countlyCommon.extractTwoLevelData(_locationsDb, _countries, countlyLocation.clearLocationObject, [
             {
@@ -152,87 +203,159 @@
                     return countlyLocation.getCountryName(rangeArr);
                 }
             },
+            {
+                "name":"code",
+                "func":function (rangeArr, dataObj) {
+                    return countlyLocation.getCountryCode(rangeArr);
+                }
+            },
             { "name":"t" },
             { "name":"u" },
             { "name":"n" }
         ]);
 
         chartData.cols = [
-            {id:'country', label:jQuery.i18n.map["countries.table.country"], type:'string'}
+            {id:'country', label:$.i18n.map["countries.table.country"], type:'string'}
         ];
         chartData.cols.push(ob);
+
+        var maxMetric = 0;
+
         chartData.rows = _.map(tt.chartData, function (value, key, list) {
-            if (value.country == "European Union" || value.country == "Unknown") {
-                return {c:[
-                    {v:""},
-                    {v:value[ob.metric]}
-                ]};
+
+            if (value.country == "European Union" || value.country == "Unknown" || value.code == "Unknown") {
+                return {
+                    /* todo */
+                };
             }
-            return {c:[
-                {v:value.country},
-                {v:value[ob.metric]}
-            ]};
+
+            if (value[ob.metric] > maxMetric)
+            {
+                maxMetric = value[ob.metric];
+            }
+
+            return {
+                code    : value.code,
+                country : value.country,
+                metric  : value[ob.metric]
+            };
         });
 
-        _dataTable = new google.visualization.DataTable(chartData);
+        var linear = d3.scale.linear()
+          .domain([0, maxMetric])
+          .range([0, 1]);
 
-        _chartOptions['region'] = "world";
-        _chartOptions['resolution'] = 'countries';
-        _chartOptions["displayMode"] = "region";
+        var countryData = { };
 
-        // This is how you handle regionClick and change zoom for only a specific country
+        for (var i = 0; i < chartData.rows.length; i++)
+        {
+            var country = chartData.rows[i]["code"];
+            var metric  = chartData.rows[i]["metric"];
+            var linearMetric = (linear(metric) * 0.6).toFixed(1).toString();
 
-        if (countlyCommon.CITY_DATA !== false && _chartOptions.height > 300) {
-            google.visualization.events.addListener(_chart, 'regionClick', function (eventData) {
-                var activeAppCountry = countlyGlobal['apps'][countlyCommon.ACTIVE_APP_ID].country;
-                if (activeAppCountry && eventData.region == activeAppCountry) {
-                    _chartOptions['region'] = eventData.region;
-                    _chartOptions['resolution'] = 'countries';
-                    _chart.draw(_dataTable, _chartOptions);
-
-                    $(document).trigger('selectMapCountry');
+            if (country == "CHN")
+            {
+                countryData[country] = {
+                    "fillKey"        : 'increase',
+                    "numberOfThings" : metric
                 }
-            });
+            }
+            else if (country == "AUS")
+            {
+                countryData[country] = {
+                    "fillKey"        : 'decrease',
+                    "numberOfThings" : metric
+                }
+            }
+            else
+            {
+                countryData[country] = {
+                    "fillKey"        : linearMetric,
+                    "numberOfThings" : metric
+                }
+            }
         }
 
-        _chart.draw(_dataTable, _chartOptions);
+        return countryData;
+    }
+
+    function draw(ob) {
+
+        $("#" + _chartElementId).empty();
+
+        var countryData = formatData(ob);
+
+        var countryFills = {
+            defaultFill : _defaultFill,
+            increase    : 'url(#increase)',
+            decrease    : 'url(#decrease)'
+        }
+
+        /*
+          create 10 gradations of brightness
+        */
+
+        for (var i = 0; i < 1; i+=0.1)
+        {
+            countryFills[i.toFixed(1).toString()] = colorLuminance(_basicFill, i * (-1)); // .toFixed(1) because Javascript have some problem with float: http://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
+        }
+
+        /*
+          create map
+        */
+
+        var containerSize = getContainerSize();
+
+        var mapHeight = containerSize.heigth - 50;
+        var mapWidth  = mapHeight * 1.48;
+
+        $("#" + _chartElementId).css("margin-left", containerSize.width/2 * -1); // center the map element
+        $("#" + _chartElementId).css("margin-top", 10);
+
+        _datamap = new Datamap({
+            element    : document.getElementById(_chartElementId),
+            height     : mapHeight,
+            width      : mapWidth,
+            projection : 'mercator',
+            fills      : countryFills,
+            geographyConfig: _chartOptions,
+            data       : countryData
+        });
+
+        _datamap.svg.selectAll('path').on('click', function(elem) {
+
+            if (_activeContainer != _chartElementContainer)
+            {
+                return false;
+            }
+
+            var countryIso = elem.id;
+
+            countlyCity.drawGeoChart({
+                height        : 450,
+                "countryIso3" : countryIso
+            });
+
+            store.set("countly_location_city", true);
+
+        });
+
+        return true;
     }
 
     function reDraw(ob) {
-        ob = ob || {id:'total', label:jQuery.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
-        var chartData = {cols:[], rows:[]};
 
-        var tt = countlyCommon.extractTwoLevelData(_locationsDb, _countries, countlyLocation.clearLocationObject, [
-            {
-                "name":"country",
-                "func":function (rangeArr, dataObj) {
-                    return countlyLocation.getCountryName(rangeArr);
-                }
-            },
-            { "name":"t" },
-            { "name":"u" },
-            { "name":"n" }
-        ]);
+        if (!_datamap)
+        {
+            /* todo */
+            return false;
+        }
 
-        chartData.cols = [
-            {id:'country', label:jQuery.i18n.map["countries.table.country"], type:'string'}
-        ];
-        chartData.cols.push(ob);
-        chartData.rows = _.map(tt.chartData, function (value, key, list) {
-            if (value.country == "European Union" || value.country == "Unknown") {
-                return {c:[
-                    {v:""},
-                    {v:value[ob.metric]}
-                ]};
-            }
-            return {c:[
-                {v:value.country},
-                {v:value[ob.metric]}
-            ]};
-        });
+        var countryData = formatData(ob);
 
-        _dataTable = new google.visualization.DataTable(chartData);
-        _chart.draw(_dataTable, _chartOptions);
+        _datamap.updateChoropleth(countryData);
+
+        return true;
     }
 
     function setMeta() {
@@ -249,4 +372,26 @@
         }
     }
 
-}(window.countlyLocation = window.countlyLocation || {}, jQuery));
+    function colorLuminance(hex, lum) {
+
+        // validate hex string
+        hex = String(hex).replace(/[^0-9a-f]/gi, '');
+
+    	  if (hex.length < 6) {
+    		    hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    	  }
+
+      	lum = lum || 0;
+
+      	// convert to decimal and change luminosity
+      	var rgb = "#", c, i;
+      	for (i = 0; i < 3; i++) {
+      		  c = parseInt(hex.substr(i*2,2), 16);
+      		  c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+      		  rgb += ("00"+c).substr(c.length);
+      	}
+
+      	return rgb;
+    }
+
+}(window.countlyLocation = window.countlyLocation || {}, $));
