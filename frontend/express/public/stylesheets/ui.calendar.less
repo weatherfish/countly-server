@@ -10,9 +10,9 @@
 
 .transform(@string){
 		-webkit-transform : @string;
-		-moz-transform		: @string;
-		-ms-transform			: @string;
-		-o-transform			: @string;
+		-moz-transform    : @string;
+		-ms-transform     : @string;
+		-o-transform      : @string;
 }
 
 #calendar {
@@ -27,56 +27,50 @@
 }
 
 #calendar .date_sign {
-    border 				: 1px solid gray;
-    cursor 				: pointer;
-    border-radius : 3px;
-		height				: 30px;
-		line-height		: 30px;
+		border           : 1px solid gray;
+		cursor           : pointer;
+		border-radius    : 3px;
+		height           : 30px;
+		line-height      : 30px;
 		background-color : white;
 }
 
 #calendar .icon {
-		display  : inline-block;
-		position : relative;
-		top 		 : 4px;
+		display     : inline-block;
+		position    : relative;
+		top         : 4px;
 		margin-left : 10px;
-    width  : 20px;
-    height : 20px;
-    background-image    : url("../images/calendar_icon.png");
-    background-repeat   : no-repeat;
-    background-position : center;
+		width       : 20px;
+		height      : 20px;
+		background-image    : url("../images/calendar_icon.png");
+		background-repeat   : no-repeat;
+		background-position : center;
 }
 
 #calendar .sign {
-    margin-left : 10px;
+		margin-left : 10px;
 }
 
 #calendar .dates_list {
-    /*position : absolute;*/
-		position	: relative;
-    width    	: 150px;
-    background-color : @bg_color_3;
-		border-top 	 : 1px solid #2E3545;
-		border-right : 1px solid #2E3545;
-
-    opacity : 0;
-
+		/*position : absolute;*/
+		position         : relative;
+		width            : 150px;
+		background-color : @bg_color_3;
+		border-top       : 1px solid #2E3545;
+		border-right     : 1px solid #2E3545;
+		opacity          : 0;
 		border-top-left-radius  : 4px;
 		border-top-right-radius : 4px;
-
 		border-bottom-left-radius  : 4px;
 		border-bottom-right-radius : 4px;
-
 		.transform(translate3d(90px,17px,0));
-    .transition(all, 0.1s);
+		.transition(all, 0.1s);
 }
 
 #calendar .dates_list.active {
-
-    opacity : 1;
-
-    .transform(translate3d(90px,10px,0));
-    .transition(all, 0.1s);
+		opacity : 1;
+		.transform(translate3d(90px,10px,0));
+		.transition(all, 0.1s);
 }
 
 #calendar .dates_list.calendars_active {
@@ -86,34 +80,34 @@
 }
 
 #calendar .dates_list div.date_choice {
-    text-align   : left;
-    color        : white;
-    padding-left : 20px;
-    height 			 : 40px;
-		line-height  : 40px;
-    border-bottom : 1px solid #2E3545;
-    border-left   : 1px solid #2E3545;
-    cursor 			: pointer;
-		padding-top : 10px;
-		border-box  : border;
+		text-align    : left;
+		color         : white;
+		padding-left  : 20px;
+		height        : 40px;
+		line-height   : 40px;
+		border-bottom : 1px solid #2E3545;
+		border-left   : 1px solid #2E3545;
+		cursor        : pointer;
+		padding-top   : 10px;
+		border-box    : border;
 }
 
 #calendar .dates_list > .date_choice ~ .date_choice { /* exclude 1st element */
-    padding-top : 0px;
+		padding-top : 0px;
 }
 
 #calendar .dates_list div.custom_choice {
 
-    text-align  : left;
-    padding-top : 30px;
-    color 			: #19CC5D;
-		cursor 		  : pointer;
+		text-align  : left;
+		padding-top : 30px;
+		color       : #19CC5D;
+		cursor      : pointer;
 
-    padding-left 	 : 20px;
-    padding-bottom : 10px;
+		padding-left   : 20px;
+		padding-bottom : 10px;
 
-    border-bottom : 1px solid @border_color_1;
-    border-left		: 1px solid @border_color_1;
+		border-bottom : 1px solid @border_color_1;
+		border-left   : 1px solid @border_color_1;
 
 		border-bottom-left-radius  : 4px;
 		border-bottom-right-radius : 4px;
@@ -125,8 +119,8 @@
 }
 
 #calendar .wrapper {
-	border-bottom-left-radius  : 4px;
-	border-bottom-right-radius : 4px;
+		border-bottom-left-radius  : 4px;
+		border-bottom-right-radius : 4px;
 }
 
 #calendar .dates_list .top_arrow {
@@ -136,35 +130,35 @@
 		border-width : 0 7px 7px 7px;
 		border-color : transparent transparent @bg_color_3 transparent;
 		position : relative;
-		top 		 : -7px;
-		left 		 : 120px;
+		top      : -7px;
+		left     : 120px;
 }
 
 #calendar .calendars {
-    position : absolute;
-    top      : 42px;
-    left     : 241px;
-    width    : 385px;
-    height   : 281px;
-    background-color : @bg_color_4;
+		position : absolute;
+		top      : 42px;
+		left     : 241px;
+		width    : 385px;
+		height   : 281px;
+		background-color : @bg_color_4;
 
-    opacity : 0;
-    .transition(all, 0.2s);
+		opacity : 0;
+		.transition(all, 0.2s);
 
 		border-top-right-radius    : 4px;
 		border-bottom-right-radius : 4px;
 }
 
 #calendar .calendars.active {
-    opacity : 1;
-    .transition(all, 0.2s);
+		opacity : 1;
+		.transition(all, 0.2s);
 }
 
 #calendar .calendars > div.calendar_wrapper {
-    display  : inline-block;
+		display  : inline-block;
 		position : absolute;
-		top  : 20px;
-		left : 200px;
+		top      : 20px;
+		left     : 200px;
 }
 
 #calendar .calendars > div.calendar_wrapper:first-child {
@@ -172,24 +166,24 @@
 }
 
 #calendar .rw-calendar table {
-    table-layout	 : fixed !important;
+		table-layout   : fixed !important;
 		border-radius  : 2px;
-		margin-top 		 : 14px;
+		margin-top     : 14px;
 		border-spacing : 0px;
-		text-align 		 : center;
+		text-align     : center;
 		border-right   : 1px solid @border_color_1;
 		border-bottom  : 1px solid @border_color_1;
 }
 
 #calendar .rw-calendar table > tbody > tr > td {
-    border-left : 1px solid @border_color_1;
+		border-left : 1px solid @border_color_1;
 		border-top  : 1px solid @border_color_1;
 }
 
 #calendar .rw-calendar table > tbody > tr > td span {
 		display : block;
 		height  : 20px;
-    width   : 20px;
+		width   : 20px;
 		line-height : 20px;
 }
 
@@ -198,31 +192,31 @@
 }
 
 #calendar .rw-header .rw-btn-view {
-    background-color : #141821;
-    font-family			 : Lato-Regular;
-    color 					 : #ffffff;
+		background-color : #141821;
+		font-family      : Lato-Regular;
+		color            : #ffffff;
 }
 
 #calendar thead > tr > th {
-    color 			: white;
-    font-size 	: 10px;
-    font-family : Lato-Light;
+		color       : white;
+		font-size   : 10px;
+		font-family : Lato-Light;
 }
 
 #calendar .rw-btn {
-    color : #fff;
+		color : #fff;
 }
 
 #calendar .confirm_button {
-    border : 1px solid @bg_color_1;
-		width	 : 120px;
-		height : 35px;
+		border      : 1px solid @bg_color_1;
+		width	      : 120px;
+		height      : 35px;
 		line-height : 35px;
-    color 	 : @bg_color_1;
-		position : absolute;
-		bottom 	 : 20px;
-		right 	 : 20px;
-    cursor 	 : pointer;
-    border-radius : 6px;
-    text-align 		: center;
+		color				: @bg_color_1;
+		position		: absolute;
+		bottom			: 20px;
+		right       : 20px;
+		cursor      : pointer;
+		border-radius : 6px;
+		text-align    : center;
 }
