@@ -11,11 +11,11 @@
         _activeContainer = false,
         _chartOptions = {
             borderWidth: 1,
-            borderColor: '#555',
+            borderColor: '#888',
             popupOnHover: true,
             highlightOnHover: true,
             highlightFillColor: "#024873",
-            highlightBorderColor: '#222',
+            highlightBorderColor: '#aaa',
             highlightBorderWidth: 1
         },
         _defaultFill = "#fff", // fill for countries with empty metrics
@@ -311,6 +311,9 @@
 
         $("#" + _chartElementId).css("margin-left", containerSize.width/2 * -1); // center the map element
         $("#" + _chartElementId).css("margin-top", 10);
+
+        console.log("============== countryData ===================");
+        console.log(countryData);
 
         _datamap = new Datamap({
             element    : document.getElementById(_chartElementId),

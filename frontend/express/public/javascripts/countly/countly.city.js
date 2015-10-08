@@ -12,14 +12,14 @@
         _chartElementId = "geo-chart",
         _chartOptions = {
             borderWidth: 1,
-            borderColor: '#444',
+            borderColor: '#bbb',
             popupOnHover: true, //disable the popup while hovering
             highlightOnHover: true,
             highlightFillColor: '#ddd',
             highlightBorderColor: '#444',
             highlightBorderWidth: 2
         },
-        _defaultFill = "#E6EFF2",
+        _defaultFill = "#ddd", // "#E6EFF2",
         _bubblesFill = "#024873",
         _datamap     = false,
         _countryMap  = {},
@@ -139,6 +139,9 @@
                             Get country size for calculate scale
                         */
 
+                        console.log("====================== country data ========================");
+                        console.log(json);
+
                         var lat_size = json.location_box.max_lat - json.location_box.min_lat;
                         var lon_size = json.location_box.max_lon - json.location_box.min_lon;
 
@@ -152,10 +155,12 @@
                         }
 
                         var zoomParams = {
-                            "lat"  : json.lon,
-                            "lon"  : json.lat,
+                            "iso3" : json.iso3,
+                            "lat"  : json.lat,
+                            "lon"  : json.lon,
                             "size" : parseInt(json.size),
-                            "max_latlon_size" : max_latlon_size
+                            "max_latlon_size" : max_latlon_size,
+                            "location_box"    : json.location_box
                         }
 
                         draw(options.metric, zoomParams);
@@ -350,7 +355,18 @@
         //var scale = 1000 - (zoomParams.size * 0.00005);
         var scale = parseInt(700 - zoomParams.max_latlon_size);
 
+        console.log("zoomParams.max_latlon_size:", zoomParams.max_latlon_size);
+
         console.log("country scale:", scale);
+
+        console.log("++++++++++++++ zoom params +++++++++++++++++++");
+        console.log(zoomParams);
+
+        var map_data = { };
+
+        map_data[zoomParams.iso3] = {
+            "fillKey" : "selected"
+        }
 
         _datamap = new Datamap({
             element    : document.getElementById(_chartElementId),
@@ -358,11 +374,29 @@
             width      : mapWidth,
             setProjection: function(element) {
 
+                //zoomParams.lat = 35.86166000000006;
+                //zoomParams.lon = 104.19539650000004;
+                //zoomParams.lon += 20;
+                scale = 310;
+
+                var center_lat = parseFloat(zoomParams.lat.toFixed(3));
+                var center_lon = parseFloat(zoomParams.lon.toFixed(3));
+
+                console.log("translate:", element.offsetWidth / 2, " -- ", element.offsetHeight / 2);
+
+                var width_projection = (element.offsetHeight / 2) * 1.92;
+
+                console.log("center_lon:", center_lon);
+                console.log("center_lat:", center_lat);
+
+                center_lon += 55;
+
                 var projection = d3.geo.mercator()
-                        .center([zoomParams.lat + 25, zoomParams.lon])
+                        .center([center_lon, center_lat])
                         /*.rotate([0, -8])*/
                         .scale(scale)
                         .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+                        //.translate([mapWidth, mapHeight]);
 
                 var path = d3.geo
                             .path()
@@ -374,10 +408,12 @@
                        };
             },
             fills: {
-                "defaultFill" : _defaultFill,
+                "defaultFill" : "#fff", //_defaultFill,
+                "selected"    : _defaultFill,
                 "bubble"      : _bubblesFill,
             },
             geographyConfig: _chartOptions,
+            data : map_data
         });
 
         _datamap.bubbles(cityPoints, { "popupTemplate" : popupTemplate });
@@ -387,6 +423,76 @@
             store.set("countly_location_city", false);
             return true;
         });
+
+        _datamap.graticule();
+
+        _datamap.arc([
+                {
+                    origin: {
+                      latitude: zoomParams.location_box.max_lat,
+                      longitude: zoomParams.location_box.min_lon,
+                    },
+                    destination: {
+                      latitude: zoomParams.location_box.max_lat,
+                      longitude: zoomParams.location_box.max_lon,
+                    },
+                    "options": {"strokeWidth": 2, "strokeColor": "rgba(255,0,255,0.33)"}
+                }
+                ,
+                {
+                  origin: {
+                      latitude: zoomParams.location_box.max_lat,
+                      longitude: zoomParams.location_box.min_lon,
+                    },
+                    destination: {
+                      latitude: zoomParams.location_box.min_lat,
+                      longitude: zoomParams.location_box.min_lon,
+                    },
+                    "options": {"strokeWidth": 3, "strokeColor": "rgba(255,255,0,0.33)"}
+                }
+                ,
+                {
+                  origin: {
+                      latitude: zoomParams.location_box.min_lat,
+                      longitude: zoomParams.location_box.min_lon,
+                    },
+                    destination: {
+                      latitude: zoomParams.location_box.min_lat,
+                      longitude: zoomParams.location_box.max_lon,
+                    },
+                    "options": {"strokeWidth": 2, "strokeColor": "rgba(0,0,255,0.33)"}
+                }
+                ,
+                {
+                    origin: {
+                      latitude: zoomParams.location_box.max_lat,
+                      longitude: zoomParams.location_box.max_lon,
+                    },
+                    destination: {
+                      latitude: zoomParams.location_box.min_lat,
+                      longitude: zoomParams.location_box.max_lon,
+                    },
+                    "options": {"strokeWidth": 2, "strokeColor": "rgba(0,255,0,0.33)"}
+
+              }], {
+              greatArc: true,
+              animationSpeed: 2000
+        });
+
+/*
+        _datamap.arc([{
+              origin: {
+                latitude: zoomParams.location_box.min_lat,
+                longitude: zoomParams.location_box.min_lon,
+              },
+              destination: {
+                latitude: zoomParams.location_box.max_lat,
+                longitude: zoomParams.location_box.min_lon,
+              }
+            }], {
+              /*greatArc: true,*/
+      /*        animationSpeed: 2000
+    });*/
 
         return true;
     }
