@@ -59,14 +59,44 @@
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/jquery.dataTables.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/ZeroClipboard.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/TableTools.js"></script>
-    <% } %>
+
+			<!-- ui-v2 -->
+
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/country_codes.js"></script>
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/datamaps.world.min.js"></script>
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/topojson.min.js"></script>
+
+			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script>
+			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+
+			<script type="text/jsx" src="<%- cdn %>javascripts/react/globalize/globalize.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/react/widgets/dist/react-widgets.js"></script>
+
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.data.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.top.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.right.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.left.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.applist.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.js"></script>
+
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.topbar.js"></script>
+
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.calendar.js"></script>
+
+		<% } %>
     <script type="text/javascript">
     window.production = <%= production ? true : false %>;
     </script>
 </head>
 <body>
-	
+
 	<div id="sidebar">
+	</div>
+
+	<div id="top_bar">
+	</div>
+
+	<div id="calendar">
 	</div>
 
     <div id="app-tooltip"></div>
