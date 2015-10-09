@@ -9,7 +9,7 @@ var LeftPart = React.createClass({
     },
 
     handleClick: function(i) {
-        
+
         this.setState({
             selected : i,
         });
@@ -70,9 +70,18 @@ var LeftPart = React.createClass({
                 var sign = false;
             }
 
+            if (is_active && nav_item.arrow !== -1)
+            {
+                var arrow = <div className="arrow"></div>;
+            }
+            else
+            {
+                var arrow = false;
+            }
+
             return (
                 <div className={class_name} onClick={self.handleClick.bind(self, i)}>
-                    {icon}{sign}
+                    {icon}{sign}{arrow}
                 </div>
             );
         });

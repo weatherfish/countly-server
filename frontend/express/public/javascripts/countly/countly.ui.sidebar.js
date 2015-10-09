@@ -6,6 +6,8 @@ applications.forEach(function(app){
     $(new Image()).attr('src', icon_src).load(function() { });
 });
 
+
+
 var FullSidebar = React.createClass({
 
     getInitialState: function() {
@@ -167,6 +169,7 @@ var FullSidebar = React.createClass({
 
                 <div id="countly_logo_side"></div>
             		<div id="countly_logo"></div>
+                <div id="countly_version">Enterprise Edition 1.0.0.14</div>
 
             		<div id="right_part_back"></div>
 
@@ -175,11 +178,31 @@ var FullSidebar = React.createClass({
     }
 });
 
-$(new Image()).attr('src', './images/icon2_active.png').load(function() {
+['user.svg',
+'user_hover.svg',
+'user_active.svg',
+'metrics_hover.svg',
+'metrics_active.svg',
+'messaging.svg',
+'funnels_hover.svg',
+'funnels_active.svg',
+'funnels.svg',
+'drill.svg',
+'crashes_hover.svg',
+'crashes_active.svg',
+'crashes.svg',
+'cross_2ndlevel_hover.svg',
+'cross_2ndlevel_inactive.svg',
+].forEach(function(img){
+    var icon_src = "./images/sidebar/" + img;
+    $(new Image()).attr('src', icon_src).load(function() { });
+});
+
+//$(new Image()).attr('src', './images/icon2_active.png').load(function() {
 
     React.render(
         <FullSidebar navigation={navigation} />,
         document.getElementById("sidebar")
     );
 
-});
+//});

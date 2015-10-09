@@ -46,7 +46,26 @@ var RightPart = React.createClass({
         }
     },
 
+    onItemClick: function(item) {
+
+        //event.preventDefault();
+
+        var nav_data = {
+            fstmenu : this.props.nav_key,
+            sndmenu : item,
+        }
+
+        this.setState({
+            selected_item : item,
+        });
+
+        $(event_emitter).trigger('select', nav_data);
+
+    },
+
     render: function() {
+
+        var self = this;
 
         var nav_nodes = false;
         var head_node = false;
@@ -80,9 +99,19 @@ var RightPart = React.createClass({
 
                 var action_path = "#" + nav_item[1];
 
+                // <a href={action_path} onClick={this.onItemClick} className="item">
+                // self.handleClick.bind(self, i)
+
+                var node_class_name = items_class_name;
+
+                if (self.state.selected_item == nav_item[0])
+                {
+                    node_class_name += " active";
+                }
+
                 return (
-                    <div key={nav_item[0]} className={items_class_name}>
-                        <a href={action_path} className="item">
+                    <div key={nav_item[0]} className={node_class_name}>
+                        <a href={action_path} onClick={self.onItemClick.bind(self, nav_item[0])} className="item">
                             {nav_item[0]}
                         </a>
                     </div>

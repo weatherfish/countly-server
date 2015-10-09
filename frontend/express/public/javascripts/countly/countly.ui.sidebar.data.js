@@ -45,6 +45,7 @@ var navigation = [
         key: 'Funnels',
         icon        : 'funnels',
         description : 'Funnels offer you a wide overwiew about Funnels',
+        arrow       : -1, // todo: tmp
         items       : [
                         ["Events4",      "/analytics/events"],
                         ["Resolutions4", "/analytics/resolutions"],
@@ -58,6 +59,23 @@ var navigation = [
         key: 'Crashes',
         icon        : 'crashes',
         description : 'Crashes offer you a wide overwiew about your apps Crashes',
+        items       : [
+                        ["Loyalty5",     "/analytics/loyalty"],
+                        ["Devices5",     "/analytics/devices"],
+                        ["Platforms5",   "/analytics/platforms"],
+                        ["Versions5",    "/analytics/versions"],
+                        ["Carriers5",    "/analytics/carriers"],
+                        ["Frequency5",   "/analytics/frequency"],
+                        ["Events5",      "/analytics/events"],
+                        ["Resolutions5", "/analytics/resolutions"],
+                        ["Durations5",   "/analytics/durations"],
+                      ]
+    },
+    {
+        key: 'Drill',
+        icon        : 'drill',
+        description : 'Crashes offer you a wide overwiew about your apps Crashes',
+        arrow       : -1, // todo: tmp
         items       : [
                         ["Loyalty5",     "/analytics/loyalty"],
                         ["Devices5",     "/analytics/devices"],
