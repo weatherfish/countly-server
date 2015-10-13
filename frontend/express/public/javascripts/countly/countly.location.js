@@ -21,7 +21,8 @@
         _defaultFill = "#fff", // fill for countries with empty metrics
         _basicFill   = "#E6EFF2", // basic fill for countries with non empty metrics
         _datamap     = false,
-        _countryMap  = {};
+        _countryMap  = {},
+        _countryData_previous = false;
 
     // Load local country names
     $.get('localization/countries/' + countlyCommon.BROWSER_LANG_SHORT + '/country.json', function (data) {
@@ -243,7 +244,7 @@
 
         var linear = d3.scale.linear()
           .domain([0, maxMetric])
-          .range([0, 1]);
+          .range([0.1, 1]);
 
         var countryData = { };
 
@@ -295,7 +296,9 @@
           create 10 gradations of brightness
         */
 
-        for (var i = 0; i < 1; i+=0.1)
+        countryFills["0.0"] = "#ffffff";
+
+        for (var i = 0.1; i < 1; i+=0.1)
         {
             countryFills[i.toFixed(1).toString()] = colorLuminance(_basicFill, i * (-1)); // .toFixed(1) because Javascript have some problem with float: http://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
         }
@@ -312,8 +315,7 @@
         $("#" + _chartElementId).css("margin-left", containerSize.width/2 * -1); // center the map element
         $("#" + _chartElementId).css("margin-top", 10);
 
-        console.log("============== countryData ===================");
-        console.log(countryData);
+        _countryData_previous = countryData;
 
         _datamap = new Datamap({
             element    : document.getElementById(_chartElementId),
@@ -355,6 +357,19 @@
         }
 
         var countryData = formatData(ob);
+
+        for (var iso3 in _countryData_previous)
+        {
+            if (!countryData[iso3])
+            {
+                countryData[iso3] = {
+                    "fillKey"        : "0.0",
+                    "numberOfThings" : 0
+                };
+            }
+        }
+
+        _countryData_previous = countryData;
 
         _datamap.updateChoropleth(countryData);
 

@@ -139,7 +139,7 @@
                             Get country size for calculate scale
                         */
 
-                        console.log("====================== country data ========================");
+                        console.log("country data:");
                         console.log(json);
 
                         var lat_size = json.location_box.max_lat - json.location_box.min_lat;
@@ -356,10 +356,8 @@
         var scale = parseInt(700 - zoomParams.max_latlon_size);
 
         console.log("zoomParams.max_latlon_size:", zoomParams.max_latlon_size);
-
         console.log("country scale:", scale);
-
-        console.log("++++++++++++++ zoom params +++++++++++++++++++");
+        console.log("zoom params:");
         console.log(zoomParams);
 
         var map_data = { };
@@ -374,18 +372,14 @@
             width      : mapWidth,
             setProjection: function(element) {
 
-                //zoomParams.lat = 35.86166000000006;
-                //zoomParams.lon = 104.19539650000004;
-                //zoomParams.lon += 20;
                 scale = 310;
 
                 var center_lat = parseFloat(zoomParams.lat.toFixed(3));
                 var center_lon = parseFloat(zoomParams.lon.toFixed(3));
 
-                console.log("translate:", element.offsetWidth / 2, " -- ", element.offsetHeight / 2);
-
                 var width_projection = (element.offsetHeight / 2) * 1.92;
 
+                console.log("translate:", element.offsetWidth / 2, " -- ", element.offsetHeight / 2);
                 console.log("center_lon:", center_lon);
                 console.log("center_lat:", center_lat);
 
@@ -479,62 +473,16 @@
               animationSpeed: 2000
         });
 
-/*
-        _datamap.arc([{
-              origin: {
-                latitude: zoomParams.location_box.min_lat,
-                longitude: zoomParams.location_box.min_lon,
-              },
-              destination: {
-                latitude: zoomParams.location_box.max_lat,
-                longitude: zoomParams.location_box.min_lon,
-              }
-            }], {
-              /*greatArc: true,*/
-      /*        animationSpeed: 2000
-    });*/
-
         return true;
     }
 
     function reDraw(ob) {
 
+        var cityPoints = formatData(ob);
+
+        _datamap.bubbles(cityPoints, { "popupTemplate" : popupTemplate });
+
         return true;
-
-        ob = ob || {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
-        var chartData = {cols:[], rows:[]};
-
-        var tt = countlyCommon.extractTwoLevelData(_locationsDb, _cities, countlyCity.clearLocationObject, [
-            {
-                "name":"city",
-                "func":function (rangeArr, dataObj) {
-                    return rangeArr;
-                }
-            },
-            { "name":"t" },
-            { "name":"u" },
-            { "name":"n" }
-        ]);
-
-        chartData.cols = [
-            {id:'city', label:"City", type:'string'}
-        ];
-        chartData.cols.push(ob);
-        chartData.rows = _.map(tt.chartData, function (value, key, list) {
-            if (value.city == "Unknown") {
-                return {c:[
-                    {v:""},
-                    {v:value[ob.metric]}
-                ]};
-            }
-            return {c:[
-                {v:value.city},
-                {v:value[ob.metric]}
-            ]};
-        });
-
-        _dataTable = new google.visualization.DataTable(chartData);
-        _chart.draw(_dataTable, _chartOptions);
     }
 
     function setMeta() {
