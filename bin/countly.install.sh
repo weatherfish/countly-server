@@ -73,6 +73,8 @@ unzip ./scripts/geo_data/TM_WORLD_BORDERS-0.3.zip -d ./scripts/geo_data
 # create mongodb table with geo data
 node ./scripts/create_country_table.js
 
+wget http://download.geonames.org/export/dump/cities1000.zip
+
 #install grunt & npm modules
 ( cd $DIR/.. ; npm install -g grunt-cli --unsafe-perm ; npm install )
 
