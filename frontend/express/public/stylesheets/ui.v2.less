@@ -159,16 +159,12 @@
 
 #sidebar_top .down_arrow span.left_part {
     position : relative;
-    background-image    : url('../images/arrow_part.png');
-    background-repeat   : no-repeat;
-    background-position : center;
+		.background_image(arrow_part);
 }
 
 #sidebar_top .down_arrow span.right_part {
     position : relative;
-    left		 : -14px;
-    background-image : url('../images/arrow_part.png');
-
+		.background_image(arrow_part);
     -ms-transform			: rotate(90deg);
     -webkit-transform : rotate(90deg);
     transform					: rotate(90deg);
@@ -228,7 +224,7 @@
     width       : 240px;
     font-family : Lato-Light;
     font-size   : 14px;
-    color       : @font_color_2;
+    /*color       : @font_color_2;*/
     z-index     : 20;
     letter-spacing : 0.4px;
 }
@@ -294,12 +290,13 @@
 
 #sidebar #left_part > div.navitem {
 
-    width            : 50px;
-    height           : 1500px;
+    /*width            : 50px;*/
+		width : 240px;
+    height           : 2000px; /* todo */
 
     background-color : @bg_color_3;
 
-		.transition(all, @right_open_speed);
+		/*.transition(all, @right_open_speed);*/
 }
 
 #sidebar #left_part div.navitem.active {
@@ -433,12 +430,10 @@
 		.background_image(messaging);
 }
 #sidebar #left_part div.messaging_active {
-		/*.background_image(messaging_active);*/
-		background-image : url('../images/sidebar/icon2_active.png');
+		.background_image(messaging_active);
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.messaging {
-    /*.background_image(messaging_hover);*/
-		background-image : url('../images/sidebar/icon2_active.png');
+    .background_image(messaging_hover);
 }
 /* funnels */
 #sidebar #left_part div.funnels {
@@ -465,12 +460,11 @@
 		.background_image(drill);
 }
 #sidebar #left_part div.drill_active {
-		/*.background_image(drill_active);*/
-		background-image : url('../images/sidebar/icon2_active.png');
+		//.background_image(drill_active);
+		background-image : url('../images/sidebar/drill_active.png');
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.drill {
-    /*.background_image(drill_hover);*/
-		background-image : url('../images/sidebar/icon2_active.png');
+    .background_image(drill_hover);
 }
 /********************* right side *********************/
 
@@ -716,11 +710,20 @@
     display       : inline-block;
     padding-left  : 17px;
     /*margin-bottom : 10px;*/
-    color         : white;
-    font-weight   : bold;
-    font-size     : 14px;
-    position      : relative;
-  	transform     : translateY(-50%);
+    color         : gray;
+    /*font-weight   : bold;*/
+    font-size      : 14px;
+		letter-spacing : 0.45px
+    position       : relative;
+  	transform      : translateY(-50%);
+}
+
+#app_info div.app:hover span {
+		color : white;
+}
+
+#app_info div.app.active span {
+		color : white;
 }
 
 #sidebar #countly_logo_side {

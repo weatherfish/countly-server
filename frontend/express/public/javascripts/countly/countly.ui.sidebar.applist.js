@@ -46,22 +46,21 @@ var AppList = React.createClass({
                 var class_name = "app search_result";
             }
 
-            var icon_src = "./images/" + app.icon;
+            if (self.props.active_app.id == app.id)
+            {
+                class_name += " active";
+            }
+
+            var logo_src = "./appimages/" + app.logo;
 
             return (
-                <div className={class_name}>
-                    <img src={icon_src}/>
+                <div className={class_name} onClick={self.props.onAppChange.bind(self, app/*.key, app.id*/)}>
+                    <img src={logo_src}/>
                     <span>{app.name}</span>
                 </div>
             );
         });
-/*
-        var covers = Array.apply(null, Array(10)).map(function (x, i) {
-            return (
-                <div className="cover"></div>
-            );
-        })
-*/
+
         return (
             <div className="app_list">
                 {app_list}
@@ -75,10 +74,11 @@ var ApplicationsList = React.createClass({
     getInitialState: function() {
         return {
             app_filter_text : false,
-            active         : false,
+            active          : false,
             showen          : 0
         };
     },
+
     app_filter: function(filter) {
         console.log("app_filter:", filter);
         this.setState({
@@ -92,7 +92,7 @@ var ApplicationsList = React.createClass({
         // todo: one time:
         var screen_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
-        var list_height = (screen_height - 60 - 50) + "px";
+        var list_height = (screen_height - 60 - 50) + "px"; // todo: change values to variables
 
         document.getElementById('app_info').style.height = list_height;
 
@@ -125,23 +125,11 @@ var ApplicationsList = React.createClass({
             class_name += " active";
         }
 
-/*
-        var inline_style = {
-            height : list_height
-        };
-*/
         return (
             <div id="app_info" className={class_name}>
                 <AppListSearch app_filter={this.app_filter}/>
-                <AppList applications={applications} app_filter_text={this.state.app_filter_text}/>
+                <AppList applications={applications} active_app={this.props.active_app} onAppChange={this.props.onAppChange} app_filter_text={this.state.app_filter_text}/>
             </div>
         );
-
-        /*return (
-            <div id="app_info" className={class_name}>
-                <AppListSearch app_filter={this.app_filter}/>
-                <AppList applications={applications} app_filter_text={this.state.app_filter_text}/>
-            </div>
-        );*/
     }
 });

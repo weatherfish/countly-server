@@ -6,8 +6,6 @@ applications.forEach(function(app){
     $(new Image()).attr('src', icon_src).load(function() { });
 });
 
-
-
 var FullSidebar = React.createClass({
 
     getInitialState: function() {
@@ -16,14 +14,15 @@ var FullSidebar = React.createClass({
             in_transition : false,
             right_closed  : true,
             previous_left : -1,
-            top_active    : false
+            top_active    : false,
+            active_app    : this.props.active_app
         };
     },
 
     handle_top_click : function()
     {
         this.setState({
-            top_active : !this.state.top_active
+            top_active : !this.state.top_active,
         });
     },
 
@@ -117,7 +116,23 @@ var FullSidebar = React.createClass({
         });
     },
 
-    render: function() {
+    handle_active_app_change : function(app)
+    {
+        console.log("change app id:", app.id);
+        console.log("change app key:", app.key);
+
+        this.setState({
+            "active_app" : app,
+            "top_active" : false
+        });
+
+        $(event_emitter).trigger("app_changed", {
+            "app_id"  : app.id,
+            "app_key" : app.key
+        });
+    },
+
+    render : function() {
 
         var full_navigation = this.props.navigation;
 
@@ -156,9 +171,9 @@ var FullSidebar = React.createClass({
         return (
             <div className="wrapper">
 
-                <SidebarTop onClick={this.handle_top_click}/>
+                <SidebarTop is_active={this.state.top_active} active_app={this.state.active_app} onClick={this.handle_top_click}/>
 
-                <ApplicationsList active={this.state.top_active}/>
+                <ApplicationsList active_app={this.state.active_app} onAppChange={this.handle_active_app_change} active={this.state.top_active}/>
 
                 <div id="left_part">
                     <LeftPart navigation={full_navigation} selected_i={this.state.selected_left} is_active={is_left_active} in_transition={this.state.in_transition} handleClick={this.handle_left_click}/>
@@ -177,32 +192,3 @@ var FullSidebar = React.createClass({
         );
     }
 });
-
-['user.svg',
-'user_hover.svg',
-'user_active.svg',
-'metrics_hover.svg',
-'metrics_active.svg',
-'messaging.svg',
-'funnels_hover.svg',
-'funnels_active.svg',
-'funnels.svg',
-'drill.svg',
-'crashes_hover.svg',
-'crashes_active.svg',
-'crashes.svg',
-'cross_2ndlevel_hover.svg',
-'cross_2ndlevel_inactive.svg',
-].forEach(function(img){
-    var icon_src = "./images/sidebar/" + img;
-    $(new Image()).attr('src', icon_src).load(function() { });
-});
-
-//$(new Image()).attr('src', './images/icon2_active.png').load(function() {
-
-    React.render(
-        <FullSidebar navigation={navigation} />,
-        document.getElementById("sidebar")
-    );
-
-//});

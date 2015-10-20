@@ -90,6 +90,7 @@ var navigation = [
     }
 ];
 
+/*
 var applications = [
     {
         name : "Countly App",
@@ -103,4 +104,4 @@ var applications = [
         name : "Bubble shooter saga",
         icon : "appi3.png"
     }
-]
+]*/

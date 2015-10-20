@@ -20,7 +20,7 @@ var RightPart = React.createClass({
         }
 
         this.props.handle_changed();
-        event.target.removeEventListener(event.type, this.transition_end);
+        event.target.removeEventListener(event.type, this.transitionEnd);
     },
 
     componentDidUpdate: function() {
