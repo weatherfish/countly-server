@@ -9,7 +9,7 @@
 -->
 <html>
 <head>
-	<title><%- countlyTitle %></title>
+	<title><%- countlyTitle %> TEST 3</title>
     <script><%- javascript %></script>
 	<link rel="icon" type="image/png" href="<%- cdn %>images/favicon.png">
     <link rel="stylesheet" href="<%- cdn %>stylesheets/font-awesome/css/font-awesome.min.css" />
@@ -19,10 +19,72 @@
     <% if (production) { %>
 		<link rel="stylesheet" href="<%- cdn %>stylesheets/main.min.css?<%= countlyVersion %>" />
 		<link rel="stylesheet" href="<%- cdn %>stylesheets/plugins.min.css?<%= countlyVersion %>" />
+
+		<link rel="stylesheet" href="<%- cdn %>stylesheets/v2.css" />
+		<link rel="stylesheet" href="<%- cdn %>stylesheets/ui.v2.topbar.css" />
+		<link rel="stylesheet" href="<%- cdn %>stylesheets/calendar.css" />
+		<!--link rel="stylesheet" href="<%- cdn %>javascripts/react/rc-calendar/assets/index.css" /-->
+
+		<link rel="stylesheet" href="<%- cdn %>javascripts/react/widgets/dist/css/core.css" />
+		<link rel="stylesheet" href="<%- cdn %>javascripts/react/widgets/dist/css/react-widgets.css" />
+
+		<script type="text/javascript">
+		    var event_emitter = {};
+    </script>
+
     	<!-- PRODUCTION -->
     	<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.dom.js?<%= countlyVersion %>"></script>
     	<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.utils.js?<%= countlyVersion %>"></script>
-    <% } else { %>
+
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/country_codes.js"></script>
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/datamaps.world.min.js"></script>
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/topojson.min.js"></script>
+
+			<!--script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script-->
+			<script type="text/javascript" src="<%- cdn %>javascripts/react-with-addons.js"></script>
+			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+
+			<script language="javascript" type="text/javascript" src="http://ricostacruz.com/jquery.transit/jquery.transit.min.js"></script>
+
+			<!--script type="text/jsx" src="<%- cdn %>javascripts/react/globalize/globalize.js"></script-->
+
+			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/globalize/0.1.1/globalize.min.js"></script>
+
+<!--
+
+/home/ubuntu/countly_sidebar/frontend/express/public/javascripts/react/widgets/dist
+
+javascripts/utils/react-widgets.js
+
+-->
+
+			<script type="text/jsx" src="<%- cdn %>javascripts/react/widgets/dist/react-widgets.js"></script>
+
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.data.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.top.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.right.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.left.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.applist.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.js"></script>
+
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.topbar.js"></script>
+
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.calendar.js"></script>
+
+			<!--script type="text/jsx" src="<%- cdn %>javascripts/react/clear_test/calendar_out.js"></script-->
+
+			<!--script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.calendar.js"></script-->
+
+			<style type="text/less">
+				.transition (@value1,@value2:X,...) { @value: ~`"@{arguments}".replace(/[\[\]]|\,\sX/g, '')`; -webkit-transition: @value; -moz-transition: @value; -ms-transition: @value; -o-transition: @value; transition: @value; }
+				.transform (@value1,@value2:X,...) { @value: ~`"@{arguments}".replace(/[\[\]]|\,\sX/g, '')`; transform:@value; -ms-transform:@value; -webkit-transform:@value; -o-transform:@value; -moz-transform:@value; }
+							.border-box { box-sizing:border-box; -moz-box-sizing:border-box; }
+
+			</style>
+
+			<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js"></script>
+
+		<% } else { %>
 		<link rel="stylesheet" href="<%- cdn %>stylesheets/main.css?<%= countlyVersion %>" />
         <link rel="stylesheet" href="<%- cdn %>javascripts/dom/tipsy/tipsy.css" />
         <link rel="stylesheet" href="<%- cdn %>stylesheets/amaranjs/amaran.min.css" />
@@ -32,7 +94,7 @@
 		<link rel="stylesheet" href="<%- cdn %><%= plugins[i] %>/stylesheets/main.css?<%= countlyVersion %>" />
 			<% } %>
 		<% } %>
-	    <!-- DEVELOPMENT -->
+			<!-- DEVELOPMENT -->
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/jquery.form.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/tipsy/jquery.tipsy.js"></script>
@@ -59,45 +121,116 @@
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/jquery.dataTables.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/ZeroClipboard.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/TableTools.js"></script>
-
-			<!-- ui-v2 -->
-
-			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/country_codes.js"></script>
-			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/datamaps.world.min.js"></script>
-			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/topojson.min.js"></script>
-
-			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script>
-			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
-
-			<script type="text/jsx" src="<%- cdn %>javascripts/react/globalize/globalize.js"></script>
-			<script type="text/jsx" src="<%- cdn %>javascripts/react/widgets/dist/react-widgets.js"></script>
-
-			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.data.js"></script>
-			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.top.js"></script>
-			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.right.js"></script>
-			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.left.js"></script>
-			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.applist.js"></script>
-			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.js"></script>
-
-			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.topbar.js"></script>
-
-			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.calendar.js"></script>
-
-		<% } %>
+    <% } %>
     <script type="text/javascript">
-    window.production = <%= production ? true : false %>;
+		    window.production = <%= production ? true : false %>;
+
+				var applications = [];
+
+				<% for (var i = 0; i < userOfApps.length; i++) { %>
+
+						var app_id   = "<%= userOfApps[i]._id %>";
+						var app_name = "<%= userOfApps[i].name %>";
+						var app_logo = "<%= userOfApps[i]._id %>.png";
+						var app_key  = "<%= userOfApps[i].key %>";
+
+						applications.push({
+								id   : app_id,
+				        name : app_name,
+				        logo : app_logo,
+								key  : app_key
+				    });
+
+				<% } %>
+
     </script>
+
+		<script type="text/jsx">
+
+				$(function() {
+
+						setTimeout(function(){ // todo: remove
+
+								React.render(
+										<CalendarWrapper />,
+										document.getElementById("calendar")
+								);
+
+						}, 200);
+
+				});
+
+				var loaded = 0;
+
+				var icons = ['user.svg',
+								'user_hover.svg',
+								'user_active.svg',
+								'metrics_hover.svg',
+								'metrics_active.svg',
+								'messaging.svg',
+								'messaging_hover.svg',
+								'messaging_active.svg',
+								'funnels_hover.svg',
+								'funnels_active.svg',
+								'funnels.svg',
+								'drill.svg',
+								'drill_hover.svg',
+								//'drill_active.svg',
+								'crashes_hover.svg',
+								'crashes_active.svg',
+								'crashes.svg',
+								'cross_2ndlevel_hover.svg',
+								'cross_2ndlevel_inactive.svg',
+								]
+
+				icons.forEach(function(img){
+				    var icon_src = "./images/sidebar/" + img;
+				    $(new Image()).attr('src', icon_src).load(function() {
+
+								loaded++;
+
+								if (loaded == icons.length)
+								{
+
+										var active_app_id = countlyCommon.ACTIVE_APP_ID;
+
+										var active_app_data = false;
+
+										for (var i = 0; i < applications.length; i++)
+										{
+												if (applications[i].id == active_app_id)
+												{
+														active_app_data = applications[i];
+														break;
+												}
+										}
+
+										React.render(
+												<FullSidebar navigation={navigation} active_app={active_app_data} />,
+												document.getElementById("sidebar")
+										);
+								}
+						});
+				});
+
+		</script>
+
 </head>
 <body>
 
-	<div id="sidebar">
-	</div>
+		<div id="sidebar">
+		</div>
 
-	<div id="top_bar">
-	</div>
+		<div id="top_bar">
+		</div>
 
-	<div id="calendar">
-	</div>
+		<!--div class="widget-content-top-test">
+
+	</div-->
+
+
+		<div id="calendar">
+		</div>
 
     <div id="app-tooltip"></div>
 	<div id="app-nav">
@@ -257,7 +390,7 @@
         <div id="content">
             <div id="content-loader"></div>
         </div>
-		<div id="content-footer">
+		<!--div id="content-footer">
             <span><%= countlyTypeName %></span>
 		 <% if (!countlyType) { %>
 			<ul>
@@ -276,32 +409,10 @@
 				<li><a href="http://resources.count.ly/" target="_blank">Documentation</a></li>
 			</ul>
 		 <% } %>
-		</div>
+	 </div-->
     </div>
 
-    <script id="template-date-selector" type="text/x-handlebars-template">
-		<div id="date-selector" class="help-zone-vs">
-			<div class="calendar" id="date-picker-button"></div>
-			<div id="date-picker">
-				<div class="tip"></div>
-				<div class="calendar-container">
-					<div id="date-from" class="calendar"></div>
-					<div id="date-to" class="calendar"></div>
-				</div>
-				<div class="button-container">
-					<div id="date-submit" style="float:right;" class="cly-button-dark" data-localize="common.apply"></div>
-				</div>
-			</div>
-			<div class="button date-selector" id="month"></div>
-			<div class="button date-selector" id="day"></div>
-            <div class="button date-selector" id="yesterday"></div>
-			<div class="button date-selector" id="hour" data-localize="common.today"></div>
-			<div class="button date-selector" id="7days" data-localize="common.7days"></div>
-			<div class="button date-selector" id="30days" data-localize="common.30days"></div>
-			<div class="button date-selector" id="60days" data-localize="common.60days"></div>
-			<!--<div class="button date-selector" id="90days" data-localize="common.90days"></div>-->
-		</div>
-	</script>
+
 
 	<script id="template-app-categories" type="text/x-handlebars-template">
 		<div data-value="1" class="item" data-localize="application-category.books"></div>
@@ -328,7 +439,12 @@
 
 	<script id="template-analytics-common"  type="text/x-handlebars-template">
 		<div class="widget">
-			<div class="widget-header">
+
+			<!--div class="widget-content-top-test">
+
+			</div-->
+
+			<!--div class="widget-header">
 				<div class="left">
                     {{#if logo-class}}
 					<div class="logo {{logo-class}}"></div>
@@ -339,8 +455,7 @@
                     {{/if}}
 					<div class="title">{{page-title}}</div>
 				</div>
-				{{> date-selector }}
-			</div>
+			</div-->
 			<div class="widget-content help-zone-vb" data-help-localize="help.{{{chart-helper}}}" style="{{#if graph-type-double-pie}} overflow:hidden; {{else}} height:300px; padding-top:20px; padding-bottom:10px; {{/if}}">
 				{{#if graph-type-double-pie}}
 				<div class="pie-chart-container">
@@ -420,7 +535,7 @@
 		<div class="widget allappview">
 			<div class="widget-header">
 				<div class="title" style="letter-spacing:-1px; font-size:19px; margin-top:10px; margin-left:5px;">{{toUpperCase page-title}}</div>
-				{{> date-selector }}
+
 			</div>
 			<div class="widget-content" style="border:none;">
 				<div id="big-numbers-container" class="dashboard">
@@ -452,34 +567,44 @@
 		</div>
 	</script>
 
+
+
 	<script id="template-analytics-countries"  type="text/x-handlebars-template">
+
 		<div class="widget">
-			<div class="widget-header">
+			<!--div class="widget-header">
 				<div class="left">
-					<div class="logo {{logo-class}}"></div>
-					<div class="title">{{page-title}}</div>
+					<!--div class="logo {{logo-class}}"></div-->
+					<!--div class="title">{{page-title}}</div>
 				</div>
-				{{> date-selector }}
-			</div>
+
+			</div-->
+
+			<!--div class="widget-content-top-test">
+
+			</div-->
+
 			<div class="widget-content geo-switch help-zone-vb" data-help-localize="help.{{{chart-helper}}}" style="height:495px; background-color:#FFF;">
 				<div style="position:absolute; top:20px; right:20px; z-index:1;">
-					<a id="toggle-map" class="icon-button light"></a>
+					<!--a id="toggle-map" class="icon-button light"></a-->
 				</div>
-                <div class="cly-button-group over">
+
+                <!--div class="cly-button-group over">
                     <div id="map-list-sessions" style="padding: 6px 8px 7px 8px;" class="icon-button light active" data-localize="sidebar.analytics.sessions"></div>
                     <div id="map-list-users" style="padding: 6px 8px 7px 8px;" class="icon-button light" data-localize="sidebar.analytics.users"></div>
                     <div id="map-list-new" style="padding: 6px 8px 7px 8px;" class="icon-button light" data-localize="common.table.new-users"></div>
-                </div>
+                </div-->
+
 				<div id="geo-chart-outer"><div><div id="geo-chart"></div></div></div>
 			</div>
-			<div class="widget-footer" style="background-color:#EEEEEE;">
+			<div class="widget-footer">
 				<div id="big-numbers-container">
 					{{#each big-numbers.items}}
 					<div class="big-numbers three-column help-zone-vs" data-help-localize="help.{{this.help}}">
 						<div class="inner">
 							<div class="select">{{this.title}}</div>
-							<div class="number" style="margin-top: 10px;">{{getFormattedNumber this.total}}</div>
-							<div class="trend" style="background-image:url('<%- cdn %>images/dashboard/{{this.trend}}trend.png');"></div>
+							<div class="number">{{getFormattedNumber this.total}}</div>
+							<!--div class="trend" style="background-image:url('<%- cdn %>images/dashboard/{{this.trend}}trend.png');"></div-->
 						</div>
 					</div>
 					{{/each}}
@@ -487,14 +612,23 @@
 			</div>
 		</div>
 		<table class="d-table help-zone-vb" cellpadding="0" cellspacing="0" data-help-localize="help.{{{table-helper}}}"></table>
+
+		<!--script>
+				alert("++++++++++++++++++++++++++++=")
+		</script-->
+
 	</script>
 
 	<script id="dashboard-template" type="text/x-handlebars-template">
 		<div class="widget">
-			<div class="widget-header">
+			<!--div class="widget-header">
 				<div class="title" style="letter-spacing:-1px; font-size:19px; margin-top:10px; margin-left:5px;">{{toUpperCase page-title}}</div>
-				{{> date-selector }}
-			</div>
+
+			</div-->
+			<!--div class="widget-content-top-test">
+
+			</div-->
+
 			<div class="widget-content" style="border:none;">
 				<div id="big-numbers-container" class="dashboard">
 					{{#each usage}}
@@ -596,11 +730,11 @@
 		</div>
 		<div class="widget" style="margin-left:187px;">
 			<div id="add-new-app">
-				<div class="widget-header">
+				<!--div class="widget-header">
 					<div class="left">
 						<div class="title new-app-name" data-localize="management-applications.my-new-app"></div>
 					</div>
-				</div>
+				</div-->
 				<div>
 					<table class="d-table horizontal" cellpadding="0" cellspacing="0">
 						<tbody>
@@ -905,7 +1039,7 @@
 						</div>
 					</div>
 				</div>
-                {{> date-selector }}
+
 			</div>
 			<div class="widget-content" style="{{#if graph-type-double-pie}} overflow:hidden; {{else}} height:300px; padding-top:20px; padding-bottom:10px; {{/if}}">
 				{{#if graph-type-double-pie}}
@@ -976,7 +1110,8 @@
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.config.js?<%= countlyVersion %>"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.lib.js?<%= countlyVersion %>"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.plugins.js?<%= countlyVersion %>"></script>
-    <% } else { %>
+
+		<% } else { %>
 	    <!-- DEVELOPMENT -->
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/utils/textcounter.min.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/jquery.peity.min.js"></script>
@@ -1049,5 +1184,22 @@
     </script>
     <% } %>
     <!---->
+
+		<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+				 xmlns:xlink="http://www.w3.org/1999/xlink" >
+
+			<pattern id="increase"
+					 width="8" height="8"
+					 patternUnits="userSpaceOnUse">
+						 <polygon points="3,0 6,6 0,6" fill="#385831"/>
+					</pattern>
+
+			<pattern id="decrease"
+					 width="8" height="8"
+					 patternUnits="userSpaceOnUse">
+						 <polygon points="0,0 6,0 3,6" fill="#F35D4D"/>
+					</pattern>
+		</svg>
+
 </body>
 </html>
