@@ -1,0 +1,21 @@
+{
+    "ISO2" : {
+        "side" : "the difference in percent"
+    },
+    "AU" : {
+        "bottom" : -29
+    },
+    "SD" : {
+        "bottom" : -25
+    },
+    "ZA" : {
+        "bottom" : -48,
+        "right"  : -22
+    },
+    "BR" : {
+        "right" : -10
+    },
+    "CL" : {
+        "left" : 75
+    }
+}

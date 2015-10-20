@@ -9,6 +9,7 @@ var fetch = {},
     moment = require('moment'),
     _ = require('underscore'),
     crypto = require('crypto'),
+    fs = require('fs'),
     plugins = require('../../../plugins/pluginManager.js');
 
 (function (fetch) {
@@ -452,8 +453,102 @@ var fetch = {},
     */
 
     fetch.countryLatLon = function (iso3, callback) {
-        common.db.collection('countries_latlon').findOne({ "iso3" : iso3 }, function (err, result) {
-            callback(err, result);
+        common.db.collection('countries_latlon').findOne({ "iso3" : iso3 }, function (err, geo_data) {
+
+            /* new method */
+
+            var avg_lat = (geo_data.location_box.min_lat + geo_data.location_box.max_lat) / 2;
+            var avg_lon = (geo_data.location_box.min_lon + geo_data.location_box.max_lon) / 2;
+
+            geo_data.lat = avg_lat;
+            geo_data.lon = avg_lon;
+
+            var iso2 = geo_data.iso2;
+
+            console.log("=============== fetch geo_data ===========");
+            console.log(geo_data);
+
+            var patch = fs.readFileSync('./cities_geo_patch.json', 'utf8');
+            patch = JSON.parse(patch);
+            patch = patch[iso2];
+
+            if (patch)
+            {
+
+                var location_box = geo_data.location_box;
+
+                for (var side in patch)
+                {
+                    switch (side)
+                    {
+                        case "top":
+
+                            var total_height = Math.abs(location_box.max_lat) - Math.abs(location_box.min_lat);
+
+                        break;
+
+                        case "bottom":
+
+                            var total_height = Math.abs(location_box.max_lat) - Math.abs(location_box.min_lat);
+
+                            var new_height = total_height + total_height / 100 * patch.bottom;
+
+                            if (geo_data.location_box.min_lat < 0)
+                            {
+                                geo_data.location_box.min_lat = geo_data.location_box.min_lat - (total_height - new_height);
+                            }
+                            else
+                            {
+                                geo_data.location_box.min_lat = geo_data.location_box.min_lat + (total_height - new_height);
+                            }
+
+                        break;
+
+                        case "left":
+
+                            var total_width = Math.abs(location_box.max_lon) - Math.abs(location_box.min_lon);
+
+                            console.log("total_width:", total_width);
+
+                            var new_width = total_width + total_width / 100 * patch.left;
+
+                            console.log("new_width:", new_width);
+
+                            if (geo_data.location_box.min_lon < 0)
+                            {
+                                geo_data.location_box.min_lon = geo_data.location_box.min_lon + (total_width - new_width);
+                            }
+                            else
+                            {
+                                geo_data.location_box.min_lon = geo_data.location_box.min_lon - (total_width - new_width);
+                            }
+
+                        break;
+
+                        case "right":
+
+                            var total_width = Math.abs(location_box.max_lon) - Math.abs(location_box.min_lon);
+
+                            var new_width = total_width + total_width / 100 * patch.right;
+
+                            if (geo_data.location_box.max_lon < 0)
+                            {
+                                geo_data.location_box.max_lon = geo_data.location_box.max_lon + (total_width - new_width);
+                            }
+                            else
+                            {
+                                geo_data.location_box.max_lon = geo_data.location_box.max_lon - (total_width - new_width);
+                            }
+
+                        break;
+                    }
+                }
+            }
+
+            //console.log("========== patch =======");
+            //console.log(patch);
+
+            callback(err, geo_data);
         });
     }
 
