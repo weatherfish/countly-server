@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="17px" height="17px" viewBox="0 0 17 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.3 (12081) - http://www.bohemiancoding.com/sketch -->
+    <title>Rectangle 112 + Rectangle 112 Copy + Oval 24 Copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Artboard-2" sketch:type="MSArtboardGroup" transform="translate(-759.000000, -138.000000)">
+            <g id="Rectangle-112-+-Rectangle-112-Copy-+-Oval-24-Copy" sketch:type="MSLayerGroup" transform="translate(759.000000, 138.000000)">
+                <g id="Rectangle-112-+-Rectangle-112-Copy" transform="translate(8.394199, 8.712936) rotate(-45.000000) translate(-8.394199, -8.712936) translate(3.612949, 4.462936)" fill="#FFFFFF" sketch:type="MSShapeGroup">
+                    <path d="M1.27638153,4.88750003 C0.923537018,4.88750003 0.637500025,4.59178468 0.637500025,4.25 L0.637500025,4.25 C0.637500025,3.89791846 0.920310237,3.61249997 1.27638153,3.61249997 L8.49861852,3.61249997 C8.85146303,3.61249997 9.13750003,3.90821532 9.13750003,4.25 L9.13750003,4.25 C9.13750003,4.60208154 8.85468981,4.88750003 8.49861852,4.88750003 L1.27638153,4.88750003 L1.27638153,4.88750003 Z" id="Rectangle-112"></path>
+                    <rect id="Rectangle-112-Copy" x="4.25" y="0" width="1.27500005" height="8.5" rx="40"></rect>
+                </g>
+                <circle id="Oval-24" stroke="#FFFFFF" sketch:type="MSShapeGroup" cx="8.5" cy="8.5" r="8.5"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

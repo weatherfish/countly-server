@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="18px" height="16px" viewBox="0 0 18 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.3 (12081) - http://www.bohemiancoding.com/sketch -->
+    <title>Oval 155 + Rectangle 308 + Star 15 Copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Ikony-Copy" sketch:type="MSArtboardGroup" transform="translate(-313.000000, -200.000000)">
+            <g id="Oval-155-+-Rectangle-308-+-Star-15-Copy" sketch:type="MSLayerGroup" transform="translate(313.000000, 200.000000)">
+                <g id="Oval-155-+-Rectangle-308" transform="translate(8.000000, 5.199997)" fill="#D8D8D8" sketch:type="MSShapeGroup">
+                    <circle id="Oval-155" cx="1" cy="7" r="1"></circle>
+                    <rect id="Rectangle-308" x="0.5" y="0" width="1.10000002" height="5" rx="40"></rect>
+                </g>
+                <polygon id="Star-15" stroke="#B8BFC4" sketch:type="MSShapeGroup" points="9 15 0.339745962 15 4.66987298 7.5 9 0 13.330127 7.5 17.660254 15 "></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
