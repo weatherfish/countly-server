@@ -9,6 +9,7 @@ var fetch = {},
     moment = require('moment'),
     _ = require('underscore'),
     crypto = require('crypto'),
+    fs = require('fs'),
     plugins = require('../../../plugins/pluginManager.js');
 
 (function (fetch) {
@@ -149,9 +150,9 @@ var fetch = {},
 
         function getEventData(eventKey, callback) {
             var collectionName = "events" + crypto.createHash('sha1').update(eventKey).digest('hex');
-			fetchTimeObj(collectionName, params, true, function(output) {
-				callback(null, output || {});
-			});
+      			fetchTimeObj(collectionName, params, true, function(output) {
+      				callback(null, output || {});
+      			});
         }
     };
 
@@ -163,12 +164,12 @@ var fetch = {},
 
             if (result && collection === 'events') {
                 if (result.list) { result.list = _.filter(result.list, function(l){ return l.indexOf('[CLY]') !== 0; }); }
-				if (result.segments) {
-					for(var i in result.segments){
-						if(i.indexOf('[CLY]') === 0)
-							delete result.segments[i];
-					}
-				}
+        				if (result.segments) {
+        					for(var i in result.segments){
+        						if(i.indexOf('[CLY]') === 0)
+        							delete result.segments[i];
+        					}
+        				}
             }
 
             common.returnOutput(params, result);
@@ -236,7 +237,7 @@ var fetch = {},
             });
         });
     };
-	
+
 	fetch.fetchTops = function(params) {
         fetchTimeObj('users', params, false, function(usersDoc) {
             fetchTimeObj('device_details', params, false, function(deviceDetailsDoc) {
@@ -283,14 +284,14 @@ var fetch = {},
             common.returnOutput(params, output);
         });
     };
-	
+
 	fetch.fetchSessions = function(params) {
         fetchTimeObj('users', params, false, function(usersDoc) {
 			countlySession.setDb(usersDoc || {});
 			common.returnOutput(params, countlySession.getSubperiodData());
         });
     };
-	
+
 	fetch.fetchLoyalty = function(params) {
         fetchTimeObj("users", params, false, function(doc) {
 			var _meta = [];
@@ -302,7 +303,7 @@ var fetch = {},
 			common.returnOutput(params, chartData);
 		});
     };
-	
+
 	fetch.fetchFrequency = function(params) {
         fetchTimeObj("users", params, false, function(doc) {
 			var _meta = [];
@@ -314,7 +315,7 @@ var fetch = {},
 			common.returnOutput(params, chartData);
 		});
     };
-	
+
 	fetch.fetchDurations = function(params) {
         fetchTimeObj("users", params, false, function(doc) {
 			var _meta = [];
@@ -326,7 +327,7 @@ var fetch = {},
 			common.returnOutput(params, chartData);
 		});
     };
-	
+
 	fetch.fetchMetric = function(params) {
 		function getMetric(metric){
 			fetchTimeObj(metric, params, false, function(doc) {
@@ -339,7 +340,7 @@ var fetch = {},
 					else {
 						obj = {"t":0, "n":0, "u":0};
 					}
-			
+
 					return obj;
 				};
 				if (doc['meta'] && doc['meta'][params.qstring.metric]) {
@@ -393,14 +394,163 @@ var fetch = {},
     };
 
     fetch.fetchTimeObj = function (collection, params, isCustomEvent) {
+
         fetchTimeObj(collection, params, isCustomEvent, function(output) {
-            common.returnOutput(params, output);
+
+            if (collection == "cities")
+            {
+
+                if (!output.meta)
+                {
+                    return common.returnOutput(params, output);
+                }
+
+                /*
+                    search gps coordinates for each city from statistics
+                    todo: async.queue or promise.each
+                */
+
+                async.map(output.meta.cities, function(city, __callback){
+                    common.db.collection('cities_coords').findOne({ "city" : city.toLowerCase() }, function (err, result) {
+                        __callback(err, result);
+                    });
+                }, function(err, results){
+
+                    if (err)
+                    {
+                        return false; // todo: common.returnError ?
+                    }
+
+                    output.citiesData = {};
+
+                    results.forEach(function(city_data){
+
+                        if (!city_data) return false;
+
+                        output.citiesData[city_data['city']] = {
+                            "lat" : city_data["lat"],
+                            "lon" : city_data["lon"]
+                        }
+                    });
+
+                    common.returnOutput(params, output);
+
+                });
+              }
+              else
+              {
+                  common.returnOutput(params, output);
+              }
         });
     };
-    
+
     fetch.getTimeObj = function (collection, params, callback) {
         fetchTimeObj(collection, params, null, callback);
     };
+
+    /*
+        search gps coordinates for zoomed country
+    */
+
+    fetch.countryLatLon = function (iso3, callback) {
+        common.db.collection('countries_latlon').findOne({ "iso3" : iso3 }, function (err, geo_data) {
+
+            /* new method */
+
+            var avg_lat = (geo_data.location_box.min_lat + geo_data.location_box.max_lat) / 2;
+            var avg_lon = (geo_data.location_box.min_lon + geo_data.location_box.max_lon) / 2;
+
+            geo_data.lat = avg_lat;
+            geo_data.lon = avg_lon;
+
+            var iso2 = geo_data.iso2;
+
+            console.log("=============== fetch geo_data ===========");
+            console.log(geo_data);
+
+            var patch = fs.readFileSync('./cities_geo_patch.json', 'utf8');
+            patch = JSON.parse(patch);
+            patch = patch[iso2];
+
+            if (patch)
+            {
+
+                var location_box = geo_data.location_box;
+
+                for (var side in patch)
+                {
+                    switch (side)
+                    {
+                        case "top":
+
+                            var total_height = Math.abs(location_box.max_lat) - Math.abs(location_box.min_lat);
+
+                        break;
+
+                        case "bottom":
+
+                            var total_height = Math.abs(location_box.max_lat) - Math.abs(location_box.min_lat);
+
+                            var new_height = total_height + total_height / 100 * patch.bottom;
+
+                            if (geo_data.location_box.min_lat < 0)
+                            {
+                                geo_data.location_box.min_lat = geo_data.location_box.min_lat - (total_height - new_height);
+                            }
+                            else
+                            {
+                                geo_data.location_box.min_lat = geo_data.location_box.min_lat + (total_height - new_height);
+                            }
+
+                        break;
+
+                        case "left":
+
+                            var total_width = Math.abs(location_box.max_lon) - Math.abs(location_box.min_lon);
+
+                            console.log("total_width:", total_width);
+
+                            var new_width = total_width + total_width / 100 * patch.left;
+
+                            console.log("new_width:", new_width);
+
+                            if (geo_data.location_box.min_lon < 0)
+                            {
+                                geo_data.location_box.min_lon = geo_data.location_box.min_lon + (total_width - new_width);
+                            }
+                            else
+                            {
+                                geo_data.location_box.min_lon = geo_data.location_box.min_lon - (total_width - new_width);
+                            }
+
+                        break;
+
+                        case "right":
+
+                            var total_width = Math.abs(location_box.max_lon) - Math.abs(location_box.min_lon);
+
+                            var new_width = total_width + total_width / 100 * patch.right;
+
+                            if (geo_data.location_box.max_lon < 0)
+                            {
+                                geo_data.location_box.max_lon = geo_data.location_box.max_lon + (total_width - new_width);
+                            }
+                            else
+                            {
+                                geo_data.location_box.max_lon = geo_data.location_box.max_lon - (total_width - new_width);
+                            }
+
+                        break;
+                    }
+                }
+            }
+
+            //console.log("========== patch =======");
+            //console.log(patch);
+
+            callback(err, geo_data);
+        });
+    }
 
     function fetchTimeObj(collection, params, isCustomEvent, callback) {
         if (params.qstring.action == "refresh") {
@@ -493,15 +643,15 @@ var fetch = {},
                     if (!dataObjects[i] || !dataObjects[i].m) {
                         continue;
                     }
-    
+
                     var mSplit = dataObjects[i].m.split(":"),
                         year = mSplit[0],
                         month = mSplit[1];
-    
+
                     if (!mergedDataObj[year]) {
                         mergedDataObj[year] = {};
                     }
-    
+
                     if (month == 0) {
                         if (mergedDataObj['meta']) {
                             for (var metaEl in dataObjects[i]['meta']) {
@@ -514,7 +664,7 @@ var fetch = {},
                         } else {
                             mergedDataObj['meta'] = dataObjects[i]['meta'] || [];
                         }
-    
+
                         if (mergedDataObj[year]) {
                             for (var prop in dataObjects[i]['d']) {
                                 mergedDataObj[year][prop] = dataObjects[i]['d'][prop];
@@ -530,14 +680,14 @@ var fetch = {},
                         } else {
                             mergedDataObj[year][month] = dataObjects[i]['d'] || {};
                         }
-    
+
                         if (!isRefresh) {
                             for (var day in dataObjects[i]['d']) {
                                 for (var prop in dataObjects[i]['d'][day]) {
                                     if ((collection == 'users' || dataObjects[i]['s'] == 'no-segment') && prop <= 23 && prop >= 0) {
                                         continue;
                                     }
-    
+
                                     if (typeof dataObjects[i]['d'][day][prop] === 'object') {
                                         for (var secondLevel in dataObjects[i]['d'][day][prop]) {
                                             if (secondLevel == common.dbMap.total || secondLevel == common.dbMap.new ||
@@ -545,17 +695,17 @@ var fetch = {},
                                                 if (!mergedDataObj[year][month][prop]) {
                                                     mergedDataObj[year][month][prop] = {};
                                                 }
-    
+
                                                 if (mergedDataObj[year][month][prop][secondLevel]) {
                                                     mergedDataObj[year][month][prop][secondLevel] += dataObjects[i]['d'][day][prop][secondLevel];
                                                 } else {
                                                     mergedDataObj[year][month][prop][secondLevel] = dataObjects[i]['d'][day][prop][secondLevel];
                                                 }
-    
+
                                                 if (!mergedDataObj[year][prop]) {
                                                     mergedDataObj[year][prop] = {};
                                                 }
-    
+
                                                 if (mergedDataObj[year][prop][secondLevel]) {
                                                     mergedDataObj[year][prop][secondLevel] += dataObjects[i]['d'][day][prop][secondLevel];
                                                 } else {
@@ -566,13 +716,13 @@ var fetch = {},
                                     } else if (prop == common.dbMap.total || prop == common.dbMap.new ||
                                         prop == common.dbMap.duration || prop == common.dbMap.events ||
                                         prop == common.dbEventMap.count || prop == common.dbEventMap.sum) {
-    
+
                                         if (mergedDataObj[year][month][prop]) {
                                             mergedDataObj[year][month][prop] += dataObjects[i]['d'][day][prop];
                                         } else {
                                             mergedDataObj[year][month][prop] = dataObjects[i]['d'][day][prop];
                                         }
-    
+
                                         if (mergedDataObj[year][prop]) {
                                             mergedDataObj[year][prop] += dataObjects[i]['d'][day][prop];
                                         } else {
@@ -655,7 +805,7 @@ var fetch = {},
             try {
                 params.qstring.period = JSON.parse(params.qstring.period);
             } catch (SyntaxError) {
-				console.log('Parse period JSON failed');
+				        console.log('Parse period JSON failed');
                 return false;
             }
         }
