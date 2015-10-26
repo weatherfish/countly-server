@@ -4,7 +4,7 @@ var fast_choises = [
     ["hour", "Today"],
     ["7days", "Last Week"],
     ["30days", "Last Month"],
-    ["90days", "Last Month"],
+    ["90days", "Last 3 Months"],
     ["month", "Last Year"],
 ]
 
@@ -72,6 +72,30 @@ var CalendarWrapper = React.createClass({
 
         // ------------
 
+        var date_values = this.fill_date_values(date_range);
+
+        return {
+            choise_open     : false,
+            calendars_open  : false,
+            transition_open    : false,
+            transition_c_open  : false,
+            transition_close   : false,
+            transition_c_close : false,
+            in_close           : false, // 2-step animation during both panel closing
+            //left_date      : false, // todo: now they are globals
+            //right_date     : false,
+            from_string : /*date_range[0] + " " + */date_values.first_date_year,
+            to_string   : /*date_range[1] + " " + */date_values.last_date_year,
+            fast_choise : countlyCommon.getPeriod()
+        };
+    },
+
+    fill_date_values : function(date_range)
+    {
+
+        console.log("[[[[[[[[[[[[[[[[[[ fill_date_values ]]]]]]]]]]]]]]]]]]");
+        console.log(date_range);
+
         if (countlyCommon.periodObj.currentPeriodArr) // not "today" and "year???" - fast choise
         {
 
@@ -88,33 +112,71 @@ var CalendarWrapper = React.createClass({
             console.log("first_date:", left_date.date);
             console.log("last_date:", right_date.date);
 
-            var first_date_year = first_date[0];
-            var last_date_year  = last_date[0];
+            var first_date_year = date_range[0];
+
+            if (first_date[0] != first_date[0] && date_range[0].indexOf(",") == -1) // can be ["24 Feb", "19 Oct"] or ["12 Nov, 2014", "19 Oct, 2015"]
+            {
+                first_date_year += " " + first_date[0];
+            }
+
+            var last_date_year  = date_range[1];
+
+            if (date_range[1].indexOf(",") == -1)
+            {
+                last_date_year += " " + last_date[0];
+            }
 
         }
         else
         {
-            left_date.date  = new Date();
-            right_date.date = new Date();
 
-            var first_date_year = "Today";
-            var last_date_year  = "Today";
+            if(Object.prototype.toString.call(date_range) === '[object Array]') {
+
+                if (date_range[0].indexOf(":") > -1)
+                {
+                    console.log("=========== today variant ============");
+                    console.log(date_range);
+
+                    /*
+                        ["00:00", "17:15"]
+                    */
+
+                    left_date.date  = new Date();
+                    right_date.date = new Date();
+
+                    var first_date_year = date_range[0];
+                    var last_date_year  = date_range[1] + " Today";
+                }
+                else
+                {
+                    /*
+                        Last Year: "Jan" - current month
+                    */
+
+                    console.log("=========== other period ============");
+                    console.log(date_range);
+
+                    var current_year = new Date().getFullYear();
+
+                    var first_date_year = date_range[0];
+                    var last_date_year  = date_range[1] + " " + current_year;
+
+                    left_date.date = new Date(current_year, 0, 1);
+                    right_date.date = new Date();
+                }
+            }
+            /*else
+            {
+
+
+            }*/
         }
 
         return {
-            choise_open     : false,
-            calendars_open  : false,
-            transition_open    : false,
-            transition_c_open  : false,
-            transition_close   : false,
-            transition_c_close : false,
-            in_close       : false, // 2-step animation during both panel closing
-            left_date      : false,
-            right_date     : false,
-            from_string    : date_range[0] + " " + first_date_year,
-            to_string      : date_range[1] + " " + last_date_year,
-            fast_choise    : countlyCommon.getPeriod()
-        };
+            first_date_year : first_date_year,
+            last_date_year  : last_date_year
+        }
+
     },
 
     handleOpenClick: function(i) {
@@ -177,6 +239,7 @@ var CalendarWrapper = React.createClass({
 
         // ----------
 
+/*
         if (countlyCommon.periodObj.currentPeriodArr)
         {
             var current_period = countlyCommon.periodObj.currentPeriodArr;
@@ -210,6 +273,17 @@ var CalendarWrapper = React.createClass({
             to_string      : date_range[1] + " " + last_date_year,
             fast_choise    : choise
         };
+*/
+
+        var date_values = this.fill_date_values(date_range);
+
+        var state_obj = {
+            //from_string : date_range[0]/* + " " + date_values.first_date_year*/, // todo : "2014 2014", "2015 2015"
+            //to_string   : date_range[1]/* + " " + date_values.last_date_year*/,
+            from_string : date_values.first_date_year,
+            to_string   : date_values.last_date_year,
+            fast_choise : choise
+        }
 
         /* if time range calendars are open, close them first */
         if (this.state.calendars_open == true)
@@ -288,9 +362,11 @@ var CalendarWrapper = React.createClass({
 
         date_range = date_range.split(" - ");
 
+        var date_values = this.fill_date_values(date_range);
+
         var state_obj = {
-            from_string : date_range[0] + " 2015",
-            to_string   : date_range[1] + " 2015",
+            from_string : date_range[0]/* + " " + date_values.first_date_year*/, // todo : "2014 2014", "2015 2015"
+            to_string   : date_range[1]/* + " " + date_values.last_date_year*/,
             fast_choise : false
         }
 
@@ -419,7 +495,7 @@ var CalendarWrapper = React.createClass({
         {
 
             if (this.state.choise_open && this.state.fast_choise == false)
-            {                
+            {
                 this.handleOpenCalendars();
             }
             else
@@ -510,16 +586,21 @@ var CalendarWrapper = React.createClass({
 
                   {fast_choises_html}
 
-                  <div className={custom_choice_class} onClick={this.handleOpenCalendars}>Custom</div>
+                  <div className={custom_choice_class} onClick={this.handleOpenCalendars}>
+                      <span>Custom</span>
+                      <div className="arrow"></div>
+                  </div>
               </div>
 
               <div className={calendars_class_name}>
+
                   <div className="calendar_wrapper">
                       <ReactWidgets.Calendar dayComponent={DayComponentLeft} max={right_date.date} onChange={this.handleLeftChange} defaultValue={left_date.date}  />
                   </div>
                   <div className="calendar_wrapper">
                       <ReactWidgets.Calendar dayComponent={DayComponentRight} min={left_date.date} onChange={this.handleRightChange} defaultValue={right_date.date}  />
                   </div>
+
                   <div className="confirm_button" onClick={this.handleDateSelect}>
                       Confirm Range
                   </div>
@@ -544,18 +625,5 @@ var CalendarWrapper = React.createClass({
             }
         }
     }
-
-});
-
-$(function() {
-
-    setTimeout(function(){
-
-        React.render(
-            <CalendarWrapper />,
-            document.getElementById("calendar")
-        );
-
-    }, 200);
 
 });

@@ -46,18 +46,27 @@ var RightPart = React.createClass({
         }
     },
 
+    /*
+        items is simple links, and they change window location
+    */
+
     onItemClick: function(item) {
 
         //event.preventDefault();
+
+        this.setState({
+            selected_item : item,
+        });
+
+        /*
+            trigger ui.topbar.js
+            todo: move to the root component
+        */
 
         var nav_data = {
             fstmenu : this.props.nav_key,
             sndmenu : item,
         }
-
-        this.setState({
-            selected_item : item,
-        });
 
         $(event_emitter).trigger('select', nav_data);
 
@@ -98,9 +107,6 @@ var RightPart = React.createClass({
             var nav_nodes = this.props.navigation.map(function (nav_item, i) {
 
                 var action_path = "#" + nav_item[1];
-
-                // <a href={action_path} onClick={this.onItemClick} className="item">
-                // self.handleClick.bind(self, i)
 
                 var node_class_name = items_class_name;
 

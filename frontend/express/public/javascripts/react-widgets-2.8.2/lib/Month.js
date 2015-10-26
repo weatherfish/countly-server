@@ -144,7 +144,7 @@ var MonthView = _react2['default'].createClass({
         return !_utilDates2['default'].inRange(day, min, max) ? _react2['default'].createElement(
           'td',
           { key: 'day_' + colIdx, role: 'presentation', className: 'rw-empty-cell' },
-          ' '
+          _react2['default'].createElement('span', { className: 'empty_date' })
         ) : _react2['default'].createElement(
           'td',
           {

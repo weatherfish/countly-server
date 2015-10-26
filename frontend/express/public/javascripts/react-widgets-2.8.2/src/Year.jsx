@@ -52,6 +52,9 @@ let YearView = React.createClass({
         role='grid'
         className={cn(className, 'rw-nav-view')}
       >
+        <thead>
+            <th colSpan="4">Choose a Month</th>
+        </thead>
         <tbody >
           { rows.map(this._row)}
         </tbody>
@@ -94,13 +97,15 @@ let YearView = React.createClass({
                     'rw-state-focus':    isFocused,
                     'rw-state-selected': isSelected,
                     'rw-now':            currentMonth
-                  })}
+                  }, 'month_selector')}
                 >
                   {localizers.date.format(date, format(this.props), culture) }
                 </span>
               </td>
             )
-            : <td key={colIdx} className='rw-empty-cell' role='presentation'>&nbsp;</td>
+            : <td key={colIdx} className='rw-empty-cell' role='presentation'>
+            <span className="month_selector empty_date"></span>
+            </td>
         })}
     </tr>)
   }

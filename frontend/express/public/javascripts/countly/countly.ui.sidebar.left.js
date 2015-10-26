@@ -14,6 +14,8 @@ var LeftPart = React.createClass({
             selected : i,
         });
 
+        console.log("select i:", i);
+
         this.props.handleClick(i);
     },
 
@@ -103,7 +105,7 @@ var LeftPart = React.createClass({
         return (
             <div className={full_classname}>
                 <div className={dashboard_sign_class}>
-                    <div className="icon app1"  onClick={this.handleClick.bind(this, -1)}></div>
+                    <div className="icon"  onClick={this.handleClick.bind(this, -1)}></div>
                     <span className={menu_sign_class}><span>Dashboard</span></span>
                 </div>
                 {navNodes}

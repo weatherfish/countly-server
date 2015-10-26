@@ -83,6 +83,15 @@ var YearView = _react2['default'].createClass({
         className: _classnames2['default'](className, 'rw-nav-view')
       }),
       _react2['default'].createElement(
+        'thead',
+        null,
+        _react2['default'].createElement(
+          'th',
+          { colSpan: '4' },
+          'Choose a Month'
+        )
+      ),
+      _react2['default'].createElement(
         'tbody',
         null,
         rows.map(this._row)
@@ -136,14 +145,14 @@ var YearView = _react2['default'].createClass({
                 'rw-state-focus': isFocused,
                 'rw-state-selected': isSelected,
                 'rw-now': currentMonth
-              })
+              }, 'month_selector')
             },
             localizers.date.format(date, format(_this.props), culture)
           )
         ) : _react2['default'].createElement(
           'td',
           { key: colIdx, className: 'rw-empty-cell', role: 'presentation' },
-          ' '
+          _react2['default'].createElement('span', { className: 'month_selector empty_date' })
         );
       })
     );

@@ -59,6 +59,22 @@ apt-get -y install imagemagick
 #install sendmail
 apt-get -y install sendmail
 
+apt-get install -y zip
+
+# download geo data for datamaps visualization from "themapping.org"
+if wget -q http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip;
+  then echo "done";
+  else wget http://static.count.ly/TM_WORLD_BORDERS-0.3.zip;
+fi
+
+mkdir ./scripts/geo_data
+mv TM_WORLD_BORDERS-0.3.zip ./scripts/geo_data
+unzip ./scripts/geo_data/TM_WORLD_BORDERS-0.3.zip -d ./scripts/geo_data
+# create mongodb table with geo data
+node ./scripts/create_country_table.js
+
+wget http://download.geonames.org/export/dump/cities1000.zip
+
 #install grunt & npm modules
 ( cd $DIR/.. ; npm install -g grunt-cli --unsafe-perm ; npm install )
 
@@ -87,12 +103,6 @@ fi
 
 #install plugins
 bash $DIR/scripts/countly.install.plugins.sh
-
-#install less
-npm install -g less
-
-#compile less
-lessc $DIR/../frontend/express/public/stylesheets/ui.v2.less $DIR/../frontend/express/public/stylesheets/ui.v2.css
 
 #compile scripts for production
 cd $DIR && grunt dist-all

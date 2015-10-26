@@ -80,7 +80,9 @@ export default React.createClass({
           var currentID = optionId(id, date);
 
           return !dates.inRange(date, min, max, 'year')
-            ? <td key={colIdx} role='presentation' className='rw-empty-cell'>&nbsp;</td>
+            ? <td key={colIdx} role='presentation' className='rw-empty-cell'>
+            <span className="empty_date decade_selector"></span>
+            </td>
             : (
               <td
                 key={colIdx}
@@ -99,7 +101,7 @@ export default React.createClass({
                     'rw-state-focus':    isFocused,
                     'rw-state-selected': isSelected,
                     'rw-now':            currentYear
-                  })}
+                  }, 'year_selector')}
                 >
                   {
                     label

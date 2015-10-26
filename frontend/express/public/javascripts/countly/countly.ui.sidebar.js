@@ -40,6 +40,22 @@ var FullSidebar = React.createClass({
 
         if (i == -1)
         {
+
+            console.log("current:", window.location);
+
+            if (window.location.hash != "#/")
+            {
+                window.location = "/dashboard#";
+
+                var nav_data = {
+                    fstmenu : false,
+                    sndmenu : "Dashboard",
+                }
+
+                $(event_emitter).trigger('select', nav_data);
+
+            }
+
             return this.handle_right_close();
         }
 
@@ -69,9 +85,6 @@ var FullSidebar = React.createClass({
     {
         if (this.state.right_change_i != -1) // second stage of transition - old hidden, new not shown yet
         {
-
-            console.log("second stage:", this.state.right_change_i);
-
             this.setState({
                 selected_left  : this.state.right_change_i,
                 in_transition  : true,
@@ -81,8 +94,6 @@ var FullSidebar = React.createClass({
         }
         else // finish animation
         {
-            console.log("finish st 2:");
-
             var self = this;
 
             setTimeout(function(){ // hack - need to change items class name for change opacity from 0(or bigger, doesn't matter) to 1, on new elements immediately after insert to DOM. But function componentDidUpdate call early then in insert to DOM i think.
@@ -118,9 +129,6 @@ var FullSidebar = React.createClass({
 
     handle_active_app_change : function(app)
     {
-        console.log("change app id:", app.id);
-        console.log("change app key:", app.key);
-
         this.setState({
             "active_app" : app,
             "top_active" : false

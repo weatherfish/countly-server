@@ -2,7 +2,7 @@
     position : fixed;
     top      : 0px;
     left     : 240px;
-    z-index  : 1001;
+    z-index  : 1501;
     width    : 100%;
     height   : 59px;
     color    : #000;
@@ -42,6 +42,10 @@
     font-family : Lato-Regular;
     font-size   : 14px;
     color       : #3D3D3D;
+}
+
+#top_bar .navigation .sndmenu.dashboard {
+    margin-left : 0px !important;
 }
 
 #top_bar .navigation .hint_icon {

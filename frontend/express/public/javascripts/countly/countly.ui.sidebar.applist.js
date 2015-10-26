@@ -14,7 +14,7 @@ var AppListSearch = React.createClass({
         var value = this.state.value;
         return (
             <div className="search">
-                <input type="search" placeholder="Search Project" onKeyUp={this.change_input}/>
+                <input type="search" placeholder="Search Apps" onKeyUp={this.change_input}/>
                 <div className="search_icon"></div>
             </div>
         );

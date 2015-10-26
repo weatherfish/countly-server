@@ -230,7 +230,7 @@ $.extend(Template.prototype, {
 
     CountlyHelpers.setUpDateSelectors = function(self) {
 
-        $(event_emitter).on('date_fast_choise', function(e, period){
+        $(event_emitter).on('date_choise', function(e, period){
 
             console.log("emitter period:", period.period);
 
@@ -3123,6 +3123,7 @@ window.EventsView = countlyView.extend({
 });
 
 var AppRouter = Backbone.Router.extend({
+
     routes:{
         "/":"dashboard",
         "/analytics/sessions":"sessions",
@@ -3255,7 +3256,7 @@ var AppRouter = Backbone.Router.extend({
         this.eventsView = new EventsView();
         this.resolutionsView = new ResolutionView();
         this.durationsView = new DurationView();
-
+    
         Handlebars.registerPartial("date-selector", $("#template-date-selector").html());
         Handlebars.registerPartial("timezones", $("#template-timezones").html());
         Handlebars.registerPartial("app-categories", $("#template-app-categories").html());
@@ -3355,7 +3356,19 @@ var AppRouter = Backbone.Router.extend({
         });
 
         var self = this;
+
         $(document).ready(function () {
+
+            $(event_emitter).on('app_changed', function(e, data){
+
+                self.activeAppName = "hello";
+                self.activeAppKey  = data.app_key;
+
+                countlyCommon.setActiveApp(data.app_id);
+
+                self.activeView.appChanged();
+
+            }.bind(self));
 
             CountlyHelpers.initializeSelect();
             CountlyHelpers.initializeTextSelect();

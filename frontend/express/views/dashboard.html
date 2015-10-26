@@ -25,8 +25,8 @@
 		<link rel="stylesheet" href="<%- cdn %>stylesheets/calendar.css" />
 		<!--link rel="stylesheet" href="<%- cdn %>javascripts/react/rc-calendar/assets/index.css" /-->
 
-		<link rel="stylesheet" href="<%- cdn %>javascripts/react/widgets/dist/css/core.css" />
-		<link rel="stylesheet" href="<%- cdn %>javascripts/react/widgets/dist/css/react-widgets.css" />
+		<link rel="stylesheet" href="<%- cdn %>javascripts/react_old/widgets/dist/css/core.css" />
+		<link rel="stylesheet" href="<%- cdn %>javascripts/react_old/widgets/dist/css/react-widgets.css" />
 
 		<script type="text/javascript">
 		    var event_emitter = {};
@@ -56,9 +56,11 @@
 
 javascripts/utils/react-widgets.js
 
+javascripts/react/widgets/dist/react-widgets.js
+
 -->
 
-			<script type="text/jsx" src="<%- cdn %>javascripts/react/widgets/dist/react-widgets.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/utils/react-widgets.js"></script>
 
 			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.data.js"></script>
 			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.top.js"></script>
@@ -223,6 +225,8 @@ javascripts/utils/react-widgets.js
 
 		<div id="top_bar">
 		</div>
+
+		<div id="preloader"></div>
 
 		<!--div class="widget-content-top-test">
 

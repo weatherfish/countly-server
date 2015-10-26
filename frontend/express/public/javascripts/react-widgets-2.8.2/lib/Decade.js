@@ -120,7 +120,7 @@ exports['default'] = _react2['default'].createClass({
         return !_utilDates2['default'].inRange(date, min, max, 'year') ? _react2['default'].createElement(
           'td',
           { key: colIdx, role: 'presentation', className: 'rw-empty-cell' },
-          ' '
+          _react2['default'].createElement('span', { className: 'empty_date decade_selector' })
         ) : _react2['default'].createElement(
           'td',
           {
@@ -142,7 +142,7 @@ exports['default'] = _react2['default'].createClass({
                 'rw-state-focus': isFocused,
                 'rw-state-selected': isSelected,
                 'rw-now': currentYear
-              })
+              }, 'year_selector')
             },
             label
           )
