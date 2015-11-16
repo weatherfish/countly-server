@@ -106,7 +106,7 @@
                 grid:{ hoverable:true, borderColor:"null", color:"#999", borderWidth:0, minBorderMargin:10},
                 xaxis:{ minTickSize:1, tickDecimals:"number", tickLength:0},
                 yaxis:{ min:0, minTickSize:1, tickDecimals:"number", position:"right" },
-                legend:{ backgroundOpacity:0, margin:[20, -19] },
+                legend:{ backgroundOpaset:0, margin:[20, -19] },
                 colors:countlyCommon.GRAPH_COLORS
             };
 
@@ -181,8 +181,15 @@
     };
 
     // Draws a line graph with the given dataPoints to container.
-    countlyCommon.drawTimeGraph = function (dataPoints, container, bucket) {
+
+    var chart = false;
+    var _rickshaw_graph = false;
+    var _state_single_graph_data = false;
+    var initial_single_graph_data = false;
+
+    countlyCommon.drawTimeGraph = function (dataPoints, container, data_items, graph_width, graph_height, bucket) {
         _.defer(function(){
+          
             if (!dataPoints.length) {
                 $(container).hide();
                 $(container).siblings(".no-data").show();
@@ -202,26 +209,17 @@
                 }
             }
 
-            var graphProperties = {
-                    series:{
-                        lines:{ stack:false, show:true, fill:true, lineWidth:2, fillColor:{ colors:[
-                            { opacity:0 },
-                            { opacity:0.15 }
-                        ] }, shadowSize:0 },
-                        points:{ show:true, radius:4, shadowSize:0 },
-                        shadowSize:0
-                    },
-                    grid:{ hoverable:true, borderColor:"null", color:"#BDBDBD", borderWidth:0, minBorderMargin:10, labelMargin:10},
-                    xaxis:{ tickDecimals:"number", tickSize:0, tickLength:0 },
-                    yaxis:{ min:0, minTickSize:1, tickDecimals:"number", ticks:3, position:"right" },
-                    legend:{ show:false, margin:[-25, -44], noColumns:3, backgroundOpacity:0 },
-                    colors:countlyCommon.GRAPH_COLORS
-                };
+            console.log("countlyCommon.drawTimeGraph:", container, " datapoints:");
+            console.log(dataPoints);
 
-            graphProperties.series.points.show = (dataPoints[0].data.length <= 90);
+            var time_period = countlyCommon.periodObj.currentPeriodArr;
+
+            /*var margin = {top: 20, right: 80, bottom: 30, left: 50},
+                width = 960 - margin.left - margin.right,
+                height = 300 - margin.top - margin.bottom;*/
 
             var graphTicks = [],
-                tickObj = {};
+                   tickObj = {};
 
             if (_period == "month" && !bucket) {
                 tickObj = countlyCommon.getTickObj("monthly");
@@ -229,213 +227,657 @@
                 tickObj = countlyCommon.getTickObj(bucket);
             }
 
-            graphProperties.xaxis.max = tickObj.max;
-            graphProperties.xaxis.min = tickObj.min;
-            graphProperties.xaxis.ticks = tickObj.ticks;
-
             graphTicks = tickObj.tickTexts;
 
-            var graphObj = $.plot($(container), dataPoints, graphProperties),
-                keyEventCounter = "A",
-                keyEvents = [],
-                keyEventsIndex = 0;
+            /*
+                data formatting
+            */
 
-            for (var k = 0; k < graphObj.getData().length; k++) {
+            if (!time_period){
+                time_period = graphTicks;
+                var parseDate = function(date_for_parse){
 
-                var tmpMax = 0,
-                    tmpMaxIndex = 0,
-                    tmpMin = 999999999999,
-                    tmpMinIndex = 0,
-                    label = (graphObj.getData()[k].label + "").toLowerCase();
-
-                if (graphObj.getData()[k].mode === "ghost") {
-                    keyEventsIndex += graphObj.getData()[k].data.length;
-                    continue;
-                }
-
-                $.each(graphObj.getData()[k].data, function (i, el) {
-
-                    //data point is null
-                    //this workaround is used to start drawing graph with a certain padding
-                    if (!el[1] && el[1] !== 0) {
-                        return true;
-                    }
-
-                    el[1] = parseFloat(el[1]);
-
-                    if (el[1] >= tmpMax) {
-                        tmpMax = el[1];
-                        tmpMaxIndex = el[0];
-                    }
-
-                    if (el[1] <= tmpMin) {
-                        tmpMin = el[1];
-                        tmpMinIndex = el[0];
-                    }
-                });
-
-                if (tmpMax == tmpMin) {
-                    continue;
-                }
-
-                keyEvents[k] = [];
-
-                keyEvents[k][keyEvents[k].length] = {
-                    data:[tmpMinIndex, tmpMin],
-                    code:keyEventCounter,
-                    color:graphObj.getData()[k].color,
-                    event:"min",
-                    desc:jQuery.i18n.prop('common.graph-min', tmpMin, label, graphTicks[tmpMinIndex])
-                };
-
-                keyEventCounter = String.fromCharCode(keyEventCounter.charCodeAt() + 1);
-
-                keyEvents[k][keyEvents[k].length] = {
-                    data:[tmpMaxIndex, tmpMax],
-                    code:keyEventCounter,
-                    color:graphObj.getData()[k].color,
-                    event:"max",
-                    desc:jQuery.i18n.prop('common.graph-max', tmpMax, label, graphTicks[tmpMaxIndex])
-                };
-
-                keyEventCounter = String.fromCharCode(keyEventCounter.charCodeAt() + 1);
-            }
-
-            var graphWidth = graphObj.width();
-
-            for (var k = 0; k < keyEvents.length; k++) {
-                var bgColor = graphObj.getData()[k].color;
-
-                if (!keyEvents[k]) {
-                    continue;
-                }
-
-                for (var l = 0; l < keyEvents[k].length; l++) {
-                    var o = graphObj.pointOffset({x:keyEvents[k][l]["data"][0], y:keyEvents[k][l]["data"][1]});
-                    var p = graphObj.pointOffset({x:keyEvents[k][l]["data"][0], y:keyEvents[k][l]["data"][1]});
-
-                    if (o.left <= 15) {
-                        o.left = 15;
-                    }
-
-                    if (o.left >= (graphWidth - 15)) {
-                        o.left = (graphWidth - 15);
-                    }
-
-                    var keyEventLabel = $('<div class="graph-key-event-label">').text(keyEvents[k][l]["code"]);
-
-                    keyEventLabel.attr({
-                        "title":keyEvents[k][l]["desc"],
-                        "data-points":"[" + keyEvents[k][l]["data"] + "]"
-                    }).css({
-                        "position":'absolute',
-                        "left":o.left,
-                        "top":o.top - 33,
-                        "display":'none',
-                        "background-color":bgColor
-                    }).appendTo(graphObj.getPlaceholder()).show();
-
-                    $(".tipsy").remove();
-                    keyEventLabel.tipsy({gravity:$.fn.tipsy.autoWE, offset:3, html:true});
+                    var now = new Date();
+                    var today = d3.time.day(now);
+                    date_for_parse = d3.time.format("%Y-%m-%d")(today) + "-" + date_for_parse;
+                    return d3.time.format("%Y-%m-%d-%H:%M").parse(date_for_parse);
                 }
             }
-
-            // Add note labels to the graph
-            if (!(bucket == "hourly" && dataPoints[0].data.length > 24) && bucket != "weekly") {
-                var noteDateIds = countlyCommon.getNoteDateIds(bucket),
-                    frontData = graphObj.getData()[graphObj.getData().length - 1],
-                    startIndex = (!frontData.data[1] && frontData.data[1] !== 0)? 1 : 0;
-
-                for (var k = 0, l = startIndex; k < frontData.data.length; k++, l++) {
-					if(frontData.data[l]){
-						var graphPoint = graphObj.pointOffset({x:frontData.data[l][0], y:frontData.data[l][1]});
-	
-						if (countlyCommon.getNotesForDateId(noteDateIds[k]).length) {
-							$('<div class="graph-note-label"><div class="point"></div></div>').attr({
-								"data-title":tickObj.tickTexts[k],
-								"data-notes":countlyCommon.getNotesForDateId(noteDateIds[k]),
-								"data-value":frontData.data[l][1].toFixed(1).replace(".0", "") + " " + frontData.label,
-								"data-points":"[" + frontData.data[l] + "]"
-							}).css({
-								"position":'absolute',
-								"left":graphPoint.left,
-								"top":graphPoint.top,
-								"display":'none',
-								"border-color":frontData.color
-							}).appendTo(graphObj.getPlaceholder()).show();
-						}
-					}
-                }
-
-                $(".graph-note-label").mouseenter(function() {
-                    $("#graph-tooltip").remove();
-
-                    var noteLines = ($(this).data("notes") + "").split("==="),
-                        contents = "<div class='label-value'>" + '<span id="graph-tooltip-title">' + $(this).data("title") + '</span>' + $(this).data("value") + "</div><div class='separator'></div>";
-
-                    for (var i = 0; i < noteLines.length; i++) {
-                        contents += "<div class='note-line'>&#8226; " + noteLines[i] + "</div>";
-                    }
-
-                    var tooltip = '<div id="graph-tooltip">' + contents + '</div>',
-                        x = $(this).offset().left,
-                        y = $(this).offset().top,
-                        widthVal,
-                        heightVal;
-
-                    $("#content").append("<div id='tooltip-calc'>" + tooltip + "</div>");
-                    widthVal = $("#graph-tooltip").outerWidth();
-                    heightVal = $("#graph-tooltip").outerHeight();
-                    $("#tooltip-calc").remove();
-
-                    var newLeft = x - widthVal,
-                        xReach = x + widthVal;
-
-                    if (xReach > $(window).width()) {
-                        newLeft = x - widthVal - 10;
-                    } else if (xReach < 800) {
-                        newLeft = x + $(this).outerWidth() + 10;
-                    } else {
-                        newLeft -= 10;
-                    }
-
-                    $(tooltip).css({
-                        top: y - (heightVal / 2) + ($(this).height() / 2),
-                        left: newLeft
-                    }).appendTo("body").fadeIn(200);
-                });
-
-                $(".graph-note-label").mouseleave(function() {
-                    $("#graph-tooltip").remove();
-                });
+            else
+            {
+                var parseDate = d3.time.format("%Y.%m.%d").parse;
             }
 
-            var previousPoint;
+            var graph_data = [];
 
-            $(container).unbind("plothover");
-            $(container).bind("plothover", function (event, pos, item) {
-                if (item) {
-                    if (previousPoint != item.dataIndex) {
-                        previousPoint = item.dataIndex;
-
-                        $("#graph-tooltip").remove();
-                        var x = item.datapoint[0].toFixed(1).replace(".0", ""),
-                            y = item.datapoint[1].toFixed(1).replace(".0", "");
-
-                        // If this is the "ghost" graph don't add the date
-                        if (item.series.color === "#DDDDDD") {
-                            showTooltip(item.pageX, item.pageY - 40, y + " " + item.series.label);
-                        } else {
-                            showTooltip(item.pageX, item.pageY - 40, y + " " + item.series.label, tickObj.tickTexts[item.dataIndex]);
-                        }
-                    }
-                } else {
-                    $("#graph-tooltip").remove();
-                    previousPoint = null;
+            for (var i = 0; i < time_period.length; i++)
+            {
+                var obj = {
+                    "date" : parseDate(time_period[i]),
                 }
+
+                dataPoints.forEach(function(set){
+
+                    if (!set.data[i])
+                    {
+                        obj[set.label] = 0;
+                    }
+                    else
+                    {
+                        obj[set.label] = set.data[i][1];
+                    }
+
+                });
+
+                graph_data.push(obj);
+            }
+
+            var color = d3.scale.category10();
+
+            color.domain(d3.keys(graph_data[0]).filter(function(key) { return key !== "date"; }));
+
+            var single_graph_data = color.domain().map(function(name, i) {
+                  return {
+                    name: name,
+                    values: graph_data.map(function(d) {
+                        return {x: d.date.getTime(), y: +d[name]};
+                    }),
+                    color : data_items[i].color
+                  };
             });
-        }, dataPoints, container, bucket);
+
+            if (container.indexOf("#") > -1)
+            {
+                var draw_element = document.getElementById(container.replace("#", ""));
+            }
+            else
+            {
+                var draw_element = document.getElementsByClassName(container.replace(".", ""));
+            }
+
+            var series = [];
+
+            single_graph_data.forEach(function(data, i){
+
+                series.push({
+                    color : data_items[i].color,
+                    data  : data.values,
+                    name  : data.name
+                })
+
+            });
+
+            _rickshaw_graph = new Rickshaw.Graph({
+              	element  : draw_element,
+              	width    : graph_width,
+              	height   : graph_height,
+              	renderer : 'line',
+              	series : series
+            });
+
+            var scales = [];
+
+            _ref = single_graph_data[0];
+
+            for (_j = 0, _len = _ref.length; _j < _len; _j++) {
+                point = _ref[_j];
+                point.y *= point.y;
+            }
+
+            for (_k = 0, _len1 = single_graph_data.length; _k < _len1; _k++) {
+                series = single_graph_data[_k];
+                min = Number.MAX_VALUE;
+                max = Number.MIN_VALUE;
+                for (_l = 0, _len2 = series.length; _l < _len2; _l++) {
+                    point = series[_l];
+                    min = Math.min(min, point.y);
+                    max = Math.max(max, point.y);
+
+                    console.log("check point:");
+                    console.log(point);
+                }
+
+                console.log("min:", min, ", max:", max);
+
+                if (_k === 0) {
+                    scales.push(d3.scale.linear().domain([min, max]).nice());
+                } else {
+                    scales.push(d3.scale.pow().domain([min, max]).nice());
+                }
+            }
+
+            var y_axis_left = new Rickshaw.Graph.Axis.Y({
+                graph: _rickshaw_graph,
+                orientation: 'left',
+                tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+                element: document.getElementById('axis_left'),
+                /*pixelsPerTick : 200*/
+            });
+
+            document.getElementById('axis_right').style.left = (graph_width - 20) + "px";
+
+            var y_axis_right = new Rickshaw.Graph.Axis.Y({
+                graph: _rickshaw_graph,
+                orientation: 'right',
+                tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+                element: document.getElementById('axis_right'),
+                //pixelsPerTick : 200
+            });
+
+            _rickshaw_graph.period = _period;
+
+            new Rickshaw.Graph.Axis.Time({
+                graph: _rickshaw_graph,
+                //tickFormat: format
+            });
+
+            _state_single_graph_data   = single_graph_data;
+            initial_single_graph_data = single_graph_data;
+
+            var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+            	graph: _rickshaw_graph,
+            	formatter: function(series, x, y) {
+
+                  var date = new Date(x);
+                  var date_string = date.toLocaleFormat('%d %B %Y');
+
+                  var hover_html = "<div>";
+
+                  hover_html += "<div class='date_string'>" + date_string + "</div>";
+
+                  _state_single_graph_data.forEach(function(data, sg){
+
+                      for (var i=0; i < data.values.length; i++)
+                      {
+                          if (data.values[i].x == x)
+                          {
+
+                              hover_html += "<div class='hover_element'><div class='circle' style='background-color:" + data_items[sg].color + "'></div><div class='name'>" + data.name + "</div><div class='value'>" + data.values[i].y + "</div></div>";
+                              break;
+                          }
+                      }
+
+                  });
+
+                  hover_html += "</div>"
+
+              		return hover_html;
+            	}
+            });
+
+            _rickshaw_graph.render();
+
+            return true;
+
+        });
     };
+
+    countlyCommon.updateTimeGraph = function (dataPoints, container, data_items, bucket) {
+
+        if (!_rickshaw_graph)
+        {
+            return false;
+        }
+
+        if (dataPoints[0] && dataPoints[0].data[0][0] == 1) {
+            for (var i = 0; i < dataPoints.length; i++) {
+                for (var j = 0; j < dataPoints[i].data.length; j++) {
+                    dataPoints[i].data[j][0] -= 1;
+                }
+            }
+        }
+
+        var time_period = countlyCommon.periodObj.currentPeriodArr;
+
+/*
+        var margin = {top: 20, right: 80, bottom: 30, left: 50},
+            width = 960 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+*/
+
+        var graphTicks = [],
+               tickObj = {};
+
+        if (_period == "month" && !bucket) {
+            tickObj = countlyCommon.getTickObj("monthly");
+        } else {
+            tickObj = countlyCommon.getTickObj(bucket);
+        }
+
+        console.log("+++++++++++++++ tickObj 1 ++++++++++++++++");
+        console.log(tickObj);
+
+        /*graphProperties.xaxis.max = tickObj.max;
+        graphProperties.xaxis.min = tickObj.min;
+        graphProperties.xaxis.ticks = tickObj.ticks;*/
+
+        graphTicks = tickObj.tickTexts;
+
+        //var parseDate = d3.time.format("%Y.%m.%d").parse;
+
+        if (!time_period){
+            //console.log("-------------- time_period = graphTicks -------------");
+            time_period = graphTicks;
+            var parseDate = d3.time.format("%H:%M").parse;
+        }
+        else
+        {
+            var parseDate = d3.time.format("%Y.%m.%d").parse;
+        }
+
+        console.log("========= time_period =============");
+        console.log(time_period);
+
+        /*
+            data formatting
+        */
+
+        var graph_data = [];
+
+        for (var i = 0; i < time_period.length; i++)
+        {
+
+            var obj = {
+                "date" : parseDate(time_period[i]),
+            }
+
+            if (!obj.date)
+            {
+                console.log("!obj.date", time_period[i]);
+                continue;
+            }
+
+            dataPoints.forEach(function(set){
+
+                if (!set.data[i])
+                {
+                    obj[set.label] = 0;
+                }
+                else
+                {
+                    obj[set.label] = set.data[i][1];
+                }
+
+            });
+
+            graph_data.push(obj);
+        }
+
+        var color = d3.scale.category10();
+
+        color.domain(d3.keys(graph_data[0]).filter(function(key) { return key !== "date"; }));
+
+        console.log("===================== _state_single_graph_data ===================");
+        console.log(initial_single_graph_data);
+
+        var single_graph_data = color.domain().map(function(name, i) {
+
+              var color = false;
+
+              for (var c = 0; c < initial_single_graph_data.length; c++)
+              {
+
+                  console.log("check name:::", initial_single_graph_data[c].name, ">>", name);
+
+                  if (initial_single_graph_data[c].name == name)
+                  {
+                      console.log("found...");
+                      console.log(initial_single_graph_data[c]);
+                      color = initial_single_graph_data[c].color;
+                      break;
+                  }
+              }
+
+              console.log(">>>>> color:", color);
+
+              return {
+                  name: name,
+                  values: graph_data.map(function(d) {
+                      //return {date: d.date, value: +d[name]};
+                      return {x: d.date.getTime(), y: +d[name]};
+                  }),
+                  color : color
+              };
+        });
+
+        _state_single_graph_data = single_graph_data;
+
+        /*
+            add or remove graph line path element
+        */
+        if (_rickshaw_graph.series.length != single_graph_data.length)
+        {
+
+            console.log("---add or remove---");
+            console.log(single_graph_data);
+
+            var new_series = [];
+
+            for (var i = 0; i < (_rickshaw_graph.series.length - single_graph_data.length); i++)
+            {
+                _rickshaw_graph.series.pop();
+            }
+
+            for (var i = 0; i < single_graph_data.length; i++)
+            {
+                _rickshaw_graph.series[i] = {
+                    color : single_graph_data[i].color,
+                    data  : single_graph_data[i].values,
+                    name  : single_graph_data[i].name
+                }
+            }
+
+        }
+        else
+        {
+            console.log("--- update data ---");
+
+            for (var i = 0; i < _rickshaw_graph.series.length; i++)
+            {
+                _rickshaw_graph.series[i].data = single_graph_data[i].values;
+            }
+        }
+
+        _rickshaw_graph.period = _period;
+
+        _rickshaw_graph.update();
+
+/*
+        if (container.indexOf("#") > -1)
+        {
+            var draw_element = document.getElementById(container.replace("#", ""));
+        }
+        else
+        {
+            var draw_element = document.getElementsByClassName(container.replace(".", ""));
+        }
+
+        console.log("{{{{{ draw element }}}}}");
+        console.log(draw_element);
+
+        var graph = new Rickshaw.Graph({
+            element  : draw_element,
+            width    : 960,
+            height   : 300,
+            renderer : 'line',
+            series: [
+              {
+                  color : "#c05020",
+                  data  : single_graph_data[0].values,
+                  name  : single_graph_data[0].name
+              }, {
+                  color : "#30c020",
+                  data  : single_graph_data[1].values,
+                  name  : single_graph_data[1].name
+              }, {
+                  color : "#6060c0",
+                  data  : single_graph_data[2].values,
+                  name  : single_graph_data[2].name
+              }
+            ]
+        });
+
+        var scales = [];
+
+        _ref = single_graph_data[0];
+
+        console.log("________ ref _________");
+        console.log(_ref);
+
+        for (_j = 0, _len = _ref.length; _j < _len; _j++) {
+            point = _ref[_j];
+            point.y *= point.y;
+        }
+
+        for (_k = 0, _len1 = single_graph_data.length; _k < _len1; _k++) {
+            series = single_graph_data[_k];
+            min = Number.MAX_VALUE;
+            max = Number.MIN_VALUE;
+            for (_l = 0, _len2 = series.length; _l < _len2; _l++) {
+                point = series[_l];
+                min = Math.min(min, point.y);
+                max = Math.max(max, point.y);
+            }
+            if (_k === 0) {
+                scales.push(d3.scale.linear().domain([min, max]).nice());
+            } else {
+                scales.push(d3.scale.pow().domain([min, max]).nice());
+            }
+        }
+
+        graph.render();
+*/
+        return false;
+
+
+/*
+        x.domain(d3.extent(graph_data, function(d) { return d.date; }));
+
+        y.domain([
+            d3.min(single_graph_data, function(c) { return d3.min(c.values, function(v) { return v.value; }); }),
+            d3.max(single_graph_data, function(c) { return d3.max(c.values, function(v) { return v.value; }); })
+        ]);
+*/
+
+        var values_list_array = [];
+        var axis_array = [];
+
+        for (var i = 0; i < single_graph_data.length; i++)
+        {
+            values_list_array[i] = [];
+            values_list_array[i][0] = single_graph_data[i].name;
+            axis_array[i] = [];
+            axis_array[i][0] = 'x' + i;
+        }
+
+        for (var i = 0; i < single_graph_data[0].values.length; i++)
+        {
+            for (var j = 0; j < single_graph_data.length; j++)
+            {
+                values_list_array[j].push(single_graph_data[j].values[i].value);
+                axis_array[j].push(single_graph_data[j].values[i].date);
+            }
+        }
+
+        /*var columns = {
+            bindto: container,
+            data: {
+                xs: { },
+                columns: [ ]
+            }
+        }*/
+
+        var columns = [];
+
+        for (var i = 0; i < values_list_array.length; i++)
+        {
+            columns.push(values_list_array[i]);
+            columns.push(axis_array[i]);
+        }
+
+        console.log("{{{{{{{{{ chart_object }}}}}}}}}");
+        console.log(columns);
+        console.log("[[[[[[[[[[[[ current [[[[[[[[]]]]]]]]]]]]");
+        console.log(chart.data.names());
+        console.log("[[[[[[[[[[[[ labels [[[[[[[[]]]]]]]]]]]]");
+        console.log(chart.axis.labels({}));
+        console.log("[[[[[[[[[[[[ xs [[[[[[[[]]]]]]]]]]]]");
+        console.log(chart.xs());
+
+        var unload_ids = [];
+
+        var xs_data = chart.xs();
+
+        /*
+            todo : completely change the algorithm of unload and load - not optimal
+        */
+
+        for (var key in xs_data)
+        {
+            /*
+                check if key exist in the new data. If no - it will be unloaded
+            */
+
+            var is_exist = false;
+
+            for (var i = 0; i < columns.length; i++)
+            {
+                if (columns[i][0] == key)
+                {
+                    is_exist = true;
+                    break;
+                }
+            }
+
+            if (is_exist == false){
+              unload_ids.push(key);
+            }
+        }
+
+        console.log("--------------- unload -----------");
+        console.log(unload_ids);
+
+        chart.unload({
+            ids: unload_ids
+        });
+
+        chart.load({
+                columns : columns
+            });
+
+        /*chart.load({
+                columns : columns
+            });
+*/
+        return false;
+
+        var elements = svg.selectAll(".set")
+              .data(single_graph_data)
+
+        elements
+            .selectAll("path")
+            .transition()
+            .duration(750)
+            .attr("d", function(d) {
+                return change_line(d.values);
+            })
+
+        var set = elements.enter().append("g")
+                  .attr("class", "set");
+
+        set.append("path")
+                  .attr("class", "line")
+                  .attr("d", function(d) { return line(d.values); })
+                  .style("stroke", function(d) { return color(d.name); });
+
+        elements.exit()
+            .selectAll("path")
+            .transition()
+            .duration(750)
+            .attr("d", function(d) {
+                return hide_line(d.values);
+            })
+            .remove()
+
+          /*
+              update dots
+          */
+
+          var all_points = svg.selectAll('.dots')
+                .data(single_graph_data)
+
+
+          var all_dots = all_points.selectAll('.dot')
+                           .data(function(d, index){
+                                var a = [];
+                                d.values.forEach(function(point,i){
+                                    if (point.value > 0)
+                                    {
+                                        a.push({'index': index, 'point': point, 'color' : color(d.name)});
+                                    }
+                                });
+                                return a;
+                            })
+
+
+                  all_dots.transition()
+                            .duration(750)
+                            .attr("transform", function(d) {
+                                return "translate(" + x(d.point.date) + "," + y(d.point.value) + ")"; }
+                            );
+
+                var enter_dots = all_dots.enter()
+                    .append('g')
+                    .transition()
+                    .duration(750)
+                    .attr("transform", function(d) {
+                        return "translate(" + x(d.point.date) + "," + y(d.point.value) + ")"; }
+                    );
+
+
+/*
+          var enter_points = all_points.enter()
+                .append("g")
+                  .attr("class", "dots")
+                .attr("clip-path", "url(#clip)");
+
+          var dots = enter_points.selectAll('.dot')
+                           .data(function(d, index){
+                                var a = [];
+                                d.values.forEach(function(point,i){
+                                    if (point.value > 0)
+                                    {
+                                        a.push({'index': index, 'point': point, 'color' : color(d.name)});
+                                    }
+                                });
+                                return a;
+                            })
+                            .enter()
+                            .append('g')
+                            .attr("transform", function(d) {
+                                return "translate(" + x(d.point.date) + "," + y(d.point.value) + ")"; }
+                            );
+*/
+
+          enter_dots.append('circle')
+              .attr('class','dot')
+              .attr("r", 6)
+              .attr('fill', function(d,i){
+                  return d.color;
+              })
+              /*.attr("transform", function(d) {
+                  return "translate(" + x(d.point.date) + "," + y(d.point.value) + ")"; }
+              );*/
+
+          enter_dots.append('circle')
+              .attr('class','dot')
+              .attr("r", 4)
+              .attr('fill', function(d,i){
+                  return "white";
+              })
+              /*.attr("transform", function(d) {
+                  return "translate(" + x(d.point.date) + "," + y(d.point.value) + ")"; }
+              );*/
+
+/*
+              all_points.exit()
+                  .selectAll(".dot")
+                  .transition()
+                  .duration(750)
+                  .attr("transform", function(d) {
+                      return "translate(" + x(d.point.date) + "," + y(0) + ")"; }
+                  )
+                  .remove()*/
+
+              all_dots.exit()
+                  /*.transition()
+                  .duration(750)
+                  .attr("transform", function(d) {
+                      return "translate(" + x(d.point.date) + "," + y(0) + ")"; }
+                  )*/
+                  .remove()
+
+    }
 
     countlyCommon.drawGauge = function(targetEl, value, maxValue, gaugeColor, textField) {
         var opts = {
@@ -545,6 +987,9 @@
 
         countlyCommon.periodObj = getPeriodObj();
 
+        console.log("================= countlyCommon.periodObj =================");
+        console.log(countlyCommon.periodObj);
+
         var periodMin = countlyCommon.periodObj.periodMin,
             periodMax = (countlyCommon.periodObj.periodMax + 1),
             dataObj = {},
@@ -628,7 +1073,7 @@
             keyEvents[k].max = _.max(chartVals);
         }
 
-        return {"chartDP":chartData, "chartData":_.compact(tableData), "keyEvents":keyEvents};
+        return {"chartDP":chartData, "chartData":_.compact(tableData), "keyEvents":keyEvents, "time_period" : countlyCommon.periodObj.currentPeriodArr, "time_format" : countlyCommon.periodObj.dateString };
     };
 
     countlyCommon.extractTwoLevelData = function (db, rangeArray, clearFunction, dataProperties) {
@@ -805,7 +1250,7 @@
 
         return {"chartData":_.compact(tableData)};
     };
-    
+
     countlyCommon.mergeMetricsByName = function(chartData, metric){
         var uniqueNames = {},
             data;
@@ -878,12 +1323,12 @@
 
         return barData;
     };
-	
+
 	countlyCommon.extractUserChartData = function (db, label, sec) {
 		var ret = {"data":[],"label":label};
         countlyCommon.periodObj = getPeriodObj();
         var periodMin, periodMax, dateob;
-			
+
 		if(countlyCommon.periodObj.isSpecialPeriod){
 			periodMin = 0;
             periodMax = (countlyCommon.periodObj.daysInPeriod);
@@ -896,7 +1341,7 @@
             periodMax = countlyCommon.periodObj.periodMax;
 			dateob = countlyCommon.processPeriod(countlyCommon.periodObj.activePeriod.toString());
 		}
-		var res = [], 
+		var res = [],
 			ts;
 		//get all timestamps in that period
 		for(var i = 0, l = db.length; i < l; i++){
@@ -928,7 +1373,7 @@
 		}
         return ret;
     };
-	
+
 	countlyCommon.processPeriod = function(period){
 		var date = period.split(".");
 		var range,
@@ -1181,11 +1626,11 @@
 
     countlyCommon.divide = function (val1, val2) {
         var temp = val1 / val2;
-	
+
         if (!temp || temp == Number.POSITIVE_INFINITY) {
             temp = 0;
         }
-	
+
         return temp;
     };
 
@@ -1351,7 +1796,7 @@
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return parts.join(".");
     };
-	
+
 	countlyCommon.pad = function(n, width, z){
 		z = z || '0';
 		n = n + '';
@@ -1477,7 +1922,7 @@
             }
         }
     };
-	
+
 	countlyCommon.formatTimeAgo = function(timestamp) {
 		var target = new Date(timestamp*1000);
 		var now = new Date();
@@ -1495,7 +1940,7 @@
 		if (diff <= 777600) {return "1 week ago";}
 		return "on " + target.toString().split(" GMT")[0];
 	};
-	
+
 	countlyCommon.formatTime = function(timestamp) {
 		var str = "";
 		var seconds = timestamp % 60;
@@ -1517,7 +1962,7 @@
 		}
 		return str;
 	};
-    
+
     countlyCommon.timeString = function(timespent){
         var timeSpentString = (timespent.toFixed(1)) + " " + jQuery.i18n.map["common.minute.abrv"];
 
@@ -1529,8 +1974,8 @@
             timeSpentString = (timespent / 60).toFixed(1) + " " + jQuery.i18n.map["common.hour.abrv"];
         }
         return timeSpentString;
-        
-        
+
+
         /*var timeSpentString = "";
         if(timespent > 1){
             timeSpentString = Math.floor(timespent) + " " + jQuery.i18n.map["common.minute.abrv"]+" ";
@@ -1559,28 +2004,28 @@
         }
         return timeSpentString;*/
     };
-	
+
 	countlyCommon.getDate = function(timestamp) {
 		var d = new Date(timestamp*1000);
 		return leadingZero(d.getDate())+"."+leadingZero(d.getMonth()+1)+"."+d.getFullYear();
 	}
-	
+
 	countlyCommon.getTime = function(timestamp) {
 		var d = new Date(timestamp*1000);
 		return leadingZero(d.getHours())+":"+leadingZero(d.getMinutes());
 	}
-	
+
 	function leadingZero(value){
 		if(value > 9)
 			return value
 		return "0"+value;
 	}
-    
+
     countlyCommon.round = function(num, digits) {
         digits = Math.pow(10, digits || 0);
         return Math.round(num * digits) / digits;
     };
-    
+
     countlyCommon.getDashboardData = function(data, properties, _periodObj){
         function clearObject(obj){
             if (obj) {
@@ -1594,7 +2039,7 @@
                     obj[properties[i]] = 0;
                 }
             }
-    
+
             return obj;
         };
 
@@ -1604,7 +2049,7 @@
             current = {},
             previous = {},
             change = {};
-            
+
             for(var i = 0; i < properties.length; i++){
                 current[properties[i]] = 0;
                 previous[properties[i]] = 0;
@@ -1632,7 +2077,7 @@
             tmp_y = countlyCommon.getDescendantProp(data, _periodObj.previousPeriod);
             tmp_x = clearObject(tmp_x);
             tmp_y = clearObject(tmp_y);
-            
+
             for(var i = 0; i < properties.length; i++){
                 current[properties[i]] = tmp_x[properties[i]];
                 previous[properties[i]] = tmp_y[properties[i]];

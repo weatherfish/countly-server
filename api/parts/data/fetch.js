@@ -157,6 +157,10 @@ var fetch = {},
     };
 
     fetch.fetchCollection = function (collection, params) {
+
+        console.log("fetchCollection:", collection);
+        console.log(params);
+
         common.db.collection(collection).findOne({'_id':params.app_id}, function (err, result) {
             if (!result) {
                 result = {};
@@ -187,6 +191,9 @@ var fetch = {},
             fetchFields[params.time.daily] = 1;
             fetchFields['meta'] = 1;
         }
+
+        console.log("fetchTimeData:");
+        console.log(params);
 
         common.db.collection(collection).findOne({'_id':params.app_id}, fetchFields, function (err, result) {
             if (!result) {
@@ -453,22 +460,16 @@ var fetch = {},
     */
 
     fetch.countryLatLon = function (iso3, callback) {
-        common.db.collection('countries_latlon').findOne({ "iso3" : iso3 }, function (err, geo_data) {
+        common.db.collection('countries_geo_data').findOne({ "iso3" : iso3 }, function (err, geo_data) {
 
             /* new method */
-
-            var avg_lat = (geo_data.location_box.min_lat + geo_data.location_box.max_lat) / 2;
-            var avg_lon = (geo_data.location_box.min_lon + geo_data.location_box.max_lon) / 2;
-
-            geo_data.lat = avg_lat;
-            geo_data.lon = avg_lon;
 
             var iso2 = geo_data.iso2;
 
             console.log("=============== fetch geo_data ===========");
             console.log(geo_data);
 
-            var patch = fs.readFileSync('./cities_geo_patch.json', 'utf8');
+            var patch = fs.readFileSync('./countries_geo_patch.json', 'utf8');
             patch = JSON.parse(patch);
             patch = patch[iso2];
 
@@ -484,6 +485,17 @@ var fetch = {},
                         case "top":
 
                             var total_height = Math.abs(location_box.max_lat) - Math.abs(location_box.min_lat);
+
+                            var new_height = total_height + total_height / 100 * patch.top;
+
+                            if (geo_data.location_box.max_lat > 0)
+                            {
+                                geo_data.location_box.max_lat = geo_data.location_box.max_lat - (total_height - new_height);
+                            }
+                            else
+                            {
+                                geo_data.location_box.max_lat = geo_data.location_box.max_lat + (total_height - new_height);
+                            }
 
                         break;
 
@@ -544,6 +556,13 @@ var fetch = {},
                     }
                 }
             }
+
+            /*
+              calculate center
+            */
+
+            geo_data.lat = (geo_data.location_box.min_lat + geo_data.location_box.max_lat) / 2;
+            geo_data.lon = (geo_data.location_box.min_lon + geo_data.location_box.max_lon) / 2;
 
             //console.log("========== patch =======");
             //console.log(patch);

@@ -23,6 +23,14 @@
 		<link rel="stylesheet" href="<%- cdn %>stylesheets/v2.css" />
 		<link rel="stylesheet" href="<%- cdn %>stylesheets/ui.v2.topbar.css" />
 		<link rel="stylesheet" href="<%- cdn %>stylesheets/calendar.css" />
+
+		<link rel="stylesheet" href="<%- cdn %>stylesheets/calendar.css" />
+		<link rel="stylesheet" href="<%- cdn %>stylesheets/line_chart.css" />
+
+		<link rel="stylesheet" href="<%- cdn %>stylesheets/big_number.css" />
+
+		<!--link rel="stylesheet" href="<%- cdn %>stylesheets/table_wrapper.css" /-->
+
 		<!--link rel="stylesheet" href="<%- cdn %>javascripts/react/rc-calendar/assets/index.css" /-->
 
 		<link rel="stylesheet" href="<%- cdn %>javascripts/react_old/widgets/dist/css/core.css" />
@@ -30,19 +38,36 @@
 
 		<script type="text/javascript">
 		    var event_emitter = {};
+				var global_controller = {};
+
     </script>
 
     	<!-- PRODUCTION -->
+
+			<script type="text/javascript" src="<%- cdn %>javascripts/react-with-addons.js"></script>
+			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+
     	<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.dom.js?<%= countlyVersion %>"></script>
-    	<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.utils.js?<%= countlyVersion %>"></script>
+    	<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.utils.concat.js?<%= countlyVersion %>"></script>
 
 			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/country_codes.js"></script>
 			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/datamaps.world.min.js"></script>
 			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/topojson.min.js"></script>
 
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/c3/c3.js"></script>
+
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.js"></script>
+
+			<link rel="stylesheet" href="<%- cdn %>javascripts/visualization/c3/c3.css" />
+
+			<link rel="stylesheet" href="<%- cdn %>javascripts/react_old/widgets/dist/css/react-widgets.css" />
+
+			<link rel="stylesheet" href="<%- cdn %>stylesheets/tables.css" />
+
+			<link rel="stylesheet" href="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.css" />
+
 			<!--script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script-->
-			<script type="text/javascript" src="<%- cdn %>javascripts/react-with-addons.js"></script>
-			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+
 
 			<script language="javascript" type="text/javascript" src="http://ricostacruz.com/jquery.transit/jquery.transit.min.js"></script>
 
@@ -68,10 +93,13 @@ javascripts/react/widgets/dist/react-widgets.js
 			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.left.js"></script>
 			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.applist.js"></script>
 			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.js"></script>
-
 			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.topbar.js"></script>
-
 			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.calendar.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.big_number.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.data_date_sign.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table_filter.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table_wrapper.js"></script>
 
 			<!--script type="text/jsx" src="<%- cdn %>javascripts/react/clear_test/calendar_out.js"></script-->
 
@@ -155,7 +183,7 @@ javascripts/react/widgets/dist/react-widgets.js
 
 								React.render(
 										<CalendarWrapper />,
-										document.getElementById("calendar")
+										document.getElementById("calendar_block")
 								);
 
 						}, 200);
@@ -233,7 +261,7 @@ javascripts/react/widgets/dist/react-widgets.js
 	</div-->
 
 
-		<div id="calendar">
+		<div id="calendar_block">
 		</div>
 
     <div id="app-tooltip"></div>
@@ -467,8 +495,9 @@ javascripts/react/widgets/dist/react-widgets.js
 						<div class="pie-overlay one {{logo-class}}">
 							<div class="title">{{pie-titles.left}}</div>
 						</div>
-						<div id="dashboard-graph" class="graph" style="margin:0 auto; height:360px; font-family:'Ubuntu';"></div>
-					</div>
+						<div id="dashboard-graph" class="graph" style="margin:0 auto; height:360px;"></div>
+
+						</div>
 				</div>
 				<div class="pie-chart-container">
 					<div class="graph-segment-container">
@@ -489,10 +518,15 @@ javascripts/react/widgets/dist/react-widgets.js
 				</div>
 				{{else}}
                 <div id="dashboard-graph" class="graph" style="height:100%; margin-left:-10px;"></div>
+								<div id="axis_left"></div>
+								<div id="axis_right"></div>
 				{{/if}}
 			</div>
+
+			<div class="big-numbers-container"></div>
+
 			{{#if big-numbers}}
-			<div class="widget-footer" style="background-color:#EEEEEE;">
+			<!--div class="widget-footer" style="background-color:#EEEEEE;">
 				<div id="big-numbers-container">
 					{{#each big-numbers.items}}
 					<div class="big-numbers three-column help-zone-vs" data-help-localize="help.{{this.help}}">
@@ -505,9 +539,11 @@ javascripts/react/widgets/dist/react-widgets.js
 					</div>
 					{{/each}}
 				</div>
-			</div>
+			</div-->
 			{{/if}}
+
 		</div>
+
 		{{#if bars}}
 		<div class="dashboard-summary three">
 			{{#each bars}}
@@ -529,10 +565,25 @@ javascripts/react/widgets/dist/react-widgets.js
 			{{/each}}
 		</div>
 		{{/if}}
-        <table id="dataTableOne" class="d-table help-zone-vb" cellpadding="0" cellspacing="0" data-help-localize="help.{{{table-helper}}}"></table>
-        {{#if two-tables}}
-        <table id="dataTableTwo" class="d-table help-zone-vb" cellpadding="0" cellspacing="0" data-help-localize="help.{{{table-helper}}}"></table>
-        {{/if}}
+
+				<div class="table_block">
+				</div>
+
+				<!--div class="table_wrapper">
+						<div class="data_sign">DATA</div>
+						<div class="data_date_sign"></div>
+
+						<div class="table_filter_wrapper">
+								<!--div class="icon"></div>
+								<input type="search" class="table_filter" placeholder="Search the Data"-->
+						<!--/div>
+
+						<table id="dataTableOne" class="d-table help-zone-vb" cellpadding="0" cellspacing="0" data-help-localize="help.{{{table-helper}}}"></table>
+		        {{#if two-tables}}
+		        <table id="dataTableTwo" class="d-table help-zone-vb" cellpadding="0" cellspacing="0" data-help-localize="help.{{{table-helper}}}"></table>
+		        {{/if}}
+				</div-->
+
 	</script>
 
 	<script id="template-allapps"  type="text/x-handlebars-template">
@@ -1115,6 +1166,8 @@ javascripts/react/widgets/dist/react-widgets.js
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.lib.js?<%= countlyVersion %>"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.plugins.js?<%= countlyVersion %>"></script>
 
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/rickshaw/rickshaw.js"></script>
+
 		<% } else { %>
 	    <!-- DEVELOPMENT -->
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/utils/textcounter.min.js"></script>
@@ -1126,7 +1179,10 @@ javascripts/react/widgets/dist/react-widgets.js
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/flot/jquery.flot.stack.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/gauge.min.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/d3/d3.min.js"></script>
-	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/rickshaw/rickshaw.min.js"></script>
+
+	    <!--script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/rickshaw/rickshaw.min.js"></script-->
+
+
 		<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.common.js?<%= countlyVersion %>"></script>
 		<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.config.js?<%= countlyVersion %>"></script>
 		<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.event.js?<%= countlyVersion %>"></script>
@@ -1141,7 +1197,10 @@ javascripts/react/widgets/dist/react-widgets.js
 		<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.app.version.js?<%= countlyVersion %>"></script>
 		<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.carrier.js?<%= countlyVersion %>"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.allapps.js?<%= countlyVersion %>"></script>
-		<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.template.js?<%= countlyVersion %>"></script>
+
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.template.js?<%= countlyVersion %>"></script>
+
+
 			<% if (plugins) { %>
 				<% for(var i=0, l=plugins.length; i<l; i++) {%>
 					<script language="javascript" type="text/javascript" src="<%- cdn %><%= plugins[i] %>/javascripts/countly.models.js?<%= countlyVersion %>"></script>

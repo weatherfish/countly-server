@@ -21,6 +21,8 @@
             _activeAppKey = countlyCommon.ACTIVE_APP_KEY;
             _initialized = true;
 
+            console.log("---- ajax 1 ---", countlyCommon.API_PARTS.data.r);
+
             return $.ajax({
                 type:"GET",
                 url:countlyCommon.API_PARTS.data.r,
@@ -37,6 +39,9 @@
 
                     countlySession.initialize();
                     countlyLocation.initialize();
+
+                    $(event_emitter).trigger("ajax_complete", { "url" : countlyCommon.API_PARTS.data.r });
+
                 }
             });
         } else {
@@ -51,6 +56,8 @@
                 _activeAppKey = countlyCommon.ACTIVE_APP_KEY;
                 return countlyUser.initialize();
             }
+
+            console.log("---- ajax 2 ---", countlyCommon.API_PARTS.data.r);
 
             return $.ajax({
                 type:"GET",
@@ -68,6 +75,9 @@
 
                     countlySession.refresh(json);
                     countlyLocation.refresh(json);
+
+                    $(event_emitter).trigger("ajax_complete", { "url" : countlyCommon.API_PARTS.data.r });
+
                 }
             });
         } else {

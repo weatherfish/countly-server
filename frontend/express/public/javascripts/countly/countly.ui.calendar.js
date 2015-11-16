@@ -74,6 +74,10 @@ var CalendarWrapper = React.createClass({
 
         var date_values = this.fill_date_values(date_range);
 
+        global_controller.date_string = date_values.from_string + " - " + date_values.to_string;
+
+        $(event_emitter).trigger("date_init", { "state" : { "from_string" : date_values.first_date_year, "to_string" : date_values.last_date_year } } );
+
         return {
             choise_open     : false,
             calendars_open  : false,
@@ -84,17 +88,18 @@ var CalendarWrapper = React.createClass({
             in_close           : false, // 2-step animation during both panel closing
             //left_date      : false, // todo: now they are globals
             //right_date     : false,
-            from_string : /*date_range[0] + " " + */date_values.first_date_year,
-            to_string   : /*date_range[1] + " " + */date_values.last_date_year,
+            from_string : date_values.first_date_year,
+            to_string   : date_values.last_date_year,
             fast_choise : countlyCommon.getPeriod()
         };
     },
 
+    /*
+        Create string with date description
+    */
+
     fill_date_values : function(date_range)
     {
-
-        console.log("[[[[[[[[[[[[[[[[[[ fill_date_values ]]]]]]]]]]]]]]]]]]");
-        console.log(date_range);
 
         if (countlyCommon.periodObj.currentPeriodArr) // not "today" and "year???" - fast choise
         {
@@ -132,11 +137,8 @@ var CalendarWrapper = React.createClass({
 
             if(Object.prototype.toString.call(date_range) === '[object Array]') {
 
-                if (date_range[0].indexOf(":") > -1)
+                if (date_range[0].indexOf(":") > -1) // today
                 {
-                    console.log("=========== today variant ============");
-                    console.log(date_range);
-
                     /*
                         ["00:00", "17:15"]
                     */
@@ -153,9 +155,6 @@ var CalendarWrapper = React.createClass({
                         Last Year: "Jan" - current month
                     */
 
-                    console.log("=========== other period ============");
-                    console.log(date_range);
-
                     var current_year = new Date().getFullYear();
 
                     var first_date_year = date_range[0];
@@ -165,18 +164,12 @@ var CalendarWrapper = React.createClass({
                     right_date.date = new Date();
                 }
             }
-            /*else
-            {
-
-
-            }*/
         }
 
         return {
-            first_date_year : first_date_year,
+            first_date_year : first_date_year,  // first_date_year - wrong variable name
             last_date_year  : last_date_year
         }
-
     },
 
     handleOpenClick: function(i) {
@@ -239,48 +232,10 @@ var CalendarWrapper = React.createClass({
 
         // ----------
 
-/*
-        if (countlyCommon.periodObj.currentPeriodArr)
-        {
-            var current_period = countlyCommon.periodObj.currentPeriodArr;
-            var first_date = current_period[0].split(".");
-            var last_date  = current_period[current_period.length - 1].split(".");
-
-            var left_month  = first_date[1] - 1;
-            var right_month = last_date[1] - 1;
-
-            left_date.date  = new Date(first_date[0], left_month, first_date[2]);
-            right_date.date = new Date(last_date[0], right_month, last_date[2]);
-
-            console.log("first_date:", left_date.date);
-            console.log("last_date:", right_date.date);
-
-            var first_date_year = first_date[0];
-            var last_date_year  = last_date[0];
-        }
-        else
-        {
-
-            left_date.date  = new Date();
-            right_date.date = new Date();
-
-            var first_date_year = "Today";
-            var last_date_year  = "Today";
-        }
-
-        var state_obj = {
-            from_string    : date_range[0] + " " + first_date_year,
-            to_string      : date_range[1] + " " + last_date_year,
-            fast_choise    : choise
-        };
-*/
-
         var date_values = this.fill_date_values(date_range);
 
         var state_obj = {
-            //from_string : date_range[0]/* + " " + date_values.first_date_year*/, // todo : "2014 2014", "2015 2015"
-            //to_string   : date_range[1]/* + " " + date_values.last_date_year*/,
-            from_string : date_values.first_date_year,
+            from_string : date_values.first_date_year, // first_date_year - wrong variable name
             to_string   : date_values.last_date_year,
             fast_choise : choise
         }
@@ -301,7 +256,9 @@ var CalendarWrapper = React.createClass({
 
         this.setState(state_obj);
 
-        $(event_emitter).trigger("date_choise", { "period" : choise });
+        //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
+
+        $(event_emitter).trigger("date_choise", { "period" : choise, "state" : state_obj });
 
     },
 
@@ -385,7 +342,9 @@ var CalendarWrapper = React.createClass({
 
         this.setState(state_obj);
 
-        $(event_emitter).trigger("date_choise", { "period" : [date_from, date_to] }); // todo: change date_fast_choise
+        //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
+
+        $(event_emitter).trigger("date_choise", { "period" : [date_from, date_to], "state" : state_obj }); // todo: change date_fast_choise
 
     },
 
@@ -571,42 +530,52 @@ var CalendarWrapper = React.createClass({
             custom_choice_class += " active";
         }
 
+        var element_width = window.innerWidth - 240 - 20 - 20 - 16;
+
+        var element_style = {
+            width : element_width
+        };
+
         return (
-          <div className="wrapper">
 
-              <div className={date_sign_class} onClick={this.handleOpenClick}>
-                  <span className="icon"></span>
-                  <span className="sign">{this.state.from_string} - {this.state.to_string}</span>
-                  <span className="arrow"></span>
-              </div>
+            <div className="wrapper" style={element_style}>
 
-              <div className={selectors_class_name}>
+                <div id="calendar">
 
-                  <div className="top_arrow"></div>
+                    <div className={date_sign_class} onClick={this.handleOpenClick}>
+                        <span className="icon"></span>
+                        <span className="sign">{this.state.from_string} - {this.state.to_string}</span>
+                        <span className="arrow"></span>
+                    </div>
 
-                  {fast_choises_html}
+                    <div className={selectors_class_name}>
 
-                  <div className={custom_choice_class} onClick={this.handleOpenCalendars}>
-                      <span>Custom</span>
-                      <div className="arrow"></div>
-                  </div>
-              </div>
+                        <div className="top_arrow"></div>
 
-              <div className={calendars_class_name}>
+                        {fast_choises_html}
 
-                  <div className="calendar_wrapper">
-                      <ReactWidgets.Calendar dayComponent={DayComponentLeft} max={right_date.date} onChange={this.handleLeftChange} defaultValue={left_date.date}  />
-                  </div>
-                  <div className="calendar_wrapper">
-                      <ReactWidgets.Calendar dayComponent={DayComponentRight} min={left_date.date} onChange={this.handleRightChange} defaultValue={right_date.date}  />
-                  </div>
+                        <div className={custom_choice_class} onClick={this.handleOpenCalendars}>
+                            <span>Custom</span>
+                            <div className="arrow"></div>
+                        </div>
+                    </div>
 
-                  <div className="confirm_button" onClick={this.handleDateSelect}>
-                      Confirm Range
-                  </div>
-              </div>
+                    <div className={calendars_class_name}>
 
-          </div>
+                        <div className="calendar_wrapper">
+                            <ReactWidgets.Calendar dayComponent={DayComponentLeft} max={right_date.date} onChange={this.handleLeftChange} defaultValue={left_date.date}  />
+                        </div>
+                        <div className="calendar_wrapper">
+                            <ReactWidgets.Calendar dayComponent={DayComponentRight} min={left_date.date} onChange={this.handleRightChange} defaultValue={right_date.date}  />
+                        </div>
+
+                        <div className="confirm_button" onClick={this.handleDateSelect}>
+                            Confirm Range
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         );
     },
 

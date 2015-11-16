@@ -181,7 +181,7 @@
         } else if (sessionDuration >= 60) {
             timeSpentString = (sessionDuration / 60).toFixed(1) + " " + jQuery.i18n.map["common.hour.abrv"];
         }*/
-        
+
         var timeSpentString = countlyCommon.timeString(sessionDuration);
 
         dataArr =
@@ -310,8 +310,9 @@
         var chartData = [
                 { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#DDDDDD', mode:"ghost" },
                 { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#333933' }
-            ],
-            dataProps = [
+            ];
+            
+        var dataProps = [
                 {
                     name:"pt",
                     func:function (dataObj) {

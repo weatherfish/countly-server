@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="14px" height="13px" viewBox="-1 -1 15 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.3 (12081) - http://www.bohemiancoding.com/sketch -->
+    <title>Oval 176 + Path 343</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Artboard-2" sketch:type="MSArtboardGroup" transform="translate(-215.000000, -216.000000)">
+            <g id="Oval-176-+-Path-343" sketch:type="MSLayerGroup" transform="translate(215.000000, 216.000000)">
+                <circle id="Oval-176" stroke="#7AE4A3" sketch:type="MSShapeGroup" cx="5.5" cy="5.5" r="5.5"></circle>
+                <path d="M9.5,9 L12.5,11.5" id="Path-343" stroke="#79E4A3" stroke-linecap="round" sketch:type="MSShapeGroup"></path>
+            </g>
+        </g>
+    </g>
+</svg>

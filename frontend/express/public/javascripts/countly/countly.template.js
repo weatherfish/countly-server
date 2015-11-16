@@ -1,3 +1,5 @@
+/** @jsx React.DOM */
+
 /*
  A countly view is defined as a page corresponding to a url fragment such
  as #/manage/apps. This interface defines common functions or properties
@@ -231,8 +233,6 @@ $.extend(Template.prototype, {
     CountlyHelpers.setUpDateSelectors = function(self) {
 
         $(event_emitter).on('date_choise', function(e, period){
-
-            console.log("emitter period:", period.period);
 
             self.dateChanged(period.period);
 
@@ -508,6 +508,8 @@ $.extend(Template.prototype, {
 				_activeAppKey = countlyCommon.ACTIVE_APP_KEY;
 				_initialized = true;
 
+        console.log("+++ ajax call 1 +++");
+
 				return $.ajax({
 					type:"GET",
 					url:countlyCommon.API_PARTS.data.r,
@@ -519,8 +521,12 @@ $.extend(Template.prototype, {
 					},
 					dataType:"jsonp",
 					success:function (json) {
-						_Db = json;
-						setMeta();
+
+              console.log("+++ ajax call 1 finish +++");
+              console.log(json);
+
+  						_Db = json;
+  						setMeta();
 					}
 				});
 			} else {
@@ -1112,6 +1118,8 @@ window.SessionView = countlyView.extend({
         var sessionData = countlySession.getSessionData(),
             sessionDP = countlySession.getSessionDP();
 
+        var self = this;
+
         this.templateData = {
             "page-title":jQuery.i18n.map["sessions.title"],
             "logo-class":"sessions",
@@ -1122,43 +1130,201 @@ window.SessionView = countlyView.extend({
                         "title":jQuery.i18n.map["common.total-sessions"],
                         "total":sessionData.usage["total-sessions"].total,
                         "trend":sessionData.usage["total-sessions"].trend,
-                        "help":"sessions.total-sessions"
+                        "help":"sessions.total-sessions",
+                        "color" : "#1B8AF3"
                     },
                     {
                         "title":jQuery.i18n.map["common.new-sessions"],
                         "total":sessionData.usage["new-users"].total,
                         "trend":sessionData.usage["new-users"].trend,
-                        "help":"sessions.new-sessions"
+                        "help":"sessions.new-sessions",
+                        "color" : "#F2B702"
                     },
                     {
                         "title":jQuery.i18n.map["common.unique-sessions"],
                         "total":sessionData.usage["total-users"].total,
                         "trend":sessionData.usage["total-users"].trend,
-                        "help":"sessions.unique-sessions"
+                        "help":"sessions.unique-sessions",
+                        "color" : "#FF7D7D"
                     }
                 ]
             }
         };
 
+        var change_active = function(id)
+        {
+            console.log("--- change active click element ---");
+            console.log(id);
+
+            if (id > -1)
+            {
+                self.templateData["big-numbers"]["items"][id].active = !self.templateData["big-numbers"]["items"][id].active;
+            }
+
+            var data_array = sessionDP.chartDP.slice(0);
+
+            var active_array = [];
+
+            for (var i = 0; i < data_array.length; i++)
+            {
+                if (self.templateData["big-numbers"]["items"][i].active)
+                {
+                    active_array.push(data_array[i]);
+                }
+            }
+
+            console.log("======== active ============");
+            console.log(active_array);
+
+            countlyCommon.updateTimeGraph(active_array, "#dashboard-graph", self.templateData["big-numbers"].items);
+
+        }
+
+        var table = false;
+
+        var rows = sessionDP.chartData;
+
+        function rowGetter(rowIndex) {
+            return rows[rowIndex];
+        }
+
+        $(event_emitter).on('date_choise', function(e, period){
+
+            console.log("date_choise emitter period:", period.period);
+
+            /*
+                update the graph
+            */
+
+            sessionDP = countlySession.getSessionDP();
+            change_active(-1);
+
+        //    rows = sessionDP.chartData;
+        //    React.render(table, document.getElementsByClassName('d-table')[0]);
+
+
+            /*var sidebar_width = 240;
+            var margin_left = 30;
+            var margin_right = 30;
+
+            var table_width = window.innerWidth - sidebar_width - margin_left - margin_right;*/
+
+            var rows = sessionDP.chartData;
+
+            var table_wrapper = React.createElement(TableWrapper, { "rows" : rows }, null);
+            React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
+
+            /*
+                update big numbers
+            */
+
+            var big_numbers = document.getElementsByClassName("big-numbers-container")[0].childNodes;
+
+            var sessionData = countlySession.getSessionData();
+
+            var items = [
+                {
+                    "title":jQuery.i18n.map["common.total-sessions"],
+                    "total":sessionData.usage["total-sessions"].total,
+                    "trend":sessionData.usage["total-sessions"].trend,
+                    "help":"sessions.total-sessions",
+                    "color" : "#1B8AF3"
+                },
+                {
+                    "title":jQuery.i18n.map["common.new-sessions"],
+                    "total":sessionData.usage["new-users"].total,
+                    "trend":sessionData.usage["new-users"].trend,
+                    "help":"sessions.new-sessions",
+                    "color" : "#F2B702"
+                },
+                {
+                    "title":jQuery.i18n.map["common.unique-sessions"],
+                    "total":sessionData.usage["total-users"].total,
+                    "trend":sessionData.usage["total-users"].trend,
+                    "help":"sessions.unique-sessions",
+                    "color" : "#FF7D7D"
+                }
+            ]
+
+            for (var i = 0; i < big_numbers.length; i++)
+            {
+                React.render(React.createElement(BigNumber,
+                {
+                    "title"  : items[i].title,
+                    "value"  : items[i].total,
+                    "color"  : items[i].color,
+                    //"active" : true,
+                    "on_click" : change_active,
+                    "id" : i
+                }), big_numbers[i]);
+            }
+
+            /*self.templateData["big-numbers"].items[i].active = true;
+            */
+            /*$(event_emitter).on('ajax_complete', function(e, url){
+            });*/
+
+        }.bind(self));
+
         if (!isRefresh) {
+
             $(this.el).html(this.template(this.templateData));
-            countlyCommon.drawTimeGraph(sessionDP.chartDP, "#dashboard-graph");
 
-            this.dtable = $('.d-table').dataTable($.extend({}, $.fn.dataTable.defaults, {
-                "aaData": sessionDP.chartData,
-                "aoColumns": [
-                    { "mData": "date", "sType":"customDate", "sTitle": jQuery.i18n.map["common.date"] },
-                    { "mData": "t", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.table.total-sessions"] },
-                    { "mData": "n", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.table.new-sessions"] },
-                    { "mData": "u", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.table.unique-sessions"] }
-                ]
-            }));
+            var self = this;
 
-            $(".d-table").stickyTableHeaders();
+            setTimeout(function(){ // todo: remove setTimeout
+
+                var sidebar_width = 240;
+                var margin_left = 30;
+                var padding_left = 30;
+                var margin_right = 30;
+
+                var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
+
+                document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
+
+                document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
+                document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
+                document.getElementById('dashboard-graph').style['margin-left'] = 20 + "px";
+
+                countlyCommon.drawTimeGraph(sessionDP.chartDP, "#dashboard-graph", self.templateData["big-numbers"].items, graph_width, 300);
+
+                /* BIG NUMBERS */
+
+                for (var i = 0; i < self.templateData["big-numbers"].items.length; i++)
+                {
+
+                    var node = document.createElement("div");
+
+                    document.getElementsByClassName("big-numbers-container")[0].appendChild(node);
+
+                    self.templateData["big-numbers"].items[i].active = true;
+
+                    React.render(React.createElement(BigNumber,
+                    {
+                        "title"  : self.templateData["big-numbers"].items[i].title,
+                        "value"  : self.templateData["big-numbers"].items[i].total,
+                        "color"  : self.templateData["big-numbers"].items[i].color,
+                        "active" : true,
+                        "on_click" : change_active,
+                        "id" : i
+                    }), node);
+                }
+
+                /* TABLE WRAPPER */
+
+                var table_wrapper = React.createElement(TableWrapper, { "rows" : rows }, null);
+
+                React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
+
+            }, 1000);
+
         }
     },
     refresh:function () {
         var self = this;
+
+        /*
         $.when(countlyUser.initialize()).then(function () {
             if (app.activeView != self) {
                 return false;
@@ -1173,6 +1339,7 @@ window.SessionView = countlyView.extend({
 
             app.localize();
         });
+        */
     }
 });
 
@@ -1225,7 +1392,7 @@ window.UserView = countlyView.extend({
                 ]
             }));
 
-            $(".d-table").stickyTableHeaders();
+            //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
@@ -1378,7 +1545,7 @@ window.AllAppsView = countlyView.extend({
             this.drawGraph();
             $(".dataTable-bottom").append("<div clas='dataTables_info' style='float: right; margin-top:2px; margin-right: 10px;'>Maximum number of applications to be compared (10)</div>")
 
-            $(".d-table").stickyTableHeaders();
+            //$(".d-table").stickyTableHeaders();
 
             $('.allapps tbody').on("click", "tr", function (event){
                 var td = $(event.target).closest("td");
@@ -1482,7 +1649,7 @@ window.LoyaltyView = countlyView.extend({
                 ]
             }));
 
-            $(".d-table").stickyTableHeaders();
+            //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
@@ -1540,7 +1707,7 @@ window.CountriesView = countlyView.extend({
             ]
         }));
 
-        $(".d-table").stickyTableHeaders();
+        //$(".d-table").stickyTableHeaders();
     },
     renderCommon:function (isRefresh) {
         var sessionData = countlySession.getSessionData();
@@ -1688,7 +1855,7 @@ window.FrequencyView = countlyView.extend({
                 ]
             }));
 
-            $(".d-table").stickyTableHeaders();
+            //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
@@ -1776,7 +1943,7 @@ window.DeviceView = countlyView.extend({
                 ]
             }));
 
-            $(".d-table").stickyTableHeaders();
+            //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
@@ -1870,7 +2037,7 @@ window.PlatformView = countlyView.extend({
                 ]
             }));
 
-            $("#dataTableTwo").stickyTableHeaders();
+            //$("#dataTableTwo").stickyTableHeaders();
         }
     },
     refresh:function () {
@@ -1927,7 +2094,7 @@ window.AppVersionView = countlyView.extend({
                 ]
             }));
 
-            $(".d-table").stickyTableHeaders();
+            //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
@@ -1979,7 +2146,7 @@ window.CarrierView = countlyView.extend({
                 ]
             }));
 
-            $(".d-table").stickyTableHeaders();
+            //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
@@ -2033,7 +2200,7 @@ window.ResolutionView = countlyView.extend({
                 ]
             }));
 
-            $(".d-table").stickyTableHeaders();
+            //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
@@ -2084,7 +2251,7 @@ window.DurationView = countlyView.extend({
                 ]
             }));
 
-            $(".d-table").stickyTableHeaders();
+            //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
@@ -2856,7 +3023,7 @@ window.EventsView = countlyView.extend({
             "aoColumns": aaColumns
         }));
 
-        $(".d-table").stickyTableHeaders();
+        //$(".d-table").stickyTableHeaders();
     },
     getColumnCount:function(){
         return $(".dataTable").find("thead th").length;
@@ -3256,7 +3423,7 @@ var AppRouter = Backbone.Router.extend({
         this.eventsView = new EventsView();
         this.resolutionsView = new ResolutionView();
         this.durationsView = new DurationView();
-    
+
         Handlebars.registerPartial("date-selector", $("#template-date-selector").html());
         Handlebars.registerPartial("timezones", $("#template-timezones").html());
         Handlebars.registerPartial("app-categories", $("#template-app-categories").html());

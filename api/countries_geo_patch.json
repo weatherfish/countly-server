@@ -1,0 +1,37 @@
+{
+    "ISO2" : {
+        "side" : "the difference in percent"
+    },
+    "AU" : {
+        "bottom" : -29
+    },
+    "SD" : {
+        "bottom" : -25
+    },
+    "ZA" : {
+        "bottom" : -48,
+        "right"  : -22
+    },
+    "BR" : {
+        "right" : -10
+    },
+    "CL" : {
+        "left" : 75
+    },
+    "ES" : {
+        "bottom" : -45,
+        "left"   : 60,
+        "right"  : -10
+    },
+    "GB" : {
+        "top" : -20
+    },
+    "EC" : {
+        "left" : 65
+    },
+    "JP" : {
+        "bottom" : -30,
+        "left"   : 20,
+        "right"  : -32
+    }
+}

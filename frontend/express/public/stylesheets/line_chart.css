@@ -1,0 +1,96 @@
+/*.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+  stroke-dasharray: 10, 2;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 3px;
+}*/
+
+#axis_left {
+    position: absolute;
+    height: 800px;
+    width: 40px;
+    top : 0px;
+    left : -20px;
+    z-index : 1500;
+}
+
+/*
+#axis_left line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispedges;
+    stroke-dasharray: 10, 2;
+}
+*/
+
+.rickshaw_graph .y_grid .tick {
+    stroke: rgba(3, 3, 3, 0.2);
+    stroke-dasharray: 5, 3;
+    stroke-width: 1px;
+    shape-rendering: crispedges;
+}
+
+#axis_right {
+    position: absolute;
+    /*left: 800px;*/
+    height: 800px;
+    width: 40px;
+    top : 0px;
+    z-index : 1500;
+}
+
+.date_string {
+    background-color : #132737;
+    padding : 10px;
+    border-radius:4px; /* must be in rickshaw.css .rickshaw_graph .detail .x_label */
+    /*font-weight : bold;*/
+    font-family: Lato-Medium;
+    font-size: 8px;
+    color: #FFFFFF;
+    letter-spacing: 0.17px;
+}
+
+.hover_element {
+    padding : 10px;
+    /*background-color : #2e3545;*/
+}
+
+.hover_element .circle {
+    width: 8px;
+    height: 8px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    /*background-color: white;*/
+    display : inline-block;
+}
+
+.hover_element .name {
+    margin-left : 10px;
+    display : inline-block;
+    width : 90px;
+    font-family: Lato-Light;
+    font-size: 10px;
+    color: #FFFFFF;
+}
+
+.hover_element .value {
+    display : inline-block;
+    width : 30px;
+    font-weight : bold;
+    text-align : right;
+    font-family: ProximaNova-Regular;
+    font-size: 10px;
+    color: #FFFFFF;
+}

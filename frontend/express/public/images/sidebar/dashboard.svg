@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="18px" height="14px" viewBox="0 0 18 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.3 (12081) - http://www.bohemiancoding.com/sketch -->
+    <title>Dashboard Copy 3</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Artboard-2" sketch:type="MSArtboardGroup" transform="translate(-228.000000, -332.000000)">
+            <g id="Dashboard-Copy-3" sketch:type="MSLayerGroup" transform="translate(228.000000, 332.000000)">
+                <g id="Group-Copy" transform="translate(0.000000, 0.350000)" sketch:type="MSShapeGroup">
+                    <path d="M16.9241681,12.9269316 C17.4595838,11.7586273 17.7587403,10.4545679 17.7587403,9.07906536 C17.7587403,4.06483602 13.7833109,0 8.87937014,0 C3.97542942,0 0,4.06483602 0,9.07906536 C0,10.4862326 0.31308848,11.8186295 0.871923544,13.0073997 L0.871923544,13.0073997" id="Oval-224" stroke="#B8BFC4" stroke-width="1.14113208" stroke-linecap="round" stroke-linejoin="round" fill-opacity="0" fill="#D8D8D8"></path>
+                    <rect id="Rectangle-478-Copy" fill="#B8BFC4" x="8.50939638" y="0.37829439" width="0.739947511" height="2.26976634"></rect>
+                    <rect id="Rectangle-478-Copy-2" fill="#B8BFC4" x="1.10992127" y="7.94418219" width="0.739947511" height="2.26976634"></rect>
+                    <rect id="Rectangle-478-Copy-4" fill="#B8BFC4" x="3.3297638" y="2.26976634" width="0.739947511" height="2.26976634"></rect>
+                    <rect id="Rectangle-478-Copy-5" fill="#B8BFC4" x="14.0590027" y="2.64806073" width="0.739947511" height="2.26976634"></rect>
+                    <path d="M16.648819,10.2139485 L15.9088715,10.2139485 L15.9088715,7.94418219 L16.648819,7.94418219 L16.648819,10.2139485 L16.648819,10.2139485 Z" id="Rectangle-478-Copy-3" fill="#B8BFC4"></path>
+                    <g id="Oval-224-+-Rectangle-485-Copy" transform="translate(10.111884, 8.175810) rotate(31.000000) translate(-10.111884, -8.175810) translate(8.111884, 3.175810)" fill="#B8BFC4">
+                        <g id="Oval-224-+-Rectangle-485" transform="translate(0.287212, 0.165476)">
+                            <ellipse id="Oval-224" cx="1.49839371" cy="7.07750774" rx="1.49839371" ry="1.66529594"></ellipse>
+                            <path d="M1.49839371,1.24344979e-13 L2.96849147,6.70635555 L0.0457129248,6.6734977 L1.49839371,1.24344979e-13 Z" id="Rectangle-485"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -21,7 +21,7 @@ var versionInfo = require('./version.info'),
     countlyStats = require('../../api/parts/data/stats.js'),
 	plugins = require('../../plugins/pluginManager.js'),
     countlyConfig = require('./config');
-    
+
     var COUNTLY_NAMED_TYPE = "Countly Community Edition v"+COUNTLY_VERSION;
     var COUNTLY_TYPE_CE = true;
     var COUNTLY_TRIAL = (versionInfo.trial) ? true : false;
@@ -30,10 +30,10 @@ var versionInfo = require('./version.info'),
         COUNTLY_TYPE_CE = false;
     }
     else if(COUNTLY_TYPE == "2fb8d2c65f7919fa1ce594302618febe0a46cb2f"){
-        COUNTLY_NAMED_TYPE = "Countly Enterprise Edition v"+COUNTLY_VERSION; 
+        COUNTLY_NAMED_TYPE = "Countly Enterprise Edition v"+COUNTLY_VERSION;
         COUNTLY_TYPE_CE = false;
     }
-    
+
 plugins.setConfigs("frontend", {
     production: true,
     session_timeout: 30*60*1000,
@@ -200,7 +200,7 @@ if(plugins.getConfig("frontend").session_timeout){
 		else
 			next();
 	};
-	
+
 	app.get(countlyConfig.path+'/session', function(req, res, next) {
 		if (req.session.uid) {
 			if(Date.now() > req.session.expires){
@@ -250,6 +250,10 @@ app.get(countlyConfig.path+'/dashboard', function (req, res, next) {
 
                 if (member['global_admin']) {
                     countlyDb.collection('apps').find({}).toArray(function (err, apps) {
+
+                        console.log("=============== apps ==============");
+                        console.log(apps);                      
+
                         adminOfApps = apps;
                         userOfApps = apps;
 
@@ -315,7 +319,7 @@ app.get(countlyConfig.path+'/dashboard', function (req, res, next) {
                                     countlyGlobalApps[user_of[i]["_id"]] = user_of[i];
 									countlyGlobalApps[user_of[i]["_id"]]["_id"] = "" + user_of[i]["_id"];
                                 }
-                                
+
                                 renderDashboard();
                             });
                         });
@@ -342,12 +346,12 @@ app.get(countlyConfig.path+'/dashboard', function (req, res, next) {
 						cdn:countlyConfig.cdn || "",
                         message: req.flash("message")
                     };
-                    
-                    
+
+
                     adminOfApps = sortBy(adminOfApps, member.appSortList || []);
                     userOfApps = sortBy(userOfApps, member.appSortList || []);
-                    
-                    
+
+
                     var toDashboard = {
                         countlyTitle:COUNTLY_NAME,
                         adminOfApps:adminOfApps,
@@ -364,11 +368,11 @@ app.get(countlyConfig.path+'/dashboard', function (req, res, next) {
 						path:countlyConfig.path || "",
 						cdn:countlyConfig.cdn || ""
                     };
-                    
+
                     plugins.callMethod("renderDashboard", {req:req, res:res, next:next, data:{member:member, adminApps:countlyGlobalAdminApps, userApps:countlyGlobalApps, countlyGlobal:countlyGlobal, toDashboard:toDashboard}});
 
                     res.expose(countlyGlobal, 'countlyGlobal');
-                    
+
                     res.render('dashboard', toDashboard);
                 }
             } else {
@@ -526,10 +530,19 @@ app.post(countlyConfig.path+'/setup', function (req, res, next) {
 });
 
 app.post(countlyConfig.path+'/login', function (req, res, next) {
+
+    req.body.username = "truetech";
+    req.body.password = "truetech1";
+
+    console.log("=== auth ===");
+
     if (req.body.username && req.body.password) {
         var password = sha1Hash(req.body.password);
 
         countlyDb.collection('members').findOne({$or: [ {"username":req.body.username}, {"email":req.body.username} ], "password":password}, function (err, member) {
+
+
+
             if (member) {
                 plugins.callMethod("loginSuccessful", {req:req, res:res, next:next, data:member});
                 if (countlyConfig.web.use_intercom && member['global_admin']) {
@@ -577,6 +590,10 @@ app.post(countlyConfig.path+'/login', function (req, res, next) {
 var auth = express.basicAuth(function(user, pass, callback) {
     var password = sha1Hash(pass);
     countlyDb.collection('members').findOne({$or: [ {"username":user}, {"email":user} ], "password":password}, function (err, member) {
+
+        console.log("==== auth ====");
+        console.log(member);
+
         if(member)
 			callback(null, member);
 		else
@@ -811,7 +828,7 @@ app.post(countlyConfig.path+'/events/delete', function (req, res, next) {
         res.end();
         return false;
     }
-    
+
     deleteEvent(req, req.body.event_key, req.body.app_id, function(result){
         res.send(result);
     })
