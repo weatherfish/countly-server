@@ -97,6 +97,9 @@
             chartData2 = [],
             chartData3 = [];
 
+        console.log("--------- device names ---------");
+        console.log(deviceNames);
+
         var sum = _.reduce(deviceTotal, function (memo, num) {
             return memo + num;
         }, 0);

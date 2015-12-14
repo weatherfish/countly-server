@@ -67,6 +67,8 @@ var CalendarWrapper = React.createClass({
 
     getInitialState: function() {
 
+        var self = this;
+
         var date_range = countlyCommon.getDateRange();
         date_range = date_range.split(" - ");
 
@@ -77,6 +79,17 @@ var CalendarWrapper = React.createClass({
         global_controller.date_string = date_values.from_string + " - " + date_values.to_string;
 
         $(event_emitter).trigger("date_init", { "state" : { "from_string" : date_values.first_date_year, "to_string" : date_values.last_date_year } } );
+
+        $(event_emitter).on('date_extend', function(e, data){
+
+            var ld = new Date(left_date.date);
+            var extended_left_date = ld.setDate(ld.getDate() - data.days_extend);
+
+            left_date.date = new Date(extended_left_date);
+
+            self.handleDateSelect();
+
+        }.bind(self));
 
         return {
             choise_open     : false,
@@ -113,10 +126,10 @@ var CalendarWrapper = React.createClass({
 
             left_date.date  = new Date(first_date[0], left_month, first_date[2]);
             right_date.date = new Date(last_date[0], right_month, last_date[2]);
-
+/*
             console.log("first_date:", left_date.date);
             console.log("last_date:", right_date.date);
-
+*/
             var first_date_year = date_range[0];
 
             if (first_date[0] != first_date[0] && date_range[0].indexOf(",") == -1) // can be ["24 Feb", "19 Oct"] or ["12 Nov, 2014", "19 Oct, 2015"]
@@ -172,7 +185,69 @@ var CalendarWrapper = React.createClass({
         }
     },
 
+    clickedOutsideElement : function(event, elemId) {
+
+        if (!event)
+        {
+            return false;
+        }
+
+        var theElem = this.getEventTarget(event);
+        while(theElem != null) {
+          if(theElem.id == elemId)
+            return false;
+          theElem = theElem.offsetParent;
+        }
+        return true;
+    },
+
+    getEventTarget : function(evt) {
+        var targ = (evt.target) ? evt.target : evt.srcElement;
+        if(targ != null) {
+          if(targ.nodeType == 3)
+            targ = targ.parentNode;
+        }
+        return targ;
+    },
+
     handleOpenClick: function(i) {
+
+        var self = this;
+
+        document.onclick = function(event) {
+
+            if(self.clickedOutsideElement(event, 'calendar'))
+            {
+
+                console.log("{{{{{{{{{{{{{{{{{{{{{{{{click outside}}}}}}}}}}}}}}}}}}}}}}}}");
+                console.log();
+
+                /*
+                close time range window
+                */
+
+                //document.getElementById("btnConfirm").removeEventListener("click", function(e) { e.preventDefault(); }, false);
+                document.onclick = false;
+
+                var state_obj = { };
+
+                if (self.state.calendars_open == true)
+                {
+                    state_obj.calendars_open     = false;
+                    state_obj.transition_c_close = false;
+                    state_obj.in_close           = false;
+                }
+                else
+                {
+                    state_obj.choise_open      = false;
+                    state_obj.transition_close = false;
+                    state_obj.calendars_open   = false;
+                }
+
+                self.setState(state_obj);
+            }
+
+        }
 
         var state_obj = { };
 
@@ -217,13 +292,54 @@ var CalendarWrapper = React.createClass({
         }
     },
 
+    handleLeftChange : function(date){
+
+        var day   = date.getDate();
+        var month = date.getMonth();
+
+        left_date.day   = day;
+        left_date.month = month;
+
+        left_date.date = date;
+
+        this.setState({
+            "left_date" : date
+        });
+
+        return true;
+    },
+
+    handleRightChange : function(date){
+
+        var day   = date.getDate();
+        var month = date.getMonth();
+
+        right_date.day   = day;
+        right_date.month = month;
+
+        right_date.date = date;
+
+        this.setState({
+            "right_date" : date
+        });
+
+        return true;
+    },
+
+
     /*
         Push "1 week", "month" etc
     */
 
     handleFastChoise : function(choise){
 
+        //countlyCommon.setPeriod([date_from, date_to]);
+
+        console.log("fast choise:", choise);
+
         countlyCommon.setPeriod(choise);
+
+        document.onclick = false; // unbind closing on outside place
 
         // ----------
 
@@ -262,40 +378,6 @@ var CalendarWrapper = React.createClass({
 
     },
 
-    handleLeftChange : function(date){
-
-        var day   = date.getDate();
-        var month = date.getMonth();
-
-        left_date.day   = day;
-        left_date.month = month;
-
-        left_date.date = date;
-
-        this.setState({
-            "left_date" : date
-        });
-
-        return true;
-    },
-
-    handleRightChange : function(date){
-
-        var day   = date.getDate();
-        var month = date.getMonth();
-
-        right_date.day   = day;
-        right_date.month = month;
-
-        right_date.date = date;
-
-        this.setState({
-            "right_date" : date
-        });
-
-        return true;
-    },
-
     /*
       date select on time range
     */
@@ -306,6 +388,8 @@ var CalendarWrapper = React.createClass({
         {
             return false;
         }
+
+        document.onclick = false; // unbind closing on outside place
 
         var date_from = left_date.date.getTime();
         var date_to   = right_date.date.getTime();
@@ -423,6 +507,17 @@ var CalendarWrapper = React.createClass({
                 }
             }
         }
+
+        if (this.state.choise_open == true || this.state.transition_close == true)
+        {
+            document.getElementById('content-container').style['z-index'] = 101; // todo: !!!!! change
+        }
+        else
+        {
+            document.getElementById('content-container').style['z-index'] = 2000; // todo: !!!!! change
+
+        }
+
     },
 
     /*
@@ -475,7 +570,7 @@ var CalendarWrapper = React.createClass({
 
         var selectors_class_name = "dates_list";
 
-        if (this.state.choise_open)
+        if (this.state.choise_open == true)
         {
             selectors_class_name += " active";
         }
@@ -584,9 +679,9 @@ var CalendarWrapper = React.createClass({
         var t;
         var transitions = {
             'transition'      : 'transitionend',
-            'OTransition'     : 'oTransitionEnd',
+            /*'OTransition'     : 'oTransitionEnd',
             'MozTransition'   : 'transitionend',
-            'WebkitTransition': 'webkitTransitionEnd'
+            'WebkitTransition': 'webkitTransitionEnd'*/
         };
         for(t in transitions){
             if( el.style[t] !== undefined ){

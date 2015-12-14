@@ -386,6 +386,10 @@ if ( (typeof RICKSHAW_NO_COMPAT !== "undefined" && !RICKSHAW_NO_COMPAT) || typeo
 }
 Rickshaw.namespace('Rickshaw.Graph');
 
+//var _circle_radius = 4;
+var _hover_block_width = 180;
+var _left_extension_width = 40;
+
 Rickshaw.Graph = function(args) {
 
 	var self = this;
@@ -401,6 +405,17 @@ Rickshaw.Graph = function(args) {
 
 		this.updateCallbacks = [];
 		this.configureCallbacks = [];
+
+    this.left_time_extension = args.left_time_extension;
+
+    this.small_circles = args.small_circles;
+
+    this.big_circle_r = args.big_circle_r;
+    this.small_circle_r = args.small_circle_r;
+
+    this.circle_radius = this.big_circle_r;
+
+    this.zero_points = args.zero_points;
 
 		this.defaults = {
 			interpolation: 'linear', // 'cardinal',
@@ -421,12 +436,31 @@ Rickshaw.Graph = function(args) {
 		this.setSize({ width: args.width, height: args.height });
 		this.element.classList.add('rickshaw_graph');
 
+    //var left_shift = 50;
+
 		this.vis = d3.select(this.element)
 			.append("svg:svg")
+      .attr("id", "graph_svg")
 			.attr('width', this.width)
-			.attr('height', this.height);
+			.attr('height', this.height + this.circle_radius)
+      /*.style("position","relative")
+      .style("left", left_shift + "px")*/
+      /*.attr("transform", function(d) {
+           return "translate(" + left_shift + ", 100)"; }
+      )*/
+
 
 		this.discoverRange();
+
+    if (args.granularity)
+    {
+        this.granularity = args.granularity;
+    }
+    else
+    {
+        this.granularity = false;
+    }
+
 	};
 
 	this._loadRenderers = function() {
@@ -499,19 +533,69 @@ Rickshaw.Graph = function(args) {
 		// with other Graphs. We need to ensure we copy the scale
 		// so that our mutations do not change the object given to us.
 		// Hence the .copy()
-		this.x = (this.xScale || d3.scale.linear()).copy().domain(domain.x).range([0, this.width]);
-		this.y = (this.yScale || d3.scale.linear()).copy().domain(domain.y).range([this.height, 0]);
+
+    //domain.y[1] = domain.y[1] + 20; // todo: move to other place maybe./ todo : !!!!!!!!!!!
+
+
+    var y_domain = Math.round(domain.y[1]);
+
+    var first_digit = parseInt(y_domain.toString()[0]);
+
+    //console.log("first digit:", first_digit);
+
+    var y_domain_string = (first_digit + 1).toString();
+
+    for (var i = 0; i < y_domain.toString().length - 1; i++)
+    {
+        y_domain_string += "0";
+    }
+
+    y_domain = parseInt(y_domain_string);
+
+    //console.log("new domain:", y_domain);
+/*
+    console.log("++++++++++++  x domain ++++++++++ ");
+    console.log(domain);
+
+    console.log("left_time_extension:", this.left_time_extension);
+*/
+    if(this.left_time_extension == false)
+    {
+        var left_extension_width = 0;
+    }
+    else
+    {
+        var left_extension_width = _left_extension_width;
+    }
+
+		this.x = (this.xScale || d3.scale.linear()).copy().domain(domain.x).range([0, this.width - (this.circle_radius * 2) - left_extension_width]);
+		//this.y = (this.yScale || d3.scale.linear()).copy().domain(domain.y).range([this.height, 0]);
+
+    this.y = (this.yScale || d3.scale.linear()).copy().domain([domain.y[0], y_domain]).range([this.height, 0]);
+/*
+    console.log(":::::::::::::::::: discoverRange domain ::::::::::::::::::::");
+    console.log(domain);
+*/
 
 		this.x.magnitude = d3.scale.linear()
 			.domain([domain.x[0] - domain.x[0], domain.x[1] - domain.x[0]])
 			.range([0, this.width]);
 
 		this.y.magnitude = d3.scale.linear()
-			.domain([domain.y[0] - domain.y[0], domain.y[1] - domain.y[0]])
+			.domain([domain.y[0] - domain.y[0], /*domain.y[1]*/y_domain - domain.y[0]])
 			.range([0, this.height]);
 	};
 
 	this.render = function() {
+
+    if (this.small_circles)
+    {
+        this.circle_radius = this.small_circle_r;
+    }
+    else
+    {
+        this.circle_radius = this.big_circle_r;
+    }
 
 		var stackedData = this.stackData();
 		this.discoverRange();
@@ -1436,39 +1520,62 @@ Rickshaw.Graph.Axis.Time = function(args) {
 		var domain = this.graph.x.domain();
 
 		var unit = this.fixedTimeUnit || this.appropriateTimeUnit();
-		var count = Math.ceil((domain[1] - domain[0]) / unit.seconds);
+		//var count = Math.ceil((domain[1] - domain[0]) / unit.seconds);
+
+    var count = this.graph.series[0].data.length;
+
+    var runningTick = domain[0];
+
+    //var skip = false;
+    var skip_count = 1;
+
+    //count * (300 / 32);
+
+    /*if (count * 35 > 300)
+    {
+        var skip = true;
+        var skip_count = Math.round(count / (300 / 35) / 2);
+    }
+*/
+
+    if (count > 10)
+    {
+        var skip = true;
+        var skip_count = Math.round(count / (300 / 35) / 2);
+    }
+
+		var offsets = [];
+
+    for (var i = 0; i < count; i+=skip_count)
+    {
+
+        //console.log("i:", i);
+        /*
+        var tickValue = time.ceil(runningTick, unit);
+        runningTick = tickValue + unit.seconds / 2 * sub2;
+        */
+
+        var tickValue = this.graph.series[0].data[i].x;
+
+        offsets.push( { value: tickValue, unit: unit } );
+    }
+
+/*
+    var medium = Math.round((this.graph.series[0].data.length - 1) / 2);
+
+    offsets.push({ value: this.graph.series[0].data[0].x, unit: unit });
+    offsets.push({ value: this.graph.series[0].data[this.graph.series[0].data.length -1].x, unit: unit });
+    offsets.push({ value: this.graph.series[0].data[medium].x, unit: unit });
+*/
+    console.log('--------- offsets ---------');
+    console.log(offsets);
+
+    return offsets;
 
     /*
         todo
     */
 
-    if (count > 20 && self.graph.period != "hour")
-    {
-        var sub1 = 2;
-        var sub2 = 4;
-    }
-    else if (self.graph.period != "hour") {
-        var sub1 = 1;
-        var sub2 = 2;
-    }
-    else {
-        var sub1 = 1;
-        var sub2 = 1;
-    }
-
-		var runningTick = domain[0];
-
-		var offsets = [];
-
-		for (var i = 0; i < count; i+=sub1) {
-
-			var tickValue = time.ceil(runningTick, unit);
-			runningTick = tickValue + unit.seconds / 2 * sub2;
-
-			offsets.push( { value: tickValue, unit: unit } );
-		}
-
-		return offsets;
 	};
 
 	this.render = function() {
@@ -1479,39 +1586,83 @@ Rickshaw.Graph.Axis.Time = function(args) {
 
 		this.elements = [];
 
+    if (!this.graph.series || !this.graph.series[0] || !this.graph.series[0].data || this.graph.series[0].data.length == 0)
+    {
+        return true;
+    }
+
 		var offsets = this.tickOffsets();
 
-		offsets.forEach( function(o) {
+    if(this.graph.left_time_extension == false)
+    {
+        var left_extension_width = 0;
+    }
+    else
+    {
+        var left_extension_width = _left_extension_width;
+    }
 
-			if (self.graph.x(o.value) > self.graph.x.range()[1]) return;
+		offsets.forEach(function(o, i) {
 
-			var element = document.createElement('div');
-			element.style.left = self.graph.x(o.value) + 'px';
-			element.classList.add('x_tick');
-			element.classList.add(self.ticksTreatment);
+        console.log(">>> offsets i:", i, " > ", d3.time.format("%e %b")(new Date(o.value)));
 
-			var title = document.createElement('div');
-			title.classList.add('title');
-			//title.innerHTML = o.unit.formatter(new Date(o.value * 1000));
+  			if (self.graph.x(o.value) > self.graph.x.range()[1]) return;
 
-      console.log("period:", self.graph.period);
+        if (offsets.length == 1)
+        {
+            var points_offset = self.graph.width / 2; //  If there is a single data point on graph, it should be centered
+        }
+        else {
+            var points_offset = 0;
+        }
 
-      if (self.graph.period == "hour")
-      {
-          title.innerHTML = d3.time.format("%H:%M")(new Date(o.value));
-      }
-      else
-      {
-          title.innerHTML = d3.time.format("%e %b")(new Date(o.value));
-      }
+  			var element = document.createElement('div');
 
-			element.appendChild(title);
+  			element.classList.add('x_tick');
+  			element.classList.add(self.ticksTreatment);
 
-			self.graph.element.appendChild(element);
-			self.elements.push(element);
+  			var title = document.createElement('div');
+  			title.classList.add('title');
+  			//title.innerHTML = o.unit.formatter(new Date(o.value * 1000));
 
-		} );
-	};
+        if (self.graph.period == "hour")
+        {
+            title.innerHTML = d3.time.format("%H:%M")(new Date(o.value));
+        }
+        else
+        {
+            title.innerHTML = d3.time.format("%e %b")(new Date(o.value));
+        }
+
+  			element.appendChild(title);
+
+  			self.graph.element.appendChild(element);
+
+        var tick_title_width = title.offsetWidth;
+
+        /*
+            shift first tick to right and last to left
+        */
+
+        if (i == 0)
+        {
+            element.style.left = 0;
+        }
+        else if (i == offsets.length - 1)
+        {
+            element.style.left = (self.graph.x(o.value) - (tick_title_width) + left_extension_width + points_offset) + 'px';
+        }
+        else
+        {
+            element.style.left = (self.graph.x(o.value) - (tick_title_width / 2) + left_extension_width + points_offset) + 'px'; // todo: change 16 to var.
+        }
+
+        //console.log("title: ", title.offsetWidth);
+
+  			self.elements.push(element);
+
+		});
+};
 
 	this.graph.onUpdate( function() { self.render() } );
 };
@@ -1659,12 +1810,12 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 			this.element = args.element;
 			this.vis = d3.select(args.element)
 				.append("svg:svg")
-				.attr('class', 'rickshaw_graph y_axis');
+				.attr('class', 'rickshaw_graph y_axis ' + this.orientation);
 
 			this.element = this.vis[0][0];
 			this.element.style.position = 'relative';
 
-			this.setSize({ width: args.width, height: args.height });
+			this.setSize({ width: args.width, height: args.height + 20 }); // todo: +10 because the trimmed portion of the number
 
 		} else {
 			this.vis = this.graph.vis;
@@ -1693,6 +1844,8 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 		this.width = args.width || elementWidth || this.graph.width * this.berthRate;
 		this.height = args.height || elementHeight || this.graph.height;
 
+    this.height += 20;
+
 		this.vis
 			.attr('width', this.width)
 			.attr('height', this.height * (1 + this.berthRate));
@@ -1702,6 +1855,9 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 		if (this.orientation == 'left') {
 			this.element.style.top = -1 * berth + 'px';
 		}
+    else {
+      this.element.style.top = -10 + 'px';
+    }
 	},
 
 	render: function() {
@@ -1710,9 +1866,24 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
 		this.ticks = this.staticTicks || Math.floor(this.graph.height / this.pixelsPerTick);
 
+    //console.log("ticks count:", this.ticks);
+
+    if (this.graph.zero_points)
+    {
+        this.vis.style("visibility", "hidden")
+        return true;
+    }
+    else
+    {
+        this.vis.style("visibility", "visible")
+    }
+
 		var axis = this._drawAxis(this.graph.y);
 
-		this._drawGrid(axis);
+    if (this.orientation == "left")
+    {
+        this._drawGrid(axis);
+    }
 
 		this._renderHeight = this.graph.height;
 	},
@@ -1724,7 +1895,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
 	_drawAxis: function(scale) {
 
-    //return false;
+    var domain = this.graph.renderer.domain();
 
 		var axis = d3.svg.axis().scale(scale).orient(this.orientation);
 
@@ -1734,30 +1905,112 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
 		if (this.orientation == 'left') {
 			var berth = this.height * this.berthRate;
-			var transform = 'translate(' + this.width + ', ' + berth + ')';
+			var transform = 'translate(' + this.width + ', ' + (berth + 1) + ')';
 		}
+    else {
+      var transform = 'translate(' + 0 + ', ' + (10) + ')';
+    }
 
 		if (this.element) {
 			this.vis.selectAll('*').remove();
 		}
 
+    var y_domain = Math.round(domain.y[1]);
+
+    var first_digit = parseInt(y_domain.toString()[0]);
+
+    //console.log("first digit:", first_digit);
+
+    var y_domain_string = (first_digit + 1).toString();
+
+    for (var i = 0; i < y_domain.toString().length - 1; i++)
+    {
+        y_domain_string += "0";
+    }
+
+    y_domain = parseInt(y_domain_string);
+
+    //console.log("new domain:", y_domain);
+
+    var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, 298]); // todo: +20 !!!!!!!!!!!!!
+
+    var tick_values = [];
+
+    var ticks_count = 5;
+
+    var tick_size = (y_domain) / ticks_count;
+
+    for (var i = 0; i <= ticks_count; i++)
+    {
+        tick_values.push(Math.round(i * tick_size));
+    }
+
+    var formatValue = d3.format(".2s");
+
 		this.vis
 			.append("svg:g")
 			.attr("class", ["y_ticks", this.ticksTreatment].join(" "))
 			.attr("transform", transform)
-			.call(axis.ticks(this.ticks).tickSubdivide(0).tickSize(this.tickSize))
+			.call(axis.ticks(this.ticks).scale(y_inverted).tickValues(tick_values).tickFormat(function(d) {
+          return formatValue(d).replace('0.0', '0').replace('.0', '');/* return d*/
+      })) /*.tickSubdivide(0)*/ /*.tickPadding([0])*/
       .call(this.customAxis);
 
 		return axis;
 	},
 
 	_drawGrid: function(axis) {
+
+    var domain = this.graph.renderer.domain();
+
 		var gridSize = (this.orientation == 'right' ? 1 : -1) * this.graph.width;
 
-		this.graph.vis
-			.append("svg:g")
-			.attr("class", "y_grid")
-			.call(axis.ticks(this.ticks).tickSubdivide(0).tickSize(gridSize))
+    var y_domain = Math.round(domain.y[1]);
+
+    var first_digit = parseInt(y_domain.toString()[0]);
+
+    var y_domain_string = (first_digit + 1).toString();
+
+    for (var i = 0; i < y_domain.toString().length - 1; i++)
+    {
+        y_domain_string += "0";
+    }
+
+    y_domain = parseInt(y_domain_string);
+
+    var y_inverted = d3.scale.linear().domain([0, y_domain]).rangeRound([0, 298]); // todo: +20 !!!!!!!!!!!!! // todo: change 300 to variable
+
+    var tick_values = [];
+
+    var ticks_count = 5;
+
+    var tick_size = (y_domain) / ticks_count;
+
+    for (var i = 0; i <= ticks_count; i++)
+    {
+        tick_values.push(Math.round(i * tick_size));
+    }
+
+    d3.selection.prototype.last = function() {
+        var last = this.size() - 1;
+        return d3.select(this[0][last]);
+    };
+
+    var grids = this.graph.vis
+  			//.append("svg:g")
+        .insert("svg:g",":first-child")
+  			.attr("class", "y_grid")
+  			.call(axis.ticks(this.ticks).scale(y_inverted).tickSize(gridSize).tickValues(tick_values)) /*.tickSubdivide(0)*/ /*.tickPadding([0])*/
+        .attr("transform", function(d) {
+             return "translate(" + 0 + "," + 1 + ")"; }
+        )
+
+    grids
+        .selectAll('g')
+        .last()
+        .attr('class','tick first');
+
+		grids
 			.selectAll('text')
 			.each(function() {
         //console.log("grid text:", this.textContent);
@@ -1826,6 +2079,29 @@ Rickshaw.Graph.Axis.Y.Scaled = Rickshaw.Class.create( Rickshaw.Graph.Axis.Y, {
     }
   }
 } );
+
+/*
+Rickshaw.namespace('Rickshaw.Graph.Extension.Left');
+
+Rickshaw.Graph.Extension.Left = function(args) {
+
+//Rickshaw.Graph.Axis.Y.Scaled = Rickshaw.Class.create( Rickshaw.Graph.Axis.Y, {
+
+    this.initialize = function(args) {
+
+        this.graph = args.graph;
+
+    }
+
+    this.render = function() {
+
+        this.vis = this.graph.vis;
+
+    };
+}
+
+*/
+
 Rickshaw.namespace('Rickshaw.Graph.Behavior.Series.Highlight');
 
 Rickshaw.Graph.Behavior.Series.Highlight = function(args) {
@@ -2082,6 +2358,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 	initialize: function(args) {
 
+    var self = this;
+
 		var graph = this.graph = args.graph;
 
 		this.xFormatter = args.xFormatter || function(x) {
@@ -2107,6 +2385,14 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 		this.formatter = args.formatter || this.formatter;
 
+    this.transition = false;
+    this.last_point_x = false;
+    this.last_point = false;
+
+    $(event_emitter).on('big_number_state', function(e, period){
+        self.block_height = false;
+    });
+
 	},
 
 	formatter: function(series, x, y, formattedX, formattedY, d) {
@@ -2114,6 +2400,10 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
       return "";
 		  //return series.name + ':&nbsp;' + formattedY;
 	},
+
+  hasClass: function(element, className) {
+      return element.className.animVal && new RegExp("(^|\\s)" + className + "(\\s|$)").test(element.className.animVal);
+  },
 
 	update: function(e) {
 
@@ -2128,9 +2418,16 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 		var eventX = e.offsetX || e.layerX;
 		var eventY = e.offsetY || e.layerY;
 
+    if (this.hasClass(e.target, "y_axis") && this.hasClass(e.target, "right"))
+    {
+        eventX = this.graph.width - 10; // todo: change to var
+    }
+
 		var j = 0;
 		var points = [];
 		var nearestPoint;
+
+    var skip = false;
 
 		this.graph.series.active().forEach( function(series) {
 
@@ -2163,12 +2460,28 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 			}
 
 			if (dataIndex < 0) dataIndex = 0;
+
 			var value = data[dataIndex];
 
 			var distance = Math.sqrt(
 				Math.pow(Math.abs(graph.x(value.x) - eventX), 2) +
 				Math.pow(Math.abs(graph.y(value.y + value.y0) - eventY), 2)
 			);
+
+      var x_distance = Math.pow(Math.abs(graph.x(value.x) - eventX), 2);
+
+      if(x_distance > 70) // todo: make var, todo: executing inside forEach !
+      {
+          skip = true;
+          //this.point_focused = false;
+          return false;
+      }
+      else
+      {
+          //this.point_focused = true;
+      }
+
+      //console.log("x_distance:", Math.pow(Math.abs(graph.x(value.x) - eventX), 2));
 
 			var xFormatter = series.xFormatter || this.xFormatter;
 			var yFormatter = series.yFormatter || this.yFormatter;
@@ -2191,10 +2504,46 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 		}, this );
 
+    if (skip)
+    {
+        //this.element.classList.add('transition');
+        this.point_leave();
+        return;
+    }
+    else {
+        //this.element.classList.remove('transition');
+    }
+
+    var p = points[0];
+
+    /*if (!this.last_point)
+    {
+        this.last_point = points[0];
+    }*/
+
+    if (!this.current_point || (p && p.value.x != this.last_point.value.x)) /*this.last_point &&*/
+    {
+        //his.last_point.value.x = point.value.x;
+        //this.last_point = point;
+        //this.start_transition();
+
+        this.point_changed(points[0], points);
+        this.last_point = points[0];
+    }
+
+    /*if (!this.current_point)
+    {
+        this.current_point = points[0];
+        this.current_points = points;
+    }*/
+
+
 		if (!nearestPoint)
 			return;
 
 		nearestPoint.active = true;
+
+    //console.log("------------------points--------------");
 
 		var domainX = nearestPoint.value.x;
 		var formattedXValue = nearestPoint.formattedXValue;
@@ -2208,7 +2557,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 			mouseX: eventX,
 			mouseY: eventY,
 			formattedXValue: formattedXValue,
-			domainX: domainX
+			domainX: domainX,
+      hide : skip
 		} );
 	},
 
@@ -2230,11 +2580,216 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 		}
 	},
 
+  getScrollTop : function (){
+      if(typeof pageYOffset!= 'undefined'){
+          //most browsers except IE before #9
+          return pageYOffset;
+      }
+      else{
+          var B= document.body; //IE 'quirks'
+          var D= document.documentElement; //IE with doctype
+          D= (D.clientHeight)? D: B;
+          return D.scrollTop;
+      }
+  },
+
+  findPos : function(id) {
+      var node = document.getElementById(id);
+      var curtop = 0;
+      var curtopscroll = 0;
+      if (node.offsetParent) {
+          do {
+              curtop += node.offsetTop;
+              curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+
+          } while (node = node.offsetParent);
+          return (curtop - curtopscroll)
+      }
+  },
+/*
+  start_transition : function()
+  {
+
+      console.log("start transition");
+
+      var self = this;
+
+      this.transition = true;
+      this.transition_end = false;
+
+      //this.visible = false;
+      this.element.classList.add('transition');
+
+      setTimeout(function(){
+          self.element.classList.remove('transition');
+          self.last_point = false;
+          self.transition = false;
+          self.transition_end = true;
+      }, 1000);
+
+  },
+*/
+
+  point_leave : function()
+  {
+
+      //console.log("->>>>>>>>>>>>>. point leave >>>>>>>>>>>>>>>>");
+
+    var self = this;
+
+    this.current_point = false;
+    this.current_points = false;
+
+    this.element.classList.add('transition');
+
+    clearTimeout(this.point_change_timeout);
+
+  },
+  point_changed : function(point, points)
+  {
+
+      var self = this;
+
+      //this.current_point = point;
+
+      /*if (!this.transition)
+      {
+          this.transition = true;
+          this.transition_end = false;
+
+          setTimeout(function(){
+              this.transition_end = true;
+          }, 100);
+
+          this.transition_duration = 0;
+
+          this.transition_interval = setInterval(function(){
+              self.transition_duration += 10;
+          }, 10);
+
+      }*/
+
+      //this.element.classList.add('transition');
+
+/*
+      if (this.transition_end)
+      {
+          var delay = 20;
+      }
+      else
+      {
+          var delay = 200;
+      }
+*/
+/*
+      var delay = 200 - self.transition_duration;
+
+      if (delay < 20)
+      {
+          delay = 20;
+      }*/
+
+      var delay = 50;
+
+      //console.log("delay:", delay);
+
+      clearTimeout(this.point_change_timeout);
+
+      this.point_change_timeout = setTimeout(function(){
+          self.element.classList.remove('transition');
+          self.current_point = point;
+          self.current_points = points;
+          self.transition = false;
+          self.render(self.render_args);
+          clearInterval(self.transition_interval);
+      }, delay);
+  },
+
 	render: function(args) {
+
+    //console.log("--------- hover render ----------------");
+
+    this.render_args = args;
 
 		var graph = this.graph;
 		var points = args.points;
-		var point = points.filter( function(p) { return p.active } ).shift();
+		var p = points.filter( function(p) { return p.active } ).shift();
+
+    //console.log("points length:", points.length);
+
+    var block_date_header_height = 12;
+    var block_date_header_padding = 10;
+    var datapoint_height = 14;
+    var datapoint_padding = 10;
+    var triangle_height = 7;
+    var top_position = 20;
+    var topbar_height = 60; // todo: pass from top functions
+    //var block_width = 180;
+    //var block_height = 156;
+    /*var calendar_block_height = 120;*/
+
+    if (!this.block_height && !document.getElementsByClassName("hover_wrapper")[0])
+    {
+
+        var block_height = (block_date_header_height + (block_date_header_padding * 2)) + ((datapoint_height * points.length) + (datapoint_padding * 2 * points.length)) + triangle_height + top_position; // todo: not the real block height
+
+        this.block_height = block_height;
+
+    }
+    else if (document.getElementsByClassName("hover_wrapper")[0])
+    {
+        var block_height = document.getElementsByClassName("hover_wrapper")[0].clientHeight + top_position;
+    }
+    /*else
+    {
+        var block_height = this.block_height;
+    }
+*/
+
+    if (!block_height)
+    {
+        block_height = this.block_height;
+    }
+
+    //console.log("block_height:", block_height);
+
+    //var point = false;
+
+    //var is_bottom_block = false;
+    //point = points[0];
+
+    if (!this.current_point)
+    {
+        return false;
+    }
+
+    point = this.current_point;
+
+    if ((this.findPos("graph_svg") + graph.y(point.value.y) - topbar_height) < block_height)
+    {
+        var is_bottom_block = true;
+        //point = points[points.length - 1];
+
+        /* search bottom path */
+
+        var min_y_value = false;
+
+        //var point = false;
+
+        this.current_points.forEach(function(p){
+
+            if (parseInt(p.formattedYValue) < min_y_value || !min_y_value)
+            {
+                min_y_value = parseInt(p.formattedYValue);
+                point = p;
+            }
+        });
+    }
+    else
+    {
+        var is_bottom_block = false;
+        /*point = points[0];*/
+    }
 
 		if (point.value.y === null) return;
 
@@ -2242,7 +2797,29 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 		var formattedYValue = point.formattedYValue;
 
 		this.element.innerHTML = '';
-		this.element.style.left = graph.x(point.value.x) + 'px';
+
+    if(graph.left_time_extension == false)
+    {
+        var left_extension_width = 0;
+    }
+    else {
+        var left_extension_width = _left_extension_width;
+    }
+
+    this.element.style.left = (graph.x(point.value.x) + graph.circle_radius + left_extension_width + this.graph.points_offset) + 'px';
+
+    if (!is_bottom_block)
+    {
+        var hover_top_position = graph.y(point.value.y) - block_height;
+    }
+    else
+    {
+        var hover_top_position = graph.y(point.value.y) + 7 + 15/*+ block_height*/;
+    }
+
+    //if (graph_svg_top)
+
+    this.element.style.top = hover_top_position + "px";
 
     var series = point.series;
 		var actualY = series.scale ? series.scale.invert(point.value.y) : point.value.y;
@@ -2250,7 +2827,27 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     var xLabel = document.createElement('div');
 
 		xLabel.className = 'x_label';
-		xLabel.innerHTML = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point);// formattedXValue;
+		xLabel.innerHTML = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point, is_bottom_block);// formattedXValue;
+
+/*
+    xLabel.attr("transform", function(d) {
+         return "translate(" + (_circle_radius) + ", 0)"; } // tode: here in library is function for cross browser transform
+    )
+*/
+
+    xLabel.style.position = "relative";
+
+    if (graph.x(point.value.x) > this.graph.width / 2)
+    {
+        xLabel.style.left = (-1 * _hover_block_width) + (_hover_block_width / 2) + 'px';
+    }
+    else {
+        xLabel.style.left = -1 * (_hover_block_width / 2) + 'px';
+    }
+
+    //xLabel.style.left = "0px";
+
+
 		this.element.appendChild(xLabel);
 
 		var item = document.createElement('div');
@@ -2262,6 +2859,17 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     item.style.display = "none";
 
 		this.element.appendChild(item);
+
+    // -- guide line
+
+    var guide_line = document.createElement('div');
+    guide_line.className = 'guide_line';
+
+    guide_line.style.top = (-1 * hover_top_position) + "px";
+
+    guide_line.style.height = (hover_top_position) + "px";
+
+    this.element.appendChild(guide_line);
 
 		var dot = document.createElement('div');
 
@@ -2338,6 +2946,14 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 			function(e) {
 				this.visible = true;
 				this.update(e);
+			}.bind(this),
+			false
+		);
+
+    this.graph.element.addEventListener(
+			'mouseleave',
+			function(e) {
+          this.point_leave();
 			}.bind(this),
 			false
 		);
@@ -3115,19 +3731,42 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 		var data = series
 			.filter(function(s) { return !s.disabled })
 			.map(function(s) { return s.stack });
-
+/*
+    if (graph.small_circles)
+    {
+        graph.circle_radius = graph.small_circle_r;
+    }
+    else
+    {
+        graph.circle_radius = graph.big_circle_r;
+    }
+*/
 		var pathNodes = vis.selectAll("path.path")
 			.data(data)
 			.enter().append("svg:path")
 			.classed('path', true)
+      .attr("transform", function(d) {
+           return "translate(" + (graph.circle_radius) + ", 0)"; } // tode: here in library is function for cross browser transform
+      )
+      .attr("class", function(d, i) {
+
+          var class_name = "graph_path path_" + series[i].color.replace("#", "");
+
+          return class_name;
+          //return "asdasd";
+      })
 			.attr("d", this.seriesPathFactory());
 
 		if (this.stroke) {
-                        var strokeNodes = vis.selectAll('path.stroke')
-                                .data(data)
-                                .enter().append("svg:path")
-				.classed('stroke', true)
-				.attr("d", this.seriesStrokeFactory());
+        var strokeNodes = vis
+                            .selectAll('path.stroke')
+                            .data(data)
+                            .enter().append("svg:path")
+                            .attr("transform", function(d) {
+                                 return "translate(" + (graph.circle_radius) + ", 0)"; } // tode: here in library is function for cross browser transform
+                            )
+                    				.classed('stroke', true)
+                    				.attr("d", this.seriesStrokeFactory());
 		}
 
 		var i = 0;
@@ -3141,13 +3780,35 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 
     var self = this;
 
+    if(self.graph.left_time_extension == false)
+    {
+        var left_extension_width = 0;
+    }
+    else {
+        var left_extension_width = _left_extension_width;
+    }
+
+    if (data[0] && data[0].length == 1)
+    {
+        var points_offset = self.graph.width / 2; //  If there is a single data point on graph, it should be centered
+    }
+    else {
+        var points_offset = 0;
+    }
+
+    this.graph.points_offset = points_offset; // used in hover block functions
+
     var points_paths = vis.selectAll('.dots')
           .data(data)
           .enter()
           .append("g")
-                    .attr("class", "dots");
+                    .attr("class", "dots")
+                    .attr("transform", function(d) {
+                         return "translate(" + (graph.circle_radius + points_offset) + ", 0)"; } // tode: here in library is function for cross browser transform
+                    )
 
-    var points = points_paths.selectAll('.dot')
+    var points = points_paths
+                      .selectAll('.dot')
                       .data(function(d, index){
 
                             var points_data = d.map(function(obj){
@@ -3158,35 +3819,151 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
                             return points_data;
                        })
                        .enter()
-                       //.filter(function(d){ return d.y > 0; })
                        .append('g')
                        .attr("class", "dot")
                        .attr("transform", function(d) {
-                            return "translate(" + self.graph.x(d.x) + "," + self.graph.y(d.y) + ")"; }
+                            return "translate(" + (self.graph.x(d.x) + left_extension_width) + "," + (self.graph.y(d.y)) + ")"; } // tode: here in library is function for cross browser transform
                        );
 
         points
-            .filter(function(d){
+            /*.filter(function(d){
                 return d.y > 0;
-            })
+            })*/
             .append('circle')
-            .attr('class','dot')
-            .attr("r", 4)
+            .attr('class', function(d){
+                var class_name = 'one_dot ' + "dot_" + d.color.replace("#", "");
+                return class_name;
+            })
+            .attr("r", graph.circle_radius)
             .attr('fill', function(d,i){
                 return d.color;
             })
 
-        points
-            .filter(function(d){
-                return d.y > 0;
-            })
-            .append('circle')
-            .attr('class','dot')
-            .attr("r", 2)
-            .attr('fill', function(d,i){
-                return "white";
-            })
+// ---------------------------------------------------------------------------
 
+      if (self.graph.left_time_extension)
+      {
+
+          var time_extension = vis.selectAll('.time_extension')
+                .data(data)
+                .enter()
+                //.append("path")
+                .insert("path",":first-child")
+                .attr('class','time_extension')
+                .attr("stroke", "#C7C7C7")
+                .attr("stroke-width", 2)
+                .attr("fill", "none")
+                .attr("d", function(d, i){
+
+                    if (d[0].y == 0)
+                    {
+                        return false;
+                    }
+
+                    var y = d[0].y - ((data.length - i) * 20);
+
+                    var extension_lines_data = [
+                                    { "x": graph.x(d[0].x),  "y": graph.y(y) },
+                                    { "x": graph.x(d[0].x) + left_extension_width + graph.circle_radius, "y": graph.y(d[0].y) }];
+
+                    var extension_line = d3.svg.line()
+                          .x(function(d) { return d.x; })
+                          .y(function(d) { return d.y; })
+                          .interpolate(self.graph.interpolation).tension(self.tension)
+
+                    return extension_line(extension_lines_data);
+
+                })
+
+/*
+            var tmp_graph_height = 300;
+
+            var y = -1 * (tmp_graph_height - self.graph.y(data[0][0].y) + 30);
+
+            /*var div = d3.select(self.graph.element).append("div")*/
+/*
+            var div = d3.select(self.graph.element).selectAll('.time_extension_info').data([1])
+
+            //var icon_html = "<div>( i )</div>"
+            //var info_hover_html = "<div id='info_hover_html'><span class='big'>Time range contains an Incomplete week</span><span class='small'>Click to extend to full week</span></div>";
+
+            div.style("left", (left_extension_width + "px"))
+                   .style("top", y +"px")
+
+            div.enter()
+                    .append("div")
+                    .attr("class", "time_extension_info")
+                    //.html("<div>" + icon_html + info_hover_html + "</div>")
+                    .style("position", "relative")
+                    .style("left", (left_extension_width + "px"))
+                    .style("top", y +"px")
+
+            var time_extension = React.createElement(GraphTimeExtension, { "show" : true }, null);
+            React.render(time_extension, document.getElementsByClassName('time_extension_info')[0]);
+*/
+        }
+        else
+        {
+/*
+            console.log("{{{{{{{{{{{{{{ element }}}}}}}}}}}}}}");
+            console.log(d3.select(self.graph.element).selectAll('.time_extension_info'));
+
+            if (d3.select(self.graph.element).selectAll('.time_extension_info')[0].length == 1)
+            {
+                var time_extension = React.createElement(GraphTimeExtension, { "show" : false }, null);
+                React.render(time_extension, document.getElementsByClassName('time_extension_info')[0]);
+            }
+*/
+        }
+
+/*
+.selectAll('.time_extension_info')
+    .data([1])
+    .enter()
+
+*/
+
+            /*.attr("transform", function(d) {
+
+                  //var y = d[0].y + 30;
+
+                  console.log("{{{{{{{{{{{{{{{{{{{{{{{{{ INFO BLOCK }}}}}}}}}}}}}}}}}}}}}}}}}");
+                  //console.log(d);
+
+                  return "translate(0,0)";
+
+                  //return "translate(0," + (self.graph.y(y)) + ")";
+                  //return "translate(" + (self.graph.x(d.x) + _left_extension_width) + "," + (self.graph.y(d.y)) + ")"; }
+            })*/
+
+            /*.append('circle')
+            .attr('class','dot')
+            .attr("r", _circle_radius)
+            .attr('fill', function(d,i){
+                return d[0].color;
+            })
+            .attr("transform", function(d) {
+
+                  var y = d[0].y + 30;
+
+                  console.log("{{{{{{{{{{{{{{{{{{{{{{{{{ extension }}}}}}}}}}}}}}}}}}}}}}}}}");
+                  console.log(d);
+                  return "translate(0," + (self.graph.y(y)) + ")";
+                  //return "translate(" + (self.graph.x(d.x) + _left_extension_width) + "," + (self.graph.y(d.y)) + ")"; }
+            })*/
+
+            /*
+            .append("g")
+                      .attr("class", "dots_extension")
+                      .attr("transform", function(d) {
+
+                            var y = d[0].y;
+
+                            console.log("{{{{{{{{{{{{{{{{{{{{{{{{{ extension }}}}}}}}}}}}}}}}}}}}}}}}}");
+                            console.log(d);
+                            return "translate(0," + (self.graph.y(y)) + ")";
+                            //return "translate(" + (self.graph.x(d.x) + _left_extension_width) + "," + (self.graph.y(d.y)) + ")"; }
+                      })*/
 
 	},
 
@@ -3271,9 +4048,17 @@ Rickshaw.Graph.Renderer.Line = Rickshaw.Class.create( Rickshaw.Graph.Renderer, {
 
 		var graph = this.graph;
 
+    if(graph.left_time_extension == false)
+    {
+        var left_extension_width = 0;
+    }
+    else {
+        var left_extension_width = _left_extension_width;
+    }
+
 		var factory = d3.svg.line()
 			.x( function(d) {
-          return graph.x(d.x)
+          return graph.x(d.x) + left_extension_width
       } )
 			.y( function(d) { return graph.y(d.y) } )
 			.interpolate(this.graph.interpolation).tension(this.tension);

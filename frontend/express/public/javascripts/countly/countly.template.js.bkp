@@ -4,11 +4,7 @@
  A countly view is defined as a page corresponding to a url fragment such
  as #/manage/apps. This interface defines common functions or properties
  the view object has. A view may override any function or property.
-
  */
-
-var _circle_radius = 4; // todo: global var. // todo : combine with var from rickshaw.js
-
 var countlyView = Backbone.View.extend({
     template:null, //handlebars template of the view
     templateData:{}, //data to be used while rendering the template
@@ -1124,23 +1120,7 @@ window.SessionView = countlyView.extend({
 
         var self = this;
 
-        _granularity = false; // todo: remove global var
-
-        var sidebar_width = 240;
-        var margin_left   = 30;
-        var padding_left  = 30;
-        var margin_right  = 30;
-        var graph_height  = 300;
-
-        var graph_width = false;
-
-        var table = false;
-
-        var rows = sessionDP.chartData;
-
-        function rowGetter(rowIndex) {
-            return rows[rowIndex];
-        }
+        _granularity = false;
 
         this.templateData = {
             "page-title":jQuery.i18n.map["sessions.title"],
@@ -1173,7 +1153,7 @@ window.SessionView = countlyView.extend({
             }
         };
 
-        var update_graph = function(id, granularity_changed)
+        var change_active = function(id)
         {
 
             sessionDP = countlySession.getSessionDP();
@@ -1196,43 +1176,9 @@ window.SessionView = countlyView.extend({
                 if (!active_found)
                 {
                     document.getElementById('no_data_wrapper').style.display = "block";
-                    document.getElementsByClassName('granularity')[0].className = "granularity hidden";
-                    var no_data = true;
                 }
                 else {
                     document.getElementById('no_data_wrapper').style.display = "none";
-                    document.getElementsByClassName('granularity')[0].className = "granularity";
-                    var no_data = false;
-                }
-            }
-
-            /*
-                disable auto granularity
-            */
-
-            if (!granularity_changed) // auto granularity is active, event from date selection
-            {
-
-                if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
-                {
-                    _granularity = "monthly";
-                }
-                else if ((sessionDP.daily_granularity[0].data.length * _circle_radius * 2 * 2) > graph_width)
-                {
-                    _granularity = "weekly";
-                }
-                else {
-                    _granularity = "daily";
-                }
-            }
-            else if (_granularity == "daily")
-            {
-                if ((sessionDP.daily_granularity[0].data.length * _circle_radius * 2 * 2) > graph_width)
-                {
-                    var small_circles = true;
-                }
-                else {
-                    var small_circles = false;
                 }
             }
 
@@ -1249,37 +1195,11 @@ window.SessionView = countlyView.extend({
                 var granularity_rows = sessionDP.daily_granularity;
             }
 
-            var zero_points = true;
-
-            granularity_rows.every(function(datapath){
-
-                datapath.data.every(function(datapoint){
-
-                    var value = datapoint[1];
-
-                    if (value > 0)
-                    {
-                        zero_points = false;
-                        return false;
-                    }
-
-                    return true;
-                });
-
-                if (!zero_points)
-                {
-                    return false;
-                }
-
-                return true;
-
-            });
-
-            if (no_data)
-            {
-                zero_points = true;
-            }
-
+          /*  console.log(":::::::::::::::::::::::: granularity_rows :::::::::::::::::::::::::::::");
+            console.log(":::::::::::::::::::::::: granularity_rows :::::::::::::::::::::::::::::");
+            console.log(":::::::::::::::::::::::: granularity_rows :::::::::::::::::::::::::::::");
+            console.log(granularity_rows);
+*/
             var active_array = [];
 
             for (var i = 0; i < self.templateData["big-numbers"]["items"].length; i++)
@@ -1308,32 +1228,30 @@ window.SessionView = countlyView.extend({
                 }
             }
 
-            countlyCommon.updateTimeGraph(active_array, "#dashboard-graph", self.templateData["big-numbers"].items, false, _granularity, small_circles, zero_points);
+            countlyCommon.updateTimeGraph(active_array, "#dashboard-graph", self.templateData["big-numbers"].items, false, active_array, _granularity);
 
-            return _granularity;
+        }
 
+        var table = false;
+
+        var rows = sessionDP.chartData;
+
+        function rowGetter(rowIndex) {
+            return rows[rowIndex];
         }
 
         $(event_emitter).on('date_choise', function(e, period){
 
-            //console.log("date_choise emitter period:", period.period);
+            console.log("date_choise emitter period:", period.period);
 
             /*
                 update the graph
             */
 
             sessionDP = countlySession.getSessionDP();
-            var new_granularity = update_graph(-1);
+            change_active(-1);
 
-            //var chart_data = sessionDP.chartData;
-
-            console.log("will triger new_granularity:", new_granularity);
-
-            $(event_emitter).trigger("granularity_data", {
-                "period"          : countlyCommon.getPeriod(),
-                "session_dp"      : sessionDP,
-                "new_granularity" : new_granularity
-            });
+            var rows = sessionDP.chartData;
 
             var table_wrapper = React.createElement(TableWrapper, { "rows" : rows }, null);
             React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
@@ -1378,7 +1296,7 @@ window.SessionView = countlyView.extend({
                     "value"  : items[i].total,
                     "color"  : items[i].color,
                     //"active" : true,
-                    "on_click" : update_graph,
+                    "on_click" : change_active,
                     "id" : i
                 }), big_numbers[i]);
             }
@@ -1394,11 +1312,18 @@ window.SessionView = countlyView.extend({
 
             _granularity = granularity;
 
-            update_graph(-1, true);
+            change_active(-1);
 
         }.bind(self));
 
         $(event_emitter).on('big_number_hover', function(e, data){
+/*
+            console.log("******** hover data *********");
+            console.log(data.hover);
+    */
+            function hasClass(el, cls) {
+                return el.className.baseVal && new RegExp("(\\s|^)" + cls + "(\\s|$)").test(el.className.baseVal);
+            }
 
             if (data.hover)
             {
@@ -1443,6 +1368,8 @@ window.SessionView = countlyView.extend({
 
                 for (var i = 0; i < document.getElementsByClassName("one_dot").length; i++)
                 {
+                    //document.getElementsByClassName("dot")[i].style["stroke-opacity"] = 0.2;
+                    //document.getElementsByClassName("dot")[i].style["opacity"] = 1;
                     document.getElementsByClassName("one_dot")[i].style.opacity = 1;
                 }
             }
@@ -1457,85 +1384,40 @@ window.SessionView = countlyView.extend({
 
             setTimeout(function(){ // todo: remove setTimeout
 
-                graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
+                var sidebar_width = 240;
+                var margin_left = 30;
+                var padding_left = 30;
+                var margin_right = 30;
 
-                var small_circles = false;
-
-                document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
-                document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
-                document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
-                document.getElementById('dashboard-graph').style['margin-left'] = 40 + "px";
-                document.getElementById('dashboard-graph').style.width = (graph_width - 70 - 70) + "px";
-                document.getElementById('no_data_wrapper').style.height = "100px"; // todo: change to variable
-                document.getElementById('no_data_wrapper').style['padding-top'] = "140px"; // todo: remove this
-                document.getElementById('axis_right').style.left = (graph_width - 60) + "px";
-
-
-                if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
-                {
-                    _granularity = "monthly";
-                }
-                else if (sessionDP.daily_granularity[0].data.length * (_circle_radius * 2) * 2 > graph_width) // todo: combine with block from update
-                {
-                    _granularity = "weekly";
-                }
-                else {
-                    _granularity = "daily";
-                }
-
-                console.log("init _granularity type:", _granularity);
-
-                if (_granularity == "weekly")
-                {
-                    var granularity_rows = sessionDP.weekly_granularity;
-                }
-                else if (_granularity == "monthly")
-                {
-                    var granularity_rows = sessionDP.monthly_granularity;
-                }
-                else
-                {
-                    var granularity_rows = sessionDP.daily_granularity;
-                }
-
-                /*
-                    granularity section
-                */
+                var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
 
                 React.render(React.createElement(granularity, {
                     "data"        : sessionDP,
-                    "graph_width" : graph_width,
-                    "type"        : _granularity,
-                    "period"      : countlyCommon.getPeriod()
+                    "graph_width" : graph_width
                 }), document.getElementsByClassName("granularity")[0]);
 
-                var zero_points = true;
+                document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
 
-                granularity_rows.every(function(datapath){
+                document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
+                document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
 
-                    datapath.data.every(function(datapoint){
 
-                        var value = datapoint[1];
+                document.getElementById('dashboard-graph').style['margin-left'] = 20 + "px";
 
-                        if (value > 0)
-                        {
-                            zero_points = false;
-                            return false;
-                        }
+                document.getElementById('dashboard-graph').style.width = (graph_width - 70 - 70) + "px";
 
-                        return true;
-                    });
+                document.getElementById('no_data_wrapper').style.height = "100px"; // todo: change to variable
+                document.getElementById('no_data_wrapper').style['padding-top'] = "140px"; // todo: remove this
 
-                    if (!zero_points)
-                    {
-                        return false;
-                    }
+                //document.getElementById('axis_right').style.height = graph_height;
+                document.getElementById('axis_right').style.left = (graph_width) + "px";
 
-                    return true;
+                var granularity_rows = sessionDP.daily_granularity;
 
-                });
+                console.log("{{{{{{{{{{{{{{{ init granularity rows }}}}}}}}}}}}}}}");
+                console.log(granularity_rows);
 
-                countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", self.templateData["big-numbers"].items, (graph_width - 60), graph_height, false, _granularity, small_circles, zero_points);
+                countlyCommon.drawTimeGraph(sessionDP.chartDP, "#dashboard-graph", self.templateData["big-numbers"].items, graph_width, 300, false, granularity_rows);
 
                 /* BIG NUMBERS */
 
@@ -1554,7 +1436,7 @@ window.SessionView = countlyView.extend({
                         "value"  : self.templateData["big-numbers"].items[i].total,
                         "color"  : self.templateData["big-numbers"].items[i].color,
                         "active" : true,
-                        "on_click" : update_graph,
+                        "on_click" : change_active,
                         "id" : i
                     }), node);
                 }
@@ -1565,12 +1447,8 @@ window.SessionView = countlyView.extend({
 
                 React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
 
-            }, 2000);
+            }, 1000);
 
-        }
-
-        function hasClass(el, cls) {
-            return el.className.baseVal && new RegExp("(\\s|^)" + cls + "(\\s|$)").test(el.className.baseVal);
         }
     },
     refresh:function () {
@@ -2128,7 +2006,7 @@ window.DeviceView = countlyView.extend({
     beforeRender: function() {
         return $.when(countlyDevice.initialize(), countlyDeviceDetails.initialize()).then(function () {});
     },
-    /*pageScript:function () {
+    pageScript:function () {
         $(".bar-inner").on({
             mouseenter:function () {
                 var number = $(this).parent().next();
@@ -2145,14 +2023,9 @@ window.DeviceView = countlyView.extend({
         });
 
         app.localize();
-    },*/
+    },
     renderCommon:function (isRefresh) {
         var deviceData = countlyDevice.getDeviceData();
-
-        console.log("------------ device data -------------");
-        console.log(deviceData);
-
-        return false;
 
         this.templateData = {
             "page-title":jQuery.i18n.map["devices.title"],

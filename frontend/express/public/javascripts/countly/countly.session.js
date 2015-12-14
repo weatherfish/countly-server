@@ -7,6 +7,7 @@
 
     //Public Methods
     countlySession.initialize = function () {
+        console.log("{{{{{{{{{{{{{{{{{{{[ countlySession initialize ]}}}}}}}}}}}}}}}}}}}");
         _sessionDb = countlyUser.getDbObj();
         setMeta();
     };
@@ -302,7 +303,12 @@
                 { name:"u" }
             ];
 
-        return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        console.log("++++++++++++++++++++++++++++ getSessionDP +++++++++++++++++++++++++++++");
+        console.log(_sessionDb);
+
+        return countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+
+        //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
 
     countlySession.getSessionDPTotal = function () {
@@ -311,7 +317,7 @@
                 { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#DDDDDD', mode:"ghost" },
                 { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#333933' }
             ];
-            
+
         var dataProps = [
                 {
                     name:"pt",

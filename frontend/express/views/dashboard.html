@@ -40,12 +40,18 @@
 		    var event_emitter = {};
 				var global_controller = {};
 
+				Date.prototype.monthDays= function(){ // todo: move from here
+            var d= new Date(this.getFullYear(), this.getMonth()+1, 0);
+            return d.getDate();
+        }
+
     </script>
 
     	<!-- PRODUCTION -->
 
 			<script type="text/javascript" src="<%- cdn %>javascripts/react-with-addons.js"></script>
 			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+
 
     	<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.dom.js?<%= countlyVersion %>"></script>
     	<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.utils.concat.js?<%= countlyVersion %>"></script>
@@ -100,6 +106,9 @@ javascripts/react/widgets/dist/react-widgets.js
 			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table.js"></script>
 			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table_filter.js"></script>
 			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table_wrapper.js"></script>
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.graph.granularity.js"></script>
+
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.graph.time_extension.js"></script>
 
 			<!--script type="text/jsx" src="<%- cdn %>javascripts/react/clear_test/calendar_out.js"></script-->
 
@@ -151,6 +160,8 @@ javascripts/react/widgets/dist/react-widgets.js
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/jquery.dataTables.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/ZeroClipboard.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/TableTools.js"></script>
+
+			<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.graph.granularity.js"></script>
     <% } %>
     <script type="text/javascript">
 		    window.production = <%= production ? true : false %>;
@@ -418,7 +429,7 @@ javascripts/react/widgets/dist/react-widgets.js
         </div>
     </div>
     <div id="content-container">
-        <div id="content-top"></div>
+        <!--div id="content-top"></div-->
         <div id="content">
             <div id="content-loader"></div>
         </div>
@@ -488,7 +499,7 @@ javascripts/react/widgets/dist/react-widgets.js
 					<div class="title">{{page-title}}</div>
 				</div>
 			</div-->
-			<div class="widget-content help-zone-vb" data-help-localize="help.{{{chart-helper}}}" style="{{#if graph-type-double-pie}} overflow:hidden; {{else}} height:300px; padding-top:20px; padding-bottom:10px; {{/if}}">
+			<div class="widget-content help-zone-vb" data-help-localize="help.{{{chart-helper}}}">
 				{{#if graph-type-double-pie}}
 				<div class="pie-chart-container">
 					<div style="border-right:1px solid #CCC; width: 100%; height: 100%">
@@ -517,30 +528,25 @@ javascripts/react/widgets/dist/react-widgets.js
 					<div id="dashboard-graph2" class="graph" style="margin:0 auto; height:360px; font-family:'Ubuntu';"></div>
 				</div>
 				{{else}}
-                <div id="dashboard-graph" class="graph" style="height:100%; margin-left:-10px;"></div>
-								<div id="axis_left"></div>
-								<div id="axis_right"></div>
+
+								<div class="trend_name">SESSIONS TREND</div>
+								<div class="granularity"></div>
+
+                <div id="dashboard-graph" class="graph" style="height:100%; margin-left:-10px;">
+
+										<div id="axis_left"></div>
+										<div id="axis_right"></div>
+
+										<div id="no_data_wrapper">
+												<div class="big_sign">You need to choose data to visualize it</div>
+												<div class="small_sign">Use checkboxes below to visualize data you want.</div>
+										</div>
+								</div>
+
 				{{/if}}
 			</div>
 
 			<div class="big-numbers-container"></div>
-
-			{{#if big-numbers}}
-			<!--div class="widget-footer" style="background-color:#EEEEEE;">
-				<div id="big-numbers-container">
-					{{#each big-numbers.items}}
-					<div class="big-numbers three-column help-zone-vs" data-help-localize="help.{{this.help}}">
-						<div class="inner">
-							<div class="select">{{this.title}}</div>
-							<div class="color"></div>
-							<div class="number">{{getFormattedNumber this.total}}</div>
-							<div class="trend" style="background-image:url('<%- cdn %>images/dashboard/{{this.trend}}trend.png');"></div>
-						</div>
-					</div>
-					{{/each}}
-				</div>
-			</div-->
-			{{/if}}
 
 		</div>
 
@@ -568,21 +574,6 @@ javascripts/react/widgets/dist/react-widgets.js
 
 				<div class="table_block">
 				</div>
-
-				<!--div class="table_wrapper">
-						<div class="data_sign">DATA</div>
-						<div class="data_date_sign"></div>
-
-						<div class="table_filter_wrapper">
-								<!--div class="icon"></div>
-								<input type="search" class="table_filter" placeholder="Search the Data"-->
-						<!--/div>
-
-						<table id="dataTableOne" class="d-table help-zone-vb" cellpadding="0" cellspacing="0" data-help-localize="help.{{{table-helper}}}"></table>
-		        {{#if two-tables}}
-		        <table id="dataTableTwo" class="d-table help-zone-vb" cellpadding="0" cellspacing="0" data-help-localize="help.{{{table-helper}}}"></table>
-		        {{/if}}
-				</div-->
 
 	</script>
 
@@ -639,7 +630,7 @@ javascripts/react/widgets/dist/react-widgets.js
 
 			</div-->
 
-			<div class="widget-content geo-switch help-zone-vb" data-help-localize="help.{{{chart-helper}}}" style="height:495px; background-color:#FFF;">
+			<div class="widget-content geo-switch help-zone-vb" data-help-localize="help.{{{chart-helper}}}">
 				<div style="position:absolute; top:20px; right:20px; z-index:1;">
 					<!--a id="toggle-map" class="icon-button light"></a-->
 				</div>
@@ -1096,7 +1087,7 @@ javascripts/react/widgets/dist/react-widgets.js
 				</div>
 
 			</div>
-			<div class="widget-content" style="{{#if graph-type-double-pie}} overflow:hidden; {{else}} height:300px; padding-top:20px; padding-bottom:10px; {{/if}}">
+			<div class="widget-content">
 				{{#if graph-type-double-pie}}
 				<div class="pie-chart-container">
 					<div style="border-right:1px solid #CCC; width: 100%; height: 100%">
@@ -1161,6 +1152,9 @@ javascripts/react/widgets/dist/react-widgets.js
 	<script language="javascript" type="text/javascript" src="https://www.google.com/jsapi"></script>
     <% if (production) { %>
 	    <!-- PRODUCTION -->
+
+			<!--script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.common.js?<%= countlyVersion %>"></script-->
+
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.visualization.js?<%= countlyVersion %>"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.config.js?<%= countlyVersion %>"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.lib.js?<%= countlyVersion %>"></script>

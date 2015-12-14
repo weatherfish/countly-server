@@ -8,6 +8,7 @@
     countlyCommon.ACTIVE_APP_ID = 0;
     countlyCommon.BROWSER_LANG = jQuery.i18n.browserLang() || "en-US";
     countlyCommon.BROWSER_LANG_SHORT = countlyCommon.BROWSER_LANG.split("-")[0];
+
     countlyCommon.periodObj = getPeriodObj();
 
     if (store.get("countly_active_app")) {
@@ -22,6 +23,7 @@
         countlyCommon.BROWSER_LANG_SHORT = lang;
         countlyCommon.BROWSER_LANG = lang;
     }
+
 
     // Public Methods
 
@@ -44,10 +46,12 @@
     };
 
     countlyCommon.setActiveApp = function (appId) {
+        console.log("- inside function -");
         countlyCommon.ACTIVE_APP_KEY = countlyGlobal['apps'][appId].key;
         countlyCommon.ACTIVE_APP_ID = appId;
         store.set("countly_active_app", appId);
     };
+
 
     // Calculates the percent change between previous and current values.
     // Returns an object in the following format {"percent": "20%", "trend": "u"}
@@ -187,9 +191,10 @@
     var _state_single_graph_data = false;
     var initial_single_graph_data = false;
 
-    countlyCommon.drawTimeGraph = function (dataPoints, container, data_items, graph_width, graph_height, bucket) {
+    countlyCommon.drawTimeGraph = function (granularity_rows, container, data_items, graph_width, graph_height, bucket, granularity_type, small_circles, zero_points) {
         _.defer(function(){
-          
+
+/*
             if (!dataPoints.length) {
                 $(container).hide();
                 $(container).siblings(".no-data").show();
@@ -208,15 +213,10 @@
                     }
                 }
             }
-
-            console.log("countlyCommon.drawTimeGraph:", container, " datapoints:");
-            console.log(dataPoints);
-
+*/
             var time_period = countlyCommon.periodObj.currentPeriodArr;
 
-            /*var margin = {top: 20, right: 80, bottom: 30, left: 50},
-                width = 960 - margin.left - margin.right,
-                height = 300 - margin.top - margin.bottom;*/
+            _rickshaw_graph.period = _period;
 
             var graphTicks = [],
                    tickObj = {};
@@ -232,15 +232,31 @@
             /*
                 data formatting
             */
-
+/*
             if (!time_period){
                 time_period = graphTicks;
-                var parseDate = function(date_for_parse){
 
-                    var now = new Date();
-                    var today = d3.time.day(now);
-                    date_for_parse = d3.time.format("%Y-%m-%d")(today) + "-" + date_for_parse;
-                    return d3.time.format("%Y-%m-%d-%H:%M").parse(date_for_parse);
+                if (_period == "month")
+                {
+                    var parseDate = function(date_for_parse){
+
+                        var now = new Date();
+                        var year = d3.time.year(now);
+
+                        var formated = d3.time.format("%Y")(year) + "-" + date_for_parse + "-" + d3.time.format("%d")(year);
+                        return d3.time.format("%Y-%b-%d").parse(formated);
+                    }
+                }
+                else
+                {
+
+                    var parseDate = function(date_for_parse){
+
+                        var now = new Date();
+                        var today = d3.time.day(now);
+                        date_for_parse = d3.time.format("%Y-%m-%d")(today) + "-" + date_for_parse;
+                        return d3.time.format("%Y-%m-%d-%H:%M").parse(date_for_parse);
+                    }
                 }
             }
             else
@@ -286,6 +302,97 @@
                   };
             });
 
+*/
+
+/// -------------------- new -----------------------
+
+            console.log("----------------- granularity_rows --------------------");
+            console.log(granularity_rows);
+
+            //var granularity_type = "daily";
+
+            if (granularity_type == "weekly" || granularity_type == "monthly")
+            {
+
+                for (var i = 0; i < granularity_rows.length; i++)
+                {
+                    var elem = granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1];
+/*
+                    console.log("++++++++++++++ last element ++++++++++++++++++");
+                    console.log(elem);
+*/
+                    if (granularity_type == "monthly")
+                    {
+                        var full_days = new Date(elem[0]).monthDays();
+
+                        console.log("full_days:", full_days);
+                        console.log("days in period:", elem[2]);
+
+                        var extension_days = full_days - elem[2];
+
+                        var extension_date = new Date(elem[0]);
+                        extension_date.setDate(extension_date.getDate() + extension_days);
+
+                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][0] = extension_date.getTime();
+                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][2] = full_days;
+
+                        //var
+
+                        //console.log("firt full_days:", full_days);
+                        //console.log(full_days);
+                    }
+                    else
+                    {
+                        var full_days = 7;
+                        //console.log("-------- weekly -----------", elem[2]);
+                        //console.log();
+
+                        var extension_days = full_days - elem[2];
+
+                        var extension_date = new Date(elem[0]);
+                        extension_date.setDate(extension_date.getDate() + extension_days);
+
+                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][0] = extension_date.getTime();
+                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][2] = full_days;
+
+                    }
+                }
+            }
+
+            var single_graph_data = [];
+
+            for (var i = 0; i < granularity_rows.length; i++)
+            {
+
+                var set_data = granularity_rows[i];
+
+                var obj = {
+                    "name"   : set_data.label,
+                    "values" : [],
+                    "color"  : data_items[i].color/*set_data.color*/
+                }
+
+                for(var j = 0; j < set_data.data.length; j++){
+
+                    var point_data = {
+                        "x" : set_data.data[j][0]/*.unix() * 1000*/,
+                        "y" : set_data.data[j][1],
+                    }
+
+                    if (set_data.data[j][2])
+                    {
+                        point_data["days_count"] = set_data.data[j][2];
+                    }
+
+                    obj.values.push(point_data);
+                }
+
+                single_graph_data.push(obj);
+            }
+
+            console.log("[[[[[[[[[[[[[[[[[[ new single graph data ]]]]]]]]]]]]]]]]]]");
+            console.log(single_graph_data);
+
             if (container.indexOf("#") > -1)
             {
                 var draw_element = document.getElementById(container.replace("#", ""));
@@ -300,19 +407,37 @@
             single_graph_data.forEach(function(data, i){
 
                 series.push({
-                    color : data_items[i].color,
+                    color : data.color, //data_items[i].color,
                     data  : data.values,
                     name  : data.name
-                })
-
+                });
             });
+/*
+            if (granularity_rows[0]['data'][0].length > 2 && granularity_rows[0]['data'][0][2] < 7)
+            {
+                var left_time_extension = true;
+                //_rickshaw_graph.left_time_extension = true;
+            }
+            else
+            {
+                var left_time_extension = false;
+                //_rickshaw_graph.left_time_extension = false;
+            }
+*/
+            var left_time_extension = false;
 
             _rickshaw_graph = new Rickshaw.Graph({
               	element  : draw_element,
               	width    : graph_width,
               	height   : graph_height,
               	renderer : 'line',
-              	series : series
+              	series   : series,
+                granularity : "daily",
+                left_time_extension : left_time_extension,
+                small_circle_r : 0,
+                big_circle_r : 4,
+                small_circles : small_circles,
+                zero_points : zero_points
             });
 
             var scales = [];
@@ -346,42 +471,104 @@
                 }
             }
 
+            //document.getElementById('axis_left').style.height = graph_height;
+
             var y_axis_left = new Rickshaw.Graph.Axis.Y({
                 graph: _rickshaw_graph,
                 orientation: 'left',
                 tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
                 element: document.getElementById('axis_left'),
-                /*pixelsPerTick : 200*/
+                pixelsPerTick : 100
             });
-
-            document.getElementById('axis_right').style.left = (graph_width - 20) + "px";
 
             var y_axis_right = new Rickshaw.Graph.Axis.Y({
                 graph: _rickshaw_graph,
                 orientation: 'right',
                 tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
                 element: document.getElementById('axis_right'),
-                //pixelsPerTick : 200
+                pixelsPerTick : 100
             });
-
-            _rickshaw_graph.period = _period;
 
             new Rickshaw.Graph.Axis.Time({
                 graph: _rickshaw_graph,
+                max_ticks_count : 10
                 //tickFormat: format
             });
 
-            _state_single_graph_data   = single_graph_data;
+            _state_single_graph_data  = single_graph_data;
             initial_single_graph_data = single_graph_data;
 
             var hoverDetail = new Rickshaw.Graph.HoverDetail( {
             	graph: _rickshaw_graph,
-            	formatter: function(series, x, y) {
+            	formatter: function(series, x, y, x0, y0, point, is_bottom_block) {
 
                   var date = new Date(x);
-                  var date_string = date.toLocaleFormat('%d %B %Y');
 
-                  var hover_html = "<div>";
+                  if (this.graph.granularity == "weekly")
+                  {
+
+                      for (var i = 0; i < series.data.length; i++)
+                      {
+                          if (series.data[i].x == x)
+                          {
+                              var days_count = series.data[i].days_count;
+                              break;
+                          }
+                      }
+
+                      var one_week_ago = new Date(x);
+                      one_week_ago.setDate(one_week_ago.getDate() - days_count + 1);
+
+                      var date_string = d3.time.format("%d %b")(one_week_ago) + " - " + d3.time.format("%d %b %Y")(date) /*+ "  (" + d3.time.format("%a")(one_week_ago) + " - " + d3.time.format("%a")(date) + ")"*/;
+
+                  }
+                  else if (this.graph.granularity == "monthly")
+                  {
+
+                      for (var i = 0; i < series.data.length; i++)
+                      {
+                          if (series.data[i].x == x)
+                          {
+                              var days_count = series.data[i].days_count;
+                              break;
+                          }
+                      }
+
+                      //var one_month_ago = new Date(x);
+                      //one_month_ago.setDate(one_month_ago.getDate() - days_count + 1);
+
+                      //console.log("days_count::", days_count);
+
+
+                      var one_month_ago = new Date(x);
+                      //one_month_ago.setMonth(one_month_ago.getMonth() - days_count + 1);
+                      one_month_ago.setDate(one_month_ago.getDate() - days_count + 1);
+
+                      var date_string = d3.time.format("%d %b")(one_month_ago) + " - " + d3.time.format("%d %b %Y")(date) /*+ "  (" + d3.time.format("%a")(one_month_ago) + " - " + d3.time.format("%a")(date) + ")"*/;
+
+                  }
+                  else
+                  {
+                      //var date_string = date.getDate() + " " +  date.getMonth() + " " + date.getFullYear();
+
+                      var date_string = d3.time.format("%d %b %Y")(date);
+                  }
+
+                  /*
+
+                  var now = new Date();
+                  var today = d3.time.day(now);
+                  date_for_parse = d3.time.format("%Y-%m-%d")(today) + "-" + date_for_parse;
+                  return d3.time.format("%Y-%m-%d-%H:%M").parse(date_for_parse);
+
+                  */
+
+                  /*
+                  var date_string = oneWeekAgo.format('%d %B') + " - " + date.format('%d %B %Y'); // todo: need to upgrade the function
+                  var date_string =  date.format('%d %B %Y');
+                  */
+
+                  var hover_html = "<div class='hover_wrapper'>";
 
                   hover_html += "<div class='date_string'>" + date_string + "</div>";
 
@@ -391,13 +578,26 @@
                       {
                           if (data.values[i].x == x)
                           {
+                              var value = data.values[i].y.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                              hover_html += "<div class='hover_element'><div class='circle' style='background-color:" + data_items[sg].color + "'></div><div class='name'>" + data.name + "</div><div class='value'>" + value + "</div></div>";
 
-                              hover_html += "<div class='hover_element'><div class='circle' style='background-color:" + data_items[sg].color + "'></div><div class='name'>" + data.name + "</div><div class='value'>" + data.values[i].y + "</div></div>";
+                              //hover_html += "<div class='hover_element'><div class='circle' style='background-color:" + data_items[sg].color + "'></div><div class='value'>" + value + "</div></div>";
+
+
                               break;
                           }
                       }
 
                   });
+
+                  if (is_bottom_block)
+                  {
+                      hover_html += "<div class='triangle bottom'></div>";
+                  }
+                  else
+                  {
+                      hover_html += "<div class='triangle top'></div>"
+                  }
 
                   hover_html += "</div>"
 
@@ -412,28 +612,22 @@
         });
     };
 
-    countlyCommon.updateTimeGraph = function (dataPoints, container, data_items, bucket) {
+    countlyCommon.updateTimeGraph = function (granularity_rows, container, data_items, bucket, granularity_type, small_circles, zero_points) {
 
         if (!_rickshaw_graph)
         {
             return false;
         }
 
-        if (dataPoints[0] && dataPoints[0].data[0][0] == 1) {
-            for (var i = 0; i < dataPoints.length; i++) {
-                for (var j = 0; j < dataPoints[i].data.length; j++) {
-                    dataPoints[i].data[j][0] -= 1;
+        if (granularity_rows[0] && granularity_rows[0].data[0][0] == 1) {
+            for (var i = 0; i < granularity_rows.length; i++) {
+                for (var j = 0; j < granularity_rows[i].data.length; j++) {
+                    granularity_rows[i].data[j][0] -= 1;
                 }
             }
         }
 
         var time_period = countlyCommon.periodObj.currentPeriodArr;
-
-/*
-        var margin = {top: 20, right: 80, bottom: 30, left: 50},
-            width = 960 - margin.left - margin.right,
-            height = 300 - margin.top - margin.bottom;
-*/
 
         var graphTicks = [],
                tickObj = {};
@@ -444,113 +638,190 @@
             tickObj = countlyCommon.getTickObj(bucket);
         }
 
-        console.log("+++++++++++++++ tickObj 1 ++++++++++++++++");
-        console.log(tickObj);
-
-        /*graphProperties.xaxis.max = tickObj.max;
-        graphProperties.xaxis.min = tickObj.min;
-        graphProperties.xaxis.ticks = tickObj.ticks;*/
-
         graphTicks = tickObj.tickTexts;
 
-        //var parseDate = d3.time.format("%Y.%m.%d").parse;
+        if (granularity_rows)
+        {
 
-        if (!time_period){
-            //console.log("-------------- time_period = graphTicks -------------");
-            time_period = graphTicks;
-            var parseDate = d3.time.format("%H:%M").parse;
+            // add the end of the week and month in Weekly and Monthly mode
+
+            if (granularity_type == "weekly" || granularity_type == "monthly")
+            {
+
+                for (var i = 0; i < granularity_rows.length; i++)
+                {
+                    var elem = granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1];
+
+                    if (granularity_type == "monthly")
+                    {
+                        var full_days = new Date(elem[0]).monthDays();
+
+                        console.log("full_days:", full_days);
+                        console.log("days in period:", elem[2]);
+
+                        var extension_days = full_days - elem[2];
+
+                        var extension_date = new Date(elem[0]);
+                        extension_date.setDate(extension_date.getDate() + extension_days);
+
+                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][0] = extension_date.getTime();
+                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][2] = full_days;
+
+                    }
+                    else
+                    {
+                        var full_days = 7;
+
+                        var extension_days = full_days - elem[2];
+
+                        var extension_date = new Date(elem[0]);
+                        extension_date.setDate(extension_date.getDate() + extension_days);
+
+                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][0] = extension_date.getTime();
+                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][2] = full_days;
+
+                    }
+                }
+            }
+
+            var single_graph_data = [];
+
+            for (var i = 0; i < granularity_rows.length; i++)
+            {
+
+                var set_data = granularity_rows[i];
+
+                var obj = {
+                    "name"   : set_data.label,
+                    "values" : [],
+                    "color"  : set_data.color
+                }
+
+                for(var j = 0; j < set_data.data.length; j++){
+
+                    var point_data = {
+                        "x" : set_data.data[j][0]/*.unix() * 1000*/,
+                        "y" : set_data.data[j][1],
+                    }
+
+                    if (set_data.data[j][2])
+                    {
+                        point_data["days_count"] = set_data.data[j][2];
+                    }
+
+                    obj.values.push(point_data);
+                }
+
+                single_graph_data.push(obj);
+            }
+
         }
         else
         {
-            var parseDate = d3.time.format("%Y.%m.%d").parse;
-        }
 
-        console.log("========= time_period =============");
-        console.log(time_period);
+            if (!time_period){
 
-        /*
-            data formatting
-        */
+                time_period = graphTicks;
 
-        var graph_data = [];
-
-        for (var i = 0; i < time_period.length; i++)
-        {
-
-            var obj = {
-                "date" : parseDate(time_period[i]),
-            }
-
-            if (!obj.date)
-            {
-                console.log("!obj.date", time_period[i]);
-                continue;
-            }
-
-            dataPoints.forEach(function(set){
-
-                if (!set.data[i])
+                if (_period == "month")
                 {
-                    obj[set.label] = 0;
+                    var parseDate = function(date_for_parse){
+
+                        var now = new Date();
+                        var year = d3.time.year(now);
+
+                        var formated = d3.time.format("%Y")(year) + "-" + date_for_parse + "-" + d3.time.format("%d")(year);
+                        return d3.time.format("%Y-%b-%d").parse(formated);
+                    }
                 }
                 else
                 {
-                    obj[set.label] = set.data[i][1];
+
+                    var parseDate = function(date_for_parse){
+
+                        var now = new Date();
+                        var today = d3.time.day(now);
+                        date_for_parse = d3.time.format("%Y-%m-%d")(today) + "-" + date_for_parse;
+                        return d3.time.format("%Y-%m-%d-%H:%M").parse(date_for_parse);
+                    }
+                }
+            }
+            else
+            {
+                var parseDate = d3.time.format("%Y.%m.%d").parse;
+            }
+
+            /*
+                data formatting
+            */
+
+            var graph_data = [];
+
+            for (var i = 0; i < time_period.length; i++)
+            {
+
+                var obj = {
+                    "date" : parseDate(time_period[i]),
                 }
 
-            });
+                if (!obj.date)
+                {
+                    console.log("!obj.date", time_period[i]);
+                    continue;
+                }
 
-            graph_data.push(obj);
-        }
+                granularity_rows.forEach(function(set){
 
-        var color = d3.scale.category10();
+                    if (!set.data[i])
+                    {
+                        obj[set.label] = 0;
+                    }
+                    else
+                    {
+                        obj[set.label] = set.data[i][1];
+                    }
 
-        color.domain(d3.keys(graph_data[0]).filter(function(key) { return key !== "date"; }));
+                });
 
-        console.log("===================== _state_single_graph_data ===================");
-        console.log(initial_single_graph_data);
+                graph_data.push(obj);
+            }
 
-        var single_graph_data = color.domain().map(function(name, i) {
+            var color = d3.scale.category10();
 
-              var color = false;
+            color.domain(d3.keys(graph_data[0]).filter(function(key) { return key !== "date"; }));
 
-              for (var c = 0; c < initial_single_graph_data.length; c++)
-              {
+            var single_graph_data = color.domain().map(function(name, i) {
 
-                  console.log("check name:::", initial_single_graph_data[c].name, ">>", name);
+                  var color = false;
 
-                  if (initial_single_graph_data[c].name == name)
+                  for (var c = 0; c < initial_single_graph_data.length; c++)
                   {
-                      console.log("found...");
-                      console.log(initial_single_graph_data[c]);
-                      color = initial_single_graph_data[c].color;
-                      break;
+                      if (initial_single_graph_data[c].name == name)
+                      {
+                          color = initial_single_graph_data[c].color;
+                          break;
+                      }
                   }
-              }
 
-              console.log(">>>>> color:", color);
-
-              return {
-                  name: name,
-                  values: graph_data.map(function(d) {
-                      //return {date: d.date, value: +d[name]};
-                      return {x: d.date.getTime(), y: +d[name]};
-                  }),
-                  color : color
-              };
-        });
+                  return {
+                      name: name,
+                      values: graph_data.map(function(d) {
+                          //return {date: d.date, value: +d[name]};
+                          return {x: d.date.getTime(), y: +d[name]};
+                      }),
+                      color : color
+                  };
+            });
+        }
 
         _state_single_graph_data = single_graph_data;
 
         /*
             add or remove graph line path element
         */
+
         if (_rickshaw_graph.series.length != single_graph_data.length)
         {
-
-            console.log("---add or remove---");
-            console.log(single_graph_data);
-
             var new_series = [];
 
             for (var i = 0; i < (_rickshaw_graph.series.length - single_graph_data.length); i++)
@@ -570,8 +841,6 @@
         }
         else
         {
-            console.log("--- update data ---");
-
             for (var i = 0; i < _rickshaw_graph.series.length; i++)
             {
                 _rickshaw_graph.series[i].data = single_graph_data[i].values;
@@ -579,6 +848,43 @@
         }
 
         _rickshaw_graph.period = _period;
+
+        _rickshaw_graph.granularity = granularity_type;
+
+        _rickshaw_graph.zero_points = zero_points;
+
+/*
+        console.log("{{{{{{{{{{{{{{{{{{ granularity_rows }}}}}}}}}}}}}}}}}}", granularity_type);
+        console.log("{{{{{{{{{{{{{{{{{{ granularity_rows }}}}}}}}}}}}}}}}}}", granularity_type);
+        console.log("{{{{{{{{{{{{{{{{{{ granularity_rows }}}}}}}}}}}}}}}}}}", granularity_type);
+        console.log(granularity_rows);
+*/
+        if (granularity_type == "monthly")
+        {
+            var full_days = new Date(granularity_rows[0].data[0][0]).monthDays();
+
+            //console.log("firt full_days:", full_days);
+            //console.log(full_days);
+        }
+        else
+        {
+            var full_days = 7;
+        }
+/*
+        if (granularity_rows[0] && granularity_rows[0]['data'] && granularity_rows[0]['data'][0].length > 2 && granularity_rows[0]['data'][0][2] < full_days)
+        {
+            _rickshaw_graph.left_time_extension = true;
+        }
+        else
+        {
+            _rickshaw_graph.left_time_extension = false;
+        }
+*/
+        _rickshaw_graph.left_time_extension = false;
+
+        _rickshaw_graph.small_circles = small_circles;
+
+        //console.log("_rickshaw_graph.left_time_extension:", _rickshaw_graph.left_time_extension);
 
         _rickshaw_graph.update();
 
@@ -986,10 +1292,10 @@
     countlyCommon.extractChartData = function (db, clearFunction, chartData, dataProperties) {
 
         countlyCommon.periodObj = getPeriodObj();
-
+/*
         console.log("================= countlyCommon.periodObj =================");
         console.log(countlyCommon.periodObj);
-
+*/
         var periodMin = countlyCommon.periodObj.periodMin,
             periodMax = (countlyCommon.periodObj.periodMax + 1),
             dataObj = {},
@@ -1037,7 +1343,10 @@
                     formattedDate = moment((activeDateArr[i]).replace(/\./g, "/"));
                     dataObj = countlyCommon.getDescendantProp(db, activeDateArr[i]);
                 }
-
+/*
+                console.log('}}}}}}}}}}}}}} dataObj }}}}}}}}}}}}}}');
+                console.log(dataObj);
+*/
                 dataObj = clearFunction(dataObj);
 
                 if (!tableData[i]) {
@@ -1074,6 +1383,192 @@
         }
 
         return {"chartDP":chartData, "chartData":_.compact(tableData), "keyEvents":keyEvents, "time_period" : countlyCommon.periodObj.currentPeriodArr, "time_format" : countlyCommon.periodObj.dateString };
+    };
+
+    countlyCommon.extractChartData_granularity = function(db, clearFunction, chartData, dataProperties) {
+
+        countlyCommon.periodObj = getPeriodObj();
+/*
+        console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< chartData extractChartData_granularity >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        console.log(db);
+*/
+        var weekly_granularity  = JSON.parse(JSON.stringify(chartData)); // clone
+        var monthly_granularity = JSON.parse(JSON.stringify(chartData));
+        var daily_granularity   = JSON.parse(JSON.stringify(chartData));
+/*
+        console.log("================= countlyCommon.periodObj =================");
+        console.log(countlyCommon.periodObj);
+*/
+        var periodMin = countlyCommon.periodObj.periodMin,
+            periodMax = (countlyCommon.periodObj.periodMax + 1),
+            dataObj = {},
+            formattedDate = "",
+            tableData = [],
+            propertyNames = _.pluck(dataProperties, "name"),
+            propertyFunctions = _.pluck(dataProperties, "func"),
+            currOrPrevious = _.pluck(dataProperties, "period"),
+            activeDate,
+            activeDateArr;
+/*
+        console.log("periodMin:", periodMin);
+        console.log("periodMax:", periodMax);
+        console.log("activeDate:", activeDate);
+        console.log("activeDateArr:", activeDateArr);
+        console.log("is special period:", countlyCommon.periodObj.isSpecialPeriod);
+        console.log("countlyCommon.periodObj /");
+        console.log(countlyCommon.periodObj);
+        console.log("::::::::::: propertyFunctions ::::::::::::");
+        console.log(propertyFunctions);
+*/
+        if (currOrPrevious[j] === "previous") {
+            if (countlyCommon.periodObj.isSpecialPeriod) {
+                periodMin = 0;
+                periodMax = countlyCommon.periodObj.previousPeriodArr.length;
+                activeDateArr = countlyCommon.periodObj.previousPeriodArr;
+            } else {
+                activeDate = countlyCommon.periodObj.previousPeriod;
+            }
+        } else {
+            if (countlyCommon.periodObj.isSpecialPeriod) {
+                periodMin = 0;
+                periodMax = countlyCommon.periodObj.currentPeriodArr.length;
+                activeDateArr = countlyCommon.periodObj.currentPeriodArr;
+            } else {
+                activeDate = countlyCommon.periodObj.activePeriod;
+            }
+        }
+/*
+        console.log("activeDateArr:");
+        console.log(activeDateArr);
+        console.log("activeDate:");
+        console.log(activeDate);
+        console.log("propertyNames:");
+        console.log(propertyNames);
+*/
+        for (var j = 0; j < propertyNames.length; j++) {
+
+            var week_count = 0;
+            var week_days_count = 0;
+
+            var month_count = 0;
+            var month_days_count = 0;
+
+            for (var i = periodMin; i < periodMax; i++) {
+
+                if (!countlyCommon.periodObj.isSpecialPeriod) {
+
+                    //console.log("??????? active date:", activeDate, " -- ", i);
+
+                    if (countlyCommon.periodObj.periodMin == 0) {
+                        formattedDate = moment((activeDate + " " + i + ":00:00").replace(/\./g, "/"));
+                    } else if (("" + activeDate).indexOf(".") == -1) {
+                        formattedDate = moment((activeDate + "/" + i + "/1").replace(/\./g, "/"));
+                    } else {
+                        formattedDate = moment((activeDate + "/" + i).replace(/\./g, "/"));
+                    }
+
+                    dataObj = countlyCommon.getDescendantProp(db, activeDate + "." + i);
+                } else {
+                    formattedDate = moment((activeDateArr[i]).replace(/\./g, "/"));
+                    dataObj = countlyCommon.getDescendantProp(db, activeDateArr[i]);
+
+                    if (activeDateArr[i + 1])
+                    {
+                        var formattedDate_next = moment((activeDateArr[i + 1]).replace(/\./g, "/"));
+                    }
+                    else
+                    {
+                        var formattedDate_next = false;
+                    }
+                }
+
+                dataObj = clearFunction(dataObj);
+/*
+                console.log("-------------- dataObj ----------------");
+                console.log(dataObj);
+*/
+                if (!tableData[i]) {
+                    tableData[i] = {};
+                }
+
+                tableData[i]["date"] = formattedDate.format(countlyCommon.periodObj.dateString);
+
+                if (propertyFunctions[j]) {
+                    propertyValue = propertyFunctions[j](dataObj);
+                } else {
+                    propertyValue = dataObj[propertyNames[j]];
+                }
+
+                chartData[j]["data"][chartData[j]["data"].length] = [i, propertyValue];
+                tableData[i][propertyNames[j]] = propertyValue;
+
+                // daily granularity
+
+                daily_granularity[j]["data"][daily_granularity[j]["data"].length] = [formattedDate.unix() * 1000, propertyValue];
+
+                // weekly granularity
+
+                week_count += propertyValue;
+                week_days_count += 1;
+
+                var day_num = formattedDate.day(); //.format('dddd');
+
+                if (day_num == 0) /*"Sunday"*/
+                {
+                    weekly_granularity[j]["data"][weekly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, week_count, week_days_count];
+                    week_count = 0;
+                    week_days_count = 0;
+                }
+
+                // monthly granularity
+
+                month_count += propertyValue;
+                month_days_count += 1;
+
+                var day_num = formattedDate.format('D');
+
+                if (formattedDate_next && formattedDate_next.format('D') == 1)
+                {
+                    monthly_granularity[j]["data"][monthly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, month_count, month_days_count];
+                    month_count = 0;
+                    month_days_count = 0;
+                }
+            }
+
+            // add the remaining days of the week
+            weekly_granularity[j]["data"][weekly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, week_count, week_days_count];
+            // add the remaining days of the month
+            monthly_granularity[j]["data"][monthly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, month_count, month_days_count];
+
+        }
+
+        var keyEvents = [];
+
+        for (var k = 0; k < chartData.length; k++) {
+            var flatChartData = _.flatten(chartData[k]["data"]);
+            var chartVals = _.reject(flatChartData, function (context, value, index, list) {
+                return value % 2 == 0;
+            });
+            var chartIndexes = _.filter(flatChartData, function (context, value, index, list) {
+                return value % 2 == 0;
+            });
+
+            keyEvents[k] = {};
+            keyEvents[k].min = _.min(chartVals);
+            keyEvents[k].max = _.max(chartVals);
+        }
+
+        return {
+            "chartDP"        : chartData,
+            "daily_granularity"   : daily_granularity,
+            "weekly_granularity"  : weekly_granularity,
+            "monthly_granularity" : monthly_granularity,
+            "chartData"           : _.compact(tableData),
+            "keyEvents"   : keyEvents,
+            "time_period" : countlyCommon.periodObj.currentPeriodArr,
+            "time_format" : countlyCommon.periodObj.dateString
+        };
+
     };
 
     countlyCommon.extractTwoLevelData = function (db, rangeArray, clearFunction, dataProperties) {
@@ -2129,14 +2624,27 @@
             uniquePeriodsCheck = [],
             previousUniquePeriodsCheck = [];
 
+        console.log("getPeriodObj :_period: ", _period);
+
         switch (_period) {
             case "month":
-                activePeriod = year;
+                /*activePeriod = year;
                 previousPeriod = year - 1;
                 periodMax = month;
                 periodMin = 1;
                 dateString = "MMM";
-                numberOfDays = getDOY();
+                numberOfDays = getDOY();*/
+
+                var now = new Date();
+                var start = new Date(now.getFullYear(), 0, 0);
+                var diff = now - start;
+                var oneDay = 1000 * 60 * 60 * 24;
+                var day = Math.floor(diff / oneDay);
+
+                console.log("count days:", day);
+
+                numberOfDays = daysInPeriod = day;
+
                 break;
             case "day":
                 activePeriod = year + "." + month;
@@ -2197,6 +2705,11 @@
                 break;
             default:
                 break;
+        }
+
+        if (!_period[0])
+        {
+            _period[0] = _period[1] - (60 * 60 * 24 * 1000); // todo: fast fix !
         }
 
         // Check whether period object is array

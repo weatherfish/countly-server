@@ -101,31 +101,26 @@
 }
 */
 
-body { margin:0; padding:0; overflow:auto; /*background-image:url('../images/dashboard/bg.png');*/ background-color:#F5F5F5; user-select:text; }
+body {
+  margin:0;
+  padding:0;  
+  background-color:#F5F5F5;
+  user-select:text;
+}
 #content-container {
 
     margin-left:260px;
-    /*padding-top : 80px;*/
     min-width:768px;
     min-height: 400px;
-    /*padding:16px;
-    padding-bottom:35px;*/
-    overflow:auto;
-    position: relative;
-
-    top : 50px;
-
-    /*margin-top : 70px;*/
-
-    z-index:1000;
-
-
-
+    position: absolute;
+    top : 141px;
+    z-index : 2000;
 }
+
 #content {
     padding-bottom: 50px;
     border : 1px solid #eeeeee;
-    margin-top : 95px;
+    /*margin-top : 95px;*/
     background-color : #ffffff;
 }
 a { color:inherit; text-decoration:none; }
@@ -250,9 +245,11 @@ a:active { color:inherit; }
 /* DASHBOARD */
 	#dashboard-graph {
 
-    font-family:Oswald; text-shadow:none; font-size:14px;
+
+    margin-top : 30px;
+
   }
-    #dashboard-graph .legendLabel,.graph .legendLabel { font-family:Ubuntu !important; font-size:14px !important; }
+    #dashboard-graph .legendLabel,.graph .legendLabel {  }
 
 
 
@@ -332,6 +329,8 @@ a:active { color:inherit; }
       /*margin-top : 90px;*/
       margin-left : 20px;
       margin-right : 20px;
+
+      padding-top : 30px;
 
       position : relative;
 
@@ -483,7 +482,8 @@ a:active { color:inherit; }
 			.map-list .country-name { width:128px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; float:left; padding-top:4px; color:#646464; text-shadow:0 1px #FFF; font:16px Ubuntu,Helvetica,sans-serif; line-height:111%; }
 			.map-list .bar { float:left; margin-left:10px; height:15px; margin-top:2px; background-color:#333; }
 
-		.graph { font:14px Oswald; z-index:1; }
+		.graph {
+      z-index:1; }
 		.graph table tr:nth-child(n+10){ display:none; }
 		#graph-tooltip { border:1px solid #1B1B1C; box-shadow:0 1px 1px 0 #B0B0B0, inset 0 1px 0 #727475; background-image:linear-gradient(top, #3947320 30%, #383B3C 100%); background-image:linear-gradient(to bottom, #3947320 30%, #383B3C 100%); padding:5px 7px; border-radius:2px; background-color:#3C3F40; opacity:0.80; color:#FFF; font:12px Oswald; display:none; position:absolute; z-index:100; }
 		.pie-chart-container { float:left; width:50%; position:relative; height:360px; }
