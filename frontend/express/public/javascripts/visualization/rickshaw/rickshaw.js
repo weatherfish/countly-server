@@ -1498,6 +1498,8 @@ Rickshaw.Graph.Axis.Time = function(args) {
 
 	var time = args.timeFixture || new Rickshaw.Fixtures.Time();
 
+  var max_tick_width = 39;
+
 	this.appropriateTimeUnit = function() {
 
 		var unit;
@@ -1522,53 +1524,51 @@ Rickshaw.Graph.Axis.Time = function(args) {
 		var unit = this.fixedTimeUnit || this.appropriateTimeUnit();
 		//var count = Math.ceil((domain[1] - domain[0]) / unit.seconds);
 
-    var count = this.graph.series[0].data.length;
+    var ticks_count = this.graph.series[0].data.length;
 
     var runningTick = domain[0];
 
-    //var skip = false;
+    var skip = false;
     var skip_count = 1;
 
-    //count * (300 / 32);
-
-    /*if (count * 35 > 300)
+    /*if (ticks_count * max_tick_width > this.graph.width)
     {
         var skip = true;
         var skip_count = Math.round(count / (300 / 35) / 2);
     }
-*/
+    */
 
-    if (count > 10)
+    if (ticks_count > 10)
     {
         var skip = true;
-        var skip_count = Math.round(count / (300 / 35) / 2);
+        var skip_count = Math.round(ticks_count / (this.graph.width / max_tick_width) * 2);
     }
 
 		var offsets = [];
 
-    for (var i = 0; i < count; i+=skip_count)
+    for (var i = 0; i < ticks_count; i+=skip_count)
     {
-
-        //console.log("i:", i);
-        /*
-        var tickValue = time.ceil(runningTick, unit);
-        runningTick = tickValue + unit.seconds / 2 * sub2;
-        */
-
         var tickValue = this.graph.series[0].data[i].x;
-
         offsets.push( { value: tickValue, unit: unit } );
     }
 
-/*
-    var medium = Math.round((this.graph.series[0].data.length - 1) / 2);
+    /*
+        add the last tick
+    */
 
-    offsets.push({ value: this.graph.series[0].data[0].x, unit: unit });
-    offsets.push({ value: this.graph.series[0].data[this.graph.series[0].data.length -1].x, unit: unit });
-    offsets.push({ value: this.graph.series[0].data[medium].x, unit: unit });
-*/
-    console.log('--------- offsets ---------');
-    console.log(offsets);
+    if (this.graph.series[0].data[this.graph.series[0].data.length - 1].x != offsets[offsets.length - 1].value)
+    {
+
+        var last_tick = this.graph.series[0].data[this.graph.series[0].data.length - 1].x;
+        offsets.push( { value: last_tick, unit: unit } );
+
+        console.log("++++++ last tick +++++");
+        console.log(last_tick);
+
+        console.log('--------- offsets ---------');
+        console.log(offsets);
+
+    }
 
     return offsets;
 
@@ -1604,7 +1604,7 @@ Rickshaw.Graph.Axis.Time = function(args) {
 
 		offsets.forEach(function(o, i) {
 
-        console.log(">>> offsets i:", i, " > ", d3.time.format("%e %b")(new Date(o.value)));
+        //console.log(">>> offsets i:", i, " > ", d3.time.format("%e %b")(new Date(o.value)));
 
   			if (self.graph.x(o.value) > self.graph.x.range()[1]) return;
 
@@ -1648,13 +1648,13 @@ Rickshaw.Graph.Axis.Time = function(args) {
         {
             element.style.left = 0;
         }
-        else if (i == offsets.length - 1)
+        else if (i == (offsets.length - 1))
         {
-            element.style.left = (self.graph.x(o.value) - (tick_title_width) + left_extension_width + points_offset) + 'px';
+            element.style.left = (self.graph.x(o.value) - (tick_title_width) + 8 + points_offset) + 'px';
         }
         else
         {
-            element.style.left = (self.graph.x(o.value) - (tick_title_width / 2) + left_extension_width + points_offset) + 'px'; // todo: change 16 to var.
+            element.style.left = (self.graph.x(o.value) - (tick_title_width / 2) + 4 + points_offset) + 'px'; // todo: change 16 to var.
         }
 
         //console.log("title: ", title.offsetWidth);
