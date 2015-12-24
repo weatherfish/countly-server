@@ -417,6 +417,8 @@ Rickshaw.Graph = function(args) {
 
     this.zero_points = args.zero_points;
 
+    this.space_between_points = false;
+
 		this.defaults = {
 			interpolation: 'linear', // 'cardinal',
 			offset: 'zero',
@@ -449,19 +451,27 @@ Rickshaw.Graph = function(args) {
            return "translate(" + left_shift + ", 100)"; }
       )*/
 
-
 		this.discoverRange();
 
     if (args.granularity)
     {
         this.granularity = args.granularity;
+
+        if (this.granularity == "monthly")
+        {
+            this.max_tick_width = 22;
+        }
+        else
+        {
+            this.max_tick_width = 38;
+        }
     }
     else
     {
         this.granularity = false;
     }
 
-	};
+  };
 
 	this._loadRenderers = function() {
 
@@ -552,13 +562,6 @@ Rickshaw.Graph = function(args) {
 
     y_domain = parseInt(y_domain_string);
 
-    //console.log("new domain:", y_domain);
-/*
-    console.log("++++++++++++  x domain ++++++++++ ");
-    console.log(domain);
-
-    console.log("left_time_extension:", this.left_time_extension);
-*/
     if(this.left_time_extension == false)
     {
         var left_extension_width = 0;
@@ -568,7 +571,7 @@ Rickshaw.Graph = function(args) {
         var left_extension_width = _left_extension_width;
     }
 
-		this.x = (this.xScale || d3.scale.linear()).copy().domain(domain.x).range([0, this.width - (this.circle_radius * 2) - left_extension_width]);
+		this.x = (this.xScale || d3.scale.linear()).copy().domain(domain.x).range([0, this.width - (this.circle_radius * 2) - this.max_tick_width]);
 		//this.y = (this.yScale || d3.scale.linear()).copy().domain(domain.y).range([this.height, 0]);
 
     this.y = (this.yScale || d3.scale.linear()).copy().domain([domain.y[0], y_domain]).range([this.height, 0]);
@@ -608,7 +611,33 @@ Rickshaw.Graph = function(args) {
 
 	};
 
-	this.update = this.render;
+	this.update = function() {
+
+      if (this.granularity == "monthly")
+      {
+          this.max_tick_width = 22;
+      }
+      else
+      {
+          this.max_tick_width = 38;
+      }
+
+      var element = document.getElementsByClassName('rickshaw_graph')[0].getElementsByClassName('detail')[0];
+
+      console.log("------ update element ---------------");
+      console.log(element);
+
+      if (this.small_circles)
+      {
+          element.style.transition = "top 0.4s";
+      }
+      else
+      {
+          element.style.transition = "top 0s";
+      }
+
+      this.render();
+  }
 
 	this.stackData = function() {
 
@@ -1498,7 +1527,7 @@ Rickshaw.Graph.Axis.Time = function(args) {
 
 	var time = args.timeFixture || new Rickshaw.Fixtures.Time();
 
-  var max_tick_width = 39;
+  //this.graph.max_tick_width = 38; // todo: combine with same variable but class element
 
 	this.appropriateTimeUnit = function() {
 
@@ -1531,50 +1560,65 @@ Rickshaw.Graph.Axis.Time = function(args) {
     var skip = false;
     var skip_count = 1;
 
-    /*if (ticks_count * max_tick_width > this.graph.width)
-    {
-        var skip = true;
-        var skip_count = Math.round(count / (300 / 35) / 2);
-    }
-    */
+    console.log("formula:", ticks_count, "--",  this.graph.width, "--", this.graph.max_tick_width);
 
     if (ticks_count > 10)
     {
         var skip = true;
-        var skip_count = Math.round(ticks_count / (this.graph.width / max_tick_width) * 2);
+        var skip_count = Math.round(ticks_count / (this.graph.width / this.graph.max_tick_width) * 2);
     }
 
-		var offsets = [];
+    console.log("ticks_count:", ticks_count, " > ", skip_count);
 
-    for (var i = 0; i < ticks_count; i+=skip_count)
+		var offsets = [];
+    var i = 0
+
+    //for (var i = 0; i < ticks_count; i+=skip_count)
+    while(i < ticks_count)
     {
         var tickValue = this.graph.series[0].data[i].x;
         offsets.push( { value: tickValue, unit: unit } );
+
+        if (i + skip_count > ticks_count) // we need clear i
+        {
+            break;
+        }
+
+        i+=skip_count;
     }
+
+    console.log("iiiii:", i);
+
+    var empty_ticks_left = ticks_count - i;
 
     /*
         add the last tick
     */
 
-    if (this.graph.series[0].data[this.graph.series[0].data.length - 1].x != offsets[offsets.length - 1].value)
-    {
+    var place_left = empty_ticks_left * this.graph.space_between_points;
 
+    console.log("place_left:", place_left);
+
+    if (place_left > this.graph.max_tick_width)
+    {
         var last_tick = this.graph.series[0].data[this.graph.series[0].data.length - 1].x;
         offsets.push( { value: last_tick, unit: unit } );
+    }
+    else
+    {
+        if (this.graph.series[0].data[this.graph.series[0].data.length - 1].x != offsets[offsets.length - 1].value)
+        {
+            var last_tick = this.graph.series[0].data[this.graph.series[0].data.length - 1].x;
+            //offsets.push( { value: last_tick, unit: unit } );
 
-        console.log("++++++ last tick +++++");
-        console.log(last_tick);
-
-        console.log('--------- offsets ---------');
-        console.log(offsets);
-
+            offsets[offsets.length - 1] = { value: last_tick, unit: unit }
+        }
     }
 
-    return offsets;
+    console.log("------- offsets -------");
+    console.log(offsets);
 
-    /*
-        todo
-    */
+    return offsets;
 
 	};
 
@@ -1593,18 +1637,7 @@ Rickshaw.Graph.Axis.Time = function(args) {
 
 		var offsets = this.tickOffsets();
 
-    if(this.graph.left_time_extension == false)
-    {
-        var left_extension_width = 0;
-    }
-    else
-    {
-        var left_extension_width = _left_extension_width;
-    }
-
 		offsets.forEach(function(o, i) {
-
-        //console.log(">>> offsets i:", i, " > ", d3.time.format("%e %b")(new Date(o.value)));
 
   			if (self.graph.x(o.value) > self.graph.x.range()[1]) return;
 
@@ -1629,6 +1662,10 @@ Rickshaw.Graph.Axis.Time = function(args) {
         {
             title.innerHTML = d3.time.format("%H:%M")(new Date(o.value));
         }
+        else if (self.graph.granularity == "monthly")
+        {
+            title.innerHTML = d3.time.format("%b")(new Date(o.value));
+        }
         else
         {
             title.innerHTML = d3.time.format("%e %b")(new Date(o.value));
@@ -1644,7 +1681,7 @@ Rickshaw.Graph.Axis.Time = function(args) {
             shift first tick to right and last to left
         */
 
-        if (i == 0)
+        /*if (i == 0)
         {
             element.style.left = 0;
         }
@@ -1653,9 +1690,11 @@ Rickshaw.Graph.Axis.Time = function(args) {
             element.style.left = (self.graph.x(o.value) - (tick_title_width) + 8 + points_offset) + 'px';
         }
         else
-        {
-            element.style.left = (self.graph.x(o.value) - (tick_title_width / 2) + 4 + points_offset) + 'px'; // todo: change 16 to var.
-        }
+        {*/
+
+        element.style.left = (self.graph.circle_radius + (self.graph.max_tick_width / 2)) + (self.graph.x(o.value) - (tick_title_width / 2) + points_offset) + 'px'; // todo: change 16 to var.
+
+        /*}*/
 
         //console.log("title: ", title.offsetWidth);
 
@@ -2393,6 +2432,34 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
         self.block_height = false;
     });
 
+    //var this.element = document.getElementsByClassName('rickshaw_graph')[0].getElementsByClassName('detail')[0];
+
+    console.log("========= this.element ========");
+    console.log(this.element);
+
+    if (graph.small_circles)
+    {
+        this.element.style.transition = "top 0.4s";
+    }
+    else
+    {
+        this.element.style.transition = "top 0s";
+    }
+
+
+    this.guide_line = document.createElement('div');
+    this.guide_line.className = 'guide_line';
+
+    this.guide_line.style.top = "0px";  // (-1 * hover_top_position) + "px";
+    //guide_line.style.left = tooltip_left + 'px';
+
+    this.guide_line.style.height = graph.height + "px"; /*(hover_top_position) + "px";*/
+
+    graph.element.appendChild(this.guide_line);
+
+    //document.getElementById("dashboard-graph").appendChild(guide_line);
+
+
 	},
 
 	formatter: function(series, x, y, formattedX, formattedY, d) {
@@ -2417,6 +2484,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 		var eventX = e.offsetX || e.layerX;
 		var eventY = e.offsetY || e.layerY;
+
+    eventX -= graph.circle_radius + (graph.max_tick_width / 2);
 
     if (this.hasClass(e.target, "y_axis") && this.hasClass(e.target, "right"))
     {
@@ -2468,9 +2537,33 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 				Math.pow(Math.abs(graph.y(value.y + value.y0) - eventY), 2)
 			);
 
-      var x_distance = Math.pow(Math.abs(graph.x(value.x) - eventX), 2);
+      var x_distance = Math.abs(graph.x(value.x) - eventX);
 
-      if(x_distance > 70) // todo: make var, todo: executing inside forEach !
+      //if(x_distance > (this.graph.space_between_points / 3)) // todo: make var, todo: executing inside forEach !
+
+      if (this.graph.granularity == "daily")
+      {
+          var active_area = graph.circle_radius;
+          var active_area = (this.graph.space_between_points / 2);
+      }
+      else
+      {
+          var active_area = graph.circle_radius * 3;
+
+          if ((graph.circle_radius * 3) < (this.graph.space_between_points / 2))
+          {
+              var active_area = graph.circle_radius * 3;
+          }
+          else
+          {
+              var active_area = (this.graph.space_between_points / 2);
+          }
+
+      }
+
+      //console.log("this.graph.space_between_points:", this.graph.space_between_points, ", x_distance:", x_distance, ", active_area:", active_area);
+
+      if(x_distance > active_area)
       {
           skip = true;
           //this.point_focused = false;
@@ -2510,33 +2603,18 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
         this.point_leave();
         return;
     }
-    else {
+    else
+    {
         //this.element.classList.remove('transition');
     }
 
     var p = points[0];
 
-    /*if (!this.last_point)
-    {
-        this.last_point = points[0];
-    }*/
-
     if (!this.current_point || (p && p.value.x != this.last_point.value.x)) /*this.last_point &&*/
     {
-        //his.last_point.value.x = point.value.x;
-        //this.last_point = point;
-        //this.start_transition();
-
         this.point_changed(points[0], points);
         this.last_point = points[0];
     }
-
-    /*if (!this.current_point)
-    {
-        this.current_point = points[0];
-        this.current_points = points;
-    }*/
-
 
 		if (!nearestPoint)
 			return;
@@ -2593,7 +2671,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
       }
   },
 
-  findPos : function(id) {
+  find_top_position : function(id) {
       var node = document.getElementById(id);
       var curtop = 0;
       var curtopscroll = 0;
@@ -2606,92 +2684,43 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
           return (curtop - curtopscroll)
       }
   },
-/*
-  start_transition : function()
-  {
 
-      console.log("start transition");
+  find_left_position : function(id) {
+      var node = document.getElementById(id);
+      var curleft = 0;
+      //var curtopscroll = 0;
+      if (node.offsetParent) {
+          do {
+              curleft += node.offsetLeft;
+              //curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
 
-      var self = this;
-
-      this.transition = true;
-      this.transition_end = false;
-
-      //this.visible = false;
-      this.element.classList.add('transition');
-
-      setTimeout(function(){
-          self.element.classList.remove('transition');
-          self.last_point = false;
-          self.transition = false;
-          self.transition_end = true;
-      }, 1000);
-
+          } while (node = node.offsetParent);
+          return (curleft)
+      }
   },
-*/
 
   point_leave : function()
   {
 
-      //console.log("->>>>>>>>>>>>>. point leave >>>>>>>>>>>>>>>>");
+      var self = this;
 
-    var self = this;
+      this.current_point = false;
+      this.current_points = false;
 
-    this.current_point = false;
-    this.current_points = false;
+      this.element.classList.add('transition');
 
-    this.element.classList.add('transition');
+      this.guide_line.style.display = "none";
 
-    clearTimeout(this.point_change_timeout);
+      clearTimeout(this.point_change_timeout);
 
   },
+
   point_changed : function(point, points)
   {
 
       var self = this;
 
-      //this.current_point = point;
-
-      /*if (!this.transition)
-      {
-          this.transition = true;
-          this.transition_end = false;
-
-          setTimeout(function(){
-              this.transition_end = true;
-          }, 100);
-
-          this.transition_duration = 0;
-
-          this.transition_interval = setInterval(function(){
-              self.transition_duration += 10;
-          }, 10);
-
-      }*/
-
-      //this.element.classList.add('transition');
-
-/*
-      if (this.transition_end)
-      {
-          var delay = 20;
-      }
-      else
-      {
-          var delay = 200;
-      }
-*/
-/*
-      var delay = 200 - self.transition_duration;
-
-      if (delay < 20)
-      {
-          delay = 20;
-      }*/
-
-      var delay = 50;
-
-      //console.log("delay:", delay);
+      var delay = 0;
 
       clearTimeout(this.point_change_timeout);
 
@@ -2707,74 +2736,72 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 	render: function(args) {
 
-    //console.log("--------- hover render ----------------");
-
     this.render_args = args;
 
 		var graph = this.graph;
 		var points = args.points;
 		var p = points.filter( function(p) { return p.active } ).shift();
 
-    //console.log("points length:", points.length);
-
     var block_date_header_height = 12;
     var block_date_header_padding = 10;
     var datapoint_height = 14;
     var datapoint_padding = 10;
     var triangle_height = 7;
-    var top_position = 20;
+    var triangle_width = 14;
+    var top_position = 15;
     var topbar_height = 60; // todo: pass from top functions
+    var sidebar_width = 240;
+    var content_container_margin_left = 20;
     //var block_width = 180;
     //var block_height = 156;
     /*var calendar_block_height = 120;*/
 
-    if (!this.block_height && !document.getElementsByClassName("hover_wrapper")[0])
+    if (!this.current_points)
+    {
+        this.guide_line.style.display = "none";
+        return false;
+    }
+    else
+    {
+        this.guide_line.style.display = "block";
+    }
+
+    var current_points_length = this.current_points.length;
+
+    if (!this.block_height && !document.getElementsByClassName("hover_wrapper")[0]) // first initialization
     {
 
-        var block_height = (block_date_header_height + (block_date_header_padding * 2)) + ((datapoint_height * points.length) + (datapoint_padding * 2 * points.length)) + triangle_height + top_position; // todo: not the real block height
+        var block_height = (block_date_header_height + (block_date_header_padding * 2)) + ((datapoint_height * current_points_length) + (datapoint_padding * 2 * current_points_length)) + triangle_height + top_position; // todo: not the real block height
 
         this.block_height = block_height;
 
     }
-    else if (document.getElementsByClassName("hover_wrapper")[0])
+    else if (document.getElementsByClassName("hover_wrapper")[0]) // todo: this block never works
     {
         var block_height = document.getElementsByClassName("hover_wrapper")[0].clientHeight + top_position;
+        this.block_height = block_height;
     }
-    /*else
-    {
-        var block_height = this.block_height;
-    }
-*/
 
     if (!block_height)
     {
         block_height = this.block_height;
     }
 
-    //console.log("block_height:", block_height);
-
-    //var point = false;
-
-    //var is_bottom_block = false;
-    //point = points[0];
-
     if (!this.current_point)
     {
+        this.guide_line.style.display = "none";
         return false;
     }
 
     point = this.current_point;
 
-    if ((this.findPos("graph_svg") + graph.y(point.value.y) - topbar_height) < block_height)
+    if ((this.find_top_position("graph_svg") + graph.y(point.value.y) - topbar_height) < block_height + 10) // 10 - extra additional place
     {
         var is_bottom_block = true;
-        //point = points[points.length - 1];
 
         /* search bottom path */
 
         var min_y_value = false;
-
-        //var point = false;
 
         this.current_points.forEach(function(p){
 
@@ -2788,7 +2815,6 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     else
     {
         var is_bottom_block = false;
-        /*point = points[0];*/
     }
 
 		if (point.value.y === null) return;
@@ -2802,11 +2828,18 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     {
         var left_extension_width = 0;
     }
-    else {
+    else
+    {
         var left_extension_width = _left_extension_width;
     }
 
-    this.element.style.left = (graph.x(point.value.x) + graph.circle_radius + left_extension_width + this.graph.points_offset) + 'px';
+    var tooltip_left = Math.ceil((graph.x(point.value.x) + graph.circle_radius + (graph.max_tick_width / 2) + this.graph.points_offset));
+
+    //console.log("tooltip_left:", tooltip_left);
+
+    this.element.style.left = tooltip_left + 'px';
+
+    //console.log("this.element.style.left:", tooltip_left);
 
     if (!is_bottom_block)
     {
@@ -2814,7 +2847,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     }
     else
     {
-        var hover_top_position = graph.y(point.value.y) + 7 + 15/*+ block_height*/;
+        var hover_top_position = graph.y(point.value.y) + triangle_height + top_position/*+ block_height*/;
     }
 
     //if (graph_svg_top)
@@ -2823,11 +2856,30 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
     var series = point.series;
 		var actualY = series.scale ? series.scale.invert(point.value.y) : point.value.y;
-
+/*
     var xLabel = document.createElement('div');
 
 		xLabel.className = 'x_label';
 		xLabel.innerHTML = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point, is_bottom_block);// formattedXValue;
+*/
+
+    var xLabel = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point, is_bottom_block, this.element);// formattedXValue;
+    xLabel.className = 'x_label';
+
+    var block_width = xLabel.offsetWidth;
+
+    var triangle = document.createElement('div');
+
+    if (is_bottom_block)
+    {
+        triangle.className = 'triangle bottom';
+    }
+    else
+    {
+        triangle.className = 'triangle top';
+    }
+
+    xLabel.appendChild(triangle);
 
 /*
     xLabel.attr("transform", function(d) {
@@ -2837,18 +2889,40 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
     xLabel.style.position = "relative";
 
-    if (graph.x(point.value.x) > this.graph.width / 2)
+    if (graph.x(point.value.x) > this.graph.width / 2) // right side
     {
-        xLabel.style.left = (-1 * _hover_block_width) + (_hover_block_width / 2) + 'px';
+
+        if ((tooltip_left + (block_width / 2)) > this.graph.width)
+        {
+            var shift_left = this.graph.width - (tooltip_left + (block_width / 2));
+        }
+        else
+        {
+            var shift_left = 0;
+        }
+
+        xLabel.style.left = -1 * (block_width / 2) + shift_left + 'px';
+
+        triangle.style.left = ((block_width / 2) - (triangle_width / 2) - shift_left) + "px";
+
     }
-    else {
-        xLabel.style.left = -1 * (_hover_block_width / 2) + 'px';
+    else // left side
+    {
+
+        if (tooltip_left < block_width / 2)
+        {
+            var shift_right = (block_width / 2) - tooltip_left/* - 20*/;
+        }
+        else
+        {
+            var shift_right = 0;
+        }
+
+        xLabel.style.left = -1 * (block_width / 2) + shift_right + 'px';
+
+        triangle.style.left = ((block_width / 2) - (triangle_width / 2) - shift_right) + "px";
+
     }
-
-    //xLabel.style.left = "0px";
-
-
-		this.element.appendChild(xLabel);
 
 		var item = document.createElement('div');
 
@@ -2862,14 +2936,15 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
     // -- guide line
 
-    var guide_line = document.createElement('div');
-    guide_line.className = 'guide_line';
+// guide_line = document.createElement('div');
+    //guide_line.className = 'guide_line test_class';
 
-    guide_line.style.top = (-1 * hover_top_position) + "px";
+    //guide_line.style.top = "0px";  // (-1 * hover_top_position) + "px";
+    this.guide_line.style.left = (tooltip_left - 1) + 'px';
 
-    guide_line.style.height = (hover_top_position) + "px";
+    //guide_line.style.height = graph.height + "px"; /*(hover_top_position) + "px";*/
 
-    this.element.appendChild(guide_line);
+    //document.getElementById("dashboard-graph").appendChild(guide_line);
 
 		var dot = document.createElement('div');
 
@@ -3741,19 +3816,23 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
         graph.circle_radius = graph.big_circle_r;
     }
 */
+/*
+    if (!data || data[0] || data[0].length == 0)
+    {
+        return false;
+    }
+*/
+
 		var pathNodes = vis.selectAll("path.path")
 			.data(data)
 			.enter().append("svg:path")
 			.classed('path', true)
       .attr("transform", function(d) {
-           return "translate(" + (graph.circle_radius) + ", 0)"; } // tode: here in library is function for cross browser transform
+           return "translate(" + (graph.circle_radius + (graph.max_tick_width / 2)) + ", 0)"; } // tode: here in library is function for cross browser transform
       )
       .attr("class", function(d, i) {
-
           var class_name = "graph_path path_" + series[i].color.replace("#", "");
-
           return class_name;
-          //return "asdasd";
       })
 			.attr("d", this.seriesPathFactory());
 
@@ -3763,7 +3842,7 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
                             .data(data)
                             .enter().append("svg:path")
                             .attr("transform", function(d) {
-                                 return "translate(" + (graph.circle_radius) + ", 0)"; } // tode: here in library is function for cross browser transform
+                                 return "translate(" + (graph.circle_radius + (graph.max_tick_width / 2)) + ", 0)"; } // tode: here in library is function for cross browser transform
                             )
                     				.classed('stroke', true)
                     				.attr("d", this.seriesStrokeFactory());
@@ -3780,14 +3859,6 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 
     var self = this;
 
-    if(self.graph.left_time_extension == false)
-    {
-        var left_extension_width = 0;
-    }
-    else {
-        var left_extension_width = _left_extension_width;
-    }
-
     if (data[0] && data[0].length == 1)
     {
         var points_offset = self.graph.width / 2; //  If there is a single data point on graph, it should be centered
@@ -3798,13 +3869,23 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 
     this.graph.points_offset = points_offset; // used in hover block functions
 
+    if (!data || data.length == 0)
+    {
+        return false;
+    }
+
+    var space_between_points = Math.round(self.graph.x(data[0][1].x) - self.graph.x(data[0][0].x));
+    console.log("space_between_points:", space_between_points);
+
+    this.graph.space_between_points = space_between_points;
+
     var points_paths = vis.selectAll('.dots')
           .data(data)
           .enter()
           .append("g")
                     .attr("class", "dots")
                     .attr("transform", function(d) {
-                         return "translate(" + (graph.circle_radius + points_offset) + ", 0)"; } // tode: here in library is function for cross browser transform
+                         return "translate(" + (graph.circle_radius + (graph.max_tick_width / 2) + points_offset) + ", 0)"; } // tode: here in library is function for cross browser transform
                     )
 
     var points = points_paths
@@ -3822,99 +3903,22 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
                        .append('g')
                        .attr("class", "dot")
                        .attr("transform", function(d) {
-                            return "translate(" + (self.graph.x(d.x) + left_extension_width) + "," + (self.graph.y(d.y)) + ")"; } // tode: here in library is function for cross browser transform
+                            return "translate(" + (Math.ceil(self.graph.x(d.x))) + "," + (self.graph.y(d.y)) + ")"; } // tode: here in library is function for cross browser transform
                        );
 
-        points
-            /*.filter(function(d){
-                return d.y > 0;
-            })*/
-            .append('circle')
-            .attr('class', function(d){
-                var class_name = 'one_dot ' + "dot_" + d.color.replace("#", "");
-                return class_name;
-            })
-            .attr("r", graph.circle_radius)
-            .attr('fill', function(d,i){
-                return d.color;
-            })
+    points
+        .append('circle')
+        .attr('class', function(d){
+            var class_name = 'one_dot ' + "dot_" + d.color.replace("#", "");
+            return class_name;
+        })
+        .attr("r", graph.circle_radius)
+        .attr('fill', function(d,i){
+            return d.color;
+        })
+
 
 // ---------------------------------------------------------------------------
-
-      if (self.graph.left_time_extension)
-      {
-
-          var time_extension = vis.selectAll('.time_extension')
-                .data(data)
-                .enter()
-                //.append("path")
-                .insert("path",":first-child")
-                .attr('class','time_extension')
-                .attr("stroke", "#C7C7C7")
-                .attr("stroke-width", 2)
-                .attr("fill", "none")
-                .attr("d", function(d, i){
-
-                    if (d[0].y == 0)
-                    {
-                        return false;
-                    }
-
-                    var y = d[0].y - ((data.length - i) * 20);
-
-                    var extension_lines_data = [
-                                    { "x": graph.x(d[0].x),  "y": graph.y(y) },
-                                    { "x": graph.x(d[0].x) + left_extension_width + graph.circle_radius, "y": graph.y(d[0].y) }];
-
-                    var extension_line = d3.svg.line()
-                          .x(function(d) { return d.x; })
-                          .y(function(d) { return d.y; })
-                          .interpolate(self.graph.interpolation).tension(self.tension)
-
-                    return extension_line(extension_lines_data);
-
-                })
-
-/*
-            var tmp_graph_height = 300;
-
-            var y = -1 * (tmp_graph_height - self.graph.y(data[0][0].y) + 30);
-
-            /*var div = d3.select(self.graph.element).append("div")*/
-/*
-            var div = d3.select(self.graph.element).selectAll('.time_extension_info').data([1])
-
-            //var icon_html = "<div>( i )</div>"
-            //var info_hover_html = "<div id='info_hover_html'><span class='big'>Time range contains an Incomplete week</span><span class='small'>Click to extend to full week</span></div>";
-
-            div.style("left", (left_extension_width + "px"))
-                   .style("top", y +"px")
-
-            div.enter()
-                    .append("div")
-                    .attr("class", "time_extension_info")
-                    //.html("<div>" + icon_html + info_hover_html + "</div>")
-                    .style("position", "relative")
-                    .style("left", (left_extension_width + "px"))
-                    .style("top", y +"px")
-
-            var time_extension = React.createElement(GraphTimeExtension, { "show" : true }, null);
-            React.render(time_extension, document.getElementsByClassName('time_extension_info')[0]);
-*/
-        }
-        else
-        {
-/*
-            console.log("{{{{{{{{{{{{{{ element }}}}}}}}}}}}}}");
-            console.log(d3.select(self.graph.element).selectAll('.time_extension_info'));
-
-            if (d3.select(self.graph.element).selectAll('.time_extension_info')[0].length == 1)
-            {
-                var time_extension = React.createElement(GraphTimeExtension, { "show" : false }, null);
-                React.render(time_extension, document.getElementsByClassName('time_extension_info')[0]);
-            }
-*/
-        }
 
 /*
 .selectAll('.time_extension_info')
@@ -4048,17 +4052,10 @@ Rickshaw.Graph.Renderer.Line = Rickshaw.Class.create( Rickshaw.Graph.Renderer, {
 
 		var graph = this.graph;
 
-    if(graph.left_time_extension == false)
-    {
-        var left_extension_width = 0;
-    }
-    else {
-        var left_extension_width = _left_extension_width;
-    }
-
 		var factory = d3.svg.line()
 			.x( function(d) {
-          return graph.x(d.x) + left_extension_width
+          //console.log("x position:", graph.x(d.x));
+          return Math.ceil(graph.x(d.x));
       } )
 			.y( function(d) { return graph.y(d.y) } )
 			.interpolate(this.graph.interpolation).tension(this.tension);

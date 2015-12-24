@@ -67,8 +67,6 @@ var CalendarWrapper = React.createClass({
 
     getInitialState: function() {
 
-        var self = this;
-
         var date_range = countlyCommon.getDateRange();
         date_range = date_range.split(" - ");
 
@@ -78,18 +76,7 @@ var CalendarWrapper = React.createClass({
 
         global_controller.date_string = date_values.from_string + " - " + date_values.to_string;
 
-        $(event_emitter).trigger("date_init", { "state" : { "from_string" : date_values.first_date_year, "to_string" : date_values.last_date_year } } );
-
-        $(event_emitter).on('date_extend', function(e, data){
-
-            var ld = new Date(left_date.date);
-            var extended_left_date = ld.setDate(ld.getDate() - data.days_extend);
-
-            left_date.date = new Date(extended_left_date);
-
-            self.handleDateSelect();
-
-        }.bind(self));
+        $(event_emitter).trigger("date_init", { "state" : { "from_string" : date_values.from_string, "to_string" : date_values.to_string } } );
 
         return {
             choise_open     : false,
@@ -101,10 +88,29 @@ var CalendarWrapper = React.createClass({
             in_close           : false, // 2-step animation during both panel closing
             //left_date      : false, // todo: now they are globals
             //right_date     : false,
-            from_string : date_values.first_date_year,
-            to_string   : date_values.last_date_year,
+            from_string : date_values.from_string,
+            to_string   : date_values.to_string,
             fast_choise : countlyCommon.getPeriod()
         };
+    },
+
+    componentDidMount : function(){
+
+        //var self = this;
+
+        $(event_emitter).on('date_extend', this.date_extend.bind(this));
+
+    },
+
+    date_extend : function(e, data){
+
+        var ld = new Date(left_date.date);
+        var extended_left_date = ld.setDate(ld.getDate() - data.days_extend);
+
+        left_date.date = new Date(extended_left_date);
+
+        this.handleDateSelect();
+
     },
 
     /*
@@ -126,13 +132,10 @@ var CalendarWrapper = React.createClass({
 
             left_date.date  = new Date(first_date[0], left_month, first_date[2]);
             right_date.date = new Date(last_date[0], right_month, last_date[2]);
-/*
-            console.log("first_date:", left_date.date);
-            console.log("last_date:", right_date.date);
-*/
+
             var first_date_year = date_range[0];
 
-            if (first_date[0] != first_date[0] && date_range[0].indexOf(",") == -1) // can be ["24 Feb", "19 Oct"] or ["12 Nov, 2014", "19 Oct, 2015"]
+            if (first_date[0] != last_date[0] && date_range[0].indexOf(",") == -1) // can be ["24 Feb", "19 Oct"] or ["12 Nov, 2014", "19 Oct, 2015"]
             {
                 first_date_year += " " + first_date[0];
             }
@@ -148,7 +151,7 @@ var CalendarWrapper = React.createClass({
         else
         {
 
-            if(Object.prototype.toString.call(date_range) === '[object Array]') {
+            //if(Object.prototype.toString.call(date_range) === '[object Array]') {
 
                 if (date_range[0].indexOf(":") > -1) // today
                 {
@@ -176,12 +179,15 @@ var CalendarWrapper = React.createClass({
                     left_date.date = new Date(current_year, 0, 1);
                     right_date.date = new Date();
                 }
-            }
+            //}
         }
 
+        console.log("computed first_date_year:", first_date_year);
+        console.log("computed last_date_year:", last_date_year);
+
         return {
-            first_date_year : first_date_year,  // first_date_year - wrong variable name
-            last_date_year  : last_date_year
+            from_string : first_date_year,  // first_date_year - wrong variable name
+            to_string   : last_date_year
         }
     },
 
@@ -219,14 +225,10 @@ var CalendarWrapper = React.createClass({
             if(self.clickedOutsideElement(event, 'calendar'))
             {
 
-                console.log("{{{{{{{{{{{{{{{{{{{{{{{{click outside}}}}}}}}}}}}}}}}}}}}}}}}");
-                console.log();
-
                 /*
                 close time range window
                 */
 
-                //document.getElementById("btnConfirm").removeEventListener("click", function(e) { e.preventDefault(); }, false);
                 document.onclick = false;
 
                 var state_obj = { };
@@ -351,8 +353,8 @@ var CalendarWrapper = React.createClass({
         var date_values = this.fill_date_values(date_range);
 
         var state_obj = {
-            from_string : date_values.first_date_year, // first_date_year - wrong variable name
-            to_string   : date_values.last_date_year,
+            from_string : date_values.from_string, // first_date_year - wrong variable name
+            to_string   : date_values.to_string,
             fast_choise : choise
         }
 
@@ -374,7 +376,7 @@ var CalendarWrapper = React.createClass({
 
         //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
 
-        $(event_emitter).trigger("date_choise", { "period" : choise, "state" : state_obj });
+        $(event_emitter).trigger("date_change", { "period" : choise, "state" : state_obj });
 
     },
 
@@ -406,8 +408,8 @@ var CalendarWrapper = React.createClass({
         var date_values = this.fill_date_values(date_range);
 
         var state_obj = {
-            from_string : date_range[0]/* + " " + date_values.first_date_year*/, // todo : "2014 2014", "2015 2015"
-            to_string   : date_range[1]/* + " " + date_values.last_date_year*/,
+            from_string : date_range[0]/* + " " + date_values.from_string*/, // todo : "2014 2014", "2015 2015"
+            to_string   : date_range[1]/* + " " + date_values.to_string*/,
             fast_choise : false
         }
 

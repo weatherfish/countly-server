@@ -18,7 +18,7 @@ var granularity = React.createClass({
 
         list.push(weekly);
 
-        var monthly = { name : "Monthly", active : false };
+        var monthly = { name : "Monthly", active : this.props.type == "monthly" ? true : false };
 
         var days_in_month = new Date(self.props.data.monthly_granularity[0].data[0][0]).monthDays();
 
@@ -29,6 +29,20 @@ var granularity = React.createClass({
         }
 
         list.push(monthly);
+
+        document.getElementById("weekly_extend_block").getElementsByClassName("small")[0].addEventListener("click", function(){
+            self.extend_click(self.state.list[1]);
+        });
+
+        document.getElementById("weekly_extend_block").addEventListener("mousemove", this.onmousemove);
+        document.getElementById("weekly_extend_block").addEventListener("mouseleave", this.onhoverend_extension_block);
+
+        document.getElementById("monthly_extend_block").getElementsByClassName("small")[0].addEventListener("click", function(){
+            self.extend_click(self.state.list[2]);
+        });
+
+        document.getElementById("monthly_extend_block").addEventListener("mousemove", this.onmousemove);
+        document.getElementById("monthly_extend_block").addEventListener("mouseleave", this.onhoverend_extension_block);
 
         return {
             "list"      : list,
@@ -130,20 +144,17 @@ var granularity = React.createClass({
         console.log("--------- hover end ---------", this.mouse_move_direction);
         console.log(event);
 */
-        /*if (this.mouse_move_direction == "down")
+        if (this.mouse_move_direction == "down")
         {
             this.setState({
                 info_open : false
             });
-        }*/
+        }
 
     },
 
-    onmousemove : function(event, event2)
+    onmousemove : function(event)
     {
-        //console.log("--------- onmousemove ---------");
-        //console.log(event.pageY);
-        //console.log(event2);
 
         if (event.pageY < this.last_y && this.last_y)
         {
@@ -174,7 +185,7 @@ var granularity = React.createClass({
 
     onhoverend_all_block : function(event)
     {
-        if (event.pageY > this.hover_start_y || event.pageY + 40 < this.hover_start_y) // todo: 40 is offset that indicate that hoverend was on tooltip
+        if (event.pageY > this.hover_start_y || event.pageY + 60 < this.hover_start_y) // todo: 40 is offset that indicate that hoverend was on tooltip
         {
             this.setState({
                 info_open : false
@@ -182,14 +193,17 @@ var granularity = React.createClass({
 
             this.hover_start_y = false;
         }
+    },
 
-        /*
-        if (this.mouse_move_direction == "down")
+    onhoverend_extension_block : function(event)
+    {
+
+        if (this.mouse_move_direction != "down")
         {
             this.setState({
                 info_open : false
             });
-        }*/
+        }
 
     },
 
@@ -202,22 +216,102 @@ var granularity = React.createClass({
         $(event_emitter).trigger("date_extend", { "days_extend" : element.incomplete_left_days } );
     },
 
+    find_top_position : function(id) {
+      
+        var node = document.getElementById(id);
+
+        if (!node)
+        {
+            return false;
+        }
+
+        var curtop = 0;
+        var curtopscroll = 0;
+        if (node.offsetParent) {
+            do {
+                curtop += node.offsetTop;
+                curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+
+            } while (node = node.offsetParent);
+            return (curtop - curtopscroll)
+        }
+    },
+
+    find_left_position : function(id) {
+        var node = document.getElementById(id);
+
+        if (!node)
+        {
+            return false;
+        }
+
+        var curleft = 0;
+        //var curtopscroll = 0;
+        if (node.offsetParent) {
+            do {
+                curleft += node.offsetLeft;
+                //curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+
+            } while (node = node.offsetParent);
+            return (curleft)
+        }
+    },
+
+    getScrollTop : function (){
+        if(typeof pageYOffset!= 'undefined'){
+            //most browsers except IE before #9
+            return pageYOffset;
+        }
+        else{
+            var B= document.body; //IE 'quirks'
+            var D= document.documentElement; //IE with doctype
+            D= (D.clientHeight)? D: B;
+            return D.scrollTop;
+        }
+    },
+
+    position_element : function(parent_element, child_element) {
+
+        //console.log("parent_element:", parent_element, ", child_element : ", child_element);
+
+        var left_position = this.find_left_position(parent_element) - 50;
+        var top_position = this.find_top_position(parent_element) - 70 + this.getScrollTop();
+
+        if (!left_position || !top_position)
+        {
+            return false;
+        }
+
+        //console.log("left_position : ", left_position);
+        //console.log("top_position: ", top_position);
+
+        document.getElementById(child_element).style.left = left_position + "px";
+        document.getElementById(child_element).style.top = top_position + "px";
+
+    },
+
     render: function() {
 
         var self = this;
 
         if (self.state.info_open && self.state.list[1].active)
         {
-            var weekly_info_block_style = {
-                "display" : "block"
-            }
+            this.position_element("weekly_granularity_selection", "weekly_extend_block");
+            document.getElementById("weekly_extend_block").style.display = "block";
+        }
+        else
+        {
+            document.getElementById("weekly_extend_block").style.display = "none";
         }
 
         if (self.state.info_open && self.state.list[2].active)
         {
-            var monthly_info_block_style = {
-                "display" : "block"
-            }
+            this.position_element("monthly_granularity_selection", "monthly_extend_block");
+            document.getElementById("monthly_extend_block").style.display = "block";
+        }
+        else
+        {
+            document.getElementById("monthly_extend_block").style.display = "none";
         }
 
         if (this.state.period == "hour")
@@ -238,6 +332,7 @@ var granularity = React.createClass({
             <div className={block_class_name} onMouseEnter={self.onhover_all_block} onMouseMove={self.onmousemove} onMouseLeave={self.onhoverend_all_block}>
                 {this.state.list.map(function(element) {
 
+                    var element_id = element.name.toLowerCase() + "_granularity_selection";
                     var class_name = "";
 
                     if (element.active)
@@ -262,16 +357,9 @@ var granularity = React.createClass({
                                 star_class_name += " active";
                             }
 
-                            return <span className={class_name} onMouseEnter={self.onhover} onMouseLeave={self.onhoverend}>
+                            return <span id={element_id} className={class_name} onMouseEnter={self.onhover} onMouseLeave={self.onhoverend}>
                                       <span onClick={self.handleClick.bind(self, element.name.toLowerCase())}>{element.name}</span>
                                       <div className={star_class_name}></div>
-
-                                      <div id='info_hover_block' style={weekly_info_block_style}>
-                                          <span className='big'>Time range contains an Incomplete week</span>
-                                          <a className='small' onClick={self.extend_click.bind(self, element)}>Click to extent to full weeks</a>
-                                          <div className="bottom_arrow">
-                                          </div>
-                                      </div>
                                     </span>
                         }
                         else
@@ -284,16 +372,9 @@ var granularity = React.createClass({
                                 star_class_name += " active";
                             }
 
-                            return <span className={class_name} onMouseEnter={self.onhover} onMouseLeave={self.onhoverend}>
+                            return <span id={element_id} className={class_name} onMouseEnter={self.onhover} onMouseLeave={self.onhoverend}>
                                       <span onClick={self.handleClick.bind(self, element.name.toLowerCase())}>{element.name}</span>
                                       <div className={star_class_name}></div>
-
-                                      <div id='info_hover_block' style={monthly_info_block_style}>
-                                          <span className='big'>Time range contains an Incomplete month</span>
-                                          <a className='small' onClick={self.extend_click.bind(self, element)}>Click to extent to full months</a>
-                                          <div className="bottom_arrow">
-                                          </div>
-                                      </div>
                                     </span>
                         }
                     }

@@ -7,8 +7,6 @@
 
  */
 
-var _circle_radius = 4; // todo: global var. // todo : combine with var from rickshaw.js
-
 var countlyView = Backbone.View.extend({
     template:null, //handlebars template of the view
     templateData:{}, //data to be used while rendering the template
@@ -1132,15 +1130,11 @@ window.SessionView = countlyView.extend({
         var margin_right  = 30;
         var graph_height  = 300;
 
-        var graph_width = false;
-
         var table = false;
 
         var rows = sessionDP.chartData;
 
-        function rowGetter(rowIndex) {
-            return rows[rowIndex];
-        }
+        _circle_radius = 4; // todo: find same
 
         this.templateData = {
             "page-title":jQuery.i18n.map["sessions.title"],
@@ -1173,6 +1167,11 @@ window.SessionView = countlyView.extend({
             }
         };
 
+        var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
+
+        var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left;
+
+
         var update_graph = function(id, granularity_changed)
         {
 
@@ -1199,7 +1198,8 @@ window.SessionView = countlyView.extend({
                     document.getElementsByClassName('granularity')[0].className = "granularity hidden";
                     var no_data = true;
                 }
-                else {
+                else
+                {
                     document.getElementById('no_data_wrapper').style.display = "none";
                     document.getElementsByClassName('granularity')[0].className = "granularity";
                     var no_data = false;
@@ -1210,7 +1210,9 @@ window.SessionView = countlyView.extend({
                 disable auto granularity
             */
 
-            if (!granularity_changed) // auto granularity is active, event from date selection
+            var time_range_difference = sessionDP.previous_period_length / sessionDP.daily_granularity[0].data.length;
+
+            if (!granularity_changed && id == -1 && (time_range_difference < 0.5 || time_range_difference > 2)) // auto granularity is active, event from date selection
             {
 
                 if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
@@ -1231,7 +1233,8 @@ window.SessionView = countlyView.extend({
                 {
                     var small_circles = true;
                 }
-                else {
+                else
+                {
                     var small_circles = false;
                 }
             }
@@ -1310,166 +1313,62 @@ window.SessionView = countlyView.extend({
 
             countlyCommon.updateTimeGraph(active_array, "#dashboard-graph", self.templateData["big-numbers"].items, false, _granularity, small_circles, zero_points);
 
-            return _granularity;
+            return {
+                "new_granularity" : _granularity,
+                "session_dp" : sessionDP
+            }
 
         }
 
-        $(event_emitter).on('date_choise', function(e, period){
 
-            //console.log("date_choise emitter period:", period.period);
-
-            /*
-                update the graph
-            */
-
-            sessionDP = countlySession.getSessionDP();
-            var new_granularity = update_graph(-1);
-
-            //var chart_data = sessionDP.chartData;
-
-            console.log("will triger new_granularity:", new_granularity);
-
-            $(event_emitter).trigger("granularity_data", {
-                "period"          : countlyCommon.getPeriod(),
-                "session_dp"      : sessionDP,
-                "new_granularity" : new_granularity
-            });
-
-            var table_wrapper = React.createElement(TableWrapper, { "rows" : rows }, null);
-            React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
-
-            /*
-                update big numbers
-            */
-
-            var big_numbers = document.getElementsByClassName("big-numbers-container")[0].childNodes;
-
-            var sessionData = countlySession.getSessionData();
-
-            var items = [
-                {
-                    "title":jQuery.i18n.map["common.total-sessions"],
-                    "total":sessionData.usage["total-sessions"].total,
-                    "trend":sessionData.usage["total-sessions"].trend,
-                    "help":"sessions.total-sessions",
-                    "color" : "#1B8AF3"
-                },
-                {
-                    "title":jQuery.i18n.map["common.new-sessions"],
-                    "total":sessionData.usage["new-users"].total,
-                    "trend":sessionData.usage["new-users"].trend,
-                    "help":"sessions.new-sessions",
-                    "color" : "#F2B702"
-                },
-                {
-                    "title":jQuery.i18n.map["common.unique-sessions"],
-                    "total":sessionData.usage["total-users"].total,
-                    "trend":sessionData.usage["total-users"].trend,
-                    "help":"sessions.unique-sessions",
-                    "color" : "#FF7D7D"
-                }
-            ]
-
-            for (var i = 0; i < big_numbers.length; i++)
-            {
-                React.render(React.createElement(BigNumber,
-                {
-                    "title"  : items[i].title,
-                    "value"  : items[i].total,
-                    "color"  : items[i].color,
-                    //"active" : true,
-                    "on_click" : update_graph,
-                    "id" : i
-                }), big_numbers[i]);
-            }
-
-            /*self.templateData["big-numbers"].items[i].active = true;
-            */
-            /*$(event_emitter).on('ajax_complete', function(e, url){
-            });*/
-
-        }.bind(self));
-
-        $(event_emitter).on('granularity', function(e, granularity){
-
-            _granularity = granularity;
-
-            update_graph(-1, true);
-
-        }.bind(self));
-
-        $(event_emitter).on('big_number_hover', function(e, data){
-
-            if (data.hover)
-            {
-                var class_name = "path_" + data.color.replace("#", "");
-
-                for (var i = 0; i < document.getElementsByClassName("graph_path").length; i++)
-                {
-                    document.getElementsByClassName("graph_path")[i].style["stroke-opacity"] = 0.2;
-                }
-
-                document.getElementsByClassName(class_name)[0].style["stroke-opacity"] = 1;
-
-                // --- dots ---
-
-                var dots_class_name = "dot_" + data.color.replace("#", "");
-
-                for (var i = 0; i < document.getElementsByClassName("one_dot").length; i++)
-                {
-                    if (hasClass(document.getElementsByClassName("one_dot")[i], dots_class_name)){
-                        document.getElementsByClassName("one_dot")[i].style.opacity = 1;
-                    }
-                    else
-                    {
-                        document.getElementsByClassName("one_dot")[i].style.opacity = 0.2;
-                    }
-                }
-/*
-                for (var i = 0; i < document.getElementsByClassName(dots_class_name).length; i++)
-                {
-                    //document.getElementsByClassName(dots_class_name)[i].style.opacity = "1 !important";
-                    document.getElementsByClassName(dots_class_name)[i].style.fill = "red";
-                }
-*/
-            }
-            else
-            {
-
-                for (var i = 0; i < document.getElementsByClassName("graph_path").length; i++)
-                {
-                    document.getElementsByClassName("graph_path")[i].style["stroke-opacity"] = 1;
-                }
-
-                for (var i = 0; i < document.getElementsByClassName("one_dot").length; i++)
-                {
-                    document.getElementsByClassName("one_dot")[i].style.opacity = 1;
-                }
-            }
-
-        }.bind(self));
-
-        if (!isRefresh) {
+        if (!isRefresh) { // loading the page
 
             $(this.el).html(this.template(this.templateData));
 
             var self = this;
 
-            setTimeout(function(){ // todo: remove setTimeout
+            //setTimeout(function(){ // todo: remove setTimeout
+            //onload = function() {
 
-                graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
+            //document.addEventListener("DOMContentLoaded", function(){
 
-                var small_circles = false;
+                console.log("-------- loaded -------");
+
+                React.render(React.createElement(CalendarWrapper, {
+                }), document.getElementById("calendar_block"));
+
+                React.render(React.createElement(TopBar, {
+                    "user_name" : "John Black",
+                    "width"     : window.innerWidth - sidebar_width
+                }), document.getElementById("top_bar"));
+
+                // ------------------------
+
+                React.render(React.createElement(GraphWrapper, {
+                    "trend_sign"  : "SESSIONS TREND",
+                    "width"       : graph_width - 70 - 70,
+                    "height"      : 300,
+                    "margin_left" : 40,
+                    "data"        : sessionDP,
+                    "graph_width" : graph_width, // todo: combine
+                    "granularity" : _granularity,
+                    "period"      : countlyCommon.getPeriod(),
+                    "big_numbers" : self.templateData["big-numbers"].items,
+                    "big_number_click" : update_graph,
+                }), document.getElementById("widget-content"));
+
+                // ------------- ^^^^^^^^^^^^^^^^^^^^ -----------
 
                 document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
                 document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
                 document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
-                document.getElementById('dashboard-graph').style['margin-left'] = 40 + "px";
-                document.getElementById('dashboard-graph').style.width = (graph_width - 70 - 70) + "px";
+                /*document.getElementById('dashboard-graph').style['margin-left'] = 40 + "px";
+                document.getElementById('dashboard-graph').style.width = (graph_width - 70 - 70) + "px";*/
                 document.getElementById('no_data_wrapper').style.height = "100px"; // todo: change to variable
                 document.getElementById('no_data_wrapper').style['padding-top'] = "140px"; // todo: remove this
                 document.getElementById('axis_right').style.left = (graph_width - 60) + "px";
 
+                var small_circles = false;
 
                 if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
                 {
@@ -1501,14 +1400,14 @@ window.SessionView = countlyView.extend({
                 /*
                     granularity section
                 */
-
+/*
                 React.render(React.createElement(granularity, {
                     "data"        : sessionDP,
                     "graph_width" : graph_width,
                     "type"        : _granularity,
                     "period"      : countlyCommon.getPeriod()
                 }), document.getElementsByClassName("granularity")[0]);
-
+*/
                 var zero_points = true;
 
                 granularity_rows.every(function(datapath){
@@ -1538,7 +1437,7 @@ window.SessionView = countlyView.extend({
                 countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", self.templateData["big-numbers"].items, (graph_width - 60), graph_height, false, _granularity, small_circles, zero_points);
 
                 /* BIG NUMBERS */
-
+/*
                 for (var i = 0; i < self.templateData["big-numbers"].items.length; i++)
                 {
 
@@ -1558,15 +1457,166 @@ window.SessionView = countlyView.extend({
                         "id" : i
                     }), node);
                 }
-
+*/
                 /* TABLE WRAPPER */
 
-                var table_wrapper = React.createElement(TableWrapper, { "rows" : rows }, null);
+                var table_wrapper = React.createElement(TableWrapper, {
+                    "rows"  : rows,
+                    "width" : table_width
+                }, null);
 
                 React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
 
-            }, 2000);
+            //}, false);
+            //};
+            //}, 0);
 
+            // --------------------------
+
+            $(event_emitter).on('date_choise', function(e, period){
+
+                //console.log("date_choise emitter period:", period.period);
+
+                /*
+                    update the graph
+                */
+
+                var updated_data = update_graph(-1);
+
+                sessionDP = updated_data.session_dp;
+                var new_granularity = updated_data.new_granularity;
+
+                //var chart_data = sessionDP.chartData;
+
+                console.log("will triger new_granularity:", new_granularity);
+
+                $(event_emitter).trigger("granularity_data", {
+                    "period"          : countlyCommon.getPeriod(),
+                    "session_dp"      : sessionDP,
+                    "new_granularity" : new_granularity
+                });
+
+                var table_wrapper = React.createElement(TableWrapper, {
+                    "rows"  : rows,
+                    "width" : table_width
+                }, null);
+
+                React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
+
+                /*
+                    update big numbers
+                */
+
+                var big_numbers = document.getElementsByClassName("big-numbers-container")[0].childNodes;
+
+                var sessionData = countlySession.getSessionData();
+
+                var items = [
+                    {
+                        "title":jQuery.i18n.map["common.total-sessions"],
+                        "total":sessionData.usage["total-sessions"].total,
+                        "trend":sessionData.usage["total-sessions"].trend,
+                        "help":"sessions.total-sessions",
+                        "color" : "#1B8AF3"
+                    },
+                    {
+                        "title":jQuery.i18n.map["common.new-sessions"],
+                        "total":sessionData.usage["new-users"].total,
+                        "trend":sessionData.usage["new-users"].trend,
+                        "help":"sessions.new-sessions",
+                        "color" : "#F2B702"
+                    },
+                    {
+                        "title":jQuery.i18n.map["common.unique-sessions"],
+                        "total":sessionData.usage["total-users"].total,
+                        "trend":sessionData.usage["total-users"].trend,
+                        "help":"sessions.unique-sessions",
+                        "color" : "#FF7D7D"
+                    }
+                ]
+
+                for (var i = 0; i < big_numbers.length; i++)
+                {
+                    React.render(React.createElement(BigNumber,
+                    {
+                        "title"  : items[i].title,
+                        "value"  : items[i].total,
+                        "color"  : items[i].color,
+                        //"active" : true,
+                        "on_click" : update_graph,
+                        "id" : i
+                    }), big_numbers[i]);
+                }
+
+            }.bind(self));
+
+            // --------------------------
+
+            $(event_emitter).on('granularity', function(e, granularity){
+
+                _granularity = granularity;
+
+                update_graph(-1, true);
+
+            }.bind(self));
+
+            // --------------------------
+
+            $(event_emitter).on('big_number_hover', function(e, data){
+
+                if (data.hover)
+                {
+                    var class_name = "path_" + data.color.replace("#", "");
+
+                    for (var i = 0; i < document.getElementsByClassName("graph_path").length; i++)
+                    {
+                        document.getElementsByClassName("graph_path")[i].style["stroke-opacity"] = 0.2;
+                    }
+
+                    document.getElementsByClassName(class_name)[0].style["stroke-opacity"] = 1;
+
+                    // --- dots ---
+
+                    var dots_class_name = "dot_" + data.color.replace("#", "");
+
+                    for (var i = 0; i < document.getElementsByClassName("one_dot").length; i++)
+                    {
+                        if (hasClass(document.getElementsByClassName("one_dot")[i], dots_class_name)){
+                            document.getElementsByClassName("one_dot")[i].style.opacity = 1;
+                        }
+                        else
+                        {
+                            document.getElementsByClassName("one_dot")[i].style.opacity = 0.2;
+                        }
+                    }
+    /*
+                    for (var i = 0; i < document.getElementsByClassName(dots_class_name).length; i++)
+                    {
+                        //document.getElementsByClassName(dots_class_name)[i].style.opacity = "1 !important";
+                        document.getElementsByClassName(dots_class_name)[i].style.fill = "red";
+                    }
+    */
+                }
+                else
+                {
+
+                    for (var i = 0; i < document.getElementsByClassName("graph_path").length; i++)
+                    {
+                        document.getElementsByClassName("graph_path")[i].style["stroke-opacity"] = 1;
+                    }
+
+                    for (var i = 0; i < document.getElementsByClassName("one_dot").length; i++)
+                    {
+                        document.getElementsByClassName("one_dot")[i].style.opacity = 1;
+                    }
+                }
+
+            }.bind(self));
+
+        }
+        else
+        {
+            console.log("{{{{{{{{{{{{{{{{{{ render refresh }}}}}}}}}}}}}}}}}}");
         }
 
         function hasClass(el, cls) {
@@ -1575,6 +1625,8 @@ window.SessionView = countlyView.extend({
     },
     refresh:function () {
         var self = this;
+
+        console.log("[[[[[[[[[[[[ page refresh ]]]]]]]]]]]]");
 
         /*
         $.when(countlyUser.initialize()).then(function () {
@@ -3647,31 +3699,42 @@ var AppRouter = Backbone.Router.extend({
             return false;
         }
 
-        viewName.render();
-
         var self = this;
-        this.refreshActiveView = setInterval(function () {
-            self.activeView.refresh();
-			if(self.refreshScripts[Backbone.history.fragment])
-				for(var i = 0, l = self.refreshScripts[Backbone.history.fragment].length; i < l; i++)
-					self.refreshScripts[Backbone.history.fragment][i]();
-			if(self.refreshScripts["#"])
-				for(var i = 0, l = self.refreshScripts["#"].length; i < l; i++)
-					self.refreshScripts["#"][i]();
-        }, countlyCommon.DASHBOARD_REFRESH_MS);
 
-        if(countlyGlobal && countlyGlobal["message"]){
-            CountlyHelpers.parseAndShowMsg(countlyGlobal["message"]);
-        }
+        document.addEventListener("DOMContentLoaded", function(){
+
+            console.log("-------- DOMContentLoaded loaded -------");
+
+            viewName.render();
+
+            /*
+                todo: bad formating below
+            */
+
+            this.refreshActiveView = setInterval(function () {
+                self.activeView.refresh();
+      			    if(self.refreshScripts[Backbone.history.fragment])
+      				    for(var i = 0, l = self.refreshScripts[Backbone.history.fragment].length; i < l; i++)
+      					      self.refreshScripts[Backbone.history.fragment][i]();
+      			if(self.refreshScripts["#"])
+      				for(var i = 0, l = self.refreshScripts["#"].length; i < l; i++)
+      					self.refreshScripts["#"][i]();
+            }, countlyCommon.DASHBOARD_REFRESH_MS);
+
+            if(countlyGlobal && countlyGlobal["message"]){
+                CountlyHelpers.parseAndShowMsg(countlyGlobal["message"]);
+            }
+
+        }, false);
     },
     initialize:function () { //initialize the dashboard, register helpers etc.
-		this.pageScripts = {};
-		this.refreshScripts = {};
+    		this.pageScripts = {};
+    		this.refreshScripts = {};
         this.dashboardView = new DashboardView();
         this.sessionView = new SessionView();
         this.countriesView = new CountriesView();
         this.userView = new UserView();
-		this.allAppsView = new AllAppsView();
+		    this.allAppsView = new AllAppsView();
         this.loyaltyView = new LoyaltyView();
         this.deviceView = new DeviceView();
         this.platformView = new PlatformView();
@@ -3708,7 +3771,7 @@ var AppRouter = Backbone.Router.extend({
             }
             return ret;
         });
-		Handlebars.registerHelper('prettyJSON', function (context, options) {
+  		  Handlebars.registerHelper('prettyJSON', function (context, options) {
             return JSON.stringify(context, undefined, 4);
         });
         Handlebars.registerHelper('getShortNumber', function (context, options) {
@@ -3786,7 +3849,7 @@ var AppRouter = Backbone.Router.extend({
 
         $(document).ready(function () {
 
-            $(event_emitter).on('app_changed', function(e, data){
+            $(event_emitter).on('app_changed', function(e, data){ // todo: remove
 
                 self.activeAppName = "hello";
                 self.activeAppKey  = data.app_key;
@@ -4021,77 +4084,6 @@ var AppRouter = Backbone.Router.extend({
                     }
                 }
             });
-            /*
-			$('#sidebar-menu').slimScroll({
-				height: ($(window).height()-123-96)+'px',
-				railVisible: true,
-				railColor : '#4CC04F',
-				railOpacity : .2,
-				color: '#4CC04F'
-			});
-			$( window ).resize(function() {
-				$('#sidebar-menu').slimScroll({
-					height: ($(window).height()-123-96)+'px'
-				});
-			});*/
-/*
-      $('.ui.labeled.icon.sidebar').sidebar('toggle');
-
-            $(".sidebar-submenu").on("click", ".item", function () {
-
-                if ($(this).hasClass("disabled")) {
-                    return true;
-                }
-
-                if ($("#app-nav").offset().left == 201) {
-                    $("#app-nav").animate({left:'31px'}, {duration:500, easing:'easeInBack'});
-                    $("#sidebar-app-select").removeClass("active");
-                }
-
-                $(".sidebar-submenu .item").removeClass("active");
-                $(this).addClass("active");
-                $(this).parent().prev(".item").addClass("active");
-            });
-
-            $("#sidebar-app-select").click(function () {
-
-                if ($(this).hasClass("disabled")) {
-                    return true;
-                }
-
-                if ($(this).hasClass("active")) {
-                    $(this).removeClass("active");
-                } else {
-                    $(this).addClass("active");
-                }
-
-                $("#app-nav").show();
-                var left = $("#app-nav").offset().left;
-
-                if (left == 201) {
-                    $("#app-nav").animate({left:'31px'}, {duration:500, easing:'easeInBack', complete:function(){self.disableAppTooltip();}});
-                } else {
-                    $("#app-nav").animate({left:'201px'}, {duration:500, easing:'easeOutBack', complete:function(){self.enableAppTooltip();}});
-                }
-
-            });
-
-            $("#sidebar-bottom-container .reveal-menu").click(function () {
-                $("#language-menu").hide();
-                $("#sidebar-bottom-container .menu").toggle();
-            });
-
-            $("#sidebar-bottom-container .reveal-language-menu").click(function () {
-                $("#sidebar-bottom-container .menu").hide();
-                $("#language-menu").toggle();
-            });
-
-            $("#sidebar-bottom-container .item").click(function () {
-                $("#sidebar-bottom-container .menu").hide();
-                $("#language-menu").hide();
-            });
-*/
-
 
             $("#language-menu .item").click(function () {
                 var langCode = $(this).data("language-code"),

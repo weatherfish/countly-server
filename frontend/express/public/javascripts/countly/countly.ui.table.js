@@ -1,12 +1,5 @@
 //"use strict";
 
-/*
-var ExampleImage = require('./ExampleImage');
-var FakeObjectDataListStore = require('./FakeObjectDataListStore');
-var FixedDataTable = require('fixed-data-table');
-var React = require('react');
-*/
-
 var Column = FixedDataTable.Column;
 var PropTypes = React.PropTypes;
 var Table = FixedDataTable.Table;
@@ -91,17 +84,7 @@ var SortTable = React.createClass({
         rows.sort((a, b) => {
 
             var sortVal = 0;
-/*
-            console.log("+++ sort check +++");
-            console.log(a);
-            console.log(b);
-*/
-/*            if (sortBy == "date")
-            {
-                var a_date_unix = a.date;
-                var b_date_unix = b.date;
-            }
-*/
+
             if (a[sortBy] > b[sortBy]) {
                 sortVal = 1;
             }

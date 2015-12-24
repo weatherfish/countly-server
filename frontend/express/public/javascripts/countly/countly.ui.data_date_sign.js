@@ -2,34 +2,31 @@
 
 var DataDateSign = React.createClass({
 
-    getInitialState: function() {
+    getInitialState : function() {
+
+        console.log(">> init DataDateSign >>");
 
         return {
             date_string : global_controller.date_string,
         };
     },
 
-    componentDidMount: function(){
+    componentDidMount : function(){
 
-        var self = this;
+        $(event_emitter).on('date_init',   this.date_change_event.bind(this));
+        $(event_emitter).on('date_change', this.date_change_event.bind(this));
 
-        var date_event = function(e, data){
+    },
 
-            console.log("::::::::::: component period ::::::::::::", data.period);
+    date_change_event : function(e, data){
 
-            console.log(data.state);
+        var date_string = data.state.from_string + " - " + data.state.to_string;
 
-            var date_string = data.state.from_string + " - " + data.state.to_string;
+        console.log("//////// date_change_event /////////", date_string);
 
-            self.setState({
-                date_string : date_string,
-            });
-
-        };
-
-        $(event_emitter).on('date_init',   date_event.bind(this));
-        $(event_emitter).on('date_choise', date_event.bind(this));
-
+        this.setState({
+            date_string : date_string,
+        });
     },
 
     render : function() {

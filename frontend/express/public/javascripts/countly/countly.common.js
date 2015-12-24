@@ -24,7 +24,6 @@
         countlyCommon.BROWSER_LANG = lang;
     }
 
-
     // Public Methods
 
     countlyCommon.setPeriod = function (period) {
@@ -336,16 +335,10 @@
                         granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][0] = extension_date.getTime();
                         granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][2] = full_days;
 
-                        //var
-
-                        //console.log("firt full_days:", full_days);
-                        //console.log(full_days);
                     }
                     else
                     {
                         var full_days = 7;
-                        //console.log("-------- weekly -----------", elem[2]);
-                        //console.log();
 
                         var extension_days = full_days - elem[2];
 
@@ -390,9 +383,6 @@
                 single_graph_data.push(obj);
             }
 
-            console.log("[[[[[[[[[[[[[[[[[[ new single graph data ]]]]]]]]]]]]]]]]]]");
-            console.log(single_graph_data);
-
             if (container.indexOf("#") > -1)
             {
                 var draw_element = document.getElementById(container.replace("#", ""));
@@ -432,7 +422,7 @@
               	height   : graph_height,
               	renderer : 'line',
               	series   : series,
-                granularity : "daily",
+                granularity : granularity_type,
                 left_time_extension : left_time_extension,
                 small_circle_r : 0,
                 big_circle_r : 4,
@@ -500,7 +490,7 @@
 
             var hoverDetail = new Rickshaw.Graph.HoverDetail( {
             	graph: _rickshaw_graph,
-            	formatter: function(series, x, y, x0, y0, point, is_bottom_block) {
+            	formatter: function(series, x, y, x0, y0, point, is_bottom_block, parent_element) {
 
                   var date = new Date(x);
 
@@ -555,19 +545,117 @@
                   }
 
                   /*
-
                   var now = new Date();
                   var today = d3.time.day(now);
                   date_for_parse = d3.time.format("%Y-%m-%d")(today) + "-" + date_for_parse;
                   return d3.time.format("%Y-%m-%d-%H:%M").parse(date_for_parse);
-
                   */
-
                   /*
                   var date_string = oneWeekAgo.format('%d %B') + " - " + date.format('%d %B %Y'); // todo: need to upgrade the function
                   var date_string =  date.format('%d %B %Y');
                   */
 
+                  var x_label = document.createElement('div');
+              		x_label.className = 'x_label';
+
+                  parent_element.appendChild(x_label);
+
+                  var hover_wrapper = document.createElement('div');
+              		hover_wrapper.className = 'hover_wrapper';
+
+                  x_label.appendChild(hover_wrapper);
+
+                  var date_element = document.createElement('div');
+                  date_element.className = 'date_string';
+                  date_element.innerHTML = date_string;
+
+                  hover_wrapper.appendChild(date_element);
+
+                  var max_label_width = 0;
+                  var max_value_width = 0;
+
+                  _state_single_graph_data.forEach(function(data, sg){
+
+                      for (var i=0; i < data.values.length; i++)
+                      {
+                          if (data.values[i].x == x)
+                          {
+                              var value = data.values[i].y.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                              //hover_html += "<div class='hover_element'><div class='circle' style='background-color:" + data_items[sg].color + "'></div><div class='name'>" + data.name + "</div><div class='value'>" + value + "</div></div>";
+
+                              var hover_element = document.createElement('div');
+                              hover_element.className = 'hover_element';
+
+                              var circle = document.createElement('div');
+                              circle.className = 'circle';
+
+                              var color = false;
+
+                              data_items.every(function(element){
+
+                                  if (element.title.toLowerCase() == data.name.toLowerCase())
+                                  {
+                                      color = element.color;
+                                      return false;
+                                  }
+                                  else
+                                  {
+                                    return true
+                                  }
+
+                              });
+
+                              circle.style["background-color"] = color;
+
+                              hover_element.appendChild(circle);
+
+                              var label_element = document.createElement('div');
+                              label_element.className = 'name';
+                              label_element.innerHTML = data.name;
+
+                              hover_element.appendChild(label_element);
+
+                              var value_element = document.createElement('div');
+                              value_element.className = 'value';
+                              value_element.innerHTML = value;
+
+                              hover_element.appendChild(value_element);
+
+                              //hover_element.innerHTML = "<div class='circle' style='background-color:" + data_items[sg].color + "'></div><div class='name'>" + data.name + "</div><div class='value'>" + value + "</div>";
+
+                              hover_wrapper.appendChild(hover_element);
+
+                              if (label_element.offsetWidth > max_label_width)
+                              {
+                                  max_label_width = label_element.offsetWidth;
+                              }
+
+                              if (value_element.offsetWidth > max_value_width)
+                              {
+                                  max_value_width = value_element.offsetWidth;
+                              }
+
+                              break;
+                          }
+                      }
+                  });
+
+                  /*console.log("max_value_width:", max_value_width);*/
+
+                  var block_width = 12 + 8 + 10 + max_label_width + 10 + max_value_width + 12;
+
+                  if (block_width < 180)
+                  {
+                      block_width = 180;
+                  }
+
+                  x_label.style.width = block_width + "px";
+
+                  //hover_wrapper.innerHTML = "test";
+
+                  return x_label;
+/*
                   var hover_html = "<div class='hover_wrapper'>";
 
                   hover_html += "<div class='date_string'>" + date_string + "</div>";
@@ -581,27 +669,14 @@
                               var value = data.values[i].y.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                               hover_html += "<div class='hover_element'><div class='circle' style='background-color:" + data_items[sg].color + "'></div><div class='name'>" + data.name + "</div><div class='value'>" + value + "</div></div>";
 
-                              //hover_html += "<div class='hover_element'><div class='circle' style='background-color:" + data_items[sg].color + "'></div><div class='value'>" + value + "</div></div>";
-
-
                               break;
                           }
                       }
-
                   });
-
-                  if (is_bottom_block)
-                  {
-                      hover_html += "<div class='triangle bottom'></div>";
-                  }
-                  else
-                  {
-                      hover_html += "<div class='triangle top'></div>"
-                  }
 
                   hover_html += "</div>"
 
-              		return hover_html;
+              		return hover_html;*/
             	}
             });
 
@@ -1388,17 +1463,11 @@
     countlyCommon.extractChartData_granularity = function(db, clearFunction, chartData, dataProperties) {
 
         countlyCommon.periodObj = getPeriodObj();
-/*
-        console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< chartData extractChartData_granularity >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        console.log(db);
-*/
+
         var weekly_granularity  = JSON.parse(JSON.stringify(chartData)); // clone
         var monthly_granularity = JSON.parse(JSON.stringify(chartData));
         var daily_granularity   = JSON.parse(JSON.stringify(chartData));
-/*
-        console.log("================= countlyCommon.periodObj =================");
-        console.log(countlyCommon.periodObj);
-*/
+
         var periodMin = countlyCommon.periodObj.periodMin,
             periodMax = (countlyCommon.periodObj.periodMax + 1),
             dataObj = {},
@@ -1409,17 +1478,7 @@
             currOrPrevious = _.pluck(dataProperties, "period"),
             activeDate,
             activeDateArr;
-/*
-        console.log("periodMin:", periodMin);
-        console.log("periodMax:", periodMax);
-        console.log("activeDate:", activeDate);
-        console.log("activeDateArr:", activeDateArr);
-        console.log("is special period:", countlyCommon.periodObj.isSpecialPeriod);
-        console.log("countlyCommon.periodObj /");
-        console.log(countlyCommon.periodObj);
-        console.log("::::::::::: propertyFunctions ::::::::::::");
-        console.log(propertyFunctions);
-*/
+
         if (currOrPrevious[j] === "previous") {
             if (countlyCommon.periodObj.isSpecialPeriod) {
                 periodMin = 0;
@@ -1437,14 +1496,7 @@
                 activeDate = countlyCommon.periodObj.activePeriod;
             }
         }
-/*
-        console.log("activeDateArr:");
-        console.log(activeDateArr);
-        console.log("activeDate:");
-        console.log(activeDate);
-        console.log("propertyNames:");
-        console.log(propertyNames);
-*/
+
         for (var j = 0; j < propertyNames.length; j++) {
 
             var week_count = 0;
@@ -1483,10 +1535,7 @@
                 }
 
                 dataObj = clearFunction(dataObj);
-/*
-                console.log("-------------- dataObj ----------------");
-                console.log(dataObj);
-*/
+
                 if (!tableData[i]) {
                     tableData[i] = {};
                 }
@@ -1558,6 +1607,17 @@
             keyEvents[k].max = _.max(chartVals);
         }
 
+        if (countlyCommon.previous_period_length)
+        {
+            var previous_period_length = countlyCommon.previous_period_length;
+        }
+        else
+        {
+            var previous_period_length = false;
+        }
+
+        countlyCommon.previous_period_length = daily_granularity[0].data.length;
+
         return {
             "chartDP"        : chartData,
             "daily_granularity"   : daily_granularity,
@@ -1566,7 +1626,8 @@
             "chartData"           : _.compact(tableData),
             "keyEvents"   : keyEvents,
             "time_period" : countlyCommon.periodObj.currentPeriodArr,
-            "time_format" : countlyCommon.periodObj.dateString
+            "time_format" : countlyCommon.periodObj.dateString,
+            "previous_period_length" : previous_period_length
         };
 
     };
@@ -2624,8 +2685,6 @@
             uniquePeriodsCheck = [],
             previousUniquePeriodsCheck = [];
 
-        console.log("getPeriodObj :_period: ", _period);
-
         switch (_period) {
             case "month":
                 /*activePeriod = year;
@@ -2640,8 +2699,6 @@
                 var diff = now - start;
                 var oneDay = 1000 * 60 * 60 * 24;
                 var day = Math.floor(diff / oneDay);
-
-                console.log("count days:", day);
 
                 numberOfDays = daysInPeriod = day;
 
