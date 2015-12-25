@@ -693,3 +693,5 @@ var CalendarWrapper = React.createClass({
     }
 
 });
+
+console.log(">>> finish load Calendar  >>>");

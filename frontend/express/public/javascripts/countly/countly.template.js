@@ -1167,10 +1167,14 @@ window.SessionView = countlyView.extend({
             }
         };
 
+        for (var i = 0; i < this.templateData["big-numbers"].items.length; i++)
+        {
+            this.templateData["big-numbers"].items[i].active = true;
+        }
+
         var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
 
         var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left;
-
 
         var update_graph = function(id, granularity_changed)
         {
@@ -1330,146 +1334,96 @@ window.SessionView = countlyView.extend({
             //setTimeout(function(){ // todo: remove setTimeout
             //onload = function() {
 
-            //document.addEventListener("DOMContentLoaded", function(){
+            React.render(React.createElement(CalendarWrapper, {
+            }), document.getElementById("calendar_block"));
 
-                console.log("-------- loaded -------");
+            React.render(React.createElement(TopBar, {
+                "user_name" : "John Black",
+                "width"     : window.innerWidth - sidebar_width
+            }), document.getElementById("top_bar"));
 
-                React.render(React.createElement(CalendarWrapper, {
-                }), document.getElementById("calendar_block"));
+            React.render(React.createElement(GraphWrapper, {
+                "trend_sign"  : "SESSIONS TREND",
+                "width"       : graph_width - 70 - 70,
+                "height"      : 300,
+                "margin_left" : 40,
+                "data"        : sessionDP,
+                "graph_width" : graph_width, // todo: combine
+                "granularity" : _granularity,
+                "period"      : countlyCommon.getPeriod(),
+                "big_numbers" : this.templateData["big-numbers"].items,
+                "big_number_click" : update_graph,
+            }), document.getElementById("widget-content"));
 
-                React.render(React.createElement(TopBar, {
-                    "user_name" : "John Black",
-                    "width"     : window.innerWidth - sidebar_width
-                }), document.getElementById("top_bar"));
+            document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
+            document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
+            document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
 
-                // ------------------------
+            var small_circles = false;
 
-                React.render(React.createElement(GraphWrapper, {
-                    "trend_sign"  : "SESSIONS TREND",
-                    "width"       : graph_width - 70 - 70,
-                    "height"      : 300,
-                    "margin_left" : 40,
-                    "data"        : sessionDP,
-                    "graph_width" : graph_width, // todo: combine
-                    "granularity" : _granularity,
-                    "period"      : countlyCommon.getPeriod(),
-                    "big_numbers" : self.templateData["big-numbers"].items,
-                    "big_number_click" : update_graph,
-                }), document.getElementById("widget-content"));
+            if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
+            {
+                _granularity = "monthly";
+            }
+            else if (sessionDP.daily_granularity[0].data.length * (_circle_radius * 2) * 2 > graph_width) // todo: combine with block from update
+            {
+                _granularity = "weekly";
+            }
+            else {
+                _granularity = "daily";
+            }
 
-                // ------------- ^^^^^^^^^^^^^^^^^^^^ -----------
+            console.log("init _granularity type:", _granularity);
 
-                document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
-                document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
-                document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
-                /*document.getElementById('dashboard-graph').style['margin-left'] = 40 + "px";
-                document.getElementById('dashboard-graph').style.width = (graph_width - 70 - 70) + "px";*/
-                document.getElementById('no_data_wrapper').style.height = "100px"; // todo: change to variable
-                document.getElementById('no_data_wrapper').style['padding-top'] = "140px"; // todo: remove this
-                document.getElementById('axis_right').style.left = (graph_width - 60) + "px";
-
-                var small_circles = false;
-
-                if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
-                {
-                    _granularity = "monthly";
-                }
-                else if (sessionDP.daily_granularity[0].data.length * (_circle_radius * 2) * 2 > graph_width) // todo: combine with block from update
-                {
-                    _granularity = "weekly";
-                }
-                else {
-                    _granularity = "daily";
-                }
-
-                console.log("init _granularity type:", _granularity);
-
-                if (_granularity == "weekly")
-                {
+            if (_granularity == "weekly")
+            {
                     var granularity_rows = sessionDP.weekly_granularity;
-                }
-                else if (_granularity == "monthly")
-                {
+            }
+            else if (_granularity == "monthly")
+            {
                     var granularity_rows = sessionDP.monthly_granularity;
-                }
-                else
-                {
+            }
+            else
+            {
                     var granularity_rows = sessionDP.daily_granularity;
-                }
+            }
 
-                /*
-                    granularity section
-                */
-/*
-                React.render(React.createElement(granularity, {
-                    "data"        : sessionDP,
-                    "graph_width" : graph_width,
-                    "type"        : _granularity,
-                    "period"      : countlyCommon.getPeriod()
-                }), document.getElementsByClassName("granularity")[0]);
-*/
-                var zero_points = true;
+            var zero_points = true;
 
-                granularity_rows.every(function(datapath){
+            granularity_rows.every(function(datapath){
 
-                    datapath.data.every(function(datapoint){
+                datapath.data.every(function(datapoint){
 
-                        var value = datapoint[1];
+                    var value = datapoint[1];
 
-                        if (value > 0)
-                        {
-                            zero_points = false;
-                            return false;
-                        }
-
-                        return true;
-                    });
-
-                    if (!zero_points)
+                    if (value > 0)
                     {
+                        zero_points = false;
                         return false;
                     }
 
                     return true;
-
                 });
 
-                countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", self.templateData["big-numbers"].items, (graph_width - 60), graph_height, false, _granularity, small_circles, zero_points);
-
-                /* BIG NUMBERS */
-/*
-                for (var i = 0; i < self.templateData["big-numbers"].items.length; i++)
+                if (!zero_points)
                 {
-
-                    var node = document.createElement("div");
-
-                    document.getElementsByClassName("big-numbers-container")[0].appendChild(node);
-
-                    self.templateData["big-numbers"].items[i].active = true;
-
-                    React.render(React.createElement(BigNumber,
-                    {
-                        "title"  : self.templateData["big-numbers"].items[i].title,
-                        "value"  : self.templateData["big-numbers"].items[i].total,
-                        "color"  : self.templateData["big-numbers"].items[i].color,
-                        "active" : true,
-                        "on_click" : update_graph,
-                        "id" : i
-                    }), node);
+                    return false;
                 }
-*/
-                /* TABLE WRAPPER */
 
-                var table_wrapper = React.createElement(TableWrapper, {
-                    "rows"  : rows,
-                    "width" : table_width
-                }, null);
+                return true;
 
-                React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
+            });
 
-            //}, false);
-            //};
-            //}, 0);
+            countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", this.templateData["big-numbers"].items, (graph_width - 60), graph_height, false, _granularity, small_circles, zero_points);
+
+            /* TABLE WRAPPER */
+
+            var table_wrapper = React.createElement(TableWrapper, {
+                "rows"  : rows,
+                "width" : table_width
+            }, null);
+
+            React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
 
             // --------------------------
 
@@ -1510,7 +1464,7 @@ window.SessionView = countlyView.extend({
                 var big_numbers = document.getElementsByClassName("big-numbers-container")[0].childNodes;
 
                 var sessionData = countlySession.getSessionData();
-
+/*
                 var items = [
                     {
                         "title":jQuery.i18n.map["common.total-sessions"],
@@ -1533,7 +1487,9 @@ window.SessionView = countlyView.extend({
                         "help":"sessions.unique-sessions",
                         "color" : "#FF7D7D"
                     }
-                ]
+                ]*/
+
+                var items = self.templateData["big-numbers"].items;
 
                 for (var i = 0; i < big_numbers.length; i++)
                 {
@@ -1655,6 +1611,29 @@ window.UserView = countlyView.extend({
         var sessionData = countlySession.getSessionData(),
             userDP = countlySession.getUserDP();
 
+
+        console.log("------- UserView session data ---------");
+        console.log(sessionData);
+
+        console.log("------- userDP session data ---------");
+        console.log(userDP);
+
+        var self = this;
+
+        _granularity = false; // todo: remove global var
+
+        var sidebar_width = 240;
+        var margin_left   = 30;
+        var padding_left  = 30;
+        var margin_right  = 30;
+        var graph_height  = 300;
+
+        var table = false;
+
+        var rows = userDP.chartData;
+
+        _circle_radius = 4; // todo: find same
+
         this.templateData = {
             "page-title":jQuery.i18n.map["users.title"],
             "logo-class":"users",
@@ -1665,26 +1644,124 @@ window.UserView = countlyView.extend({
                         "title":jQuery.i18n.map["common.total-users"],
                         "total":sessionData.usage["total-users"].total,
                         "trend":sessionData.usage["total-users"].trend,
-                        "help":"users.total-users"
+                        "help":"users.total-users",
+                        "color" : "#1B8AF3"
                     },
                     {
                         "title":jQuery.i18n.map["common.new-users"],
                         "total":sessionData.usage["new-users"].total,
                         "trend":sessionData.usage["new-users"].trend,
-                        "help":"users.new-users"
+                        "help":"users.new-users",
+                        "color" : "#F2B702",
                     },
                     {
                         "title":jQuery.i18n.map["common.returning-users"],
                         "total":sessionData.usage["returning-users"].total,
                         "trend":sessionData.usage["returning-users"].trend,
-                        "help":"users.returning-users"
+                        "help":"users.returning-users",
+                        "color" : "#FF7D7D"
                     }
                 ]
             }
         };
 
+        for (var i = 0; i < this.templateData["big-numbers"].items.length; i++)
+        {
+            this.templateData["big-numbers"].items[i].active = true;
+        }
+
+        var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
+
+        var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left;
+
         if (!isRefresh) {
-            $(this.el).html(this.template(this.templateData));
+
+          $(this.el).html(this.template(this.templateData));
+
+          React.render(React.createElement(CalendarWrapper, {
+          }), document.getElementById("calendar_block"));
+
+          React.render(React.createElement(TopBar, {
+              "user_name" : "John Black",
+              "width"     : window.innerWidth - 240
+          }), document.getElementById("top_bar"));
+
+          React.render(React.createElement(GraphWrapper, {
+              "trend_sign"  : "USERS TREND",
+              "width"       : graph_width - 70 - 70,
+              "height"      : 300,
+              "margin_left" : 40,
+              "data"        : userDP,
+              "graph_width" : graph_width, // todo: combine
+              "granularity" : "daily",
+              "period"      : countlyCommon.getPeriod(),
+              "big_numbers" : this.templateData["big-numbers"].items,
+              "big_number_click" : function(){},
+          }), document.getElementById("widget-content"));
+
+
+          document.getElementsByClassName("widget")[0].setAttribute("style","width:" + 700 + "px");
+          document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
+          document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
+
+          var small_circles = false;
+
+          if ((userDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
+          {
+              _granularity = "monthly";
+          }
+          else if (userDP.daily_granularity[0].data.length * (_circle_radius * 2) * 2 > graph_width) // todo: combine with block from update
+          {
+              _granularity = "weekly";
+          }
+          else {
+              _granularity = "daily";
+          }
+
+          console.log("init _granularity type:", _granularity);
+
+          if (_granularity == "weekly")
+          {
+              var granularity_rows = userDP.weekly_granularity;
+          }
+          else if (_granularity == "monthly")
+          {
+              var granularity_rows = userDP.monthly_granularity;
+          }
+          else
+          {
+              var granularity_rows = userDP.daily_granularity;
+          }
+
+          var zero_points = true;
+
+          granularity_rows.every(function(datapath){
+
+              datapath.data.every(function(datapoint){
+
+                  var value = datapoint[1];
+
+                  if (value > 0)
+                  {
+                      zero_points = false;
+                      return false;
+                  }
+
+                  return true;
+              });
+
+              if (!zero_points)
+              {
+                  return false;
+              }
+
+              return true;
+
+          });
+
+          countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", this.templateData["big-numbers"].items, (graph_width - 60), graph_height, false, _granularity, small_circles, zero_points);
+
+/*
             countlyCommon.drawTimeGraph(userDP.chartDP, "#dashboard-graph");
             this.dtable = $('.d-table').dataTable($.extend({}, $.fn.dataTable.defaults, {
                 "aaData": userDP.chartData,
@@ -1694,12 +1771,13 @@ window.UserView = countlyView.extend({
                     { "mData": "n", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.table.new-users"] },
                     { "mData": "returning", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.table.returning-users"] }
                 ]
-            }));
+            }));*/
 
             //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
+      /*
         var self = this;
         $.when(countlyUser.initialize()).then(function () {
             if (app.activeView != self) {
@@ -1715,7 +1793,7 @@ window.UserView = countlyView.extend({
             CountlyHelpers.refreshTable(self.dtable, userDP.chartData);
 
             app.localize();
-        });
+        });*/
     }
 });
 
@@ -3701,31 +3779,35 @@ var AppRouter = Backbone.Router.extend({
 
         var self = this;
 
-        document.addEventListener("DOMContentLoaded", function(){
+        //document.addEventListener("DOMContentLoaded", function(){
+        $(document).ready(function() { // todo: remove jquery
+
+            console.log("{{{{{{{{{{{{ }}}}}}}}}}}}");
 
             console.log("-------- DOMContentLoaded loaded -------");
 
             viewName.render();
 
-            /*
-                todo: bad formating below
-            */
+                /*
+                    todo: bad formating below
+                */
 
-            this.refreshActiveView = setInterval(function () {
-                self.activeView.refresh();
-      			    if(self.refreshScripts[Backbone.history.fragment])
-      				    for(var i = 0, l = self.refreshScripts[Backbone.history.fragment].length; i < l; i++)
-      					      self.refreshScripts[Backbone.history.fragment][i]();
-      			if(self.refreshScripts["#"])
-      				for(var i = 0, l = self.refreshScripts["#"].length; i < l; i++)
-      					self.refreshScripts["#"][i]();
-            }, countlyCommon.DASHBOARD_REFRESH_MS);
+                this.refreshActiveView = setInterval(function () {
+                    self.activeView.refresh();
+          			    if(self.refreshScripts[Backbone.history.fragment])
+          				    for(var i = 0, l = self.refreshScripts[Backbone.history.fragment].length; i < l; i++)
+          					      self.refreshScripts[Backbone.history.fragment][i]();
+          			if(self.refreshScripts["#"])
+          				for(var i = 0, l = self.refreshScripts["#"].length; i < l; i++)
+          					self.refreshScripts["#"][i]();
+                }, countlyCommon.DASHBOARD_REFRESH_MS);
 
-            if(countlyGlobal && countlyGlobal["message"]){
-                CountlyHelpers.parseAndShowMsg(countlyGlobal["message"]);
-            }
+                if(countlyGlobal && countlyGlobal["message"]){
+                    CountlyHelpers.parseAndShowMsg(countlyGlobal["message"]);
+                  }
 
-        }, false);
+            //}, false);
+        });
     },
     initialize:function () { //initialize the dashboard, register helpers etc.
     		this.pageScripts = {};

@@ -193,26 +193,15 @@
     countlyCommon.drawTimeGraph = function (granularity_rows, container, data_items, graph_width, graph_height, bucket, granularity_type, small_circles, zero_points) {
         _.defer(function(){
 
-/*
-            if (!dataPoints.length) {
-                $(container).hide();
-                $(container).siblings(".no-data").show();
-                return true;
-            } else {
-                $(container).show();
-                $(container).siblings(".no-data").hide();
+            if (container.indexOf("#") > -1)
+            {
+                var draw_element = document.getElementById(container.replace("#", ""));
+            }
+            else
+            {
+                var draw_element = document.getElementsByClassName(container.replace(".", ""));
             }
 
-            // Some data points start with [1, XXX] (should be [0, XXX]) and brakes the new tick logic
-            // Below loops converts the old structures to the new one
-            if (dataPoints[0].data[0][0] == 1) {
-                for (var i = 0; i < dataPoints.length; i++) {
-                    for (var j = 0; j < dataPoints[i].data.length; j++) {
-                        dataPoints[i].data[j][0] -= 1;
-                    }
-                }
-            }
-*/
             var time_period = countlyCommon.periodObj.currentPeriodArr;
 
             _rickshaw_graph.period = _period;
@@ -231,84 +220,9 @@
             /*
                 data formatting
             */
-/*
-            if (!time_period){
-                time_period = graphTicks;
-
-                if (_period == "month")
-                {
-                    var parseDate = function(date_for_parse){
-
-                        var now = new Date();
-                        var year = d3.time.year(now);
-
-                        var formated = d3.time.format("%Y")(year) + "-" + date_for_parse + "-" + d3.time.format("%d")(year);
-                        return d3.time.format("%Y-%b-%d").parse(formated);
-                    }
-                }
-                else
-                {
-
-                    var parseDate = function(date_for_parse){
-
-                        var now = new Date();
-                        var today = d3.time.day(now);
-                        date_for_parse = d3.time.format("%Y-%m-%d")(today) + "-" + date_for_parse;
-                        return d3.time.format("%Y-%m-%d-%H:%M").parse(date_for_parse);
-                    }
-                }
-            }
-            else
-            {
-                var parseDate = d3.time.format("%Y.%m.%d").parse;
-            }
-
-            var graph_data = [];
-
-            for (var i = 0; i < time_period.length; i++)
-            {
-                var obj = {
-                    "date" : parseDate(time_period[i]),
-                }
-
-                dataPoints.forEach(function(set){
-
-                    if (!set.data[i])
-                    {
-                        obj[set.label] = 0;
-                    }
-                    else
-                    {
-                        obj[set.label] = set.data[i][1];
-                    }
-
-                });
-
-                graph_data.push(obj);
-            }
-
-            var color = d3.scale.category10();
-
-            color.domain(d3.keys(graph_data[0]).filter(function(key) { return key !== "date"; }));
-
-            var single_graph_data = color.domain().map(function(name, i) {
-                  return {
-                    name: name,
-                    values: graph_data.map(function(d) {
-                        return {x: d.date.getTime(), y: +d[name]};
-                    }),
-                    color : data_items[i].color
-                  };
-            });
-
-*/
-
-/// -------------------- new -----------------------
 
             console.log("----------------- granularity_rows --------------------");
             console.log(granularity_rows);
-
-            //var granularity_type = "daily";
 
             if (granularity_type == "weekly" || granularity_type == "monthly")
             {
@@ -316,16 +230,10 @@
                 for (var i = 0; i < granularity_rows.length; i++)
                 {
                     var elem = granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1];
-/*
-                    console.log("++++++++++++++ last element ++++++++++++++++++");
-                    console.log(elem);
-*/
+
                     if (granularity_type == "monthly")
                     {
                         var full_days = new Date(elem[0]).monthDays();
-
-                        console.log("full_days:", full_days);
-                        console.log("days in period:", elem[2]);
 
                         var extension_days = full_days - elem[2];
 
@@ -362,13 +270,13 @@
                 var obj = {
                     "name"   : set_data.label,
                     "values" : [],
-                    "color"  : data_items[i].color/*set_data.color*/
+                    "color"  : data_items[i].color
                 }
 
                 for(var j = 0; j < set_data.data.length; j++){
 
                     var point_data = {
-                        "x" : set_data.data[j][0]/*.unix() * 1000*/,
+                        "x" : set_data.data[j][0],
                         "y" : set_data.data[j][1],
                     }
 
@@ -383,14 +291,8 @@
                 single_graph_data.push(obj);
             }
 
-            if (container.indexOf("#") > -1)
-            {
-                var draw_element = document.getElementById(container.replace("#", ""));
-            }
-            else
-            {
-                var draw_element = document.getElementsByClassName(container.replace(".", ""));
-            }
+            console.log("{{{{{{{{{{{{ single_graph_data }}}}}}}}}}}}");
+            console.log(single_graph_data);
 
             var series = [];
 
@@ -402,19 +304,6 @@
                     name  : data.name
                 });
             });
-/*
-            if (granularity_rows[0]['data'][0].length > 2 && granularity_rows[0]['data'][0][2] < 7)
-            {
-                var left_time_extension = true;
-                //_rickshaw_graph.left_time_extension = true;
-            }
-            else
-            {
-                var left_time_extension = false;
-                //_rickshaw_graph.left_time_extension = false;
-            }
-*/
-            var left_time_extension = false;
 
             _rickshaw_graph = new Rickshaw.Graph({
               	element  : draw_element,
@@ -423,7 +312,7 @@
               	renderer : 'line',
               	series   : series,
                 granularity : granularity_type,
-                left_time_extension : left_time_extension,
+                left_time_extension : false,
                 small_circle_r : 0,
                 big_circle_r : 4,
                 small_circles : small_circles,

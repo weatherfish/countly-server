@@ -347,7 +347,9 @@
                 }
             ];
 
-        return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        return countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+
+        //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
 
     countlySession.getUserDPActive = function () {
