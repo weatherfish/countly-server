@@ -2,12 +2,29 @@ var TableWrapper = React.createClass({
 
     getInitialState : function() {
 
+        //var rows = this.convert_rows(this.props.rows);
+
         return {
             sortBy  : 'date',
             sortDir : null,
         };
     },
+/*
+    convert_rows : function(rows)
+    {
+        var converted_rows = [];
 
+        for (var i = 0; i < rows[0].data.length; i++)
+        {
+
+            for (var j = 0; j < rows.length; j++)
+            {
+
+            }
+
+        }
+    }
+*/
     filterFunction : function(filter)
     {
 
@@ -28,7 +45,7 @@ var TableWrapper = React.createClass({
         });
 
     },
-    
+
     render : function() {
 
         var Table  = FixedDataTable.Table;
@@ -42,6 +59,7 @@ var TableWrapper = React.createClass({
         {
             var rows = this.props.rows;
         }
+
 
         return (
             <div className="table_wrapper">

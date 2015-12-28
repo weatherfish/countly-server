@@ -1281,8 +1281,11 @@ window.SessionView = countlyView.extend({
 
             /* TABLE WRAPPER */
 
+            console.log("{{{{{{{{{{{{{{{{{{{ original rows }}}}}}}}}}}}}}}}}}}");
+            console.log(rows);
+
             var table_wrapper = React.createElement(TableWrapper, {
-                "rows"  : rows,
+                "rows"  : granularity_rows,
                 "width" : table_width
             }, null);
 
@@ -1628,7 +1631,7 @@ window.UserView = countlyView.extend({
               return true;
 
           });
-          
+
           countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", this.templateData["big-numbers"].items, (graph_width - 60), graph_height, false, _granularity, small_circles, zero_points);
 
           console.log("{{{{{{{{{{{ granularity_rows }}}}}}}}}}}");

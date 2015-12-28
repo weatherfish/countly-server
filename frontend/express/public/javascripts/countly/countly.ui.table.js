@@ -17,11 +17,12 @@ var SortTable = React.createClass({
 
     getInitialState() {
 
-        //var rows = this.convert_data_rows(this.props.rows);
+        var rows = this.convert_data_rows(this.props.rows);
+
         return {
             sortBy  : 'date',
             sortDir : null,
-            //rows    : rows
+            rows    : rows
         };
     },
 
@@ -101,9 +102,6 @@ var SortTable = React.createClass({
             return sortVal;
         });
 
-        console.log("=== set state ===");
-        console.log(this.state);
-
         this.setState({
             rows,
             sortBy,
@@ -114,19 +112,17 @@ var SortTable = React.createClass({
     convert_data_rows : function(rows)
     {
 
-        console.log("convert_data_rows:",);
-        console.log(rows);
-
-        return false;
+        var converted_rows = [];
 
         for (var i = 0; i < rows[0].data.length; i++)
         {
+            converted_rows[i] = {
+                "date" : rows.format_date(rows[0].data[i][0], 2)
+            };
 
-            var row = {};
-
-            for (var i = 0; j < rows[i].length; j++)
+            for (var j = 0; j < rows.length; j++)
             {
-                row[rows[j].short] = 0;
+                converted_rows[i][rows[j].short] = rows[0].data[i][1];
             }
         }
 
@@ -137,20 +133,15 @@ var SortTable = React.createClass({
 
         var sortDirArrow = '';
 
-        if (this.state.sortDir !== null){
-
-            console.log("sort dir exit:", this.state.sortDir);
-
+        if (this.state.sortDir !== null)
+        {
             sortDirArrow = this.state.sortDir === SortTypes.DESC ? ' ↓' : ' ↑';
         }
-
-        console.log("==== table render ====", sortDirArrow);
-        console.log("current sort:", this.state.sortBy);
 
         console.log("-------------- table  render rows --------------");
         console.log(this.props.rows);
 
-        return  false;
+        //return  false;
 
         return (
             <Table

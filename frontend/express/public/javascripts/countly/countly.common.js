@@ -1353,9 +1353,35 @@
 
         countlyCommon.periodObj = getPeriodObj();
 
-        var weekly_granularity  = JSON.parse(JSON.stringify(chartData)); // clone
+        var daily_granularity   = JSON.parse(JSON.stringify(chartData)); // clone
+        daily_granularity.format_date = function(timestamp){
+            var date_string = d3.time.format("%d %b %Y")(timestamp);
+            return date_string;
+        }
+
+        var weekly_granularity  = JSON.parse(JSON.stringify(chartData));
+        weekly_granularity.format_date = function(timestamp, days_in_period){
+
+            var date = new Date(timestamp);
+
+            var one_week_ago = new Date(timestamp);
+            one_week_ago.setDate(one_week_ago.getDate() - days_in_period + 1);
+
+            var date_string = d3.time.format("%d %b")(one_week_ago) + " - " + d3.time.format("%d %b %Y")(date) /*+ "  (" + d3.time.format("%a")(one_week_ago) + " - " + d3.time.format("%a")(date) + ")"*/;
+            return date_string;
+        }
+
         var monthly_granularity = JSON.parse(JSON.stringify(chartData));
-        var daily_granularity   = JSON.parse(JSON.stringify(chartData));
+        monthly_granularity.format_date = function(timestamp, days_in_period){
+            var date = new Date(timestamp);
+
+            var one_month_ago = new Date(timestamp);
+            //one_month_ago.setMonth(one_month_ago.getMonth() - days_count + 1);
+            one_month_ago.setDate(one_month_ago.getDate() - days_in_period + 1);
+
+            var date_string = d3.time.format("%d %b")(one_month_ago) + " - " + d3.time.format("%d %b %Y")(date) /*+ "  (" + d3.time.format("%a")(one_month_ago) + " - " + d3.time.format("%a")(date) + ")"*/;
+            return date_string;
+        }
 
         var periodMin = countlyCommon.periodObj.periodMin,
             periodMax = (countlyCommon.periodObj.periodMax + 1),
@@ -1518,7 +1544,6 @@
             "time_format" : countlyCommon.periodObj.dateString,
             "previous_period_length" : previous_period_length
         };
-
     };
 
     countlyCommon.extractTwoLevelData = function (db, rangeArray, clearFunction, dataProperties) {
