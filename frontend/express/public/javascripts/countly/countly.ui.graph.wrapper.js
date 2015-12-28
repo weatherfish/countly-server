@@ -158,9 +158,6 @@ var GraphWrapper = React.createClass({
             var granularity_rows = sessionDP.daily_granularity;
         }
 
-        console.log("[[[[[[[[[[[[[[[ granularity_rows ]]]]]]]]]]]]]]]");
-        console.log(granularity_rows);
-
         var zero_points = true;
 
         granularity_rows.every(function(datapath){

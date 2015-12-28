@@ -18,6 +18,7 @@ var DataDateSign = React.createClass({
 
     },
 
+
     date_change_event : function(e, data){
 
         var date_string = data.state.from_string + " - " + data.state.to_string;

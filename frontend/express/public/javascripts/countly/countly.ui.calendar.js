@@ -373,6 +373,7 @@ var CalendarWrapper = React.createClass({
         }
 
         this.setState(state_obj);
+        
 
         //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
 

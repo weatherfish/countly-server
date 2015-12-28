@@ -328,6 +328,7 @@
 
         return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
+    
 
     countlySession.getUserDP = function () {
 

@@ -18,13 +18,13 @@ var SortTable = React.createClass({
     getInitialState() {
 
         //var rows = this.convert_data_rows(this.props.rows);
-
         return {
             sortBy  : 'date',
             sortDir : null,
             //rows    : rows
         };
     },
+
 
     rowGetter : function(rowIndex) {
 

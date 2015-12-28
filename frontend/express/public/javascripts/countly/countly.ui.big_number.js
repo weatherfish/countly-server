@@ -61,6 +61,7 @@ var BigNumber = React.createClass({
             color : this.props.color,
             hover : false
         }
+        
 
         //$(event_emitter).trigger('big_number_hover', data);
         this.props.on_hover(data);

@@ -1628,7 +1628,7 @@ window.UserView = countlyView.extend({
               return true;
 
           });
-
+          
           countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", this.templateData["big-numbers"].items, (graph_width - 60), graph_height, false, _granularity, small_circles, zero_points);
 
           console.log("{{{{{{{{{{{ granularity_rows }}}}}}}}}}}");

@@ -28,7 +28,7 @@ var TableWrapper = React.createClass({
         });
 
     },
-
+    
     render : function() {
 
         var Table  = FixedDataTable.Table;
