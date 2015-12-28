@@ -14,13 +14,15 @@ function renderDate(/*object*/ cellData) {
 }
 
 var SortTable = React.createClass({
+
     getInitialState() {
 
-        console.log("get initial state");
+        //var rows = this.convert_data_rows(this.props.rows);
 
         return {
             sortBy  : 'date',
             sortDir : null,
+            //rows    : rows
         };
     },
 
@@ -109,6 +111,28 @@ var SortTable = React.createClass({
         });
     },
 
+    convert_data_rows : function(rows)
+    {
+
+        console.log("convert_data_rows:",);
+        console.log(rows);
+
+        return false;
+
+        for (var i = 0; i < rows[0].data.length; i++)
+        {
+
+            var row = {};
+
+            for (var i = 0; j < rows[i].length; j++)
+            {
+                row[rows[j].short] = 0;
+            }
+        }
+
+        return converted_rows;
+    },
+
     render() {
 
         var sortDirArrow = '';
@@ -122,6 +146,11 @@ var SortTable = React.createClass({
 
         console.log("==== table render ====", sortDirArrow);
         console.log("current sort:", this.state.sortBy);
+
+        console.log("-------------- table  render rows --------------");
+        console.log(this.props.rows);
+
+        return  false;
 
         return (
             <Table

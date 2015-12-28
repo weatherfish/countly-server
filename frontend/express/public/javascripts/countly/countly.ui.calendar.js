@@ -376,7 +376,7 @@ var CalendarWrapper = React.createClass({
 
         //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
 
-        $(event_emitter).trigger("date_change", { "period" : choise, "state" : state_obj });
+        $(event_emitter).trigger("date_choise", { "period" : choise, "state" : state_obj });
 
     },
 

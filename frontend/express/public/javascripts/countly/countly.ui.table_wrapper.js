@@ -1,6 +1,6 @@
 var TableWrapper = React.createClass({
 
-    getInitialState() {
+    getInitialState : function() {
 
         return {
             sortBy  : 'date',
@@ -8,7 +8,7 @@ var TableWrapper = React.createClass({
         };
     },
 
-    filterFunction(filter)
+    filterFunction : function(filter)
     {
 
         var rows = this.props.rows;
@@ -29,7 +29,7 @@ var TableWrapper = React.createClass({
 
     },
 
-    render() {
+    render : function() {
 
         var Table  = FixedDataTable.Table;
         var Column = FixedDataTable.Column;

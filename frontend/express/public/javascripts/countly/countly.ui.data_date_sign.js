@@ -14,7 +14,7 @@ var DataDateSign = React.createClass({
     componentDidMount : function(){
 
         $(event_emitter).on('date_init',   this.date_change_event.bind(this));
-        $(event_emitter).on('date_change', this.date_change_event.bind(this));
+        $(event_emitter).on('date_choise', this.date_change_event.bind(this));
 
     },
 

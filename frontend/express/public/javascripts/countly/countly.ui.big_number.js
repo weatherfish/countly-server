@@ -40,7 +40,8 @@ var BigNumber = React.createClass({
             hover : true
         }
 
-        $(event_emitter).trigger('big_number_hover', data);
+        //$(event_emitter).trigger('big_number_hover', data);
+        this.props.on_hover(data);
     },
 
     onhoverend : function()
@@ -61,7 +62,8 @@ var BigNumber = React.createClass({
             hover : false
         }
 
-        $(event_emitter).trigger('big_number_hover', data);
+        //$(event_emitter).trigger('big_number_hover', data);
+        this.props.on_hover(data);
     },
 
     render : function() {

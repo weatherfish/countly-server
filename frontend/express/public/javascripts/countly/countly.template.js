@@ -1147,6 +1147,7 @@ window.SessionView = countlyView.extend({
                         "total":sessionData.usage["total-sessions"].total,
                         "trend":sessionData.usage["total-sessions"].trend,
                         "help":"sessions.total-sessions",
+                        "short" : "t",
                         "color" : "#1B8AF3"
                     },
                     {
@@ -1154,6 +1155,7 @@ window.SessionView = countlyView.extend({
                         "total":sessionData.usage["new-users"].total,
                         "trend":sessionData.usage["new-users"].trend,
                         "help":"sessions.new-sessions",
+                        "short" : "n",
                         "color" : "#F2B702"
                     },
                     {
@@ -1161,6 +1163,7 @@ window.SessionView = countlyView.extend({
                         "total":sessionData.usage["total-users"].total,
                         "trend":sessionData.usage["total-users"].trend,
                         "help":"sessions.unique-sessions",
+                        "short" : "u",
                         "color" : "#FF7D7D"
                     }
                 ]
@@ -1178,152 +1181,9 @@ window.SessionView = countlyView.extend({
 
         var update_graph = function(id, granularity_changed)
         {
-
-            sessionDP = countlySession.getSessionDP();
-
-            if (id > -1)
-            {
-                self.templateData["big-numbers"]["items"][id].active = !self.templateData["big-numbers"]["items"][id].active;
-
-                var active_found = false;
-
-                for (var i = 0; i < self.templateData["big-numbers"]["items"].length; i++)
-                {
-                    if (self.templateData["big-numbers"]["items"][i].active)
-                    {
-                        active_found = true;
-                        break;
-                    }
-                }
-
-                if (!active_found)
-                {
-                    document.getElementById('no_data_wrapper').style.display = "block";
-                    document.getElementsByClassName('granularity')[0].className = "granularity hidden";
-                    var no_data = true;
-                }
-                else
-                {
-                    document.getElementById('no_data_wrapper').style.display = "none";
-                    document.getElementsByClassName('granularity')[0].className = "granularity";
-                    var no_data = false;
-                }
-            }
-
-            /*
-                disable auto granularity
-            */
-
-            var time_range_difference = sessionDP.previous_period_length / sessionDP.daily_granularity[0].data.length;
-
-            if (!granularity_changed && id == -1 && (time_range_difference < 0.5 || time_range_difference > 2)) // auto granularity is active, event from date selection
-            {
-
-                if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
-                {
-                    _granularity = "monthly";
-                }
-                else if ((sessionDP.daily_granularity[0].data.length * _circle_radius * 2 * 2) > graph_width)
-                {
-                    _granularity = "weekly";
-                }
-                else {
-                    _granularity = "daily";
-                }
-            }
-            else if (_granularity == "daily")
-            {
-                if ((sessionDP.daily_granularity[0].data.length * _circle_radius * 2 * 2) > graph_width)
-                {
-                    var small_circles = true;
-                }
-                else
-                {
-                    var small_circles = false;
-                }
-            }
-
-            if (_granularity == "weekly")
-            {
-                var granularity_rows = sessionDP.weekly_granularity;
-            }
-            else if (_granularity == "monthly")
-            {
-                var granularity_rows = sessionDP.monthly_granularity;
-            }
-            else
-            {
-                var granularity_rows = sessionDP.daily_granularity;
-            }
-
-            var zero_points = true;
-
-            granularity_rows.every(function(datapath){
-
-                datapath.data.every(function(datapoint){
-
-                    var value = datapoint[1];
-
-                    if (value > 0)
-                    {
-                        zero_points = false;
-                        return false;
-                    }
-
-                    return true;
-                });
-
-                if (!zero_points)
-                {
-                    return false;
-                }
-
-                return true;
-
-            });
-
-            if (no_data)
-            {
-                zero_points = true;
-            }
-
-            var active_array = [];
-
-            for (var i = 0; i < self.templateData["big-numbers"]["items"].length; i++)
-            {
-                for (var j = 0; j < granularity_rows.length; j++)
-                {
-
-                    var is_found = false;
-
-                    if (self.templateData["big-numbers"]["items"][i]['title'].toLowerCase() == granularity_rows[j].label.toLowerCase()){
-
-                        if (self.templateData["big-numbers"]["items"][i].active)
-                        {
-                            granularity_rows[j].color = self.templateData["big-numbers"]["items"][i].color;
-                            active_array.push(granularity_rows[j]);
-                        }
-
-                        is_found = true;
-                        break;
-                    }
-
-                    if (is_found)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            countlyCommon.updateTimeGraph(active_array, "#dashboard-graph", self.templateData["big-numbers"].items, false, _granularity, small_circles, zero_points);
-
-            return {
-                "new_granularity" : _granularity,
-                "session_dp" : sessionDP
-            }
+            alert('old update');
 
         }
-
 
         if (!isRefresh) { // loading the page
 
@@ -1353,6 +1213,9 @@ window.SessionView = countlyView.extend({
                 "period"      : countlyCommon.getPeriod(),
                 "big_numbers" : this.templateData["big-numbers"].items,
                 "big_number_click" : update_graph,
+                "session_data_function" : countlySession.getSessionDP,
+                "update_graph_function" : countlyCommon.updateTimeGraph
+
             }), document.getElementById("widget-content"));
 
             document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
@@ -1377,15 +1240,15 @@ window.SessionView = countlyView.extend({
 
             if (_granularity == "weekly")
             {
-                    var granularity_rows = sessionDP.weekly_granularity;
+                var granularity_rows = sessionDP.weekly_granularity;
             }
             else if (_granularity == "monthly")
             {
-                    var granularity_rows = sessionDP.monthly_granularity;
+                var granularity_rows = sessionDP.monthly_granularity;
             }
             else
             {
-                    var granularity_rows = sessionDP.daily_granularity;
+                var granularity_rows = sessionDP.daily_granularity;
             }
 
             var zero_points = true;
@@ -1429,7 +1292,7 @@ window.SessionView = countlyView.extend({
 
             $(event_emitter).on('date_choise', function(e, period){
 
-                //console.log("date_choise emitter period:", period.period);
+                console.log("date_choise emitter period:", period.period);
 
                 /*
                     update the graph
@@ -1519,6 +1382,9 @@ window.SessionView = countlyView.extend({
             // --------------------------
 
             $(event_emitter).on('big_number_hover', function(e, data){
+
+                console.log("------------------ old hover ----------------");
+                return false;
 
                 if (data.hover)
                 {
@@ -1645,6 +1511,7 @@ window.UserView = countlyView.extend({
                         "total":sessionData.usage["total-users"].total,
                         "trend":sessionData.usage["total-users"].trend,
                         "help":"users.total-users",
+                        "short" : "t",
                         "color" : "#1B8AF3"
                     },
                     {
@@ -1652,6 +1519,7 @@ window.UserView = countlyView.extend({
                         "total":sessionData.usage["new-users"].total,
                         "trend":sessionData.usage["new-users"].trend,
                         "help":"users.new-users",
+                        "short" : "n",
                         "color" : "#F2B702",
                     },
                     {
@@ -1659,6 +1527,7 @@ window.UserView = countlyView.extend({
                         "total":sessionData.usage["returning-users"].total,
                         "trend":sessionData.usage["returning-users"].trend,
                         "help":"users.returning-users",
+                        "short" : "r",
                         "color" : "#FF7D7D"
                     }
                 ]
@@ -1696,11 +1565,12 @@ window.UserView = countlyView.extend({
               "granularity" : "daily",
               "period"      : countlyCommon.getPeriod(),
               "big_numbers" : this.templateData["big-numbers"].items,
-              "big_number_click" : function(){},
+              //"big_number_click" : update_graph,
+              "session_data_function" : countlySession.getUserDP,
+              "update_graph_function" : countlyCommon.updateTimeGraph
           }), document.getElementById("widget-content"));
 
-
-          document.getElementsByClassName("widget")[0].setAttribute("style","width:" + 700 + "px");
+          document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
           document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
           document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
 
@@ -1760,6 +1630,18 @@ window.UserView = countlyView.extend({
           });
 
           countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", this.templateData["big-numbers"].items, (graph_width - 60), graph_height, false, _granularity, small_circles, zero_points);
+
+          console.log("{{{{{{{{{{{ granularity_rows }}}}}}}}}}}");
+          console.log(granularity_rows);
+
+          /* TABLE WRAPPER */
+
+          var table_wrapper = React.createElement(TableWrapper, {
+              "rows"  : granularity_rows, //rows,
+              "width" : table_width
+          }, null);
+
+          React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
 
 /*
             countlyCommon.drawTimeGraph(userDP.chartDP, "#dashboard-graph");

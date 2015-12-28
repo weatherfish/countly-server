@@ -293,9 +293,9 @@
     countlySession.getSessionDP = function () {
 
         var chartData = [
-                { data:[], label:jQuery.i18n.map["common.table.total-sessions"] },
-                { data:[], label:jQuery.i18n.map["common.table.new-sessions"] },
-                { data:[], label:jQuery.i18n.map["common.table.unique-sessions"] }
+                { data:[], label:jQuery.i18n.map["common.table.total-sessions"], short:"t" },
+                { data:[], label:jQuery.i18n.map["common.table.new-sessions"], short:"n" },
+                { data:[], label:jQuery.i18n.map["common.table.unique-sessions"], short:"u" }
             ],
             dataProps = [
                 { name:"t" },
@@ -332,9 +332,9 @@
     countlySession.getUserDP = function () {
 
         var chartData = [
-                { data:[], label:jQuery.i18n.map["common.table.total-users"] },
-                { data:[], label:jQuery.i18n.map["common.table.new-users"] },
-                { data:[], label:jQuery.i18n.map["common.table.returning-users"] }
+                { data:[], label:jQuery.i18n.map["common.table.total-users"], "short" : "t" },
+                { data:[], label:jQuery.i18n.map["common.table.new-users"], "short" : "n" },
+                { data:[], label:jQuery.i18n.map["common.table.returning-users"], "short" : "r" }
             ],
             dataProps = [
                 { name:"u" },
