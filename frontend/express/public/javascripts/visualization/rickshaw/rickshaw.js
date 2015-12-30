@@ -546,6 +546,8 @@ Rickshaw.Graph = function(args) {
 
     //domain.y[1] = domain.y[1] + 20; // todo: move to other place maybe./ todo : !!!!!!!!!!!
 
+    console.log("----- full domain ------");
+    console.log(domain);
 
     var y_domain = Math.round(domain.y[1]);
 
@@ -570,6 +572,11 @@ Rickshaw.Graph = function(args) {
     {
         var left_extension_width = _left_extension_width;
     }
+
+
+    console.log("get range:", this.width - (this.circle_radius * 2) - this.max_tick_width);
+    console.log("-- domain --");
+    console.log(domain.x);
 
 		this.x = (this.xScale || d3.scale.linear()).copy().domain(domain.x).range([0, this.width - (this.circle_radius * 2) - this.max_tick_width]);
 		//this.y = (this.yScale || d3.scale.linear()).copy().domain(domain.y).range([this.height, 0]);
@@ -3758,6 +3765,9 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 		var yMin = +Infinity;
 		var yMax = -Infinity;
 
+    console.log("------- search domain --------");
+    console.log(stackedData);
+
 		stackedData.forEach( function(series) {
 
 			series.forEach( function(d) {
@@ -3772,12 +3782,21 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 
 			if (!series.length) return;
 
+      console.log("{{{{{{{{{{{{{{{{{{{{{{{{{[[series]]}}}}}}}}}}}}}}}}}}}}}}}}}");
+      console.log(series);
+
+      console.log("series[series.length - 1].x:", series[series.length - 1].x);
+
 			if (series[0].x < xMin) xMin = series[0].x;
 			if (series[series.length - 1].x > xMax) xMax = series[series.length - 1].x;
 		} );
 
+    console.log("1----", xMin, " --- > ", xMax);
+
 		xMin -= (xMax - xMin) * this.padding.left;
 		xMax += (xMax - xMin) * this.padding.right;
+
+    console.log("2----", xMin, " --- > ", xMax);
 
 		yMin = this.graph.min === 'auto' ? yMin : this.graph.min || 0;
 		yMax = this.graph.max === undefined ? yMax : this.graph.max;
@@ -3822,6 +3841,12 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
         return false;
     }
 */
+
+    console.log("{{{{{{{{{{{ render paths }}}}}}}}}}}");
+    console.log(data);
+
+    console.log("graph.circle_radius:", graph.circle_radius);
+    console.log("graph.max_tick_width:", graph.max_tick_width);
 
 		var pathNodes = vis.selectAll("path.path")
 			.data(data)
@@ -4052,15 +4077,17 @@ Rickshaw.Graph.Renderer.Line = Rickshaw.Class.create( Rickshaw.Graph.Renderer, {
 
 		var graph = this.graph;
 
+    console.log("========== path factory graph=======");
+    console.log(graph);
+
 		var factory = d3.svg.line()
 			.x( function(d) {
-          //console.log("x position:", graph.x(d.x));
           return Math.ceil(graph.x(d.x));
       } )
 			.y( function(d) { return graph.y(d.y) } )
 			.interpolate(this.graph.interpolation).tension(this.tension);
 
-		factory.defined && factory.defined( function(d) { return d.y !== null } );
+		factory.defined && factory.defined( function(d) { return (d.y !== null && d.x)} );
 		return factory;
 	}
 } );

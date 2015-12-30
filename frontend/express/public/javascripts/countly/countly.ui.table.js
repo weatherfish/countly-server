@@ -17,50 +17,39 @@ var SortTable = React.createClass({
 
     getInitialState() {
 
+        var headers = JSON.parse(JSON.stringify(this.props.headers));
+
+        console.log("++++++ table headers +++++++");
+        console.log(headers);
+
+        headers.unshift({
+            "title" : "Date",
+            //"help"  : "sessions.unique-sessions", // todo: add translate
+            "short" : "date",
+        })
+
         var rows = this.convert_data_rows(this.props.rows);
 
         return {
             sortBy  : 'date',
             sortDir : null,
+            headers : headers,
             rows    : rows
         };
     },
 
+    componentWillMount: function() {
 
-    rowGetter : function(rowIndex) {
+        $(event_emitter).on('granularity', function(e, granularity_type){
 
-        if (this.state.rows)
-        {
-            return this.state.rows[rowIndex];
-        }
-        else
-        {
-            return this.props.rows[rowIndex];
-        }
+            var rows = countlySession.getSessionDP().get_current_data(granularity_type);
+            var rows = this.convert_data_rows(rows);
 
-    },
+            this.setState({
+                rows : rows
+            });
 
-    _renderHeader(label, cellDataKey) {
-
-        if (cellDataKey == this.state.sortBy && this.state.sortDir == "ASC")
-        {
-            var sort_icons = <div><div className="up_icon active"></div><div className="down_icon"></div></div>;
-        }
-        else if (cellDataKey == this.state.sortBy && this.state.sortDir == "DESC")
-        {
-            var sort_icons = <div><div className="up_icon"></div><div className="down_icon active"></div></div>;
-        }
-        else
-        {
-            var sort_icons = <div><div className="up_icon"></div><div className="down_icon"></div></div>;
-        }
-
-        return (
-            <div className="header_sort_button">
-                <a onClick={this._sortRowsBy.bind(null, cellDataKey)}>{label}</a>
-                {sort_icons}
-            </div>
-        );
+        }.bind(this));
     },
 
     _sortRowsBy(cellDataKey) {
@@ -129,7 +118,69 @@ var SortTable = React.createClass({
         return converted_rows;
     },
 
+    header_render(label, cellDataKey) {
+
+        if (cellDataKey == this.state.sortBy && this.state.sortDir == "ASC")
+        {
+            var sort_icons = <div><div className="up_icon active"></div><div className="down_icon"></div></div>;
+        }
+        else if (cellDataKey == this.state.sortBy && this.state.sortDir == "DESC")
+        {
+            var sort_icons = <div><div className="up_icon"></div><div className="down_icon active"></div></div>;
+        }
+        else
+        {
+            var sort_icons = <div><div className="up_icon"></div><div className="down_icon"></div></div>;
+        }
+
+        return (
+            <div className="header_sort_button">
+                <a onClick={this._sortRowsBy.bind(null, cellDataKey)}>{label}</a>
+                {sort_icons}
+            </div>
+        );
+    },
+
+    row_getter : function(rowIndex) {
+
+        if (this.state.rows)
+        {
+            var value = this.state.rows[rowIndex];
+        }
+        else
+        {
+            var value = this.props.rows[rowIndex];
+        }
+
+        //value = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return value;
+
+    },
+
+    columns_render : function(headers, sortDirArrow) {
+
+        var self = this;
+
+        return _.map(headers, function(header, id) {
+
+            var title = header.title.toLowerCase().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+
+            return <Column
+                label =  {title + sortDirArrow}
+                width = {self.props.width / headers.length}
+                dataKey = {header.short}
+                headerClassName = "table_header"
+                footerClassName = "table_footer"
+                table_content = "table_content"
+                headerRenderer={self.header_render}
+            />
+        });
+    },
+
     render() {
+
+        var row_height = this.props.row_height;
 
         var sortDirArrow = '';
 
@@ -138,57 +189,20 @@ var SortTable = React.createClass({
             sortDirArrow = this.state.sortDir === SortTypes.DESC ? ' ↓' : ' ↑';
         }
 
-        console.log("-------------- table  render rows --------------");
-        console.log(this.props.rows);
-
-        //return  false;
+        var headers = this.state.headers;
 
         return (
             <Table
-                rowHeight = {50}
-                rowGetter = {this.rowGetter}
-                rowsCount = {this.props.rows.length}
+                rowHeight = {row_height}
+                rowGetter = {this.row_getter}
+                rowsCount = {this.state.rows.length}
                 width     = {this.props.width}
-                height    = {5000}
-                headerHeight = {50}
+                height    = {row_height * (this.state.rows.length + 1)}
+                headerHeight = {row_height}
             >
-                <Column
-                    label   = {"Date" + sortDirArrow}
-                    width   = {this.props.width / 100 * 40}
-                    dataKey = "date"
-                    headerClassName = "table_header"
-                    footerClassName = "table_footer"
-                    table_content   = "table_content"
-                    headerRenderer={this._renderHeader}
-                />
-                <Column
-                    label =  {"Total Sessions" + sortDirArrow}
-                    width = {this.props.width / 100 * 20}
-                    dataKey = "t"
-                    headerClassName = "table_header"
-                    footerClassName = "table_footer"
-                    table_content = "table_content"
-                    headerRenderer={this._renderHeader}
-                />
-                <Column
-                    label   = {"New Sessions" + sortDirArrow}
-                    width   = {this.props.width / 100 * 20}
-                    dataKey = "n"
-                    headerClassName = "table_header"
-                    footerClassName = "footerClassName"
-                    table_content   = "table_content"
-                    headerRenderer={this._renderHeader}
-                />
-                <Column
-                    label = {"Unique Sessions" + sortDirArrow}
-                    width = {this.props.width / 100 * 20}
-                    dataKey = "u"
-                    headerClassName = "table_header"
-                    footerClassName = "footerClassName"
-                    table_content = "table_content"
-                    headerRenderer={this._renderHeader}
-                />
-          </Table>
+                {this.columns_render(headers, sortDirArrow)}
+            </Table>
         );
-    },
+    }
+
 });

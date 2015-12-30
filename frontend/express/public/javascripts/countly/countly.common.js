@@ -582,7 +582,7 @@
         {
             return false;
         }
-
+/*
         if (granularity_rows[0] && granularity_rows[0].data[0][0] == 1) {
             for (var i = 0; i < granularity_rows.length; i++) {
                 for (var j = 0; j < granularity_rows[i].data.length; j++) {
@@ -590,6 +590,10 @@
                 }
             }
         }
+*/
+
+        console.log("======== updateTimeGraph =============");
+        console.log(granularity_rows);
 
         var time_period = countlyCommon.periodObj.currentPeriodArr;
 
@@ -778,7 +782,11 @@
             });
         }
 
-        _state_single_graph_data = single_graph_data;
+        console.log("---------------- single_graph_data ---------------------");
+        console.log(single_graph_data);
+
+
+        _state_single_graph_data = single_graph_data; // todo: remove
 
         /*
             add or remove graph line path element
@@ -817,18 +825,9 @@
 
         _rickshaw_graph.zero_points = zero_points;
 
-/*
-        console.log("{{{{{{{{{{{{{{{{{{ granularity_rows }}}}}}}}}}}}}}}}}}", granularity_type);
-        console.log("{{{{{{{{{{{{{{{{{{ granularity_rows }}}}}}}}}}}}}}}}}}", granularity_type);
-        console.log("{{{{{{{{{{{{{{{{{{ granularity_rows }}}}}}}}}}}}}}}}}}", granularity_type);
-        console.log(granularity_rows);
-*/
         if (granularity_type == "monthly")
         {
             var full_days = new Date(granularity_rows[0].data[0][0]).monthDays();
-
-            //console.log("firt full_days:", full_days);
-            //console.log(full_days);
         }
         else
         {
@@ -917,235 +916,7 @@
 
         graph.render();
 */
-        return false;
-
-
-/*
-        x.domain(d3.extent(graph_data, function(d) { return d.date; }));
-
-        y.domain([
-            d3.min(single_graph_data, function(c) { return d3.min(c.values, function(v) { return v.value; }); }),
-            d3.max(single_graph_data, function(c) { return d3.max(c.values, function(v) { return v.value; }); })
-        ]);
-*/
-
-        var values_list_array = [];
-        var axis_array = [];
-
-        for (var i = 0; i < single_graph_data.length; i++)
-        {
-            values_list_array[i] = [];
-            values_list_array[i][0] = single_graph_data[i].name;
-            axis_array[i] = [];
-            axis_array[i][0] = 'x' + i;
-        }
-
-        for (var i = 0; i < single_graph_data[0].values.length; i++)
-        {
-            for (var j = 0; j < single_graph_data.length; j++)
-            {
-                values_list_array[j].push(single_graph_data[j].values[i].value);
-                axis_array[j].push(single_graph_data[j].values[i].date);
-            }
-        }
-
-        /*var columns = {
-            bindto: container,
-            data: {
-                xs: { },
-                columns: [ ]
-            }
-        }*/
-
-        var columns = [];
-
-        for (var i = 0; i < values_list_array.length; i++)
-        {
-            columns.push(values_list_array[i]);
-            columns.push(axis_array[i]);
-        }
-
-        console.log("{{{{{{{{{ chart_object }}}}}}}}}");
-        console.log(columns);
-        console.log("[[[[[[[[[[[[ current [[[[[[[[]]]]]]]]]]]]");
-        console.log(chart.data.names());
-        console.log("[[[[[[[[[[[[ labels [[[[[[[[]]]]]]]]]]]]");
-        console.log(chart.axis.labels({}));
-        console.log("[[[[[[[[[[[[ xs [[[[[[[[]]]]]]]]]]]]");
-        console.log(chart.xs());
-
-        var unload_ids = [];
-
-        var xs_data = chart.xs();
-
-        /*
-            todo : completely change the algorithm of unload and load - not optimal
-        */
-
-        for (var key in xs_data)
-        {
-            /*
-                check if key exist in the new data. If no - it will be unloaded
-            */
-
-            var is_exist = false;
-
-            for (var i = 0; i < columns.length; i++)
-            {
-                if (columns[i][0] == key)
-                {
-                    is_exist = true;
-                    break;
-                }
-            }
-
-            if (is_exist == false){
-              unload_ids.push(key);
-            }
-        }
-
-        console.log("--------------- unload -----------");
-        console.log(unload_ids);
-
-        chart.unload({
-            ids: unload_ids
-        });
-
-        chart.load({
-                columns : columns
-            });
-
-        /*chart.load({
-                columns : columns
-            });
-*/
-        return false;
-
-        var elements = svg.selectAll(".set")
-              .data(single_graph_data)
-
-        elements
-            .selectAll("path")
-            .transition()
-            .duration(750)
-            .attr("d", function(d) {
-                return change_line(d.values);
-            })
-
-        var set = elements.enter().append("g")
-                  .attr("class", "set");
-
-        set.append("path")
-                  .attr("class", "line")
-                  .attr("d", function(d) { return line(d.values); })
-                  .style("stroke", function(d) { return color(d.name); });
-
-        elements.exit()
-            .selectAll("path")
-            .transition()
-            .duration(750)
-            .attr("d", function(d) {
-                return hide_line(d.values);
-            })
-            .remove()
-
-          /*
-              update dots
-          */
-
-          var all_points = svg.selectAll('.dots')
-                .data(single_graph_data)
-
-
-          var all_dots = all_points.selectAll('.dot')
-                           .data(function(d, index){
-                                var a = [];
-                                d.values.forEach(function(point,i){
-                                    if (point.value > 0)
-                                    {
-                                        a.push({'index': index, 'point': point, 'color' : color(d.name)});
-                                    }
-                                });
-                                return a;
-                            })
-
-
-                  all_dots.transition()
-                            .duration(750)
-                            .attr("transform", function(d) {
-                                return "translate(" + x(d.point.date) + "," + y(d.point.value) + ")"; }
-                            );
-
-                var enter_dots = all_dots.enter()
-                    .append('g')
-                    .transition()
-                    .duration(750)
-                    .attr("transform", function(d) {
-                        return "translate(" + x(d.point.date) + "," + y(d.point.value) + ")"; }
-                    );
-
-
-/*
-          var enter_points = all_points.enter()
-                .append("g")
-                  .attr("class", "dots")
-                .attr("clip-path", "url(#clip)");
-
-          var dots = enter_points.selectAll('.dot')
-                           .data(function(d, index){
-                                var a = [];
-                                d.values.forEach(function(point,i){
-                                    if (point.value > 0)
-                                    {
-                                        a.push({'index': index, 'point': point, 'color' : color(d.name)});
-                                    }
-                                });
-                                return a;
-                            })
-                            .enter()
-                            .append('g')
-                            .attr("transform", function(d) {
-                                return "translate(" + x(d.point.date) + "," + y(d.point.value) + ")"; }
-                            );
-*/
-
-          enter_dots.append('circle')
-              .attr('class','dot')
-              .attr("r", 6)
-              .attr('fill', function(d,i){
-                  return d.color;
-              })
-              /*.attr("transform", function(d) {
-                  return "translate(" + x(d.point.date) + "," + y(d.point.value) + ")"; }
-              );*/
-
-          enter_dots.append('circle')
-              .attr('class','dot')
-              .attr("r", 4)
-              .attr('fill', function(d,i){
-                  return "white";
-              })
-              /*.attr("transform", function(d) {
-                  return "translate(" + x(d.point.date) + "," + y(d.point.value) + ")"; }
-              );*/
-
-/*
-              all_points.exit()
-                  .selectAll(".dot")
-                  .transition()
-                  .duration(750)
-                  .attr("transform", function(d) {
-                      return "translate(" + x(d.point.date) + "," + y(0) + ")"; }
-                  )
-                  .remove()*/
-
-              all_dots.exit()
-                  /*.transition()
-                  .duration(750)
-                  .attr("transform", function(d) {
-                      return "translate(" + x(d.point.date) + "," + y(0) + ")"; }
-                  )*/
-                  .remove()
+        return true;
 
     }
 
@@ -1355,12 +1126,19 @@
 
         var daily_granularity   = JSON.parse(JSON.stringify(chartData)); // clone
         daily_granularity.format_date = function(timestamp){
-            var date_string = d3.time.format("%d %b %Y")(timestamp);
+
+            console.log("convert daily --------------->");
+
+            var date = new Date(timestamp);
+
+            var date_string = d3.time.format("%d %b %Y")(date);
             return date_string;
         }
 
         var weekly_granularity  = JSON.parse(JSON.stringify(chartData));
         weekly_granularity.format_date = function(timestamp, days_in_period){
+
+            console.log(":::::::: convert weekly_granularity :::::::::");
 
             var date = new Date(timestamp);
 
@@ -1373,6 +1151,9 @@
 
         var monthly_granularity = JSON.parse(JSON.stringify(chartData));
         monthly_granularity.format_date = function(timestamp, days_in_period){
+
+            console.log(":::::::: convert monthly :::::::::");
+
             var date = new Date(timestamp);
 
             var one_month_ago = new Date(timestamp);
@@ -1468,7 +1249,8 @@
 
                 // daily granularity
 
-                daily_granularity[j]["data"][daily_granularity[j]["data"].length] = [formattedDate.unix() * 1000, propertyValue];
+                //daily_granularity[j]["data"][daily_granularity[j]["data"].length] = [formattedDate.unix() * 1000, propertyValue];
+                daily_granularity[j]["data"].push([formattedDate.unix() * 1000, propertyValue]);
 
                 // weekly granularity
 
@@ -1479,7 +1261,8 @@
 
                 if (day_num == 0) /*"Sunday"*/
                 {
-                    weekly_granularity[j]["data"][weekly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, week_count, week_days_count];
+                    //weekly_granularity[j]["data"][weekly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, week_count, week_days_count];
+                    weekly_granularity[j]["data"].push([formattedDate.unix() * 1000, week_count, week_days_count]);
                     week_count = 0;
                     week_days_count = 0;
                 }
@@ -1493,16 +1276,19 @@
 
                 if (formattedDate_next && formattedDate_next.format('D') == 1)
                 {
-                    monthly_granularity[j]["data"][monthly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, month_count, month_days_count];
+                    //monthly_granularity[j]["data"][monthly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, month_count, month_days_count];
+                    monthly_granularity[j]["data"].push([formattedDate.unix() * 1000, month_count, month_days_count]);
                     month_count = 0;
                     month_days_count = 0;
                 }
             }
 
             // add the remaining days of the week
-            weekly_granularity[j]["data"][weekly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, week_count, week_days_count];
+            //weekly_granularity[j]["data"][weekly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, week_count, week_days_count];
+            weekly_granularity[j]["data"].push([formattedDate.unix() * 1000, week_count, week_days_count])
             // add the remaining days of the month
-            monthly_granularity[j]["data"][monthly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, month_count, month_days_count];
+            //monthly_granularity[j]["data"][monthly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, month_count, month_days_count];
+            monthly_granularity[j]["data"].push([formattedDate.unix() * 1000, month_count, month_days_count])
 
         }
 
@@ -1533,6 +1319,9 @@
 
         countlyCommon.previous_period_length = daily_granularity[0].data.length;
 
+        console.log("============== daily_granularity ==================");
+        console.log(daily_granularity);
+
         return {
             "chartDP"        : chartData,
             "daily_granularity"   : daily_granularity,
@@ -1542,7 +1331,25 @@
             "keyEvents"   : keyEvents,
             "time_period" : countlyCommon.periodObj.currentPeriodArr,
             "time_format" : countlyCommon.periodObj.dateString,
-            "previous_period_length" : previous_period_length
+            "previous_period_length" : previous_period_length,
+            get_current_data : function(granularity){
+
+                switch(granularity)
+                {
+                    case "daily":
+                        return daily_granularity;
+                    break;
+
+                    case "weekly":
+                        return weekly_granularity;
+                    break;
+
+                    case "monthly":
+                        return monthly_granularity;
+                    break;
+                }
+
+            }
         };
     };
 

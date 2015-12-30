@@ -1,4 +1,4 @@
-var granularity = React.createClass({
+var Granularity = React.createClass({
 
     getInitialState: function() {
 
@@ -29,6 +29,10 @@ var granularity = React.createClass({
         }
 
         list.push(monthly);
+
+        /*
+            detect click and direction of mouse movement
+        */
 
         document.getElementById("weekly_extend_block").getElementsByClassName("small")[0].addEventListener("click", function(){
             self.extend_click(self.state.list[1]);
@@ -105,8 +109,6 @@ var granularity = React.createClass({
 
         console.log("granularity click:", granularity);
 
-        $(event_emitter).trigger('granularity', granularity);
-
         var new_list = [];
 
         for (var i = 0; i < this.state.list.length; i++)
@@ -129,6 +131,8 @@ var granularity = React.createClass({
         this.setState({
             list : new_list
         });
+
+        $(event_emitter).trigger('granularity', granularity);
 
     },
 
@@ -217,7 +221,7 @@ var granularity = React.createClass({
     },
 
     find_top_position : function(id) {
-      
+
         var node = document.getElementById(id);
 
         if (!node)
@@ -329,6 +333,7 @@ var granularity = React.createClass({
         }
 
         return (
+            <div className={this.props.class_name}>
             <div className={block_class_name} onMouseEnter={self.onhover_all_block} onMouseMove={self.onmousemove} onMouseLeave={self.onhoverend_all_block}>
                 {this.state.list.map(function(element) {
 
@@ -379,6 +384,7 @@ var granularity = React.createClass({
                         }
                     }
                 })}
+            </div>
             </div>
 
         );

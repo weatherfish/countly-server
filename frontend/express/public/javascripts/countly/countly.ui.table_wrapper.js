@@ -2,29 +2,12 @@ var TableWrapper = React.createClass({
 
     getInitialState : function() {
 
-        //var rows = this.convert_rows(this.props.rows);
-
         return {
             sortBy  : 'date',
             sortDir : null,
         };
     },
-/*
-    convert_rows : function(rows)
-    {
-        var converted_rows = [];
 
-        for (var i = 0; i < rows[0].data.length; i++)
-        {
-
-            for (var j = 0; j < rows.length; j++)
-            {
-
-            }
-
-        }
-    }
-*/
     filterFunction : function(filter)
     {
 
@@ -70,7 +53,12 @@ var TableWrapper = React.createClass({
                 <TableFilter filter_function={this.filterFunction} className="table_filter_wrapper" />
 
                 <div className="sort_table_wrapper">
-                    <SortTable rows={rows} width={this.props.width}/>
+                    <SortTable
+                        rows={rows}
+                        width={this.props.width}
+                        headers={this.props.headers}
+                        row_height={this.props.row_height}
+                    />
                 </div>
 
             </div>
@@ -82,5 +70,7 @@ var TableWrapper = React.createClass({
     <table id="dataTableTwo" class="d-table help-zone-vb" cellpadding="0" cellspacing="0" data-help-localize="help.{{{table-helper}}}"></table>
     {{/if}}
     */
+/*
 
+*/
 });

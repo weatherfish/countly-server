@@ -2,10 +2,56 @@ var GraphWrapper = React.createClass({
 
     getInitialState() {
 
+        var zero_points = true;
+
+        this.props.granularity_rows.every(function(datapath){
+
+            datapath.data.every(function(datapoint){
+
+                var value = datapoint[1];
+
+                if (value > 0)
+                {
+                    zero_points = false;
+                    return false;
+                }
+
+                return true;
+            });
+
+            if (!zero_points)
+            {
+                return false;
+            }
+
+            return true;
+
+        });
+
+        countlyCommon.drawTimeGraph(this.props.granularity_rows, "#dashboard-graph", this.props.big_numbers, (this.props.graph_width - 60),this.props.height, false, this.props.granularity, false, zero_points);
+
         return {
             big_numbers : this.props.big_numbers,
             active : true
         };
+    },
+
+    componentWillMount: function() {
+
+        $(event_emitter).on('granularity', function(e, granularity_type){
+
+            this.update(-1, granularity_type);
+
+        }.bind(this));
+
+        $(event_emitter).on('date_choise', function(e, period){
+
+            var updated_data = this.update(-1, false);
+
+            var rows = updated_data.rows;
+            var granularity = updated_data.new_granularity;
+
+        }.bind(this));
     },
 
     big_number_render : function() {
@@ -45,8 +91,6 @@ var GraphWrapper = React.createClass({
 
             var dots_class_name = "dot_" + data.color.replace("#", "");
 
-            //console.log("dots_class_name:", dots_class_name);
-
             for (var i = 0; i < document.getElementsByClassName("one_dot").length; i++)
             {
                 if (this.hasClass(document.getElementsByClassName("one_dot")[i], dots_class_name)){
@@ -57,13 +101,6 @@ var GraphWrapper = React.createClass({
                     document.getElementsByClassName("one_dot")[i].style.opacity = 0.2;
                 }
             }
-/*
-            for (var i = 0; i < document.getElementsByClassName(dots_class_name).length; i++)
-            {
-                //document.getElementsByClassName(dots_class_name)[i].style.opacity = "1 !important";
-                document.getElementsByClassName(dots_class_name)[i].style.fill = "red";
-            }
-*/
         }
         else
         {
@@ -80,33 +117,25 @@ var GraphWrapper = React.createClass({
         }
     },
 
-    hasClass : function(el, cls) {
-        return el.className.baseVal && new RegExp("(\\s|^)" + cls + "(\\s|$)").test(el.className.baseVal);
-    },
-
-    update : function(id, granularity_changed){
+    update : function(id, new_granularity){
 
         var big_numbers = this.state.big_numbers;
 
-        console.log("--->>> update --->>>", id);
-        console.log(big_numbers);
-
         if (id > -1)
         {
-
             big_numbers[id].active = !big_numbers[id].active;
+        }
 
-            var active = false;
-            var no_data = true;
+        var active = false;
+        var no_data = true;
 
-            for (var i = 0; i < big_numbers.length; i++)
+        for (var i = 0; i < big_numbers.length; i++)
+        {
+            if (big_numbers[i].active)
             {
-                if (big_numbers[i].active)
-                {
-                    active = true;
-                    no_data = false;
-                    break;
-                }
+                active = true;
+                no_data = false;
+                break;
             }
         }
 
@@ -118,23 +147,38 @@ var GraphWrapper = React.createClass({
 
         var time_range_difference = sessionDP.previous_period_length / sessionDP.daily_granularity[0].data.length;
 
-        if (!granularity_changed && id == -1 && (time_range_difference < 0.5 || time_range_difference > 2)) // auto granularity is active, event from date selection
+        if (!new_granularity && id == -1 && (time_range_difference < 0.5 || time_range_difference > 2))
         {
+
+            /*
+                auto granularity is active, event from date selection
+            */
 
             if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
             {
-                _granularity = "monthly";
+                var new_granularity = "monthly";
             }
             else if ((sessionDP.daily_granularity[0].data.length * _circle_radius * 2 * 2) > this.props.graph_width)
             {
-                _granularity = "weekly";
+                var new_granularity = "weekly";
             }
             else {
-                _granularity = "daily";
+                var new_granularity = "daily";
             }
         }
-        else if (_granularity == "daily")
+
+        if (new_granularity == "weekly")
         {
+            var granularity_rows = sessionDP.weekly_granularity;
+        }
+        else if (new_granularity == "monthly")
+        {
+            var granularity_rows = sessionDP.monthly_granularity;
+        }
+        else
+        {
+            var granularity_rows = sessionDP.daily_granularity;
+
             if ((sessionDP.daily_granularity[0].data.length * _circle_radius * 2 * 2) > this.props.graph_width)
             {
                 var small_circles = true;
@@ -145,19 +189,8 @@ var GraphWrapper = React.createClass({
             }
         }
 
-        if (_granularity == "weekly")
-        {
-            var granularity_rows = sessionDP.weekly_granularity;
-        }
-        else if (_granularity == "monthly")
-        {
-            var granularity_rows = sessionDP.monthly_granularity;
-        }
-        else
-        {
-            var granularity_rows = sessionDP.daily_granularity;
-        }
-        
+        console.log("----------- granularity_rows ------------");
+        console.log(granularity_rows);
 
         var zero_points = true;
 
@@ -185,7 +218,7 @@ var GraphWrapper = React.createClass({
 
         });
 
-        if (no_data) // todo: what is "no_data" ?
+        if (no_data)
         {
             zero_points = true;
         }
@@ -218,9 +251,6 @@ var GraphWrapper = React.createClass({
             }
         }
 
-        console.log("+++++++++++++++ active_array +++++++++++++++");
-        console.log(active_array);
-
         //countlyCommon.updateTimeGraph(active_array, "#dashboard-graph", big_numbers, false, _granularity, small_circles, zero_points);
         this.props.update_graph_function(active_array, "#dashboard-graph", big_numbers, false, _granularity, small_circles, zero_points);
 
@@ -228,6 +258,11 @@ var GraphWrapper = React.createClass({
             big_numbers : big_numbers,
             active : active
         });
+
+        return {
+            rows : granularity_rows,
+            granularity : new_granularity
+        }
 
     },
 
@@ -262,8 +297,9 @@ var GraphWrapper = React.createClass({
         return (
             <div>
                 <div className="trend_name">{this.props.trend_sign}</div>
-                <granularity
-                    className={granularity_class_name}
+
+                <Granularity
+                    class_name={granularity_class_name}
                     data={this.props.data}
                     graph_width={this.props.graph_width}
                     type={this.props.granularity}
@@ -285,6 +321,10 @@ var GraphWrapper = React.createClass({
 
             </div>
         )
+    },
+
+    hasClass : function(el, cls) {
+        return el.className.baseVal && new RegExp("(\\s|^)" + cls + "(\\s|$)").test(el.className.baseVal);
     },
 
 });
