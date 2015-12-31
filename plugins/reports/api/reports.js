@@ -10,6 +10,7 @@ var reports = {},
     mail = require("../../../api/parts/mgmt/mail"),
     plugins = require("../../pluginManager"),
     countlyCommon = require('../../../api/lib/countly.common.js'),
+    localize = require('../../../api/utils/localization.js'),
     versionInfo = require('../../../frontend/express/version.info');
     
 versionInfo.page = (!versionInfo.title) ? "http://count.ly" : null;
@@ -71,18 +72,23 @@ var metrics = {
                 if(member)
                     report.apps = sortBy(report.apps, member.appSortList || []);
                 var endDate = new Date();
+                endDate.setDate(endDate.getDate()-1);
+                endDate.setHours(23, 59);
                 report.end = endDate.getTime();
-                report.start = report.end - 24*60*60*1000;
+                report.start = report.end - 24*60*59*1000;
                 if(report.frequency == "weekly")
-                    report.start = report.end - 7*24*60*60*1000;
+                    report.start = report.end - 7*24*60*59*1000;
                 
                 var startDate = new Date(report.start);
                 report.date = startDate.getDate()+" "+months[startDate.getMonth()];
-                if(report.frequency == "weekly")
+                report.period = "yesterday";
+                if(report.frequency == "weekly"){
+                    report.period = "["+report.start+","+report.end+"]";
                     report.date += " - "+endDate.getDate()+" "+months[endDate.getMonth()];
+                }
                 
                 function appIterator(app_id, done){
-                    var params = {qstring:{period:"["+report.start+","+report.end+"]"}};
+                    var params = {qstring:{period:report.period}};
                     if(!cache[app_id]){
                         function metricIterator(metric, done){
                             if(metric.indexOf("events") == 0){
@@ -204,26 +210,27 @@ var metrics = {
                                             callback(err, {report:report});
                                     }
                                     else{
+                                        member.lang = member.lang || "en";
                                         //get language property file
-                                        fs.readFile(dir+'/localization/reports.properties', 'utf8', function (err,properties) {
+                                        localize.getProperties(member.lang, function (err,props) {
                                             if (err) {
-                                            if(callback)
-                                                callback(err, {report:report});
+                                                if(callback)
+                                                    callback(err, {report:report});
                                             }
                                             else{
-                                            var props = parser.parse(properties);
-                                            report.properties = props;
-                                            var allowedMetrics = {};
-                                            for(var i in report.metrics){
-                                                if(metrics[i]){
-                                                    for(var j in metrics[i]){
-                                                        allowedMetrics[j] = true;
+                                                report.properties = props;
+                                                var allowedMetrics = {};
+                                                for(var i in report.metrics){
+                                                    if(metrics[i]){
+                                                        for(var j in metrics[i]){
+                                                            allowedMetrics[j] = true;
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            var message = ejs.render(template, {"apps":results, "host":host, "report":report, "version":versionInfo, "properties":props, metrics:allowedMetrics});
-                                            if(callback)
-                                                callback(err, {"apps":results, "host":host, "report":report, "version":versionInfo, "properties":props, message:message});
+                                                var message = ejs.render(template, {"apps":results, "host":host, "report":report, "version":versionInfo, "properties":props, metrics:allowedMetrics});
+                                                if(callback){
+                                                    callback(err, {"apps":results, "host":host, "report":report, "version":versionInfo, "properties":props, message:message});
+                                                }
                                             }
                                         });
                                     }

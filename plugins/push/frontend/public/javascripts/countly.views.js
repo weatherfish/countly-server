@@ -234,7 +234,7 @@ var PushPopup = function(message, duplicate, dontReplaceApp) {
             test: message.test,
             date: message.date,
             sent: message.sent,
-            conditions: message.conditions === '{}' ? undefined : message.conditions,
+            conditions: message.conditions === '{}' ? undefined : (typeof message.conditions === 'string' ? JSON.parse(message.conditions) : message.conditions),
             geo: typeof message.geo === 'undefined' ? undefined : ((typeof message.geo === 'string' && message.geo) ? message.geo : undefined),
             noTests: false,
             noApps: false,
@@ -526,7 +526,11 @@ var PushPopup = function(message, duplicate, dontReplaceApp) {
         content.find('.view-date .view-value').text(message.date ? moment(message.date).format(fmt) : '');
         content.find('.view-sent .view-value').text(message.sent ? moment(message.sent).format(fmt) : '');
     } else {
-        var hidePicker = function(){
+        //ignore clicks inside calendar
+        content.find(".date-picker-push").click(function(e){
+            e.stopPropagation();
+        });
+        var hidePicker = function(e){
             $(document.body).off('click', hidePicker);
             content.find(".date-picker-push").hide();
         };
@@ -1102,6 +1106,13 @@ function pushAppMgmt(){
     $(".app-details table tr.table-edit").before(managementAdd);
     app.localize();
     var appId = countlyCommon.ACTIVE_APP_ID;
+    
+    if(!countlyGlobal["apps"][appId] || countlyGlobal["apps"][appId].type == "mobile"){
+        $(".appmng-push").show();
+    } 
+    else{
+        $(".appmng-push").hide();
+    }
 
     if (!appId) { return; }
 
@@ -1243,83 +1254,122 @@ function pushAppMgmt(){
     });
 };
 
-if(managementAdd == "")
-    app.addPageScript("/manage/apps", function(){
+app.addPageScript("/manage/apps", function(){
+    if(managementAdd == "")
         $.get(countlyGlobal["path"]+'/push/templates/push-management.html', function(src){
             managementAdd = src;
             pushAppMgmt();
         });
-    });
-else
-    app.addPageScript("/manage/apps", pushAppMgmt);
+    else
+        pushAppMgmt();
+});
+
+app.addAppManagementSwitchCallback(function(appId, type){
+    if(type == "mobile"){
+        $(".appmng-push").show();
+    } 
+    else{
+        $(".appmng-push").hide();
+    }
+});
 
 app.addPageScript("/drill", function(){
-    $("#bookmark-filter").after(
-    '<div id="create-message-connector" style="display:none; float:left; height:1px; border-top:1px solid #999; width:50px; margin-top:14px; margin-left:5px;"></div>'+
-    '<a class="icon-button green btn-header btn-create-message" data-localize="push.create" style="display:none"></a>');
-    app.localize();
-    $('.btn-create-message').off('click').on('click', function(){
-        var filterData = app.drillView.getFilterObjAndByVal();
-        var message = {
-            apps: [countlyCommon.ACTIVE_APP_ID],
-            platforms: [],
-            conditions: {}
-        };
-
-        for (var k in filterData.dbFilter) {
-            if (k.indexOf('up.') === 0) message.conditions[k.substr(3)] = filterData.dbFilter[k];
-        }
-
-        PushPopup(message, false, true);
-    });
-    $("#bookmark-view").on("click", ".bookmark-action.send", function() {
-        var filter = $(this).data("query");
-
-        var message = {
-            apps: [countlyCommon.ACTIVE_APP_ID],
-            platforms: [],
-            conditions: {}
-        };
-
-        for (var k in filter) {
-            if (k.indexOf('up.') === 0) message.conditions[k.substr(3)] = filter[k];
-        }
-
-        PushPopup(message, false, true);
-    });
+    if(countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID].type == "mobile"){
+        $("#bookmark-filter").after(
+        '<div id="create-message-connector" style="display:none; float:left; height:1px; border-top:1px solid #999; width:50px; margin-top:14px; margin-left:5px;"></div>'+
+        '<a class="icon-button green btn-header btn-create-message" data-localize="push.create" style="display:none"></a>');
+        app.localize();
+        $('.btn-create-message').off('click').on('click', function(){
+            var filterData = app.drillView.getFilterObjAndByVal();
+            var message = {
+                apps: [countlyCommon.ACTIVE_APP_ID],
+                platforms: [],
+                conditions: {}
+            };
+    
+            for (var k in filterData.dbFilter) {
+                if (k.indexOf('up.') === 0) message.conditions[k.substr(3).replace("cmp_","cmp.")] = filterData.dbFilter[k];
+            }
+    
+            PushPopup(message, false, true);
+        });
+        $("#bookmark-view").on("click", ".bookmark-action.send", function() {
+            var filter = $(this).data("query");
+    
+            var message = {
+                apps: [countlyCommon.ACTIVE_APP_ID],
+                platforms: [],
+                conditions: {}
+            };
+    
+            for (var k in filter) {
+                if (k.indexOf('up.') === 0) message.conditions[k.substr(3).replace("cmp_","cmp.")] = filter[k];
+            }
+    
+            PushPopup(message, false, true);
+        });
+    }
 });
 
 app.addPageScript("/users/#", function(){
-    var userDetails = countlyUserdata.getUserdetails();
-
-    var platforms = [], test = false, prod = false;
-    if (userDetails.tk) {
-        if (userDetails.tk.id || userDetails.tk.ia || userDetails.tk.ip) { platforms.push('i'); }
-        if (userDetails.tk.at || userDetails.tk.ap) { platforms.push('a'); }
-
-        test = !!userDetails.tk.id || !!userDetails.tk.ia || !!userDetails.tk.at;
-        prod = !!userDetails.tk.ip || !!userDetails.tk.ap;
-    }
-    if (platforms.length) {
-        if (!$('.btn-create-message').length) {
-            $('.widget-header .left').append($('<a class="icon-button green btn-header left btn-create-message" data-localize="push.create"></a>').text(jQuery.i18n.map['push.create']));
+    if(countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID].type == "mobile"){
+        //check if it is profile view
+        if(app.activeView.updateEngagement){
+            var userDetails = countlyUserdata.getUserdetails();
+        
+            var platforms = [], test = false, prod = false;
+            if (userDetails.tk) {
+                if (userDetails.tk.id || userDetails.tk.ia || userDetails.tk.ip) { platforms.push('i'); }
+                if (userDetails.tk.at || userDetails.tk.ap) { platforms.push('a'); }
+        
+                test = !!userDetails.tk.id || !!userDetails.tk.ia || !!userDetails.tk.at;
+                prod = !!userDetails.tk.ip || !!userDetails.tk.ap;
+            }
+            if (platforms.length) {
+                if (!$('.btn-create-message').length) {
+                    $('.widget-header .left').append($('<a class="icon-button green btn-header left btn-create-message" data-localize="push.create"></a>').text(jQuery.i18n.map['push.create']));
+                }
+                $('.btn-create-message').show().off('click').on('click', function(){
+                    PushPopup({
+                        platforms: platforms,
+                        apps: [countlyCommon.ACTIVE_APP_ID],
+                        test: test && !prod,
+                        conditions: {_id: app.userdetailsView.user_id}
+                    }, true, true);
+                });
+            } else {
+                $('.btn-create-message').hide();
+            }
         }
-        $('.btn-create-message').show().off('click').on('click', function(){
-            PushPopup({
-                platforms: platforms,
-                apps: [countlyCommon.ACTIVE_APP_ID],
-                test: test && !prod,
-                conditions: {_id: app.userdetailsView.user_id}
-            }, true, true);
-        });
-    } else {
-        $('.btn-create-message').hide();
+        else{
+            //list view
+            if (!$('.btn-create-message').length) {
+                $('.widget-header .left').append($('<a class="icon-button green btn-header left btn-create-message" data-localize="push.create"></a>').text(jQuery.i18n.map['push.create']));
+            }
+            $('.btn-create-message').off('click').on('click', function(){
+                //drill filter
+                var filterData = app.userdataView._query || {};
+                
+                //known/anonymous filter
+                if(app.userdataView.filter == "user-known")
+                    filterData["hasInfo"] = true;
+                else if(app.userdataView.filter == "user-anonymous")
+                    filterData["hasInfo"] = {"$ne": true};
+                
+                //text search filter
+                if($('.dataTables_filter input').val().length)
+                    filterData["$text"] = { "$search": "\""+$('.dataTables_filter input').val()+"\"" };
+                
+                var message = {
+                    apps: [countlyCommon.ACTIVE_APP_ID],
+                    platforms: [],
+                    conditions: filterData
+                };
+                
+                PushPopup(message, false, true);
+            });
+        }
     }
-});
-
-app.addPageScript("/messaging/messages", function(){
-    $("#sidebar-app-select").addClass("disabled");
-    $("#sidebar-app-select").removeClass("active");
 });
 
 $( document ).ready(function() {
@@ -1352,8 +1402,8 @@ $( document ).ready(function() {
             '<div class="text" data-localize="push.sidebar.messages">Messages</div>'+
         '</a>'+
     '</div>';
-    if($('#management-menu').length)
-        $('#management-menu').before(menu);
+    if($('#mobile-type #management-menu').length)
+        $('#mobile-type #management-menu').before(menu);
     else
-        $('#sidebar-menu').append(menu);
+        $('#mobile-type').append(menu);
 });

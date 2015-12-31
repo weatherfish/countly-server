@@ -48,6 +48,7 @@ var fetch = {},
         if (params.qstring.date == "today") {
             fetchFields[params.time.daily + "." + common.dbMap.count] = 1;
             fetchFields[params.time.daily + "." + common.dbMap.sum] = 1;
+            fetchFields[params.time.daily + "." + common.dbMap.dur] = 1;
         }
 
         var idToFetch = params.qstring.segmentation || "no-segment";
@@ -466,9 +467,6 @@ var fetch = {},
 
             var iso2 = geo_data.iso2;
 
-            console.log("=============== fetch geo_data ===========");
-            console.log(geo_data);
-
             var patch = fs.readFileSync('./countries_geo_patch.json', 'utf8');
             patch = JSON.parse(patch);
             patch = patch[iso2];
@@ -563,9 +561,6 @@ var fetch = {},
 
             geo_data.lat = (geo_data.location_box.min_lat + geo_data.location_box.max_lat) / 2;
             geo_data.lon = (geo_data.location_box.min_lon + geo_data.location_box.max_lon) / 2;
-
-            //console.log("========== patch =======");
-            //console.log(patch);
 
             callback(err, geo_data);
         });
@@ -710,7 +705,7 @@ var fetch = {},
                                     if (typeof dataObjects[i]['d'][day][prop] === 'object') {
                                         for (var secondLevel in dataObjects[i]['d'][day][prop]) {
                                             if (secondLevel == common.dbMap.total || secondLevel == common.dbMap.new ||
-                                                secondLevel == common.dbEventMap.count || secondLevel == common.dbEventMap.sum) {
+                                                secondLevel == common.dbEventMap.count || secondLevel == common.dbEventMap.sum || secondLevel == common.dbEventMap.duration) {
                                                 if (!mergedDataObj[year][month][prop]) {
                                                     mergedDataObj[year][month][prop] = {};
                                                 }
@@ -734,7 +729,8 @@ var fetch = {},
                                         }
                                     } else if (prop == common.dbMap.total || prop == common.dbMap.new ||
                                         prop == common.dbMap.duration || prop == common.dbMap.events ||
-                                        prop == common.dbEventMap.count || prop == common.dbEventMap.sum) {
+
+                                        prop == common.dbEventMap.count || prop == common.dbEventMap.sum || prop == common.dbEventMap.duration) {
 
                                         if (mergedDataObj[year][month][prop]) {
                                             mergedDataObj[year][month][prop] += dataObjects[i]['d'][day][prop];

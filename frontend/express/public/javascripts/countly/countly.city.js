@@ -166,9 +166,6 @@
                             "location_box"    : json.location_box
                         }
 
-                        console.log("=========== zoomParams ===========");
-                        console.log(zoomParams);
-
                         draw(options.metric, zoomParams);
 
                     }
@@ -195,6 +192,8 @@
                 {
                     "name":"city",
                     "func":function (rangeArr, dataObj) {
+                        if(rangeArr == "Unknown")
+                            return jQuery.i18n.map["common.unknown"];
                         return rangeArr;
                     }
                 },
@@ -256,6 +255,8 @@
             {
                 "name":"city",
                 "func":function (rangeArr, dataObj) {
+                    if(rangeArr == "Unknown")
+                        return jQuery.i18n.map["common.unknown"];
                     return rangeArr;
                 }
             },
@@ -272,13 +273,12 @@
         var maxMetric = 0;
 
         chartData.rows = _.map(tt.chartData, function (value, key, list) {
-            if (value.city == "Unknown") {
-                return {};
-            }
 
-            if (value[ob.metric] > maxMetric)
-            {
-                maxMetric = value[ob.metric];
+            if (value.city == jQuery.i18n.map["common.unknown"]) {
+                return {c:[
+                    {v:""},
+                    {v:value[ob.metric]}
+                ]};
             }
 
             return {

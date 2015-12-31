@@ -126,7 +126,7 @@
         if (countryName) {
             return countryName;
         } else {
-            return "Unknown";
+            return jQuery.i18n.map["common.unknown"] || "Unknown";
         }
     };
 
@@ -223,10 +223,11 @@
 
         chartData.rows = _.map(tt.chartData, function (value, key, list) {
 
-            if (value.country == "European Union" || value.country == "Unknown" || value.code == "Unknown") {
-                return {
-                    /* todo */
-                };
+            if (value.country == "European Union" || value.country == jQuery.i18n.map["common.unknown"]) {
+                return {c:[
+                    {v:""},
+                    {v:value[ob.metric]}
+                ]};
             }
 
             if (value[ob.metric] > maxMetric)

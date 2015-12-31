@@ -3,9 +3,15 @@ var common = {},
     time = require('time')(Date),
     crypto = require('crypto'),
     mongo = require('mongoskin'),
+    logger = require('./log.js'),
+    plugins = require('../../plugins/pluginManager.js'),
     countlyConfig = require('./../config');
 
 (function (common) {
+
+    var log = logger('common');
+
+    common.log = logger;
 
     common.dbMap = {
         'events': 'e',
@@ -17,6 +23,7 @@ var common = {},
         'frequency': 'f',
         'loyalty': 'l',
         'sum': 's',
+        'dur': 'dur',
         'count': 'c'
     };
 
@@ -39,6 +46,7 @@ var common = {},
         'last_begin_session_timestamp': 'lbst',
         'last_end_session_timestamp': 'lest',
         'has_ongoing_session': 'hos',
+        'previous_events': 'pe',
         'resolution': 'r'
     };
 
@@ -47,40 +55,12 @@ var common = {},
         'timestamp':'ts',
         'segmentations':'sg',
         'count':'c',
-        'sum':'s'
+        'sum':'s',
+        'duration': 'dur',
+        'previous_events': 'pe'
     };
-
-    //mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]
-    var dbName;
-    var dbOptions = {
-        server:{auto_reconnect:true, poolSize: countlyConfig.mongodb.max_pool_size, socketOptions: { keepAlive: 30000, connectTimeoutMS: 0, socketTimeoutMS: 0 }},
-        replSet:{socketOptions: { keepAlive: 30000, connectTimeoutMS: 0, socketTimeoutMS: 0 }},
-        mongos:{socketOptions: { keepAlive: 30000, connectTimeoutMS: 0, socketTimeoutMS: 0 }}
-    };
-    if (typeof countlyConfig.mongodb === "string") {
-        dbName = countlyConfig.mongodb;
-    } else{
-		countlyConfig.mongodb.db = countlyConfig.mongodb.db || 'countly';
-		if ( typeof countlyConfig.mongodb.replSetServers === 'object'){
-			//mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
-			dbName = countlyConfig.mongodb.replSetServers.join(",")+"/"+countlyConfig.mongodb.db;
-			if(countlyConfig.mongodb.replicaName){
-				dbOptions.replSet.rs_name = countlyConfig.mongodb.replicaName;
-			}
-		} else {
-			dbName = (countlyConfig.mongodb.host + ':' + countlyConfig.mongodb.port + '/' + countlyConfig.mongodb.db);
-		}
-	}
-	if(countlyConfig.mongodb.username && countlyConfig.mongodb.password){
-		dbName = countlyConfig.mongodb.username + ":" + countlyConfig.mongodb.password +"@" + dbName;
-	}
-	if(dbName.indexOf("mongodb://") !== 0){
-		dbName = "mongodb://"+dbName;
-	}
-    common.db = mongo.db(dbName, dbOptions);
-	common.db._emitter.setMaxListeners(0);
-	if(!common.db.ObjectID)
-		common.db.ObjectID = mongo.ObjectID;
+    
+    common.db = plugins.dbConnection(countlyConfig);
 
     common.config = countlyConfig;
 
@@ -189,6 +169,9 @@ var common = {},
         var currTimestamp,
             currDate,
             currDateWithoutTimestamp = new Date();
+            
+        if(common.isNumber(reqTimestamp))
+            reqTimestamp = Math.round(reqTimestamp);
 
         // Check if the timestamp parameter exists in the request and is a 10 or 13 digit integer
         if (reqTimestamp && (reqTimestamp + "").length === 10 && common.isNumber(reqTimestamp)) {
@@ -394,13 +377,13 @@ var common = {},
             params.res.end();
         }
     };
-	
-	common.getIpAddress = function(req) {
-		var ipAddress = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
-	
-		/* Since x-forwarded-for: client, proxy1, proxy2, proxy3 */
-		return ipAddress.split(',')[0];
-	};
+    
+    common.getIpAddress = function(req) {
+        var ipAddress = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection.remoteAddress || req.socket.remoteAddress || (req.connection.socket ? req.connection.socket.remoteAddress : '');
+    
+        /* Since x-forwarded-for: client, proxy1, proxy2, proxy3 */
+        return ipAddress.split(',')[0];
+    };
 
     common.fillTimeObjectZero = function (params, object, property, increment) {
         var tmpIncrement = (increment) ? increment : 1,
@@ -444,7 +427,7 @@ var common = {},
         return true;
     };
 
-    common.fillTimeObjectMonth = function (params, object, property, increment) {
+    common.fillTimeObjectMonth = function (params, object, property, increment, forceHour) {
         var tmpIncrement = (increment) ? increment : 1,
             timeObj = params.time;
 
@@ -458,14 +441,14 @@ var common = {},
 
                 // If the property parameter contains a dot, hourly data is not saved in
                 // order to prevent two level data (such as 2012.7.20.TR.u) to get out of control.
-                if (property[i].indexOf('.') === -1) {
+                if (forceHour || property[i].indexOf('.') === -1) {
                     object['d.' + timeObj.day + '.' + timeObj.hour + '.' + property[i]] = tmpIncrement;
                 }
             }
         } else {
             object['d.' + timeObj.day + '.' + property] = tmpIncrement;
 
-            if (property.indexOf('.') === -1) {
+            if (forceHour || property.indexOf('.') === -1) {
                 object['d.' + timeObj.day + '.' + timeObj.hour + '.' + property] = tmpIncrement;
             }
         }
@@ -615,24 +598,35 @@ var common = {},
         }
     };
 
-    // getter/setter for dot notatons:
-    // getter: dot({a: {b: {c: 'string'}}}, 'a.b.c') === 'string'
-    // getter: dot({a: {b: {c: 'string'}}}, ['a', 'b', 'c']) === 'string'
-    // setter: dot({a: {b: {c: 'string'}}}, 'a.b.c', 5) === 5
-    // getter: dot({a: {b: {c: 'string'}}}, 'a.b.c') === 5
-    common.dot = function(obj, is, value) {
-        if (typeof is == 'string') {
-            return common.dot(obj,is.split('.'), value);
-        } else if (is.length==1 && value!==undefined) {
-            obj[is[0]] = value;
-            return value;
-        } else if (is.length==0) {
-            return obj;
-        } else if (!obj) {
-            return obj;
-        } else {
-            return common.dot(obj[is[0]],is.slice(1), value);
+    // Return plain object with key set to value
+    common.o = function() {
+        var o = {};
+        for (var i = 0; i < arguments.length; i += 2) {
+            o[arguments[i]] = arguments[i + 1];
         }
+        return o;
+    };
+
+    // Return index of array element with property = value
+    common.indexOf = function(array, property, value) {
+        for (var i = 0; i < array.length; i += 1) {
+            if (array[i][property] === value) { return i; }
+        }
+        return -1;
+    };
+
+    common.optional = function(module, options){
+        try {
+            if (module[0] in {'.': 1}) {
+                module = process.cwd() + module.substr(1);
+            }
+            return require(module);
+        } catch(err) { 
+            if (err.code !== 'MODULE_NOT_FOUND' && options && options.rethrow) {
+                throw err;
+            }
+        }
+        return null;
     };
 
 }(common));

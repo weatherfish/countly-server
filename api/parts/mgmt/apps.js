@@ -71,6 +71,7 @@ var appsApi = {},
         var argProps = {
                 'name':     { 'required': true, 'type': 'String' },
                 'country':  { 'required': false, 'type': 'String' },
+                'type':     { 'required': false, 'type': 'String' },
                 'category': { 'required': false, 'type': 'String' },
                 'timezone': { 'required': false, 'type': 'String' }
             },
@@ -84,15 +85,15 @@ var appsApi = {},
         processAppProps(newApp);
 
         common.db.collection('apps').insert(newApp, function(err, app) {
-            var appKey = common.sha1Hash(app[0]._id, true);
+            var appKey = common.sha1Hash(app.ops[0]._id, true);
 
-            common.db.collection('apps').update({'_id': app[0]._id}, {$set: {key: appKey}}, function(err, app) {});
+            common.db.collection('apps').update({'_id': app.ops[0]._id}, {$set: {key: appKey}}, function(err, app) {});
 
-            newApp._id = app[0]._id;
+            newApp._id = app.ops[0]._id;
             newApp.key = appKey;
 
-            common.db.collection('app_users' + app[0]._id).insert({_id:"uid-sequence", seq:0},function(err,res){});
-			plugins.dispatch("/i/apps/create", {params:params, appId:app[0]._id, data:app[0]});
+            common.db.collection('app_users' + app.ops[0]._id).insert({_id:"uid-sequence", seq:0},function(err,res){});
+			plugins.dispatch("/i/apps/create", {params:params, appId:app.ops[0]._id, data:app.ops[0]});
             common.returnOutput(params, newApp);
         });
     };
@@ -101,6 +102,7 @@ var appsApi = {},
         var argProps = {
                 'app_id':   { 'required': true, 'type': 'String', 'min-length': 24, 'max-length': 24, 'exclude-from-ret-obj': true },
                 'name':     { 'required': false, 'type': 'String' },
+                'type':     { 'required': false, 'type': 'String' },
                 'category': { 'required': false, 'type': 'String' },
                 'timezone': { 'required': false, 'type': 'String' },
                 'country':  { 'required': false, 'type': 'String' }
@@ -164,7 +166,7 @@ var appsApi = {},
 			if(!err && app)
 				common.db.collection('apps').remove({'_id': common.db.ObjectID(appId)}, {safe: true}, function(err, result) {
 		
-					if (!result) {
+					if (err) {
 						common.returnMessage(params, 500, 'Error deleting app');
 						return false;
 					}
@@ -296,8 +298,6 @@ var appsApi = {},
                         segments = events.segments[events.list[i]];
                     
                     segments.push("no-segment");
-                    console.log(segments);
-                    console.log(dates);
                     var docs = [];
                     for(var j = 0; j < segments.length; j++){
                         for(var k = 0; k < dates.length; k++){

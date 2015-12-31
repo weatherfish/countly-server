@@ -5,7 +5,18 @@ var countlyConfig = {
         port: 27017,
         max_pool_size: 500,
 		//username: test,
-		//password: test
+		//password: test,
+        //mongos: false,
+        /*
+        dbOptions:{
+            //db options
+            native_parser: true
+        },
+        serverOptions:{
+            //server options
+            ssl:false
+        }
+        */
     },
     /*  or for a replica set
     mongodb: {
@@ -17,7 +28,15 @@ var countlyConfig = {
         db: "countly",
 		username: test,
 		password: test,
-        max_pool_size: 1000
+        max_pool_size: 1000,
+        dbOptions:{
+            //db options
+            native_parser: true
+        },
+        serverOptions:{
+            //server options
+            ssl:false
+        }
     },
     */
     /*  or define as a url
@@ -29,7 +48,11 @@ var countlyConfig = {
         host: "localhost",
         max_sockets: 1024
     },
-	path: ""
+	path: "",
+    logging: {
+        info: ["jobs", "push"],
+        default: "warn"
+    }
 };
 
 // Set your host IP or domain to be used in the emails sent

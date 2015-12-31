@@ -10,15 +10,16 @@
         _initialized = false,
 		_periodObj = {},
 		_metrics = {},
+        _lastId = null,
         _usable_metrics = {};
         
-    if(countlyGlobal.member && countlyGlobal.member.api_key){
+    countlyCrashes.loadList = function (id) {
         $.ajax({
             type:"GET",
             url:countlyCommon.API_PARTS.data.r,
             data:{
                 "api_key":countlyGlobal.member.api_key,
-                "app_id":countlyCommon.ACTIVE_APP_ID,
+                "app_id":id,
                 "method":"crashes",
                 "list":1
             },
@@ -29,6 +30,10 @@
                 }
             }
         });
+    }
+    
+    if(countlyGlobal.member && countlyGlobal.member.api_key){
+        countlyCrashes.loadList(countlyCommon.ACTIVE_APP_ID);
     }
 
     //Public Methods
@@ -46,6 +51,7 @@
         
 		
 		if(id){
+            _lastId = id;
 			return $.ajax({
 				type:"GET",
 				url:countlyCommon.API_PARTS.data.r,
@@ -108,6 +114,20 @@
         if(_list[id])
             return _list[id];
         return id;
+    }
+    
+    countlyCrashes.getRequestData =  function(){
+        return {
+					"api_key":countlyGlobal.member.api_key,
+					"app_id":countlyCommon.ACTIVE_APP_ID,
+					"method":"crashes",
+					"group":_lastId,
+                    "userlist":true
+				};
+    };
+    
+    countlyCrashes.getId = function(){
+        return _lastId;
     }
     
     countlyCrashes.common = function (id, path, callback) {
@@ -449,7 +469,7 @@
 	countlyCrashes.getResolvedBars = function () {
 		if(_crashData.crashes.unique > 0){
             var ret = [];
-            var total = _crashData.crashes.resolved + _crashData.crashes.unresolved;
+            var total = Math.max(_crashData.crashes.resolved, 0) + Math.max(_crashData.crashes.unresolved,0);
 			var resolved = (_crashData.crashes.resolved/total)*100;
 			var unresolved = (_crashData.crashes.unresolved/total)*100;
 			var name1 = Math.round(resolved)+"% "+jQuery.i18n.map["crashes.resolved"];
@@ -465,14 +485,28 @@
 	
 	countlyCrashes.getPlatformBars = function () {
 		var res = [];
+        var data = [];
 		var total = 0;
-		for(var i in _crashData.crashes.os){
-			total += _crashData.crashes.os[i];
-		}
+        
 		for(var i in _crashData.crashes.os){
             if(_crashData.crashes.os[i] > 0)
-                res.push({"name":i,"percent":(_crashData.crashes.os[i]/total)*100});
+                data.push([i, _crashData.crashes.os[i]]);
 		}
+        
+        data.sort(function(a, b) {return b[1] - a[1]});
+        
+        var maxItems = 3;
+        if(data.length < maxItems)
+            maxItems = data.length;
+        
+		for(var i = 0; i < maxItems; i++){
+            total += data[i][1];
+        }
+        
+		for(var i = 0; i < maxItems; i++){
+            res.push({"name":data[i][0],"percent":(data[i][1]/total)*100});
+		}
+        
 		return res;
     };
     

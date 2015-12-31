@@ -1024,8 +1024,11 @@
         return dataArr;
     };
 
-    countlyCommon.extractChartData = function (db, clearFunction, chartData, dataProperties) {
-
+    countlyCommon.extractChartData = function (db, clearFunction, chartData, dataProperties, metric) {
+        if(metric)
+            metric = "."+metric;
+        else
+            metric = "";
         countlyCommon.periodObj = getPeriodObj();
 /*
         console.log("================= countlyCommon.periodObj =================");
@@ -1073,10 +1076,10 @@
                         formattedDate = moment((activeDate + "/" + i).replace(/\./g, "/"));
                     }
 
-                    dataObj = countlyCommon.getDescendantProp(db, activeDate + "." + i);
+                    dataObj = countlyCommon.getDescendantProp(db, activeDate + "." + i+metric);
                 } else {
                     formattedDate = moment((activeDateArr[i]).replace(/\./g, "/"));
-                    dataObj = countlyCommon.getDescendantProp(db, activeDateArr[i]);
+                    dataObj = countlyCommon.getDescendantProp(db, activeDateArr[i]+metric);
                 }
 /*
                 console.log('}}}}}}}}}}}}}} dataObj }}}}}}}}}}}}}}');
@@ -1552,18 +1555,17 @@
     };
 
     // Extracts top three items (from rangeArray) that have the biggest total session counts from the db object.
-    countlyCommon.extractBarData = function (db, rangeArray, clearFunction) {
-
+    countlyCommon.extractBarData = function (db, rangeArray, clearFunction, fetchFunction) {
+        fetchFunction = fetchFunction || function (rangeArr, dataObj) {return rangeArr;};
+        
         var rangeData = countlyCommon.extractTwoLevelData(db, rangeArray, clearFunction, [
             {
                 name:"range",
-                func:function (rangeArr, dataObj) {
-                    return rangeArr;
-                }
+                func:fetchFunction
             },
             { "name":"t" }
         ]);
-
+        rangeData.chartData = countlyCommon.mergeMetricsByName(rangeData.chartData, "range");
         rangeData.chartData = _.sortBy(rangeData.chartData, function(obj) { return -obj.t; });
 
         var rangeNames = _.pluck(rangeData.chartData, 'range'),

@@ -132,6 +132,8 @@ a:active { color:inherit; }
 #app-tooltip .app-container{padding-left:11px;}
 .break {word-wrap: break-word;}
 .over {z-index:100;}
+#no-app-type{width: 100%; padding: 20px 0; text-align: center; border: 1px dashed #CCC; font: 13px Ubuntu,Helvetica,sans-serif;}
+#no-app-type a{color:#72AE4B; text-decoration: underline;}
 
 /* FOOTER */
 #content-footer{position: fixed; bottom:0; left:0px; width: 100%; background-color: #282828; font: 13px Ubuntu,Helvetica,sans-serif; color: #888; height: 35px; z-index:999;}
@@ -152,7 +154,7 @@ a:active { color:inherit; }
 	#sidebar-app-select .text { width:120px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; font:13px Ubuntu,Helvetica,sans-serif; line-height:111%; color:#505050; text-shadow:0 1px #CCC; float:left; }
 	#sidebar-app-select .logo { width:20px; height:20px; background-size:20px 20px; float:left; margin-right:10px; margin-top:-3px; background-position:center; border-radius:4px; border:1px solid #555; }
 
-#sidebar-bottom-container { z-index:2; position:absolute; background-color:#222222; bottom:50px; left:14px; padding:5px 10px; width:170px; font:13px Ubuntu,Helvetica,sans-serif; line-height:111%; color:#505050; box-shadow:inset 0 1px 0 #2D2D2D; text-shadow:0 -1px #161616; border:1px solid #1A1A1A; border-radius:5px; }
+#sidebar-bottom-container { z-index:2; position:fixed; background-color:#222222; bottom:50px; left:14px; padding:5px 10px; width:170px; font:13px Ubuntu,Helvetica,sans-serif; line-height:111%; color:#505050; box-shadow:inset 0 1px 0 #2D2D2D; text-shadow:0 -1px #161616; border:1px solid #1A1A1A; border-radius:5px; }
 #sidebar-bottom-container .reveal-menu { width:14px; height:15px; background-image:url('../images/dashboard/settings.png'); float:right; cursor:pointer; }
 #sidebar-bottom-container .reveal-language-menu { float:right; padding:5px 0 6px 5px; margin:-5px -4px -5px 5px; border-left:1px solid #1A1A1A; cursor:pointer; transition:color 1s; }
 #sidebar-bottom-container .reveal-language-menu:hover { color:#848484; transition:color 1s; }
@@ -167,67 +169,67 @@ a:active { color:inherit; }
 #sidebar-bottom-container .username { float:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:120px; }
 
 #sidebar-menu { }
-	#sidebar-menu>.item { margin-top:-1px; margin-left:-1px; width:223px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; height:43px; padding-top:3px; background-image:url('../images/dashboard/menu_button.png'); display:block; cursor:pointer; }
-        #sidebar-menu>.item.hide { display: none; }
-        #sidebar-menu .item:hover { background-position:446px; }
-		#sidebar-menu .item.active { background-position:223px; }
-		#sidebar-menu .item .logo { background-image:url('../images/dashboard/menu_icons.png'); color:#888; width:40px; height:40px; float:left; margin-left:9px; }
-        #sidebar-menu>.item>.logo-icon { background-image:none; font-size:24px; text-align:center; padding-top:4px; width: 35px; margin-left: 14px; line-height: 34px; }
-            #sidebar-menu .item.active .logo { color:#FFF; }
-            #sidebar-menu .item .logo.dashboard { background-position:0; }
-			#sidebar-menu .item.active .logo.dashboard { background-position:-40px; }
-			#sidebar-menu .item .logo.analytics { background-position:-80px; }
-			#sidebar-menu .item.active .logo.analytics { background-position:-120px; }
-			#sidebar-menu .item .logo.management { background-position:-160px; }
-			#sidebar-menu .item.active .logo.management { background-position:-200px; }
-			#sidebar-menu .item .logo.events { background-position:-400px; }
-			#sidebar-menu .item.active .logo.events { background-position:-440px; }
-            #sidebar-menu .item .logo.engagement { background-position:-480px; }
-            #sidebar-menu .item.active .logo.engagement { background-position:-520px; }
-		#sidebar-menu .item .text { margin-left:15px; float:left; padding-top:11px; font:15px Ubuntu,Helvetica,sans-serif; line-height:130%; color:#888; text-shadow:0 1px #222; }
-			#sidebar-menu .item.active .text { color:#FFF; text-shadow:0 1px #666; }
+	#sidebar-menu .sidebar-menu>.item { margin-top:-1px; margin-left:-1px; width:223px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; height:43px; padding-top:3px; background-image:url('../images/dashboard/menu_button.png'); display:block; cursor:pointer; }
+        #sidebar-menu .sidebar-menu>.item.hide { display: none; }
+        #sidebar-menu .sidebar-menu .item:hover { background-position:446px; }
+		#sidebar-menu .sidebar-menu .item.active { background-position:223px; }
+		#sidebar-menu .sidebar-menu .item .logo { background-image:url('../images/dashboard/menu_icons.png'); color:#888; width:40px; height:40px; float:left; margin-left:9px; }
+        #sidebar-menu .sidebar-menu>.item>.logo-icon { background-image:none; font-size:24px; text-align:center; padding-top:4px; width: 35px; margin-left: 14px; line-height: 34px; }
+            #sidebar-menu .sidebar-menu .item.active .logo { color:#FFF; }
+            #sidebar-menu .sidebar-menu .item .logo.dashboard { background-position:0; }
+			#sidebar-menu .sidebar-menu .item.active .logo.dashboard { background-position:-40px; }
+			#sidebar-menu .sidebar-menu .item .logo.analytics { background-position:-80px; }
+			#sidebar-menu .sidebar-menu .item.active .logo.analytics { background-position:-120px; }
+			#sidebar-menu .sidebar-menu .item .logo.management { background-position:-160px; }
+			#sidebar-menu .sidebar-menu .item.active .logo.management { background-position:-200px; }
+			#sidebar-menu .sidebar-menu .item .logo.events { background-position:-400px; }
+			#sidebar-menu .sidebar-menu .item.active .logo.events { background-position:-440px; }
+            #sidebar-menu .sidebar-menu .item .logo.engagement { background-position:-480px; }
+            #sidebar-menu .sidebar-menu .item.active .logo.engagement { background-position:-520px; }
+		#sidebar-menu .sidebar-menu .item .text { margin-left:15px; float:left; padding-top:11px; font:15px Ubuntu,Helvetica,sans-serif; line-height:130%; color:#888; text-shadow:0 1px #222; }
+			#sidebar-menu .sidebar-menu .item.active .text { color:#FFF; text-shadow:0 1px #666; }
 
-	#sidebar-menu .sidebar-submenu { background-image:url('../images/dashboard/submenu_bg.png'); width:222px; display:none; }
-		#sidebar-menu .sidebar-submenu .item,
-		#sidebar-menu .sidebar-submenu .disabled-item { text-overflow:ellipsis; white-space:nowrap; overflow:hidden; height:34px; display:block; padding-left:8px; background-image:url('../images/dashboard/submenu_seperator.png'); background-position:bottom; background-repeat:no-repeat; cursor:pointer; }
-		#sidebar-menu .sidebar-submenu .disabled-item { cursor:default; }
+	#sidebar-menu .sidebar-menu .sidebar-submenu { background-image:url('../images/dashboard/submenu_bg.png'); width:222px; display:none; }
+		#sidebar-menu .sidebar-menu .sidebar-submenu .item,
+		#sidebar-menu .sidebar-menu .sidebar-submenu .disabled-item { text-overflow:ellipsis; white-space:nowrap; overflow:hidden; height:34px; display:block; padding-left:8px; background-image:url('../images/dashboard/submenu_seperator.png'); background-position:bottom; background-repeat:no-repeat; cursor:pointer; }
+		#sidebar-menu .sidebar-menu .sidebar-submenu .disabled-item { cursor:default; }
 
-		#sidebar-menu .sidebar-submenu .item:hover { opacity:0.6; }
-		#sidebar-menu .sidebar-submenu .item.active:hover { opacity:1; }
-		#sidebar-menu .sidebar-submenu .item:last-child { background-image:none; }
-			#sidebar-menu .sidebar-submenu .item .logo-icon { color:#888; width:30px; height:30px; float:left; margin-left:8px; margin-top:8px; text-align:center;}
-			#sidebar-menu .sidebar-submenu .item .logo { background-image:url('../images/dashboard/analytics_icons.png'); color:#888; width:30px; height:30px; float:left; margin-left:8px; margin-top:1px; }
-	                #sidebar-menu .sidebar-submenu .item.active .logo,
-                    #sidebar-menu .sidebar-submenu .item.active .logo-icon { color:#4DB339; }
+		#sidebar-menu .sidebar-menu .sidebar-submenu .item:hover { opacity:0.6; }
+		#sidebar-menu .sidebar-menu .sidebar-submenu .item.active:hover { opacity:1; }
+		#sidebar-menu .sidebar-menu .sidebar-submenu .item:last-child { background-image:none; }
+			#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo-icon { color:#888; width:30px; height:30px; float:left; margin-left:8px; margin-top:8px; text-align:center;}
+			#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo { background-image:url('../images/dashboard/analytics_icons.png'); color:#888; width:30px; height:30px; float:left; margin-left:8px; margin-top:1px; }
+	                #sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo,
+                    #sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo-icon { color:#4DB339; }
 
 
-				#sidebar-menu .sidebar-submenu .item .logo.users { background-position:-30px; }
-				#sidebar-menu .sidebar-submenu .item.active .logo.users { background-position:0; }
-				#sidebar-menu .sidebar-submenu .item .logo.sessions { background-position:-90px; }
-				#sidebar-menu .sidebar-submenu .item.active .logo.sessions { background-position:-60px; }
-				#sidebar-menu .sidebar-submenu .item .logo.frequency { background-position:-150px; }
-				#sidebar-menu .sidebar-submenu .item.active .logo.frequency { background-position:-120px; }
-				#sidebar-menu .sidebar-submenu .item .logo.country { background-position:-210px; }
-				#sidebar-menu .sidebar-submenu .item.active .logo.country { background-position:-180px; }
-				#sidebar-menu .sidebar-submenu .item .logo.devices { background-position:-270px; }
-				#sidebar-menu .sidebar-submenu .item.active .logo.devices { background-position:-240px; }
-				#sidebar-menu .sidebar-submenu .item .logo.carrier { background-position:-330px; }
-				#sidebar-menu .sidebar-submenu .item.active .logo.carrier { background-position:-300px; }
-				#sidebar-menu .sidebar-submenu .item .logo.loyalty { background-position:-390px; }
-				#sidebar-menu .sidebar-submenu .item.active .logo.loyalty { background-position:-360px; }
-				#sidebar-menu .sidebar-submenu .item .logo.app-versions { background-position:-450px; }
-				#sidebar-menu .sidebar-submenu .item.active .app-versions { background-position:-420px; }
-				#sidebar-menu .sidebar-submenu .item .logo.platforms { background-position:-510px; }
-				#sidebar-menu .sidebar-submenu .item.active .logo.platforms { background-position:-480px; }
-				#sidebar-menu .sidebar-submenu .item .logo.durations { background-position:-630px; }
-		                #sidebar-menu .sidebar-submenu .item.active .logo.durations { background-position:-600px; }
-                		#sidebar-menu .sidebar-submenu .item .logo.resolutions { background-position:-690px; }
-		                #sidebar-menu .sidebar-submenu .item.active .logo.resolutions { background-position:-660px; }
-				#sidebar-menu .sidebar-submenu .item .text { margin-left:17px; float:left; padding-top:8px; font:13px Ubuntu,Helvetica,sans-serif; line-height:111%; color:#666; text-shadow:none; }
-				#sidebar-menu .sidebar-submenu .item.active .text { color:#4DB351; }
-				#sidebar-menu .sidebar-submenu .item.help-toggle.active { color:#666; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.users { background-position:-30px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo.users { background-position:0; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.sessions { background-position:-90px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo.sessions { background-position:-60px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.frequency { background-position:-150px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo.frequency { background-position:-120px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.country { background-position:-210px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo.country { background-position:-180px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.devices { background-position:-270px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo.devices { background-position:-240px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.carrier { background-position:-330px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo.carrier { background-position:-300px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.loyalty { background-position:-390px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo.loyalty { background-position:-360px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.app-versions { background-position:-450px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.active .app-versions { background-position:-420px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.platforms { background-position:-510px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo.platforms { background-position:-480px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.durations { background-position:-630px; }
+		                #sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo.durations { background-position:-600px; }
+                		#sidebar-menu .sidebar-menu .sidebar-submenu .item .logo.resolutions { background-position:-690px; }
+		                #sidebar-menu .sidebar-menu .sidebar-submenu .item.active .logo.resolutions { background-position:-660px; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item .text { margin-left:17px; float:left; padding-top:8px; font:13px Ubuntu,Helvetica,sans-serif; line-height:111%; color:#666; text-shadow:none; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.active .text { color:#4DB351; }
+				#sidebar-menu .sidebar-menu .sidebar-submenu .item.help-toggle.active { color:#666; }
 
-			#management-submenu.sidebar-submenu .item .logo { background-image:url('../images/dashboard/management_icons.png'); }
+			#sidebar-menu #management-submenu.sidebar-submenu .item .logo { background-image:url('../images/dashboard/management_icons.png'); }
 				.sidebar-submenu .item .logo.applications { background-position:-30px; }
 				.sidebar-submenu .item.active .logo.applications { background-position:0; }
 				.sidebar-submenu .item .logo.mgmt-users { background-position:-90px; }
@@ -455,6 +457,7 @@ a:active { color:inherit; }
 
 		.widget-content .big-numbers .trend { width:12px; height:9px; right:7%; top:11px; position:absolute; }
 		.widget-footer .big-numbers .trend { width:12px; height:9px; right:20px; top:62px; position:absolute; }
+		.widget-footer .big-numbers .check {width: 12px; height: 9px; left: 20px; top: 57px; position: absolute; font-size: 19px; color: #bbb;}
 		.widget-content .big-numbers .change { right:15px; white-space:nowrap; top:-1px; position:absolute; font:10px Ubuntu,Helvetica,sans-serif; line-height:111%; color:#999; text-shadow:0 1px #FFF; }
 			.big-numbers.active .change { color:#333; }
 
@@ -643,6 +646,8 @@ div.datatablesubrow {display: none;}
 #date-picker-button:hover { box-shadow:0 0 5px 2px #fff; }
 */
 
+.threes-column .big-numbers { width:33%; }
+.threes-column .big-numbers:last-child { width:34%; }
 .two-column .big-numbers { width:50%; }
 .one-column .big-numbers { width:100%; position:relative; }
 
@@ -757,6 +762,7 @@ div.datatablesubrow {display: none;}
 	.cly-select .select-items.square .item:last-child { border-radius:0; }
 	.cly-select .select-items .scroll-list {  max-height:189px; }
 	.cly-select .select-items .item { text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#666; font-weight:normal; border-bottom:1px solid #B5B5B5; font:13px Ubuntu,Helvetica,sans-serif; line-height:111%; text-shadow:0 1px #fff; padding:5px 9px; padding-bottom:7px; }
+    .cly-select .select-items .group { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; color: #333; font-weight: bold; border-bottom: 1px solid #B5B5B5; font: 11px Ubuntu,Helvetica,sans-serif; line-height: 100%; text-shadow: 0 1px #fff; padding: 12px 3px 6px 3px; text-align: center; cursor: default; text-transform: uppercase;}
     .cly-select.dark .select-items .item { border-color:#888; }
     .cly-select .select-items .item.hidden { display:none; }
     .cly-select .flag { opacity:0.8; width:16px; height:11px; border-radius:2px; box-shadow:0 0 1px 0 #333; margin-right:8px; margin-top:2px; float:left; }
@@ -897,6 +903,8 @@ div.datatablesubrow {display: none;}
 
 .icon-button.light.graph-segment.active { border-color:#333; box-shadow:inset 0 0 3px #222; background-color:#3E3E3E; background-image:linear-gradient(top, #292929 40%, #3E3E3E 100%); background-image:linear-gradient(to bottom, #292929 40%, #3E3E3E 100%); }
 .icon-button.light.graph-segment.active:hover { opacity:1; }
+.os-rows.active  { border-color:#333; box-shadow:inset 0 0 3px #222; background-color:#3E3E3E; background-image:linear-gradient(top, #292929 40%, #3E3E3E 100%); background-image:linear-gradient(to bottom, #292929 40%, #3E3E3E 100%); }
+.os-rows.active  td { color: #fff; }
 .os-segment { height:31px; width:28px; background-position:center; }
 .os-segment.ios { background-image:url('../images/dashboard/platform_buttons/apple.png'); }
 .active .os-segment.ios { background-image:url('../images/dashboard/platform_buttons/apple_active.png'); }
@@ -978,6 +986,14 @@ table.events-table { width:100%; padding:0; margin:0; }
 
 .delete-event, .delete-event-selected { color:#D67678; cursor:pointer; font-size:16px;}
 .delete-event:hover, .delete-event-selected:hover { color:#D63E40; }
+
+.event-numbers .big-numbers.event-count .color { background-color:#88BBC8; } 
+.event-numbers .big-numbers.event-sum .color { background-color:#ED8662; } 
+.event-numbers .big-numbers.event-dur .color { background-color:#BEEB9F; } 
+
+.event-numbers .big-numbers.event-count.selected .color { box-shadow: 0 1px 20px 0 #88BBC8; }
+.event-numbers .big-numbers.event-sum.selected .color { box-shadow: 0 1px 20px 0 #ED8662; }
+.event-numbers .big-numbers.event-dur.selected .color { box-shadow: 0 1px 20px 0 #BEEB9F; }
 
 
 /* EVENTS END */

@@ -11,9 +11,11 @@
 		_opengl: ["opengl_es1", "opengl_es2"],
 		_density: ["120dpi", "160dpi", "240dpi", "320dpi", "480dpi", "640dpi"],
 		_locale: ["en_CA", "fr_FR", "de_DE", "it_IT", "ja_JP", "ko_KR", "en_US"],
-        _store: ["com.android.vending","com.google.android.feedback","com.google.vending","com.slideme.sam.manager","com.amazon.venezia","com.sec.android.app.samsungapps","com.nokia.payment.iapenabler","com.qihoo.appstore","cn.goapk.market","com.wandoujia.phoenix2","com.hiapk.marketpho","com.hiapk.marketpad","com.dragon.android.pandaspace","me.onemobile.android","com.aspire.mm","com.xiaomi.market","com.miui.supermarket","com.baidu.appsearch","com.tencent.android.qqdownloader","com.android.browser","com.bbk.appstore","cm.aptoide.pt","com.nduoa.nmarket","com.rim.marketintent","com.lenovo.leos.appstore","com.lenovo.leos.appstore.pad","com.keenhi.mid.kitservice","com.yingyonghui.market","com.moto.mobile.appstore","com.aliyun.wireless.vos.appstore","com.appslib.vending","com.mappn.gfan","com.diguayouxi","um.market.android","com.huawei.appmarket","com.oppo.market","com.taobao.appcenter"]
+        _browser: ["Opera", "Chrome", "Internet Explorer", "Safari", "Firefox"],
+        _store: ["com.android.vending","com.google.android.feedback","com.google.vending","com.slideme.sam.manager","com.amazon.venezia","com.sec.android.app.samsungapps","com.nokia.payment.iapenabler","com.qihoo.appstore","cn.goapk.market","com.wandoujia.phoenix2","com.hiapk.marketpho","com.hiapk.marketpad","com.dragon.android.pandaspace","me.onemobile.android","com.aspire.mm","com.xiaomi.market","com.miui.supermarket","com.baidu.appsearch","com.tencent.android.qqdownloader","com.android.browser","com.bbk.appstore","cm.aptoide.pt","com.nduoa.nmarket","com.rim.marketintent","com.lenovo.leos.appstore","com.lenovo.leos.appstore.pad","com.keenhi.mid.kitservice","com.yingyonghui.market","com.moto.mobile.appstore","com.aliyun.wireless.vos.appstore","com.appslib.vending","com.mappn.gfan","com.diguayouxi","um.market.android","com.huawei.appmarket","com.oppo.market","com.taobao.appcenter"],
+        _source: ["https://www.google.lv", "https://www.google.co.in/", "https://www.google.ru/", "http://stackoverflow.com/questions", "http://stackoverflow.com/unanswered", "http://stackoverflow.com/tags", "http://r.search.yahoo.com/"]
 	};
-	var events = ["Login", "Logout", "Lost", "Won", "Achievement","Sound","Shared"];
+	var events = ["Login", "Logout", "Lost", "Won", "Achievement","Sound","Shared", "[CLY]_view"];
 	var pushEvents = ["[CLY]_push_sent", "[CLY]_push_open", "[CLY]_push_action"];
 	var segments  = {
 		Login: {referer: ["twitter", "notification", "unknown"]},
@@ -26,7 +28,15 @@
 	segments["[CLY]_push_open"]={i:"123456789012345678901234"};
 	segments["[CLY]_push_action"]={i:"123456789012345678901234"};
 	segments["[CLY]_push_sent"]={i:"123456789012345678901234"};
+	segments["[CLY]_view"]={
+        name:["Settings Page", "Purchase Page", "Credit Card Entry", "Profile page", "Start page", "Message page"],
+        visit:[1],
+        start:[0,1],
+        exit:[0,1],
+        bounce:[0,1]
+    };
 	var crashProps = ["root", "ram_current", "ram_total", "disk_current", "disk_total", "bat_current", "bat_total", "orientation", "stack", "log", "custom", "features", "settings", "comment", "os", "os_version", "manufacture", "device", "resolution", "app_version"];
+    var ip_address = [];
 	function getRandomInt(min, max) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
@@ -101,7 +111,11 @@
 		}
 
 		this.hasSession = false;
-		this.ip = chance.ip();
+        if(ip_address.length > 0 && Math.random() >= 0.5){
+            this.ip = ip_address.pop();
+        }
+        else
+            this.ip = chance.ip();
 		this.userdetails = {name: chance.name(), username: chance.twitter().substring(1), email:chance.email(), organization:capitaliseFirstLetter(chance.word()), phone:chance.phone(), gender:chance.gender().charAt(0), byear:chance.birthday().getFullYear(), custom:createRandomObj(6)};
 		this.metrics = {};
 		this.startTs = startTs;
@@ -112,10 +126,12 @@
 				this.platform = this.getProp(i);
 				this.metrics[i] = this.platform;
 			}
-			else if(i != "_store")
+			else if(i != "_store" && i != "_source")
 				this.metrics[i] = this.getProp(i);
 		}
-        if(this.platform == "Android")
+        if(countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID].type == "web")
+            this.metrics["_store"] = this.getProp("_source");
+        else if(this.platform == "Android")
             this.metrics["_store"] = this.getProp("_store");
 		
 		this.getCrash = function(){
@@ -145,7 +161,7 @@
 			crash._background = (Math.random() > 0.5) ? true : false;
             
 			crash._error = this.getError();
-			crash._logs = this.getError();
+			crash._logs = this.getLog();
             crash._nonfatal = (Math.random() > 0.5) ? true : false;
             crash._run = getRandomInt(1, 1800);
             
@@ -169,6 +185,36 @@
 			}
 			return error;
 		};
+        
+        this.getLog = function(){
+            var actions = [
+                "clicked button 1",
+                "clicked button 2",
+                "clicked button 3",
+                "clicked button 4",
+                "clicked button 5",
+                "rotated phone",
+                "clicked back",
+                "entered screen",
+                "left screen",
+                "touched screen",
+                "taped screen",
+                "long touched screen",
+                "swipe left detected",
+                "swipe right detected",
+                "swipe up detected",
+                "swipe down detected",
+                "gesture detected",
+                "shake detected"
+            ];
+            
+            var items = getRandomInt(5, 10);
+            var logs = [];
+            for(var i = 0; i < items; i++){
+                logs.push(actions[getRandomInt(0, actions.length-1)]);
+            }
+            return logs.join("\n");
+        };
 		
 		this.getEvent = function(id){
 			if(!id){
@@ -176,7 +222,10 @@
 			}
 			var event = {
 				"key": id,
-				"count": 1
+				"count": 1,
+                "timestamp": this.ts,
+                "hour": getRandomInt(0, 23),
+                "dow": getRandomInt(0, 6)
 			};
 			if(id == this.iap){
 				stats.b++;
@@ -196,16 +245,28 @@
 					event.segmentation[i] = segment[Math.floor(Math.random()*segment.length)];
 				}
 			}
+            if(id == "[CLY]_view")
+                event.dur = getRandomInt(0, 100);
+            else
+                event.dur = getRandomInt(0, 10);
 			return [event];
 		};
 		
 		this.getPushEvent = function(id){
 			if(!id){
-				id = pushEvents[Math.floor(Math.random()*pushEvents.length)];
+                if(Math.random() >= 0.4)
+                    id = "[CLY]_push_sent";
+                else if(Math.random() >= 0.4)
+                    id = "[CLY]_push_open";
+                else
+                    id = "[CLY]_push_action";
 			}
 			var event = {
 				"key": id,
 				"count": 1,
+                "timestamp": this.ts,
+                "hour": getRandomInt(0, 23),
+                "dow": getRandomInt(0, 6),
                 "test": 1 // Events starting with [CLY]_ are ignored by the API (internal events). This flag is to bypass that.
 			};
 			if(segments[id]){
@@ -220,7 +281,7 @@
 		};
 		
 		this.startSession = function(){
-			this.ts = getRandomInt(this.startTs, this.endTs);
+			this.ts = this.ts+60*60*24+100;
 			stats.s++;
 			if(!this.isRegistered){
 				this.isRegistered = true;
@@ -238,6 +299,7 @@
 				stats.e++;
 				this.request({timestamp:this.ts, begin_session:1, events:this.getEvent("Login")});
 			}
+            this.request({timestamp:this.ts, events:this.getEvent("[CLY]_view")});
 			this.hasSession = true;
 			this.timer = setTimeout(function(){that.extendSession()}, timeout);
 		};
@@ -253,7 +315,7 @@
 				if(this.hasPush){
 					this.request({timestamp:this.ts, events:this.getPushEvent()});
 				}
-				if(Math.random() > 0.5){
+				if(Math.random() > 0.8){
 					this.timer = setTimeout(function(){that.extendSession()}, timeout);
 				}
 				else{
@@ -282,6 +344,8 @@
 			stats.r++;
 			params.device_id = this.id;
 			params.ip_address = this.ip;
+            params.hour = getRandomInt(0, 23);
+            params.dow = getRandomInt(0, 6);
 			bulk.push(params);
 			countlyPopulator.sync();
 		};
@@ -305,6 +369,113 @@
 			$("#populate-stats-"+i).text(totalStats[i]);
 		}
 	}
+    
+    function createCampaign(id, name, cost, type, callback){
+        $.ajax({
+			type:"GET",
+			url:countlyCommon.API_URL + "/i/campaign/create",
+			data:{
+				api_key:countlyGlobal["member"].api_key,
+				args:JSON.stringify({
+                    "_id":id+countlyCommon.ACTIVE_APP_ID,
+                    "name":name,
+                    "link":"http://count.ly",
+                    "cost":cost,
+                    "costtype":type,
+                    "fingerprint":false,
+                    "links":{},
+                    "postbacks":[],
+                    "app_id":countlyCommon.ACTIVE_APP_ID})
+			},
+			success:callback,
+            error:callback
+		});
+    }
+    
+    function clickCampaign(name){
+        var ip = chance.ip();
+        if(ip_address.length && Math.random() > 0.5){
+            ip = ip_address[Math.floor(Math.random()*ip_address.length)];
+        }
+        else{
+            ip_address.push(ip);
+        }
+        $.ajax({
+			type:"GET",
+			url:countlyCommon.API_URL + "/i/campaign/click/"+name+countlyCommon.ACTIVE_APP_ID,
+            data:{ip_address:ip, test:true, timestamp:getRandomInt(startTs, endTs)}
+		});
+    }
+    
+    function genereateCampaigns(callback){
+        var campaigns = ["social", "ads", "landing"];
+        createCampaign("social", "Social Campaign", "0.5", "click", function(){
+            createCampaign("ads", "Ads Campaign", "1", "install", function(){
+                createCampaign("landing", "Landing page", "30", "campaign", function(){
+                    for(var i = 0; i < 200; i++){
+                        setTimeout(function(){
+                            clickCampaign(campaigns[getRandomInt(0, campaigns.length-1)]);
+                        },1);
+                    }
+                    setTimeout(callback, 3000);
+                });
+            });
+        });
+    }
+    
+    function generateRetentionUser(ts, users, ids, callback){
+        var bulk = [];
+        for(var i = 0; i < users; i++){
+            for(var j = 0; j < ids.length; j++){
+                bulk.push({ip_address:chance.ip(), device_id:i+""+ids[j], begin_session:1, timestamp:ts});
+            }
+        }
+        $.ajax({
+            type:"GET",
+            url:countlyCommon.API_URL + "/i/bulk",
+            data:{
+				app_key:countlyCommon.ACTIVE_APP_KEY,
+				requests:JSON.stringify(bulk)
+			},
+            success:callback,
+            error:callback
+        });
+    }
+    
+    function generateRetention(callback){
+        var ts = endTs - 60*60*24*9;
+        var ids = [ts];
+        var users = 10;
+        generateRetentionUser(ts, users--, ids, function(){
+            ts += 60*60*24;
+            ids.push(ts);
+            generateRetentionUser(ts, users--, ids, function(){
+                ts += 60*60*24;
+                ids.push(ts);
+                generateRetentionUser(ts, users--, ids, function(){
+                    ts += 60*60*24;
+                    ids.push(ts);
+                    generateRetentionUser(ts, users--, ids, function(){
+                        ts += 60*60*24;
+                        ids.push(ts);
+                        generateRetentionUser(ts, users--, ids, function(){
+                            ts += 60*60*24;
+                            ids.push(ts);
+                            generateRetentionUser(ts, users--, ids, function(){
+                                ts += 60*60*24;
+                                ids.push(ts);
+                                generateRetentionUser(ts, users--, ids, function(){
+                                    ts += 60*60*24;
+                                    ids.push(ts);
+                                    generateRetentionUser(ts, users--, ids, callback);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
 	
 	//Public Methods
 	countlyPopulator.setStartTime = function(time){
@@ -350,9 +521,6 @@
 				},Math.random()*timeout);
 			}
 		}
-		for(var i = 0; i < amount; i++){
-			createUser();
-		}
 		function processUsers(){
 			for(var i = 0; i < amount; i++){
 				processUser(users[i]);
@@ -362,8 +530,22 @@
 			else
 				countlyPopulator.sync(true);
 		}
-		
-		setTimeout(processUsers, timeout);
+        generateRetention(function(){
+            if(typeof countlyAttribution != "undefined"){
+                genereateCampaigns(function(){
+                    for(var i = 0; i < amount; i++){
+                        createUser();
+                    }
+                    setTimeout(processUsers, timeout);
+                });
+            }
+            else{
+                for(var i = 0; i < amount; i++){
+                    createUser();
+                }
+                setTimeout(processUsers, timeout);
+            }
+        });
 	};
 	
 	countlyPopulator.stopGenerating = function () {
