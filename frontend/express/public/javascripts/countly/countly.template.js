@@ -1218,7 +1218,7 @@ window.SessionView = countlyView.extend({
 
             var self = this;
 
-            setTimeout(function(){ // todo: remove setTimeout
+            //setTimeout(function(){ // todo: remove setTimeout
             //onload = function() {
 
             /*
@@ -1306,8 +1306,6 @@ window.SessionView = countlyView.extend({
             }, null);
 
             React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
-
-          }, 2000);
 
         }
         else
