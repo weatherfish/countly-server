@@ -25,7 +25,7 @@
     /*width : 20% !important;*/
     /*width : 200px;*/
     /*width : 200px;*/
-    font-family: Lato-Semibold;
+    font-family: Lato-Medium;
     font-size: 14px;
     color: #3D3D3D;
  }
@@ -96,10 +96,9 @@
 }
 
  .table_content {
-    width : 200px;
     font-family: Lato-Regular;
-    font-size: 11px;
-    color: #6E6E6E;
+    font-size: 13px;
+    color: #3D3D3D;
  }
 /*
 .public_fixedDataTableRow_main {
@@ -137,10 +136,11 @@
  * @providesModule fixedDataTableCellLayout
  */
 
-.fixedDataTableCellLayout_main {
+.table_header.fixedDataTableCellLayout_main {
   border-right-style: solid;
   border-right-width: 1px;
   border-width: 0 1px 0 0;
+  border-color : #E7E7E7;
   box-sizing: border-box;
   display: block;
   overflow: hidden;
@@ -326,7 +326,40 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
     position: absolute;
     top: 0;
     border-bottom : 1px solid #E7E7E7;
+    box-sizing: border-box;
 }
+
+.fixedDataTableRowLayout_rowWrapper:hover {
+    background-color : #FBFBFB;
+}
+
+.fixedDataTableRowLayout_rowWrapper:hover .table_content {
+    box-sizing: border-box;
+    border-right : 1px solid #E7E7E7;
+}
+
+/*
+.border_right {
+    display : none;
+    width : 1px;
+    height : 30px;
+    position : absolute;
+    right : 0px;
+    top : -15px;
+    background-color : #E7E7E7;
+    /*border-right : 1px solid #E7E7E7;*/
+/*}
+
+.fixedDataTableRowLayout_rowWrapper:hover .table_content {
+    position : relative;
+}
+
+.fixedDataTableRowLayout_rowWrapper:hover .table_content .border_right {
+    /*display : block;*/
+/*}
+*/
+
+
 /**
  * Copyright (c) 2015, Facebook, Inc.
  * All rights reserved.
@@ -498,9 +531,16 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
 /**
  * Table cell.
  */
-.public_fixedDataTableCell_main {
+
+.table_header .public_fixedDataTableCell_main {
   /*background-color: #fff;*/
   border-color: #E7E7E7;
+}
+
+/*.table_content */.public_fixedDataTableCell_main {
+  /*background-color: #fff;*/
+  /*border-color: #E7E7E7;*/
+  border-color : #fff;
 }
 
 .public_fixedDataTableCell_highlighted {
@@ -508,7 +548,7 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
 }
 
 .public_fixedDataTableCell_cellContent {
-  padding: 8px;
+  padding-left : 15px;
 }
 
 .public_fixedDataTableCell_columnResizerKnob {

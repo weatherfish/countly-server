@@ -55,9 +55,9 @@
         ];
 
         chartData.rows = _.map(_mapData, function (value, key, list) {
-            value.country = _countryMap[value.country] || jQuery.i18n.map["common.unknown"] || "Unknown";
+            value.country = _countryMap[value.country] || "Unknown";
 
-            if (value.country == "European Union" || value.country == jQuery.i18n.map["common.unknown"]) {
+            if (value.country == "European Union" || value.country == "Unknown") {
                 return {c:[
                     {v:""},
                     {v:value.value}

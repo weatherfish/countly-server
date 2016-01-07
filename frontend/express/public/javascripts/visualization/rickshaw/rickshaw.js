@@ -406,7 +406,7 @@ Rickshaw.Graph = function(args) {
 		this.updateCallbacks = [];
 		this.configureCallbacks = [];
 
-    this.left_time_extension = args.left_time_extension;
+    this.period = args.period;
 
     this.small_circles = args.small_circles;
 
@@ -438,18 +438,11 @@ Rickshaw.Graph = function(args) {
 		this.setSize({ width: args.width, height: args.height });
 		this.element.classList.add('rickshaw_graph');
 
-    //var left_shift = 50;
-
 		this.vis = d3.select(this.element)
 			.append("svg:svg")
       .attr("id", "graph_svg")
 			.attr('width', this.width)
 			.attr('height', this.height + this.circle_radius)
-      /*.style("position","relative")
-      .style("left", left_shift + "px")*/
-      /*.attr("transform", function(d) {
-           return "translate(" + left_shift + ", 100)"; }
-      )*/
 
 		this.discoverRange();
 
@@ -544,11 +537,6 @@ Rickshaw.Graph = function(args) {
 		// so that our mutations do not change the object given to us.
 		// Hence the .copy()
 
-    //domain.y[1] = domain.y[1] + 20; // todo: move to other place maybe./ todo : !!!!!!!!!!!
-
-    console.log("----- full domain ------");
-    console.log(domain);
-
     var y_domain = Math.round(domain.y[1]);
 
     var first_digit = parseInt(y_domain.toString()[0]);
@@ -573,19 +561,8 @@ Rickshaw.Graph = function(args) {
         var left_extension_width = _left_extension_width;
     }
 
-
-    console.log("get range:", this.width - (this.circle_radius * 2) - this.max_tick_width);
-    console.log("-- domain --");
-    console.log(domain.x);
-
 		this.x = (this.xScale || d3.scale.linear()).copy().domain(domain.x).range([0, this.width - (this.circle_radius * 2) - this.max_tick_width]);
-		//this.y = (this.yScale || d3.scale.linear()).copy().domain(domain.y).range([this.height, 0]);
-
     this.y = (this.yScale || d3.scale.linear()).copy().domain([domain.y[0], y_domain]).range([this.height, 0]);
-/*
-    console.log(":::::::::::::::::: discoverRange domain ::::::::::::::::::::");
-    console.log(domain);
-*/
 
 		this.x.magnitude = d3.scale.linear()
 			.domain([domain.x[0] - domain.x[0], domain.x[1] - domain.x[0]])
@@ -1575,12 +1552,9 @@ Rickshaw.Graph.Axis.Time = function(args) {
         var skip_count = Math.round(ticks_count / (this.graph.width / this.graph.max_tick_width) * 2);
     }
 
-    console.log("ticks_count:", ticks_count, " > ", skip_count);
-
 		var offsets = [];
     var i = 0
 
-    //for (var i = 0; i < ticks_count; i+=skip_count)
     while(i < ticks_count)
     {
         var tickValue = this.graph.series[0].data[i].x;
@@ -1594,8 +1568,6 @@ Rickshaw.Graph.Axis.Time = function(args) {
         i+=skip_count;
     }
 
-    console.log("iiiii:", i);
-
     var empty_ticks_left = ticks_count - i;
 
     /*
@@ -1603,8 +1575,6 @@ Rickshaw.Graph.Axis.Time = function(args) {
     */
 
     var place_left = empty_ticks_left * this.graph.space_between_points;
-
-    console.log("place_left:", place_left);
 
     if (place_left > this.graph.max_tick_width)
     {
@@ -1616,14 +1586,9 @@ Rickshaw.Graph.Axis.Time = function(args) {
         if (this.graph.series[0].data[this.graph.series[0].data.length - 1].x != offsets[offsets.length - 1].value)
         {
             var last_tick = this.graph.series[0].data[this.graph.series[0].data.length - 1].x;
-            //offsets.push( { value: last_tick, unit: unit } );
-
             offsets[offsets.length - 1] = { value: last_tick, unit: unit }
         }
     }
-
-    console.log("------- offsets -------");
-    console.log(offsets);
 
     return offsets;
 
@@ -1663,7 +1628,6 @@ Rickshaw.Graph.Axis.Time = function(args) {
 
   			var title = document.createElement('div');
   			title.classList.add('title');
-  			//title.innerHTML = o.unit.formatter(new Date(o.value * 1000));
 
         if (self.graph.period == "hour")
         {
@@ -1702,8 +1666,6 @@ Rickshaw.Graph.Axis.Time = function(args) {
         element.style.left = (self.graph.circle_radius + (self.graph.max_tick_width / 2)) + (self.graph.x(o.value) - (tick_title_width / 2) + points_offset) + 'px'; // todo: change 16 to var.
 
         /*}*/
-
-        //console.log("title: ", title.offsetWidth);
 
   			self.elements.push(element);
 
@@ -2440,9 +2402,6 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     });
 
     //var this.element = document.getElementsByClassName('rickshaw_graph')[0].getElementsByClassName('detail')[0];
-
-    console.log("========= this.element ========");
-    console.log(this.element);
 
     if (graph.small_circles)
     {
@@ -3765,9 +3724,6 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 		var yMin = +Infinity;
 		var yMax = -Infinity;
 
-    console.log("------- search domain --------");
-    console.log(stackedData);
-
 		stackedData.forEach( function(series) {
 
 			series.forEach( function(d) {
@@ -3782,21 +3738,12 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 
 			if (!series.length) return;
 
-      console.log("{{{{{{{{{{{{{{{{{{{{{{{{{[[series]]}}}}}}}}}}}}}}}}}}}}}}}}}");
-      console.log(series);
-
-      console.log("series[series.length - 1].x:", series[series.length - 1].x);
-
 			if (series[0].x < xMin) xMin = series[0].x;
 			if (series[series.length - 1].x > xMax) xMax = series[series.length - 1].x;
 		} );
 
-    console.log("1----", xMin, " --- > ", xMax);
-
 		xMin -= (xMax - xMin) * this.padding.left;
 		xMax += (xMax - xMin) * this.padding.right;
-
-    console.log("2----", xMin, " --- > ", xMax);
 
 		yMin = this.graph.min === 'auto' ? yMin : this.graph.min || 0;
 		yMax = this.graph.max === undefined ? yMax : this.graph.max;

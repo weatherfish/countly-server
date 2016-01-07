@@ -76,7 +76,11 @@ var CalendarWrapper = React.createClass({
 
         global_controller.date_string = date_values.from_string + " - " + date_values.to_string;
 
-        $(event_emitter).trigger("date_init", { "state" : { "from_string" : date_values.from_string, "to_string" : date_values.to_string } } );
+        $(event_emitter).trigger("date_init", {
+            "state" : {
+                "from_string" : date_values.from_string,
+                "to_string"   : date_values.to_string
+            }});
 
         return {
             choise_open     : false,
@@ -373,7 +377,7 @@ var CalendarWrapper = React.createClass({
         }
 
         this.setState(state_obj);
-        
+
 
 
         //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;

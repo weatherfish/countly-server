@@ -7,6 +7,27 @@
 
  */
 
+ var math_sort = function(a, b, sortBy, sortDir) // todo: move somewhere
+ {
+     var sortVal = 0;
+
+     var a = a[sortBy];
+     var b = b[sortBy];
+
+     if (a > b) {
+         sortVal = 1;
+     }
+     if (a < b) {
+         sortVal = -1;
+     }
+
+     if (sortDir === SortTypes.DESC) {
+         sortVal = sortVal * -1;
+     }
+
+     return sortVal;
+ }
+
 var countlyView = Backbone.View.extend({
     template:null, //handlebars template of the view
     templateData:{}, //data to be used while rendering the template
@@ -375,8 +396,7 @@ $.extend(Template.prototype, {
         dTable.fnStandingRedraw();
     };
 
-	CountlyHelpers.expandRows = function(dTable, getData, context){
-
+	CountlyHelpers.expandRows = function(dTable, getData){
 		dTable.aOpen = [];
 		dTable.on("click", "tr", function (e){
 			var nTr = this;
@@ -389,7 +409,7 @@ $.extend(Template.prototype, {
 
 				if ( i === -1 ) {
 					$(nTr).addClass("selected");
-					var nDetailsRow = dTable.fnOpen( nTr, getData(dTable.fnGetData( nTr ), context), 'details' );
+					var nDetailsRow = dTable.fnOpen( nTr, getData(dTable.fnGetData( nTr )), 'details' );
 					$('div.datatablesubrow', nDetailsRow).slideDown();
 					dTable.aOpen.push( id );
 				}
@@ -404,15 +424,14 @@ $.extend(Template.prototype, {
 		});
 	};
 
-	CountlyHelpers.reopenRows = function(dTable, getData, context){
-
+	CountlyHelpers.reopenRows = function(dTable, getData){
 		var nTr;
 		var oSettings = dTable.fnSettings();
 		if(dTable.aOpen){
 			$.each( dTable.aOpen, function ( i, id ) {
 				var nTr = $("#"+id)[0];
 				$(nTr).addClass("selected");
-				var nDetailsRow = dTable.fnOpen( nTr, getData(dTable.fnGetData( nTr ), context), 'details' );
+				var nDetailsRow = dTable.fnOpen( nTr, getData(dTable.fnGetData( nTr )), 'details' );
 				$('div.datatablesubrow', nDetailsRow).show();
 			});
 		}
@@ -576,13 +595,13 @@ $.extend(Template.prototype, {
 			setMeta();
 		};
 
-		countlyMetric.getData = function (clean) {
+		countlyMetric.getData = function () {
 
 			var chartData = countlyCommon.extractTwoLevelData(_Db, _metrics, this.clearObject, [
 				{
 					name:_name,
 					func:function (rangeArr, dataObj) {
-                        if(fetchValue && !clean)
+                        if(fetchValue)
                             return fetchValue(rangeArr);
                         else
                             return rangeArr;
@@ -644,7 +663,7 @@ $.extend(Template.prototype, {
 		};
 
 		countlyMetric.getBars = function () {
-			return countlyCommon.extractBarData(_Db, _metrics, this.clearObject, fetchValue);
+			return countlyCommon.extractBarData(_Db, _metrics, this.clearObject);
 		};
 
 		function setMeta() {
@@ -1172,6 +1191,12 @@ window.SessionView = countlyView.extend({
             }
         };
 
+        var sort_functions = {
+            "t" : math_sort,
+            "n" : math_sort,
+            "u" : math_sort,
+        }
+
         for (var i = 0; i < this.templateData["big-numbers"].items.length; i++)
         {
             this.templateData["big-numbers"].items[i].active = true;
@@ -1179,7 +1204,7 @@ window.SessionView = countlyView.extend({
 
         var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
 
-        var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left;
+        var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 36; // todo
 
         /*var update_graph = function(id, granularity_changed)
         {
@@ -1193,32 +1218,46 @@ window.SessionView = countlyView.extend({
 
             var self = this;
 
-            //setTimeout(function(){ // todo: remove setTimeout
+            setTimeout(function(){ // todo: remove setTimeout
             //onload = function() {
 
-            if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
-            {
-                _granularity = "monthly";
-            }
-            else if (sessionDP.daily_granularity[0].data.length * (_circle_radius * 2) * 2 > graph_width) // todo: combine with block from update
-            {
-                _granularity = "weekly";
-            }
-            else {
-                _granularity = "daily";
-            }
+            /*
+              todo: now it not using in graph wrapper, it consists it inside. Using only in table wrapper
+            */
 
-            if (_granularity == "weekly")
+            if (countlyCommon.getPeriod() == "hour")
             {
-                var granularity_rows = sessionDP.weekly_granularity;
-            }
-            else if (_granularity == "monthly")
-            {
-                var granularity_rows = sessionDP.monthly_granularity;
+                _granularity = "hourly";
+                var granularity_rows = sessionDP.hourly_granularity;
             }
             else
             {
-                var granularity_rows = sessionDP.daily_granularity;
+
+                if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
+                {
+                    _granularity = "monthly";
+                }
+                else if (sessionDP.daily_granularity[0].data.length * (_circle_radius * 2) * 2 > graph_width) // todo: combine with block from update
+                {
+                    _granularity = "weekly";
+                }
+                else {
+                    _granularity = "daily";
+                }
+
+                if (_granularity == "weekly")
+                {
+                    var granularity_rows = sessionDP.weekly_granularity;
+                }
+                else if (_granularity == "monthly")
+                {
+                    var granularity_rows = sessionDP.monthly_granularity;
+                }
+                else
+                {
+                    var granularity_rows = sessionDP.daily_granularity;
+                }
+
             }
 
             React.render(React.createElement(CalendarWrapper, {
@@ -1234,14 +1273,14 @@ window.SessionView = countlyView.extend({
                 "width"       : graph_width - 70 - 70,
                 "height"      : 300,
                 "margin_left" : 40,
-                "granularity_rows" : granularity_rows,
-                "data"        : sessionDP,
+                //"granularity_rows" : granularity_rows,
+                //"data"        : sessionDP,
                 "graph_width" : graph_width, // todo: combine
-                "granularity" : _granularity,
+                //"granularity" : _granularity,
                 "period"      : countlyCommon.getPeriod(),
-                "big_numbers" : this.templateData["big-numbers"].items,
+                "big_numbers" : self.templateData["big-numbers"].items,
                 //"big_number_click" : update_graph,
-                "session_data_function" : countlySession.getSessionDP,
+                "data_function" : countlySession.getSessionDP,
                 "update_graph_function" : countlyCommon.updateTimeGraph
 
             }), document.getElementById("widget-content"));
@@ -1252,19 +1291,28 @@ window.SessionView = countlyView.extend({
 
             /* TABLE WRAPPER */
 
+            console.log("============== granularity_rows ==================");
+            console.log(granularity_rows);
+
             var table_wrapper = React.createElement(TableWrapper, {
                 "rows"    : granularity_rows,
-                "headers" : this.templateData["big-numbers"].items,
+                "headers" : self.templateData["big-numbers"].items,
                 "width"   : table_width,
-                "row_height" : 50
+                "row_height" : 50,
+                "data_sign" : "DATA",
+                "sort_functions" : sort_functions,
+                "data_function" : countlySession.getSessionDP,
+                "date_sign" : "Date"
             }, null);
 
             React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
 
+          }, 2000);
+
         }
         else
         {
-            console.log("{{{{{{{{{{{{{{{{{{ render refresh }}}}}}}}}}}}}}}}}}");
+            console.log("refresh 1");
         }
 
         function hasClass(el, cls) {
@@ -1274,7 +1322,9 @@ window.SessionView = countlyView.extend({
     refresh:function () {
         var self = this;
 
-        console.log("[[[[[[[[[[[[ page refresh ]]]]]]]]]]]]");
+        console.log("refresh 2");
+
+        //$(event_emitter).trigger("data_changed", { });
 
         /*
         $.when(countlyUser.initialize()).then(function () {
@@ -1373,35 +1423,6 @@ window.UserView = countlyView.extend({
 
           $(this.el).html(this.template(this.templateData));
 
-          React.render(React.createElement(CalendarWrapper, {
-          }), document.getElementById("calendar_block"));
-
-          React.render(React.createElement(TopBar, {
-              "user_name" : "John Black",
-              "width"     : window.innerWidth - 240
-          }), document.getElementById("top_bar"));
-
-          React.render(React.createElement(GraphWrapper, {
-              "trend_sign"  : "USERS TREND",
-              "width"       : graph_width - 70 - 70,
-              "height"      : 300,
-              "margin_left" : 40,
-              "data"        : userDP,
-              "graph_width" : graph_width, // todo: combine
-              "granularity" : "daily",
-              "period"      : countlyCommon.getPeriod(),
-              "big_numbers" : this.templateData["big-numbers"].items,
-              //"big_number_click" : update_graph,
-              "session_data_function" : countlySession.getUserDP,
-              "update_graph_function" : countlyCommon.updateTimeGraph
-          }), document.getElementById("widget-content"));
-
-          document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
-          document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
-          document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
-
-          var small_circles = false;
-
           if ((userDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
           {
               _granularity = "monthly";
@@ -1413,8 +1434,6 @@ window.UserView = countlyView.extend({
           else {
               _granularity = "daily";
           }
-
-          console.log("init _granularity type:", _granularity);
 
           if (_granularity == "weekly")
           {
@@ -1429,45 +1448,42 @@ window.UserView = countlyView.extend({
               var granularity_rows = userDP.daily_granularity;
           }
 
-          var zero_points = true;
+          React.render(React.createElement(CalendarWrapper, {
+          }), document.getElementById("calendar_block"));
 
-          granularity_rows.every(function(datapath){
+          React.render(React.createElement(TopBar, {
+              "user_name" : "John Black",
+              "width"     : window.innerWidth - 240
+          }), document.getElementById("top_bar"));
 
-              datapath.data.every(function(datapoint){
+          React.render(React.createElement(GraphWrapper, {
+              "trend_sign"  : "USERS TREND",
+              "width"       : graph_width - 70 - 70,
+              "height"      : 300,
+              "margin_left" : 40,
+              "granularity_rows" : granularity_rows,
+              "data"        : userDP,
+              "graph_width" : graph_width, // todo: combine
+              "granularity" : _granularity,
+              "period"      : countlyCommon.getPeriod(),
+              "big_numbers" : this.templateData["big-numbers"].items,
+              //"big_number_click" : update_graph,
+              "session_data_function" : countlySession.getUserDP,
+              "update_graph_function" : countlyCommon.updateTimeGraph
+          }), document.getElementById("widget-content"));
 
-                  var value = datapoint[1];
-
-                  if (value > 0)
-                  {
-                      zero_points = false;
-                      return false;
-                  }
-
-                  return true;
-              });
-
-              if (!zero_points)
-              {
-                  return false;
-              }
-
-              return true;
-
-          });
-
-          console.log("[[[[[[[[[[[[[[[[[[[[[[[[[[[[ big-numbers ]]]]]]]]]]]]]]]]]]]]]]]]]]]]");
-          console.log(this.templateData["big-numbers"].items);
-
-          countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", this.templateData["big-numbers"].items, (graph_width - 60), graph_height, false, _granularity, small_circles, zero_points);
-
-          console.log("{{{{{{{{{{{ granularity_rows }}}}}}}}}}}");
-          console.log(granularity_rows);
+          document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
+          document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
+          document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
 
           /* TABLE WRAPPER */
 
           var table_wrapper = React.createElement(TableWrapper, {
-              "rows"  : granularity_rows, //rows,
-              "width" : table_width
+              "rows"    : granularity_rows,
+              "headers" : this.templateData["big-numbers"].items,
+              "width"   : table_width,
+              "row_height" : 50,
+              "data_sign"  : "DATA"
           }, null);
 
           React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
@@ -1562,9 +1578,15 @@ window.AllAppsView = countlyView.extend({
         }
         _.defer(function () {
             countlyCommon.drawTimeGraph(sessionDP, "#dashboard-graph");
+
         });
     },
     renderCommon:function (isRefresh) {
+        $("#sidebar-app-select").find(".text").text(jQuery.i18n.map["allapps.title"]);
+        $("#sidebar-app-select").find(".logo").css("background-image", "url('"+countlyGlobal["cdn"]+"images/favicon.png')");
+        $("#sidebar-menu > .item").addClass("hide");
+        $("#management-menu").removeClass("hide");
+        $("#allapps-menu").removeClass("hide").css("display", "block");
         var appData = countlyAllApps.getData();
 
         this.templateData = {
@@ -1630,50 +1652,64 @@ window.AllAppsView = countlyView.extend({
                 ]
             }));
             this.drawGraph();
-            $(".dataTable-bottom").append("<div clas='dataTables_info' style='float: right; margin-top:2px; margin-right: 10px;'>"+jQuery.i18n.map["allapps.maximum-items"]+" (10)</div>")
+            $(".dataTable-bottom").append("<div clas='dataTables_info' style='float: right; margin-top:2px; margin-right: 10px;'>Maximum number of applications to be compared (10)</div>")
 
             //$(".d-table").stickyTableHeaders();
 
             $('.allapps tbody').on("click", "tr", function (event){
                 var td = $(event.target).closest("td");
                 var row = $(this);
-
-                if(self.selectedApps[row.attr("id")]){
-                    row.find(".check").removeClass("fa fa-check").addClass("fa fa-unchecked");
-                    row.find(".color").css("background-color", "transparent");
-                    delete self.selectedApps[row.attr("id")];
-                    if(row.attr("id") != "all")
-                        self.selectedCount--;
-                    if(self.selectedCount==0){
-                        $("#empty-graph").show();
-                        $(".big-numbers").removeClass("active");
-                        $(".big-numbers .select").removeClass("selected");
-                    }
-
-                }
-                else if(self.selectedCount < 10 || row.attr("id") == "all"){
-                    if(self.selectedCount==0){
-                        $("#empty-graph").hide();
-                        $(self.selectedView).parents(".big-numbers").addClass("active");
-                    }
-                    if(row.attr("id") == "all"){
-                        $(".check").removeClass("fa fa-check").addClass("fa fa-unchecked");
-                        $('.d-table').find(".color").css("background-color", "transparent");
-                        self.selectedApps = {};
-                        self.selectedCount = 0;
-                    }
-                    else{
-                        if(self.selectedApps["all"]){
-                            $(".d-table #all .check").removeClass("fa fa-check").addClass("fa fa-unchecked");
-                            $('.d-table #all').find(".color").css("background-color", "transparent");
-                            delete self.selectedApps["all"];
+                if(row.children().first().is(td))
+                {
+                    if(self.selectedApps[row.attr("id")]){
+                        row.find(".check").removeClass("fa fa-check").addClass("fa fa-unchecked");
+                        row.find(".color").css("background-color", "transparent");
+                        delete self.selectedApps[row.attr("id")];
+                        if(row.attr("id") != "all")
+                            self.selectedCount--;
+                        if(self.selectedCount==0){
+                            $("#empty-graph").show();
+                            $(".big-numbers").removeClass("active");
+                            $(".big-numbers .select").removeClass("selected");
                         }
-                        self.selectedCount++;
+
                     }
-                    row.find(".check").removeClass("fa fa-unchecked").addClass("fa fa-check");
-                    self.selectedApps[row.attr("id")] = true;
+                    else if(self.selectedCount < 10 || row.attr("id") == "all"){
+                        if(self.selectedCount==0){
+                            $("#empty-graph").hide();
+                            $(self.selectedView).parents(".big-numbers").addClass("active");
+                        }
+                        if(row.attr("id") == "all"){
+                            $(".check.icon-check").removeClass("fa fa-check").addClass("fa fa-unchecked");
+                            $('.d-table').find(".color").css("background-color", "transparent");
+                            self.selectedApps = {};
+                            self.selectedCount = 0;
+                        }
+                        else{
+                            if(self.selectedApps["all"]){
+                                $(".d-table #all .check.icon-check").removeClass("fa fa-check").addClass("fa fa-unchecked");
+                                $('.d-table #all').find(".color").css("background-color", "transparent");
+                                delete self.selectedApps["all"];
+                            }
+                            self.selectedCount++;
+                        }
+                        row.find(".check").removeClass("fa fa-unchecked").addClass("fa fa-check");
+                        self.selectedApps[row.attr("id")] = true;
+                    }
+                    self.drawGraph();
                 }
-                self.drawGraph();
+                else
+                {
+                    if(row.attr("id") != "all"){
+                        var aData = self.dtable.fnGetData( this );
+                        countlyAllApps.setApp(row.attr("id"));
+                        $("#sidebar-app-select").find(".logo").css("background-image", "url('"+countlyGlobal["cdn"]+"appimages/" + row.attr("id") + ".png')");
+                        $("#sidebar-app-select").find(".text").text(aData["name"]);
+                        $("#sidebar-menu > .item").removeClass("hide");
+                        $("#allapps-menu").css("display", "none");
+                        window.location.hash = "#/";
+                    }
+                }
             });
         }
     },
@@ -2054,10 +2090,23 @@ window.PlatformView = countlyView.extend({
     pageScript:function () {
         var self = this;
 
+        if (self.activePlatform) {
+            $(".graph-segment[data-name='" + self.activePlatform + "']").addClass("active");
+        } else {
+            $(".graph-segment:first-child").addClass("active");
+        }
+
+        $(".graph-segment").on("click", function () {
+            self.activePlatform = $(this).data("name");
+            $(".graph-segment").removeClass("active");
+            $(this).addClass("active");
+
+            self.refresh();
+        });
+
         app.localize();
     },
     renderCommon:function (isRefresh) {
-        var self = this;
         var oSVersionData = countlyDeviceDetails.getOSVersionData(this.activePlatform),
             platformData = countlyDeviceDetails.getPlatformData();
 
@@ -2069,6 +2118,7 @@ window.PlatformView = countlyView.extend({
                 "left":jQuery.i18n.map["platforms.pie-left"],
                 "right":jQuery.i18n.map["platforms.pie-right"]
             },
+            "graph-segmentation":oSVersionData.os,
             "chart-helper":"platform-versions.chart",
             "table-helper":"",
             "two-tables": true
@@ -2081,23 +2131,8 @@ window.PlatformView = countlyView.extend({
             countlyCommon.drawGraph(platformData.chartDP, "#dashboard-graph", "pie");
             countlyCommon.drawGraph(oSVersionData.chartDP, "#dashboard-graph2", "pie");
 
-            var first = true;
             this.dtable = $('#dataTableOne').dataTable($.extend({}, $.fn.dataTable.defaults, {
                 "aaData": platformData.chartData,
-                "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-					$(nRow).data("name", aData.os_);
-					$(nRow).addClass("os-rows");
-                    if (self.activePlatform) {
-                        first = false;
-                        if(self.activePlatform == aData.os_){
-                            $(nRow).addClass("active");
-                        }
-                    }
-                    else if(first){
-                        first = false;
-                        $(nRow).addClass("active");
-                    }
-				},
                 "aoColumns": [
                     { "mData": "os_", "sTitle": jQuery.i18n.map["platforms.table.platform"] },
                     { "mData": "t", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.table.total-sessions"] },
@@ -2105,14 +2140,6 @@ window.PlatformView = countlyView.extend({
                     { "mData": "n", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.table.new-users"] }
                 ]
             }));
-
-            $('#dataTableOne tbody').on("click", "tr", function (){
-                self.activePlatform = $(this).data("name");
-                $(".os-rows").removeClass("active");
-                $(this).addClass("active");
-
-                self.refresh();
-			});
 
             this.dtableTwo = $('#dataTableTwo').dataTable($.extend({}, $.fn.dataTable.defaults, {
                 "aaData": oSVersionData.chartData,
@@ -2140,6 +2167,7 @@ window.PlatformView = countlyView.extend({
                 newPage = $("<div>" + self.template(self.templateData) + "</div>");
 
             $(self.el).find(".dashboard-summary").replaceWith(newPage.find(".dashboard-summary"));
+            $(self.el).find(".graph-segment-container").replaceWith(newPage.find(".graph-segment-container"));
 
             countlyCommon.drawGraph(platformData.chartDP, "#dashboard-graph", "pie");
             countlyCommon.drawGraph(oSVersionData.chartDP, "#dashboard-graph2", "pie");
@@ -2370,25 +2398,15 @@ window.ManageAppsView = countlyView.extend({
     },
     renderCommon:function () {
         app.enableAppTooltip();
-        var appTypes = {};
-        for(var i in app.appTypes){
-            appTypes[i] = jQuery.i18n.map["management-applications.types."+i] || i;
-        }
         $(this.el).html(this.template({
-            admin_apps:countlyGlobal['admin_apps'],
-            app_types:appTypes
+            admin_apps:countlyGlobal['admin_apps']
         }));
-
         var appCategories = this.getAppCategories();
         var timezones = this.getTimeZones();
 
         var appId = countlyCommon.ACTIVE_APP_ID;
         $("#app-management-bar .app-container").removeClass("active");
         $("#app-management-bar .app-container[data-id='" + appId + "']").addClass("active");
-
-        $(".select-app-types").on("click",".item", function(){
-            app.onAppManagementSwitch($("#app-edit-id").val(), $(this).data("value"));
-        });
 
         function initAppManagement(appId) {
             if (jQuery.isEmptyObject(countlyGlobal['apps'])) {
@@ -2418,10 +2436,7 @@ window.ManageAppsView = countlyView.extend({
                 countlyCommon.setActiveApp(appId);
                 $("#sidebar-app-select").find(".logo").css("background-image", "url('"+countlyGlobal["cdn"]+"appimages/" + appId + ".png')");
                 $("#sidebar-app-select").find(".text").text(countlyGlobal['apps'][appId].name);
-                app.onAppSwitch(appId, true);
             }
-
-            app.onAppManagementSwitch(appId);
 
             $("#app-edit-id").val(appId);
             $("#view-app").find(".widget-header .title").text(countlyGlobal['apps'][appId].name);
@@ -2429,9 +2444,6 @@ window.ManageAppsView = countlyView.extend({
             $("#app-edit-name").find(".edit input").val(countlyGlobal['apps'][appId].name);
             $("#view-app-key").text(countlyGlobal['apps'][appId].key);
             $("#view-app-id").text(appId);
-            $("#app-edit-type").find(".cly-select .text").text(appTypes[countlyGlobal['apps'][appId].type]);
-            $("#app-edit-type").find(".cly-select .text").data("value", countlyGlobal['apps'][appId].type);
-            $("#app-edit-type").find(".read").text(appTypes[countlyGlobal['apps'][appId].type]);
             $("#app-edit-category").find(".cly-select .text").text(appCategories[countlyGlobal['apps'][appId].category]);
             $("#app-edit-category").find(".cly-select .text").data("value", countlyGlobal['apps'][appId].category);
             $("#app-edit-timezone").find(".cly-select .text").data("value", countlyGlobal['apps'][appId].timezone);
@@ -2559,8 +2571,6 @@ window.ManageAppsView = countlyView.extend({
 
         function resetAdd() {
             $("#app-add-name").val("");
-            $("#app-add-type").text(jQuery.i18n.map["management-applications.type.tip"]);
-            $("#app-add-type").data("value", "");
             $("#app-add-category").text(jQuery.i18n.map["management-applications.category.tip"]);
             $("#app-add-category").data("value", "");
             $("#app-add-timezone #selected").text("");
@@ -2711,11 +2721,6 @@ window.ManageAppsView = countlyView.extend({
                             $("#sidebar-app-select .logo").css("background-image", "");
                             $("#sidebar-app-select .text").text("");
                         }
-                        else if(countlyCommon.ACTIVE_APP_ID == appId){
-                            countlyCommon.setActiveApp(changeApp.data("id"));
-                            $("#sidebar-app-select .logo").css("background-image", "url(appimages/"+changeApp.data("id")+".png)");
-                            $("#sidebar-app-select .text").text(countlyGlobal['apps'][changeApp.data("id")].name);
-                        }
                     },
                     error:function () {
                         CountlyHelpers.alert(jQuery.i18n.map["management-applications.delete-admin"], "red");
@@ -2770,7 +2775,6 @@ window.ManageAppsView = countlyView.extend({
                     args:JSON.stringify({
                         app_id:appId,
                         name:appName,
-                        type:$("#app-edit-type .cly-select .text").data("value") + '',
                         category:$("#app-edit-category .cly-select .text").data("value") + '',
                         timezone:$("#app-edit-timezone #app-timezone").val(),
                         country:$("#app-edit-timezone #app-country").val()
@@ -2868,7 +2872,6 @@ window.ManageAppsView = countlyView.extend({
             }
 
             var appName = $("#app-add-name").val(),
-                type = $("#app-add-type").data("value") + "",
                 category = $("#app-add-category").data("value") + "",
                 timezone = $("#app-add-timezone #app-timezone").val(),
                 country = $("#app-add-timezone #app-country").val();
@@ -2878,10 +2881,6 @@ window.ManageAppsView = countlyView.extend({
 
             if (!appName) {
                 $("#app-add-name").after(reqSpan.clone());
-            }
-
-            if (!type) {
-                $("#app-add-type").parents(".cly-select").after(reqSpan.clone());
             }
 
             if (!category) {
@@ -2911,7 +2910,6 @@ window.ManageAppsView = countlyView.extend({
                 data:{
                     args:JSON.stringify({
                         name:appName,
-                        type:type,
                         category:category,
                         timezone:timezone,
                         country:country
@@ -2928,7 +2926,6 @@ window.ManageAppsView = countlyView.extend({
                         "name":data.name,
                         "key":data.key,
                         "category":data.category,
-                        "type":data.type,
                         "timezone":data.timezone,
                         "country":data.country
                     };
@@ -3014,7 +3011,7 @@ window.ManageUsersView = countlyView.extend({
 });
 
 window.EventsView = countlyView.extend({
-    showOnGraph: {"event-count":true, "event-sum":true, "event-dur":true},
+    showOnGraph: 2,
     beforeRender: function() {},
     initialize:function () {
         this.template = Handlebars.compile($("#template-events").html());
@@ -3025,12 +3022,9 @@ window.EventsView = countlyView.extend({
         $(".big-numbers").unbind("click");
 
         var self = this;
-
         $(".event-container").on("click", function () {
             var tmpCurrEvent = $(this).data("key");
-            for(var i in self.showOnGraph){
-                self.showOnGraph[i] = true;
-            }
+            self.showOnGraph = 2;
             $(".event-container").removeClass("active");
             $(this).addClass("active");
 
@@ -3082,20 +3076,15 @@ window.EventsView = countlyView.extend({
         });
 
         $(".big-numbers").on("click", function () {
-            if ($(".big-numbers.selected").length == 1) {
+            if ($(".big-numbers.selected").length == 2) {
+                self.showOnGraph = 1 - $(this).index();
+            } else if ($(".big-numbers.selected").length == 1) {
                 if ($(this).hasClass("selected")) {
                     return true;
                 } else {
-                    self.showOnGraph[$(this).data("type")] = true;
+                    self.showOnGraph = 2;
                 }
             }
-            else if ($(".big-numbers.selected").length > 1) {
-                if ($(this).hasClass("selected"))
-                    self.showOnGraph[$(this).data("type")] = false;
-                else
-                    self.showOnGraph[$(this).data("type")] = true;
-            }
-
             $(this).toggleClass("selected");
 
             self.drawGraph(countlyEvent.getEventData());
@@ -3106,35 +3095,22 @@ window.EventsView = countlyView.extend({
         }
     },
     drawGraph:function(eventData) {
-        $(".big-numbers").removeClass("selected");
-        var use = [];
-        var cnt = 0;
-        for(var i in this.showOnGraph){
-            if(this.showOnGraph[i]){
-                $(".big-numbers."+i).addClass("selected");
-                $(".big-numbers."+i+" .check").removeClass("fa-square-o").addClass("fa-check-square-o");
-                use.push(cnt);
-            }
-            else{
-                $(".big-numbers."+i+" .check").removeClass("fa-check-square-o").addClass("fa-square-o");
-            }
-            cnt++;
-        }
+        if (this.showOnGraph != 2) {
+            $(".big-numbers").removeClass("selected");
+            $(".big-numbers").eq(this.showOnGraph).addClass("selected");
 
-        var data = [];
-        for(var i = 0; i < use.length; i++){
             if (eventData.dataLevel == 2) {
-                data.push(eventData.chartDP.dp[use[i]]);
+                eventData.chartDP.dp = eventData.chartDP.dp.slice(this.showOnGraph, this.showOnGraph + 1);
             } else {
-                data.push(eventData.chartDP[use[i]]);
+                eventData.chartDP = eventData.chartDP.slice(this.showOnGraph, this.showOnGraph + 1);
             }
+        } else {
+            $(".big-numbers").addClass("selected");
         }
 
         if (eventData.dataLevel == 2) {
-            eventData.chartDP.dp = data;
             countlyCommon.drawGraph(eventData.chartDP, "#dashboard-graph", "bar", {series:{stack:null}});
         } else {
-            eventData.chartDP = data;
             countlyCommon.drawTimeGraph(eventData.chartDP, "#dashboard-graph");
         }
     },
@@ -3156,19 +3132,7 @@ window.EventsView = countlyView.extend({
         aaColumns.push({"mData":"c", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle":eventData.tableColumns[1]});
 
         if (eventData.tableColumns[2]) {
-            if(eventData.tableColumns[2] == jQuery.i18n.map["events.table.dur"]){
-                aaColumns.push({"mData":"dur", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle":eventData.tableColumns[2]});
-                aaColumns.push({"mData":function(row, type){if(row.c == 0 || row.dur == 0) return 0; else return (row.dur/row.c);}, sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle":jQuery.i18n.map["events.table.avg-dur"]});
-            }
-            else{
-                aaColumns.push({"mData":"s", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle":eventData.tableColumns[2]});
-                aaColumns.push({"mData":function(row, type){if(row.c == 0 || row.s == 0) return 0; else return (row.s/row.c);}, sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle":jQuery.i18n.map["events.table.avg-sum"]});
-            }
-        }
-
-        if (eventData.tableColumns[3]) {
-            aaColumns.push({"mData":"dur", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle":eventData.tableColumns[3]});
-            aaColumns.push({"mData":function(row, type){if(row.c == 0 || row.dur == 0) return 0; else return (row.dur/row.c);}, sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle":jQuery.i18n.map["events.table.avg-dur"]});
+            aaColumns.push({"mData":"s", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle":eventData.tableColumns[2]});
         }
 
         this.dtable = $('.d-table').dataTable($.extend({}, $.fn.dataTable.defaults, {
@@ -3209,9 +3173,7 @@ window.EventsView = countlyView.extend({
 
         if (!isRefresh) {
             $(this.el).html(this.template(this.templateData));
-            for(var i in this.showOnGraph){
-                self.showOnGraph[i] = $(".big-numbers.selected."+i).length;
-            }
+
             this.drawGraph(eventData);
             this.drawTable(eventData);
             this.pageScript();
@@ -3276,13 +3238,6 @@ window.EventsView = countlyView.extend({
                                 eventMap[eventKey] = {}
                             }
                             eventMap[eventKey]["sum"] = currEvent.find(".event-sum").val();
-                        }
-
-                        if (currEvent.find(".event-dur").val()) {
-                            if (!eventMap[eventKey]) {
-                                eventMap[eventKey] = {}
-                            }
-                            eventMap[eventKey]["dur"] = currEvent.find(".event-dur").val();
                         }
                     });
 
@@ -3435,15 +3390,6 @@ window.EventsView = countlyView.extend({
             $(self.el).find("#edit-event-container").replaceWith(newPage.find("#edit-event-container"));
 
             var eventData = countlyEvent.getEventData();
-            for(var i in self.showOnGraph){
-                if(!$(".big-numbers."+i).length)
-                    self.showOnGraph[i] = false;
-            }
-            for(var i in self.showOnGraph){
-                if(self.showOnGraph[i])
-                    $(".big-numbers."+i).addClass("selected");
-            }
-
             self.drawGraph(eventData);
             self.pageScript();
 
@@ -3457,19 +3403,6 @@ window.EventsView = countlyView.extend({
 
             app.localize();
         });
-    }
-});
-
-window.DashboardView = countlyView.extend({
-    renderCommon:function () {
-        if(countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID]){
-            var type = countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID].type;
-            type = jQuery.i18n.map["management-applications.types."+type] || type;
-            $(this.el).html("<div id='no-app-type'><h1>"+jQuery.i18n.map["common.missing-type"]+": "+type+"</h1><h3><a href='#/manage/plugins'>"+jQuery.i18n.map["common.install-plugin"]+"</a><br/>"+jQuery.i18n.map["common.or"]+"<br/><a href='#/manage/apps'>"+jQuery.i18n.map["common.change-app-type"]+"</a></h3></div>");
-        }
-        else{
-            $(this.el).html("<div id='no-app-type'><h1>"+jQuery.i18n.map["management-applications.no-app-warning"]+"</h1><h3><a href='#/manage/apps'>"+jQuery.i18n.map["common.add-new-app"]+"</a></h3></div>");
-        }
     }
 });
 
@@ -3499,40 +3432,11 @@ var AppRouter = Backbone.Router.extend({
     dateFromSelected:null, //date from selected from the date picker
     activeAppName:'',
     activeAppKey:'',
-    main:function (forced) {
-        var change = true,
-            redirect = false;
-        if(location.hash != "#/" && countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID]){
-            $("#"+countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID].type+"-type a").each(function(){
-                if(this.hash != "#/" && this.hash != ""){
-                    if(location.hash == this.hash){
-                        change = false;
-                        return false;
-                    }
-                    else if(location.hash.indexOf(this.hash) == 0){
-                        redirect = this.hash;
-                        return false;
-                    }
-                }
-            });
-        }
-        if(redirect){
-            app.navigate(redirect, true);
-        }
-        else if(change){
-            this.navigate("/", true);
-            if(forced && this.activeView != this.appTypes[countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID].type]){
-                this.dashboard();
-            }
-        }
+    main:function () {
+        this.navigate("/", true);
     },
     dashboard:function () {
-        if(_.isEmpty(countlyGlobal['apps']))
-            this.renderWhenReady(this.manageAppsView);
-        else if(typeof this.appTypes[countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID].type] != "undefined")
-            this.renderWhenReady(this.appTypes[countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID].type]);
-        else
-            this.renderWhenReady(this.dashboardView);
+        this.renderWhenReady(this.dashboardView);
     },
     sessions:function () {
         this.renderWhenReady(this.sessionView);
@@ -3638,30 +3542,6 @@ var AppRouter = Backbone.Router.extend({
     initialize:function () { //initialize the dashboard, register helpers etc.
     		this.pageScripts = {};
     		this.refreshScripts = {};
-        this.refreshActiveView = setInterval(function () {
-            self.activeView.refresh();
-			if(self.refreshScripts[Backbone.history.fragment])
-				for(var i = 0, l = self.refreshScripts[Backbone.history.fragment].length; i < l; i++)
-					self.refreshScripts[Backbone.history.fragment][i]();
-            for(var k in self.refreshScripts)
-                if (k !== '#' && k.indexOf('#') !== -1 && Backbone.history.fragment.match(k.replace(/#/g, '.*')))
-                    for(var i = 0, l = self.refreshScripts[k].length; i < l; i++)
-                        self.refreshScripts[k][i]();
-			if(self.refreshScripts["#"])
-				for(var i = 0, l = self.refreshScripts["#"].length; i < l; i++)
-					self.refreshScripts["#"][i]();
-        }, countlyCommon.DASHBOARD_REFRESH_MS);
-
-        if(countlyGlobal && countlyGlobal["message"]){
-            CountlyHelpers.parseAndShowMsg(countlyGlobal["message"]);
-        }
-    },
-    initialize:function () { //initialize the dashboard, register helpers etc.
-		this.appTypes = {};
-		this.pageScripts = {};
-        this.appSwitchCallbacks = [];
-        this.appManagementSwitchCallbacks = [];
-		this.refreshScripts = {};
         this.dashboardView = new DashboardView();
         this.sessionView = new SessionView();
         this.countriesView = new CountriesView();
@@ -3769,16 +3649,12 @@ var AppRouter = Backbone.Router.extend({
             return countlyCommon.formatTimeAgo(parseInt(context)/1000);
         });
 
-        var self = this;
         jQuery.i18n.properties({
             name:'locale',
             cache:true,
             language:countlyCommon.BROWSER_LANG_SHORT,
             path:[countlyGlobal["cdn"]+'localization/min/'],
-            mode:'map',
-            callback:function () {
-                self.origLang = JSON.stringify(jQuery.i18n.map);
-            }
+            mode:'map'
         });
 
         var self = this;
@@ -3800,8 +3676,7 @@ var AppRouter = Backbone.Router.extend({
             CountlyHelpers.initializeTextSelect();
             CountlyHelpers.initializeHugeDropdown();
 
-			if(parseInt(countlyGlobal.config["session_timeout"])){
-
+			if(countlyGlobal.config["session_timeout"]){
 				var minTimeout, tenSecondTimeout, logoutTimeout, actionTimeout;
 				var shouldRecordAction = false;
 				var extendSession = function(){
@@ -3891,7 +3766,12 @@ var AppRouter = Backbone.Router.extend({
                 containment:"parent",
                 tolerance:"pointer",
                 stop:function () {
-                    var orderArr = $(".apps-scrollable").sortable( "toArray", {attribute:"data-id"} );
+                    var orderArr = [];
+                    $(".app-container.app-navigate").each(function () {
+                        if ($(this).data("id")) {
+                            orderArr.push($(this).data("id"))
+                        }
+                    });
 
                     $.ajax({
                         type:"POST",
@@ -3907,6 +3787,14 @@ var AppRouter = Backbone.Router.extend({
             });
             $("#sort-app-button").click(function () {
                 $(".app-container.app-navigate .drag").fadeToggle();
+                setTimeout(function(){
+                    if($(".app-container.app-navigate .drag").is(":visible")){
+                        self.disableAppTooltip();
+                    }
+                    else{
+                        self.enableAppTooltip();
+                    }
+                },500);
             });
 
             $(".app-navigate").live("click", function () {
@@ -3917,6 +3805,26 @@ var AppRouter = Backbone.Router.extend({
                     appName = $(this).find(".name").text(),
                     appImage = $(this).find(".logo").css("background-image"),
                     sidebarApp = $("#sidebar-app-select");
+
+				if (appId == "allapps") {
+					window.location.hash = "/all";
+					sidebarApp.removeClass("active");
+                    $("#app-nav").animate({left:'31px'}, {duration:500, easing:'easeInBack'});
+					self.activeAppKey = appKey;
+                    setTimeout(function(){
+                        $("#sidebar-menu > .item").addClass("hide");
+                        $("#management-menu").removeClass("hide");
+                        $("#allapps-menu").removeClass("hide").css("display", "block");
+                    },500);
+                    return false;
+				}
+				else{
+					$("#sidebar-menu > .item").removeClass("hide");
+					$("#allapps-menu").css("display", "none");
+				}
+
+				if(window.location.hash.toString() == "#/all")
+					window.location.hash = "/";
 
                 if (self.activeAppKey == appKey) {
                     sidebarApp.removeClass("active");
@@ -3932,13 +3840,12 @@ var AppRouter = Backbone.Router.extend({
                     sidebarApp.find(".text").text(appName);
                     sidebarApp.find(".logo").css("background-image", appImage);
                     sidebarApp.removeClass("active");
-                    app.onAppSwitch(appId);
                     self.activeView.appChanged();
                 }});
             });
 
             $(document).on("mouseenter", ".app-container", function(){
-                if(!$(this).find(".drag").is(":visible") && self.appTooltip){
+                if(self.appTooltip){
                     var elem = $(this);
                     var name = elem.find(".name");
                     if(name[0].scrollWidth >  name.innerWidth()){
@@ -4009,17 +3916,6 @@ var AppRouter = Backbone.Router.extend({
                 $("#date-to").datepicker("option", $.datepicker.regional[countlyCommon.BROWSER_LANG]);
                 $("#date-from").datepicker("option", $.datepicker.regional[countlyCommon.BROWSER_LANG]);
 
-                $.ajax({
-                    type:"POST",
-                    url:countlyGlobal["path"]+"/user/settings",
-                    data:{
-                        "username":countlyGlobal["member"].username,
-                        "lang":countlyCommon.BROWSER_LANG_SHORT,
-                        _csrf:countlyGlobal['csrf_token']
-                    },
-                    success:function (result) {}
-                });
-
                 jQuery.i18n.properties({
                     name:'locale',
                     cache:true,
@@ -4027,7 +3923,6 @@ var AppRouter = Backbone.Router.extend({
                     path:[countlyGlobal["cdn"]+'localization/min/'],
                     mode:'map',
                     callback:function () {
-                        self.origLang = JSON.stringify(jQuery.i18n.map);
                         $.when(countlyLocation.changeLanguage()).then(function () {
                             self.activeView.render();
                             self.pageScript();
@@ -4309,7 +4204,6 @@ var AppRouter = Backbone.Router.extend({
 
         if (!_.isEmpty(countlyGlobal['apps'])) {
             if (!countlyCommon.ACTIVE_APP_ID) {
-
                 for (var appId in countlyGlobal['apps']) {
 
 
@@ -4330,7 +4224,6 @@ var AppRouter = Backbone.Router.extend({
                     self.activeAppName = countlyGlobal['apps'][appId].name;
                     break;
                 }
-
             } else {
                 $("#sidebar-app-select").find(".logo").css("background-image", "url('"+countlyGlobal["cdn"]+"appimages/" + countlyCommon.ACTIVE_APP_ID + ".png')");
                 $("#sidebar-app-select .text").text(countlyGlobal['apps'][countlyCommon.ACTIVE_APP_ID].name);
@@ -4627,27 +4520,19 @@ var AppRouter = Backbone.Router.extend({
             return ((x < y) ?  1 : ((x > y) ? -1 : 0));
         };
 
-        $.extend(true, $.fn.dataTable.defaults, {
+        $.extend($.fn.dataTable.defaults, {
             "sDom": '<"dataTable-top"fpT>t<"dataTable-bottom"i>',
             "bAutoWidth": false,
             "sPaginationType": "four_button",
             "iDisplayLength": 50,
             "bDestroy": true,
             "bDeferRender": true,
-            "oLanguage": {
-				"sZeroRecords": jQuery.i18n.map["common.table.no-data"],
-				"sInfoEmpty": jQuery.i18n.map["common.table.no-data"],
-				"sEmptyTable": jQuery.i18n.map["common.table.no-data"],
-				"sInfo": jQuery.i18n.map["common.showing"],
-				"sInfoFiltered": jQuery.i18n.map["common.filtered"],
-				"sSearch": jQuery.i18n.map["common.search"]
-			},
             "oTableTools": {
                 "sSwfPath": countlyGlobal["cdn"]+"javascripts/dom/dataTables/swf/copy_csv_xls.swf",
                 "aButtons": [
                     {
                         "sExtends": "csv",
-                        "sButtonText": jQuery.i18n.map["common.save-to-csv"],
+                        "sButtonText": "Save to CSV",
                         "fnClick": function (nButton, oConfig, flash) {
                             var tableCols = $(nButton).parents(".dataTables_wrapper").find(".dataTable").dataTable().fnSettings().aoColumns,
                                 tableData = this.fnGetTableData(oConfig).split(/\r\n|\r|\n/g).join('","').split('","'),
@@ -4678,7 +4563,7 @@ var AppRouter = Backbone.Router.extend({
                     },
                     {
                         "sExtends": "xls",
-                        "sButtonText": jQuery.i18n.map["common.save-to-excel"],
+                        "sButtonText": "Save for Excel",
                         "fnClick": function (nButton, oConfig, flash) {
                             var tableCols = $(nButton).parents(".dataTables_wrapper").find(".dataTable").dataTable().fnSettings().aoColumns,
                                 tableData = this.fnGetTableData(oConfig).split(/\r\n|\r|\n/g).join('\t').split('\t'),
@@ -4736,11 +4621,6 @@ var AppRouter = Backbone.Router.extend({
         });
 
         $.fn.dataTableExt.sErrMode = 'throw';
-        $(document).ready(function () {
-            setTimeout(function(){
-                self.onAppSwitch(countlyCommon.ACTIVE_APP_ID, true);
-            },1)
-        });
     },
     localize:function (el) {
 
@@ -4822,18 +4702,6 @@ var AppRouter = Backbone.Router.extend({
             $("#app-tooltip").unbind("click");
         }
     },
-    addAppType:function(name, view){
-        this.appTypes[name] = new view();
-        var menu = $("#default-type").clone();
-        menu.attr("id",name+"-type");
-        $("#sidebar-menu").append(menu);
-    },
-    addAppSwitchCallback:function(callback){
-        this.appSwitchCallbacks.push(callback);
-    },
-    addAppManagementSwitchCallback:function(callback){
-        this.appManagementSwitchCallbacks.push(callback);
-    },
 	addPageScript:function(view, callback){
 		if(!this.pageScripts[view])
 			this.pageScripts[view] = [];
@@ -4844,28 +4712,6 @@ var AppRouter = Backbone.Router.extend({
 			this.refreshScripts[view] = [];
 		this.refreshScripts[view].push(callback);
 	},
-    onAppSwitch:function(appId, refresh){
-        if(appId != 0){
-            jQuery.i18n.map = JSON.parse(app.origLang);
-            if(!refresh){
-                app.main(true);
-            }
-            $("#sidebar-menu .sidebar-menu").hide();
-            var type = countlyGlobal["apps"][appId].type;
-            if($("#sidebar-menu #"+type+"-type").length)
-                $("#sidebar-menu #"+type+"-type").show();
-            else
-                $("#sidebar-menu #default-type").show();
-            for(var i = 0; i < this.appSwitchCallbacks.length; i++){
-                this.appSwitchCallbacks[i](appId);
-            }
-        }
-    },
-    onAppManagementSwitch:function(appId, type){
-        for(var i = 0; i < this.appManagementSwitchCallbacks.length; i++){
-            this.appManagementSwitchCallbacks[i](appId, type || countlyGlobal["apps"][appId].type);
-        }
-    },
     pageScript:function () { //scripts to be executed on each view change
         $("#month").text(moment().year());
         $("#day").text(moment().format("MMM"));
@@ -4877,20 +4723,6 @@ var AppRouter = Backbone.Router.extend({
 			$("#sidebar-menu").find("a").removeClass("active");
 
             var currentMenu = $("#sidebar-menu").find("a[href='#" + Backbone.history.fragment + "']");
-            if(currentMenu.length == 0){
-                $("#"+countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID].type+"-type a").each(function(){
-                    if(this.hash != "#/" && this.hash != ""){
-                        if(location.hash == this.hash){
-                            currentMenu = $(this);
-                            return false;
-                        }
-                        else if(location.hash.indexOf(this.hash) == 0){
-                            currentMenu = $(this);
-                            return false;
-                        }
-                    }
-                });
-            }
             currentMenu.addClass("active");
 
             var subMenu = currentMenu.parent(".sidebar-submenu");
@@ -4908,7 +4740,9 @@ var AppRouter = Backbone.Router.extend({
                 $("#" + selectedDateID).addClass("active");
             }
 
-			if (Backbone.history.fragment == "/manage/apps") {
+			if (Backbone.history.fragment == "/manage/apps" ||
+                Backbone.history.fragment == "/manage/account" ||
+                Backbone.history.fragment == "/manage/users") {
                 $("#sidebar-app-select").addClass("disabled");
                 $("#sidebar-app-select").removeClass("active");
             } else {
@@ -4919,7 +4753,7 @@ var AppRouter = Backbone.Router.extend({
 				for(var i = 0, l = self.pageScripts[Backbone.history.fragment].length; i < l; i++)
 					self.pageScripts[Backbone.history.fragment][i]();
             for(var k in self.pageScripts)
-                if (k !== '#' && k.indexOf('#') !== -1 && Backbone.history.fragment.match(k.replace(/#/g, '.*')))
+                if (k !== '#' && k.indexOf('#') !== -1 && Backbone.history.fragment.match(k.replace(/#/g, '[A-Za-z_0-9]+')))
                     for(var i = 0, l = self.pageScripts[k].length; i < l; i++)
                         self.pageScripts[k][i]();
 			if(self.pageScripts["#"])

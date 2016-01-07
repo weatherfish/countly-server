@@ -204,8 +204,6 @@
 
             var time_period = countlyCommon.periodObj.currentPeriodArr;
 
-            _rickshaw_graph.period = _period;
-
             var graphTicks = [],
                    tickObj = {};
 
@@ -220,9 +218,6 @@
             /*
                 data formatting
             */
-
-            console.log("----------------- granularity_rows --------------------");
-            console.log(granularity_rows);
 
             if (granularity_type == "weekly" || granularity_type == "monthly")
             {
@@ -291,9 +286,6 @@
                 single_graph_data.push(obj);
             }
 
-            console.log("{{{{{{{{{{{{ single_graph_data }}}}}}}}}}}}");
-            console.log(single_graph_data);
-
             var series = [];
 
             single_graph_data.forEach(function(data, i){
@@ -316,7 +308,8 @@
                 small_circle_r : 0,
                 big_circle_r : 4,
                 small_circles : small_circles,
-                zero_points : zero_points
+                zero_points : zero_points,
+                period : _period
             });
 
             var scales = [];
@@ -833,89 +826,13 @@
         {
             var full_days = 7;
         }
-/*
-        if (granularity_rows[0] && granularity_rows[0]['data'] && granularity_rows[0]['data'][0].length > 2 && granularity_rows[0]['data'][0][2] < full_days)
-        {
-            _rickshaw_graph.left_time_extension = true;
-        }
-        else
-        {
-            _rickshaw_graph.left_time_extension = false;
-        }
-*/
+
         _rickshaw_graph.left_time_extension = false;
 
         _rickshaw_graph.small_circles = small_circles;
 
-        //console.log("_rickshaw_graph.left_time_extension:", _rickshaw_graph.left_time_extension);
-
         _rickshaw_graph.update();
 
-/*
-        if (container.indexOf("#") > -1)
-        {
-            var draw_element = document.getElementById(container.replace("#", ""));
-        }
-        else
-        {
-            var draw_element = document.getElementsByClassName(container.replace(".", ""));
-        }
-
-        console.log("{{{{{ draw element }}}}}");
-        console.log(draw_element);
-
-        var graph = new Rickshaw.Graph({
-            element  : draw_element,
-            width    : 960,
-            height   : 300,
-            renderer : 'line',
-            series: [
-              {
-                  color : "#c05020",
-                  data  : single_graph_data[0].values,
-                  name  : single_graph_data[0].name
-              }, {
-                  color : "#30c020",
-                  data  : single_graph_data[1].values,
-                  name  : single_graph_data[1].name
-              }, {
-                  color : "#6060c0",
-                  data  : single_graph_data[2].values,
-                  name  : single_graph_data[2].name
-              }
-            ]
-        });
-
-        var scales = [];
-
-        _ref = single_graph_data[0];
-
-        console.log("________ ref _________");
-        console.log(_ref);
-
-        for (_j = 0, _len = _ref.length; _j < _len; _j++) {
-            point = _ref[_j];
-            point.y *= point.y;
-        }
-
-        for (_k = 0, _len1 = single_graph_data.length; _k < _len1; _k++) {
-            series = single_graph_data[_k];
-            min = Number.MAX_VALUE;
-            max = Number.MIN_VALUE;
-            for (_l = 0, _len2 = series.length; _l < _len2; _l++) {
-                point = series[_l];
-                min = Math.min(min, point.y);
-                max = Math.max(max, point.y);
-            }
-            if (_k === 0) {
-                scales.push(d3.scale.linear().domain([min, max]).nice());
-            } else {
-                scales.push(d3.scale.pow().domain([min, max]).nice());
-            }
-        }
-
-        graph.render();
-*/
         return true;
 
     }
@@ -1024,11 +941,8 @@
         return dataArr;
     };
 
-    countlyCommon.extractChartData = function (db, clearFunction, chartData, dataProperties, metric) {
-        if(metric)
-            metric = "."+metric;
-        else
-            metric = "";
+    countlyCommon.extractChartData = function (db, clearFunction, chartData, dataProperties) {
+
         countlyCommon.periodObj = getPeriodObj();
 /*
         console.log("================= countlyCommon.periodObj =================");
@@ -1076,10 +990,10 @@
                         formattedDate = moment((activeDate + "/" + i).replace(/\./g, "/"));
                     }
 
-                    dataObj = countlyCommon.getDescendantProp(db, activeDate + "." + i+metric);
+                    dataObj = countlyCommon.getDescendantProp(db, activeDate + "." + i);
                 } else {
                     formattedDate = moment((activeDateArr[i]).replace(/\./g, "/"));
-                    dataObj = countlyCommon.getDescendantProp(db, activeDateArr[i]+metric);
+                    dataObj = countlyCommon.getDescendantProp(db, activeDateArr[i]);
                 }
 /*
                 console.log('}}}}}}}}}}}}}} dataObj }}}}}}}}}}}}}}');
@@ -1127,24 +1041,30 @@
 
         countlyCommon.periodObj = getPeriodObj();
 
+        var hourly_granularity   = JSON.parse(JSON.stringify(chartData)); // clone
+        hourly_granularity.format_date = function(timestamp){
+            var date = new Date(timestamp);
+            var date_string = d3.time.format("%H:%M")(date);
+            return date_string;
+        }
+
         var daily_granularity   = JSON.parse(JSON.stringify(chartData)); // clone
         daily_granularity.format_date = function(timestamp){
-
-            console.log("convert daily --------------->");
-
             var date = new Date(timestamp);
+            var date_string = d3.time.format("%d %b %Y")(date);
+            return date_string;
+        }
 
+        var daily_granularity   = JSON.parse(JSON.stringify(chartData)); // clone
+        daily_granularity.format_date = function(timestamp){
+            var date = new Date(timestamp);
             var date_string = d3.time.format("%d %b %Y")(date);
             return date_string;
         }
 
         var weekly_granularity  = JSON.parse(JSON.stringify(chartData));
         weekly_granularity.format_date = function(timestamp, days_in_period){
-
-            console.log(":::::::: convert weekly_granularity :::::::::");
-
             var date = new Date(timestamp);
-
             var one_week_ago = new Date(timestamp);
             one_week_ago.setDate(one_week_ago.getDate() - days_in_period + 1);
 
@@ -1154,9 +1074,6 @@
 
         var monthly_granularity = JSON.parse(JSON.stringify(chartData));
         monthly_granularity.format_date = function(timestamp, days_in_period){
-
-            console.log(":::::::: convert monthly :::::::::");
-
             var date = new Date(timestamp);
 
             var one_month_ago = new Date(timestamp);
@@ -1208,8 +1125,6 @@
 
                 if (!countlyCommon.periodObj.isSpecialPeriod) {
 
-                    //console.log("??????? active date:", activeDate, " -- ", i);
-
                     if (countlyCommon.periodObj.periodMin == 0) {
                         formattedDate = moment((activeDate + " " + i + ":00:00").replace(/\./g, "/"));
                     } else if (("" + activeDate).indexOf(".") == -1) {
@@ -1253,6 +1168,7 @@
                 // daily granularity
 
                 //daily_granularity[j]["data"][daily_granularity[j]["data"].length] = [formattedDate.unix() * 1000, propertyValue];
+                hourly_granularity[j]["data"].push([formattedDate.unix() * 1000, propertyValue]);
                 daily_granularity[j]["data"].push([formattedDate.unix() * 1000, propertyValue]);
 
                 // weekly granularity
@@ -1322,11 +1238,9 @@
 
         countlyCommon.previous_period_length = daily_granularity[0].data.length;
 
-        console.log("============== daily_granularity ==================");
-        console.log(daily_granularity);
-
         return {
             "chartDP"        : chartData,
+            "hourly_granularity"  : hourly_granularity,
             "daily_granularity"   : daily_granularity,
             "weekly_granularity"  : weekly_granularity,
             "monthly_granularity" : monthly_granularity,
@@ -1337,8 +1251,20 @@
             "previous_period_length" : previous_period_length,
             get_current_data : function(granularity){
 
+                if (!granularity)
+                {
+                    granularity = _granularity; // todo: will remove this global variable "_granularity"
+                }
+
+                console.log(">>>>>>>>>> get_current_data >>>>>>>>");
+                console.log(granularity);
+
                 switch(granularity)
                 {
+                    case "hourly":
+                        return hourly_granularity;
+                    break;
+
                     case "daily":
                         return daily_granularity;
                     break;
@@ -1351,7 +1277,6 @@
                         return monthly_granularity;
                     break;
                 }
-
             }
         };
     };
@@ -1555,17 +1480,18 @@
     };
 
     // Extracts top three items (from rangeArray) that have the biggest total session counts from the db object.
-    countlyCommon.extractBarData = function (db, rangeArray, clearFunction, fetchFunction) {
-        fetchFunction = fetchFunction || function (rangeArr, dataObj) {return rangeArr;};
-        
+    countlyCommon.extractBarData = function (db, rangeArray, clearFunction) {
+
         var rangeData = countlyCommon.extractTwoLevelData(db, rangeArray, clearFunction, [
             {
                 name:"range",
-                func:fetchFunction
+                func:function (rangeArr, dataObj) {
+                    return rangeArr;
+                }
             },
             { "name":"t" }
         ]);
-        rangeData.chartData = countlyCommon.mergeMetricsByName(rangeData.chartData, "range");
+
         rangeData.chartData = _.sortBy(rangeData.chartData, function(obj) { return -obj.t; });
 
         var rangeNames = _.pluck(rangeData.chartData, 'range'),

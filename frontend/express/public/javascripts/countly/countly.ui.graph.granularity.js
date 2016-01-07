@@ -55,17 +55,18 @@ var Granularity = React.createClass({
         };
     },
 
-    componentDidMount : function(){
+    componentWillMount : function(){
 
         var self = this;
 
         $(event_emitter).on('granularity_data', function(e, data){
 
-            console.log("event new_granularity:", new_granularity);
-
             var session_dp      = data.session_dp;
             var new_granularity = data.new_granularity;
             var period          = data.period;
+
+            console.log("{}[[[}{{{}}}]]] new granularity ------->>>>>>>");
+            console.log(new_granularity);
 
             var list = [ { name : "Daily", active : (new_granularity == "daily" ? true : false) /*self.state.list[0].active*/ } ];
 
@@ -78,8 +79,6 @@ var Granularity = React.createClass({
             }
 
             list.push(weekly);
-
-            //list.push({ name : "Monthly", active : this.state.list[2].active });
 
             var monthly = { name : "Monthly", active : (new_granularity == "monthly" ? true : false) /* self.state.list[2].active*/ };
 
@@ -100,11 +99,11 @@ var Granularity = React.createClass({
 
         }.bind(this));
     },
-
+/*
     componentWillUpdate: function(nextProps, nextState){
         return true;
     },
-
+*/
     handleClick : function(granularity){
 
         console.log("granularity click:", granularity);
@@ -144,17 +143,13 @@ var Granularity = React.createClass({
     },
 
     onhoverend : function(event)
-    {/*
-        console.log("--------- hover end ---------", this.mouse_move_direction);
-        console.log(event);
-*/
+    {
         if (this.mouse_move_direction == "down")
         {
             this.setState({
                 info_open : false
             });
         }
-
     },
 
     onmousemove : function(event)

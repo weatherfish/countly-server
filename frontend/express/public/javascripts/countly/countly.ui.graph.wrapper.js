@@ -2,9 +2,47 @@ var GraphWrapper = React.createClass({
 
     getInitialState() {
 
+        var sessionDP = this.props.data_function();
+
+        console.log(">>>>>>>>>>>>> initial period:", countlyCommon.getPeriod());
+
+        if (countlyCommon.getPeriod() == "hour")
+        {
+            var granularity = "hourly";
+        }
+        else if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
+        {
+            var granularity = "monthly";
+        }
+        else if (sessionDP.daily_granularity[0].data.length * (_circle_radius * 2) * 2 > this.props.graph_width) // todo: combine with block from update
+        {
+            var granularity = "weekly";
+        }
+        else
+        {
+            var granularity = "daily";
+        }
+
+        if (granularity == "hourly")
+        {
+            var granularity_rows = sessionDP.hourly_granularity;
+        }
+        else if (granularity == "weekly")
+        {
+            var granularity_rows = sessionDP.weekly_granularity;
+        }
+        else if (_granularity == "monthly")
+        {
+            var granularity_rows = sessionDP.monthly_granularity;
+        }
+        else
+        {
+            var granularity_rows = sessionDP.daily_granularity;
+        }
+
         var zero_points = true;
 
-        this.props.granularity_rows.every(function(datapath){
+        granularity_rows.every(function(datapath){
 
             datapath.data.every(function(datapoint){
 
@@ -28,11 +66,13 @@ var GraphWrapper = React.createClass({
 
         });
 
-        countlyCommon.drawTimeGraph(this.props.granularity_rows, "#dashboard-graph", this.props.big_numbers, (this.props.graph_width - 60),this.props.height, false, this.props.granularity, false, zero_points);
+        countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", this.props.big_numbers, (this.props.graph_width - 60),this.props.height, false, granularity, false, zero_points);
 
         return {
             big_numbers : this.props.big_numbers,
-            active : true
+            active : true,
+            session_dp : sessionDP,
+            granularity_type : granularity
         };
     },
 
@@ -44,14 +84,29 @@ var GraphWrapper = React.createClass({
 
         }.bind(this));
 
-        $(event_emitter).on('date_choise', function(e, period){
+        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
 
-            var updated_data = this.update(-1, false);
+            if (period.period == "hour")
+            {
+                var updated_data = this.update(-1, "hourly");
+            }
+            else
+            {
+                var updated_data = this.update(-1, false);
+            }
 
+/*
             var rows = updated_data.rows;
             var granularity = updated_data.new_granularity;
+*/
+        }.bind(this));
+
+        $(event_emitter).on('data_changed', function(e, data){
+
+            this.update(-1, this.state.granularity_type);
 
         }.bind(this));
+
     },
 
     big_number_render : function() {
@@ -77,8 +132,6 @@ var GraphWrapper = React.createClass({
         if (data.hover)
         {
             var class_name = "path_" + data.color.replace("#", "");
-
-            //console.log("path class_name:", class_name);
 
             for (var i = 0; i < document.getElementsByClassName("graph_path").length; i++)
             {
@@ -139,7 +192,7 @@ var GraphWrapper = React.createClass({
             }
         }
 
-        var sessionDP = this.props.session_data_function();//  countlySession.getSessionDP();
+        var sessionDP = this.props.data_function();
 
         /*
             disable or enable auto granularity
@@ -147,12 +200,22 @@ var GraphWrapper = React.createClass({
 
         var time_range_difference = sessionDP.previous_period_length / sessionDP.daily_granularity[0].data.length;
 
-        if (!new_granularity && id == -1 && (time_range_difference < 0.5 || time_range_difference > 2))
+        if (id != -1)
+        {
+            new_granularity = this.state.granularity_type;
+        }
+
+        console.log("new_granularity:", new_granularity, "->", time_range_difference);
+
+        if ((!new_granularity/* && id == -1*/ && (time_range_difference < 0.5 || time_range_difference > 2)) || this.state.granularity_type == "hourly") // if previous period is hourly
         {
 
             /*
                 auto granularity is active, event from date selection
             */
+
+            console.log("... auto granularity ...");
+            console.log();
 
             if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
             {
@@ -175,6 +238,10 @@ var GraphWrapper = React.createClass({
         {
             var granularity_rows = sessionDP.monthly_granularity;
         }
+        else if (new_granularity == "hourly")
+        {
+            var granularity_rows = sessionDP.hourly_granularity;
+        }
         else
         {
             var granularity_rows = sessionDP.daily_granularity;
@@ -189,8 +256,11 @@ var GraphWrapper = React.createClass({
             }
         }
 
-        console.log("----------- granularity_rows ------------");
-        console.log(granularity_rows);
+        $(event_emitter).trigger('granularity_data', {
+            "session_dp" : sessionDP,
+            "new_granularity" : new_granularity,
+            "period" : countlyCommon.getPeriod()
+        });
 
         var zero_points = true;
 
@@ -251,12 +321,14 @@ var GraphWrapper = React.createClass({
             }
         }
 
-        //countlyCommon.updateTimeGraph(active_array, "#dashboard-graph", big_numbers, false, _granularity, small_circles, zero_points);
-        this.props.update_graph_function(active_array, "#dashboard-graph", big_numbers, false, _granularity, small_circles, zero_points);
+        _granularity = new_granularity; // todo: remove global variable
+
+        this.props.update_graph_function(active_array, "#dashboard-graph", big_numbers, false, new_granularity, small_circles, zero_points);
 
         this.setState({
             big_numbers : big_numbers,
-            active : active
+            active : active,
+            granularity_type : new_granularity
         });
 
         return {
@@ -300,9 +372,9 @@ var GraphWrapper = React.createClass({
 
                 <Granularity
                     class_name={granularity_class_name}
-                    data={this.props.data}
+                    data={this.state.session_dp}
                     graph_width={this.props.graph_width}
-                    type={this.props.granularity}
+                    type={this.state.granularity_type}
                     period={this.props.period} />
 
                 <div id="dashboard-graph" style={graph_style}>

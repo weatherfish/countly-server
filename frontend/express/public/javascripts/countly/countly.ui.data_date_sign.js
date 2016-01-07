@@ -3,9 +3,6 @@
 var DataDateSign = React.createClass({
 
     getInitialState : function() {
-
-        console.log(">> init DataDateSign >>");
-
         return {
             date_string : global_controller.date_string,
         };
@@ -22,8 +19,6 @@ var DataDateSign = React.createClass({
 
         var date_string = data.state.from_string + " - " + data.state.to_string;
 
-        console.log("//////// date_change_event /////////", date_string);
-
         this.setState({
             date_string : date_string,
         });
@@ -32,7 +27,7 @@ var DataDateSign = React.createClass({
     render : function() {
 
         return (
-          <div>
+          <div className="data_date_sign">
               {this.state.date_string}
           </div>
         );

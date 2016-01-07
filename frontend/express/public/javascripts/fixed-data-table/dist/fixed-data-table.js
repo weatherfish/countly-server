@@ -1,5 +1,5 @@
 /**
- * FixedDataTable v0.5.0 
+ * FixedDataTable v0.5.0
  *
  * Copyright (c) 2015, Facebook, Inc.
  * All rights reserved.
@@ -755,6 +755,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      onRowMouseDown: state.onRowMouseDown,
 	      onRowMouseEnter: state.onRowMouseEnter,
 	      onRowMouseLeave: state.onRowMouseLeave,
+				onCellMouseEnter : this.props.onCellMouseEnter,
+				onCellMouseLeave : this.props.onCellMouseLeave,
 	      rowClassNameGetter: state.rowClassNameGetter,
 	      rowsCount: state.rowsCount,
 	      rowGetter: state.rowGetter,
@@ -1678,7 +1680,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  getDefaultProps: function getDefaultProps() /*object*/{
 	    return {
-	      allowCellsRecycling: false,
+	      allowCellsRecycling: true,
 	      fixed: false
 	    };
 	  },
@@ -3857,6 +3859,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        onMouseDown: props.onRowMouseDown,
 	        onMouseEnter: props.onRowMouseEnter,
 	        onMouseLeave: props.onRowMouseLeave,
+					onCellMouseEnter : props.onCellMouseEnter,
+					onCellMouseLeave : props.onCellMouseLeave,
 	        className: joinClasses(rowClassNameGetter(rowIndex), cx('public/fixedDataTable/bodyRow'), cx({
 	          'fixedDataTableLayout/hasBottomBorder': hasBottomBorder,
 	          'public/fixedDataTable/hasBottomBorder': hasBottomBorder
@@ -3872,11 +3876,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    translateDOMPositionXY(style, 0, props.firstRowOffset - firstRowPosition + props.offsetTop);
 
-	    return React.createElement(
+	    var element = React.createElement(
 	      'div',
 	      { style: style },
 	      this._staticRowArray
 	    );
+
+			return element;
 	  },
 
 	  _getRowHeight: function _getRowHeight( /*number*/index) /*number*/{
@@ -4553,7 +4559,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      data: this.props.data,
 	      onColumnResize: this.props.onColumnResize,
 	      rowHeight: this.props.height,
-	      rowIndex: this.props.index
+	      rowIndex: this.props.index,
+				onCellMouseEnter : this.props.onCellMouseEnter,
+				onCellMouseLeave : this.props.onCellMouseLeave,
 	    });
 	    var columnsShadow = this._renderColumnsShadow(fixedColumnsWidth);
 	    var scrollableColumns = React.createElement(FixedDataTableCellGroup, {
@@ -4567,7 +4575,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      data: this.props.data,
 	      onColumnResize: this.props.onColumnResize,
 	      rowHeight: this.props.height,
-	      rowIndex: this.props.index
+	      rowIndex: this.props.index,
+				onCellMouseEnter : this.props.onCellMouseEnter,
+				onCellMouseLeave : this.props.onCellMouseLeave,
 	    });
 
 	    return React.createElement(
@@ -4582,7 +4592,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        style: style },
 	      React.createElement(
 	        'div',
-	        { className: cx('fixedDataTableRowLayout/body') },
+	        { className: cx('fixedDataTableRowLayout/body')},
 	        fixedColumns,
 	        scrollableColumns,
 	        columnsShadow
@@ -4823,7 +4833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      className = columnProps.cellClassName;
 	    }
 
-	    return React.createElement(FixedDataTableCell, {
+			return React.createElement(FixedDataTableCell, {
 	      align: columnProps.align,
 	      cellData: cellData,
 	      cellDataKey: cellDataKey,
@@ -4839,6 +4849,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      onColumnResize: onColumnResize,
 	      rowData: rowData,
 	      rowIndex: rowIndex,
+				onMouseEnter : this.props.onMouseEnter,
+				onMouseLeave : this.props.onMouseLeave,
+				onCellMouseEnter : this.props.onCellMouseEnter,
+				onCellMouseLeave : this.props.onCellMouseLeave,
 	      width: columnProps.width,
 	      left: left
 	    });
@@ -5679,10 +5693,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          className: cx('fixedDataTableCellLayout/columnResizerContainer'),
 	          style: columnResizerStyle,
 	          onMouseDown: this._onColumnResizerMouseDown },
-	        React.createElement('div', {
-	          className: joinClasses(cx('fixedDataTableCellLayout/columnResizerKnob'), cx('public/fixedDataTableCell/columnResizerKnob')),
-	          style: columnResizerStyle
-	        })
+		        React.createElement('div', {
+		          className: joinClasses(cx('fixedDataTableCellLayout/columnResizerKnob'), cx('public/fixedDataTableCell/columnResizerKnob')),
+		          style: columnResizerStyle
+		        })
 	      );
 	    }
 
@@ -5691,9 +5705,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      width: props.width
 	    };
 
+			//console.log("cell index:", props.rowIndex, "--> props.cellDataKey:", props.cellDataKey, ", content:", content);
+
 	    return React.createElement(
 	      'div',
-	      { className: className, style: style },
+	      {
+						className: className, style: style,
+						onMouseEnter : function(){
+								if(props.onCellMouseEnter) props.onCellMouseEnter(props.rowIndex, props.cellDataKey);
+						},
+						onMouseLeave : function(){
+								if(props.onCellMouseLeave) props.onCellMouseLeave(props.rowIndex, props.cellDataKey);
+						}
+				},
 	      columnResizerComponent,
 	      React.createElement(
 	        'div',
@@ -6249,7 +6273,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
 	 * @providesModule PrefixIntervalTree
-	 * 
+	 *
 	 * @typechecks
 	 */
 

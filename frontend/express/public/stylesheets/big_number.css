@@ -22,6 +22,7 @@
     position : relative;
     cursor : pointer;
     text-align: center;
+    word-wrap: normal;
 }
 
 .big-numbers-container > div .tick_wrp {
