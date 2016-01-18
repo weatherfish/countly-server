@@ -1940,7 +1940,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
     //console.log("new domain:", y_domain);
 
-    var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, 298]); // todo: +20 !!!!!!!!!!!!!
+    var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, 298]); // todo: change to height variable
 
     var tick_values = [];
 
@@ -1959,13 +1959,17 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 			.append("svg:g")
 			.attr("class", ["y_ticks", this.ticksTreatment].join(" "))
 			.attr("transform", transform)
-			.call(axis.ticks(this.ticks).scale(y_inverted).tickValues(tick_values).tickFormat(function(d) {
+			.call(axis.ticks(this.ticks).scale(y_inverted).tickValues(tick_values).tickFormat(function(d) { // todo: remove .ticks(this.ticks)
           return formatValue(d).replace('0.0', '0').replace('.0', '');/* return d*/
       })) /*.tickSubdivide(0)*/ /*.tickPadding([0])*/
       .call(this.customAxis);
 
 		return axis;
 	},
+
+  /*
+      todo: combime same block elements
+  */
 
 	_drawGrid: function(axis) {
 
@@ -2022,7 +2026,8 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 			.selectAll('text')
 			.each(function() {
         //console.log("grid text:", this.textContent);
-        this.parentNode.setAttribute('data-y-value', this.textContent)
+        //this.parentNode.setAttribute('data-y-value', this.textContent);
+        this.remove();
       });
 	}
 } );

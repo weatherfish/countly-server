@@ -96,6 +96,9 @@
 
         chartData.chartData = countlyCommon.extractRangeData(_userDb, "f", _frequencies, countlyUser.explainFrequencyRange);
 
+        console.log(">>>>>>>>>>>> inside function >>>>>>>>>>>");
+        console.log(chartData.chartData);
+
         var frequencies = _.pluck(chartData.chartData, "f"),
             frequencyTotals = _.pluck(chartData.chartData, "t"),
             chartDP = [

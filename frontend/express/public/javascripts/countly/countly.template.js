@@ -7,6 +7,8 @@
 
  */
 
+ var sidebar_width = 240;
+
  var math_sort = function(a, b, sortBy, sortDir) // todo: move somewhere
  {
      var sortVal = 0;
@@ -56,7 +58,7 @@ var countlyView = Backbone.View.extend({
     afterRender: function() {},
     render:function () {    //backbone.js view render function
         $("#content-top").html("");
-        this.el.html('<div id="content-loader"></div>');
+        //this.el.html('<div id="content-loader"></div>');
 
         if (countlyCommon.ACTIVE_APP_ID) {
             var self = this;
@@ -1145,7 +1147,6 @@ window.SessionView = countlyView.extend({
 
         _granularity = false; // todo: remove global var
 
-        var sidebar_width = 240;
         var margin_left   = 30;
         var padding_left  = 30;
         var margin_right  = 30;
@@ -1218,13 +1219,13 @@ window.SessionView = countlyView.extend({
 
             var self = this;
 
-            //setTimeout(function(){ // todo: remove setTimeout
+            setTimeout(function(){ // todo: remove setTimeout
             //onload = function() {
 
             /*
               todo: now it not using in graph wrapper, it consists it inside. Using only in table wrapper
             */
-
+/*
             if (countlyCommon.getPeriod() == "hour")
             {
                 _granularity = "hourly";
@@ -1259,6 +1260,7 @@ window.SessionView = countlyView.extend({
                 }
 
             }
+*/
 
             React.render(React.createElement(CalendarWrapper, {
             }), document.getElementById("calendar_block"));
@@ -1281,31 +1283,34 @@ window.SessionView = countlyView.extend({
                 "big_numbers" : self.templateData["big-numbers"].items,
                 //"big_number_click" : update_graph,
                 "data_function" : countlySession.getSessionDP,
-                "update_graph_function" : countlyCommon.updateTimeGraph
+                "update_graph_function" : countlyCommon.updateTimeGraph,
+                "mount_callback" : function(mount_data){
+
+                    document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
+                    document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
+                    document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
+
+                    /* TABLE WRAPPER */
+
+                    var table_wrapper = React.createElement(TableWrapper, {
+                        //"rows"    : granularity_rows,
+                        "headers" : self.templateData["big-numbers"].items,
+                        "width"   : table_width,
+                        "row_height" : 50,
+                        "data_sign" : "DATA",
+                        "sort_functions" : sort_functions,
+                        "data_function" : countlySession.getSessionDP,
+                        "date_sign" : "Date",
+                        "granularity" : mount_data.granularity
+                    }, null);
+
+                    React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
+
+                }
 
             }), document.getElementById("widget-content"));
 
-            document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
-            document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
-            document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
-
-            /* TABLE WRAPPER */
-
-            console.log("============== granularity_rows ==================");
-            console.log(granularity_rows);
-
-            var table_wrapper = React.createElement(TableWrapper, {
-                "rows"    : granularity_rows,
-                "headers" : self.templateData["big-numbers"].items,
-                "width"   : table_width,
-                "row_height" : 50,
-                "data_sign" : "DATA",
-                "sort_functions" : sort_functions,
-                "data_function" : countlySession.getSessionDP,
-                "date_sign" : "Date"
-            }, null);
-
-            React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
+          }, 2000);
 
         }
         else
@@ -1350,13 +1355,6 @@ window.UserView = countlyView.extend({
     renderCommon:function (isRefresh) {
         var sessionData = countlySession.getSessionData(),
             userDP = countlySession.getUserDP();
-
-
-        console.log("------- UserView session data ---------");
-        console.log(sessionData);
-
-        console.log("------- userDP session data ---------");
-        console.log(userDP);
 
         var self = this;
 
@@ -1408,6 +1406,12 @@ window.UserView = countlyView.extend({
             }
         };
 
+        var sort_functions = {
+            "t" : math_sort,
+            "n" : math_sort,
+            "r" : math_sort,
+        }
+
         for (var i = 0; i < this.templateData["big-numbers"].items.length; i++)
         {
             this.templateData["big-numbers"].items[i].active = true;
@@ -1421,6 +1425,125 @@ window.UserView = countlyView.extend({
 
           $(this.el).html(this.template(this.templateData));
 
+          var self = this;
+
+/*
+          if (countlyCommon.getPeriod() == "hour")
+          {
+              _granularity = "hourly";
+              var granularity_rows = sessionDP.hourly_granularity;
+          }
+          else
+          {
+
+              if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
+              {
+                  _granularity = "monthly";
+              }
+              else if (sessionDP.daily_granularity[0].data.length * (_circle_radius * 2) * 2 > graph_width) // todo: combine with block from update
+              {
+                  _granularity = "weekly";
+              }
+              else {
+                  _granularity = "daily";
+              }
+
+              if (_granularity == "weekly")
+              {
+                  var granularity_rows = sessionDP.weekly_granularity;
+              }
+              else if (_granularity == "monthly")
+              {
+                  var granularity_rows = sessionDP.monthly_granularity;
+              }
+              else
+              {
+                  var granularity_rows = sessionDP.daily_granularity;
+              }
+
+          }
+
+          React.render(React.createElement(CalendarWrapper, {
+          }), document.getElementById("calendar_block"));
+
+          React.render(React.createElement(TopBar, {
+              "user_name" : "John Black",
+              "width"     : window.innerWidth - sidebar_width
+          }), document.getElementById("top_bar"));
+
+          React.render(React.createElement(GraphWrapper, {
+              "trend_sign"  : "SESSIONS TREND",
+              "width"       : graph_width - 70 - 70,
+              "height"      : 300,
+              "margin_left" : 40,
+              //"granularity_rows" : granularity_rows,
+              //"data"        : sessionDP,
+              "graph_width" : graph_width, // todo: combine
+              //"granularity" : _granularity,
+              "period"      : countlyCommon.getPeriod(),
+              "big_numbers" : self.templateData["big-numbers"].items,
+              //"big_number_click" : update_graph,
+              "data_function" : countlySession.getSessionDP,
+              "update_graph_function" : countlyCommon.updateTimeGraph,
+
+          }), document.getElementById("widget-content"));
+*/
+
+          // ------------------------------------------------------------------------------------------------------
+
+          React.render(React.createElement(CalendarWrapper, {
+          }), document.getElementById("calendar_block"));
+
+          React.render(React.createElement(TopBar, {
+              "user_name" : "John Black",
+              "width"     : window.innerWidth - 240
+          }), document.getElementById("top_bar"));
+
+          React.render(React.createElement(GraphWrapper, {
+              "trend_sign"  : "USERS TREND",
+              "width"       : graph_width - 70 - 70,
+              "height"      : 300,
+              "margin_left" : 40,
+              //"granularity_rows" : granularity_rows,
+              //"data"        : userDP,
+              "graph_width" : graph_width, // todo: combine
+              //"granularity" : _granularity,
+              "period"      : countlyCommon.getPeriod(),
+              "big_numbers" : this.templateData["big-numbers"].items,
+              //"big_number_click" : update_graph,
+              "data_function" : countlySession.getUserDP,
+              "update_graph_function" : countlyCommon.updateTimeGraph,
+              "mount_callback" : function(mount_data){
+
+
+                  console.log("=========== mount_callback data ===============");
+                  console.log(mount_data);
+
+                  document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
+                  document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
+                  document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
+
+                  /* TABLE WRAPPER */
+
+                  var table_wrapper = React.createElement(TableWrapper, {
+                      //"rows"    : granularity_rows,
+                      "headers" : self.templateData["big-numbers"].items,
+                      "width"   : table_width,
+                      "row_height" : 50,
+                      "data_sign" : "DATA",
+                      "sort_functions" : sort_functions,
+                      "data_function" : countlySession.getSessionDP,
+                      "date_sign" : "Date",
+                      "granularity" : mount_data.granularity
+                  }, null);
+
+                  React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
+
+              }
+
+          }), document.getElementById("widget-content"));
+
+/*
           if ((userDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
           {
               _granularity = "monthly";
@@ -1446,36 +1569,14 @@ window.UserView = countlyView.extend({
               var granularity_rows = userDP.daily_granularity;
           }
 
-          React.render(React.createElement(CalendarWrapper, {
-          }), document.getElementById("calendar_block"));
 
-          React.render(React.createElement(TopBar, {
-              "user_name" : "John Black",
-              "width"     : window.innerWidth - 240
-          }), document.getElementById("top_bar"));
-
-          React.render(React.createElement(GraphWrapper, {
-              "trend_sign"  : "USERS TREND",
-              "width"       : graph_width - 70 - 70,
-              "height"      : 300,
-              "margin_left" : 40,
-              "granularity_rows" : granularity_rows,
-              "data"        : userDP,
-              "graph_width" : graph_width, // todo: combine
-              "granularity" : _granularity,
-              "period"      : countlyCommon.getPeriod(),
-              "big_numbers" : this.templateData["big-numbers"].items,
-              //"big_number_click" : update_graph,
-              "session_data_function" : countlySession.getUserDP,
-              "update_graph_function" : countlyCommon.updateTimeGraph
-          }), document.getElementById("widget-content"));
 
           document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
           document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
           document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
 
           /* TABLE WRAPPER */
-
+/*
           var table_wrapper = React.createElement(TableWrapper, {
               "rows"    : granularity_rows,
               "headers" : this.templateData["big-numbers"].items,
@@ -1485,6 +1586,8 @@ window.UserView = countlyView.extend({
           }, null);
 
           React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
+
+*/
 
 /*
             countlyCommon.drawTimeGraph(userDP.chartDP, "#dashboard-graph");
@@ -1745,6 +1848,9 @@ window.LoyaltyView = countlyView.extend({
         if (!isRefresh) {
             $(this.el).html(this.template(this.templateData));
 
+            console.log("============= template loyaltyData.chartDP ============");
+            console.log(loyaltyData.chartDP);
+/*
             countlyCommon.drawGraph(loyaltyData.chartDP, "#dashboard-graph", "bar");
 
             this.dtable = $('.d-table').dataTable($.extend({}, $.fn.dataTable.defaults, {
@@ -1754,13 +1860,14 @@ window.LoyaltyView = countlyView.extend({
                     { "mData": "t", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.number-of-users"] },
                     { "mData": "percent", "sType":"percent", "sTitle": jQuery.i18n.map["common.percent"] }
                 ]
-            }));
+            }));*/
 
             //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
         var self = this;
+        /*
         $.when(countlyUser.initialize()).then(function () {
             if (app.activeView != self) {
                 return false;
@@ -1769,7 +1876,7 @@ window.LoyaltyView = countlyView.extend({
             var loyaltyData = countlyUser.getLoyaltyData();
             countlyCommon.drawGraph(loyaltyData.chartDP, "#dashboard-graph", "bar");
             CountlyHelpers.refreshTable(self.dtable, loyaltyData.chartData);
-        });
+        });*/
     }
 });
 
@@ -1949,6 +2056,49 @@ window.FrequencyView = countlyView.extend({
         };
 
         if (!isRefresh) {
+
+            console.log("============= frequencyData =============");
+            console.log(frequencyData);
+
+            var chart_width = window.innerWidth - 240 - 40 - 80 - 40;
+            var chart_height = 300;
+
+            //frequencyData.chartDP.dp.shift();
+/*
+            var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654"    , "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
+
+            for (var i = 0; i < frequencyData.chartData.length; i++)
+            {
+                var color = make_color();
+                frequencyData.chartData[i].color = colors[i];
+            }
+*/
+            setTimeout(function(){
+
+                React.render(React.createElement(CalendarWrapper, {
+                }), document.getElementById("calendar_block"));
+
+                React.render(React.createElement(TopBar, {
+                    "user_name" : "John Black",
+                    "width"     : window.innerWidth - sidebar_width
+                }), document.getElementById("top_bar"));
+
+                React.render(React.createElement(Chart, {
+                    "width"  : chart_width,
+                    "height" : chart_height,
+                    //"data"   : frequencyData.chartData,
+                    "data_function" : countlyUser.getFrequencyData,
+                    "tooltip_width" : 60,
+                    "tooltip_height" : 44,
+                    "bar_width" : 40,
+                }), document.getElementById("content-container"));
+
+            }, 1000);
+
+/*
+            countlyCommon.drawGraph(frequencyData.chartData, "#bar_chart", "bar", graph_width, graph_height);
+*/
+          /*
             $(this.el).html(this.template(this.templateData));
 
             countlyCommon.drawGraph(frequencyData.chartDP, "#dashboard-graph", "bar");
@@ -1960,12 +2110,14 @@ window.FrequencyView = countlyView.extend({
                     { "mData": "t", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.number-of-users"] },
                     { "mData": "percent", "sType":"percent", "sTitle": jQuery.i18n.map["common.percent"] }
                 ]
-            }));
+            }));*/
 
             //$(".d-table").stickyTableHeaders();
+
         }
     },
     refresh:function () {
+      /*
         var self = this;
         $.when(countlyUser.initialize()).then(function () {
             if (app.activeView != self) {
@@ -1975,7 +2127,7 @@ window.FrequencyView = countlyView.extend({
             var frequencyData = countlyUser.getFrequencyData();
             countlyCommon.drawGraph(frequencyData.chartDP, "#dashboard-graph", "bar");
             CountlyHelpers.refreshTable(self.dtable, frequencyData.chartData);
-        });
+        });*/
     }
 });
 

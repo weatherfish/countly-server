@@ -4,8 +4,6 @@ var GraphWrapper = React.createClass({
 
         var sessionDP = this.props.data_function();
 
-        console.log(">>>>>>>>>>>>> initial period:", countlyCommon.getPeriod());
-
         if (countlyCommon.getPeriod() == "hour")
         {
             var granularity = "hourly";
@@ -255,13 +253,13 @@ var GraphWrapper = React.createClass({
                 var small_circles = false;
             }
         }
-
+/*
         $(event_emitter).trigger('granularity_data', {
             "session_dp" : sessionDP,
             "new_granularity" : new_granularity,
             "period" : countlyCommon.getPeriod()
         });
-
+*/
         var zero_points = true;
 
         granularity_rows.every(function(datapath){
@@ -323,7 +321,19 @@ var GraphWrapper = React.createClass({
 
         _granularity = new_granularity; // todo: remove global variable
 
-        this.props.update_graph_function(active_array, "#dashboard-graph", big_numbers, false, new_granularity, small_circles, zero_points);
+        this.props.update_graph_function(active_array, "#dashboard-graph", big_numbers, false, new_granularity, small_circles, zero_points, function(error, result){
+
+            console.log("------- graph updated --------");
+            console.log("------- graph updated --------");
+            console.log("------- graph updated --------");
+            console.log("------- graph updated --------");
+
+            $(event_emitter).trigger('granularity_data', {
+                "session_dp" : sessionDP,
+                "new_granularity" : new_granularity,
+                "period" : countlyCommon.getPeriod()
+            });
+        });
 
         this.setState({
             big_numbers : big_numbers,
@@ -395,10 +405,18 @@ var GraphWrapper = React.createClass({
         )
     },
 
+    componentDidMount : function()
+    {
+        if (this.props.mount_callback)
+        {
+            this.props.mount_callback({
+                granularity : this.state.granularity_type
+            });
+        }
+    },
+
     hasClass : function(el, cls) {
         return el.className.baseVal && new RegExp("(\\s|^)" + cls + "(\\s|$)").test(el.className.baseVal);
     },
 
 });
-
-console.log(">>> finish load GraphWrapper  >>>");

@@ -60,23 +60,14 @@
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/v2.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/ui.v2.topbar.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/calendar.css" />
-
-			<link rel="stylesheet" href="<%- cdn %>stylesheets/calendar.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/line_chart.css" />
-
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/big_number.css" />
-
-			<!--link rel="stylesheet" href="<%- cdn %>stylesheets/table_wrapper.css" /-->
-			<!--link rel="stylesheet" href="<%- cdn %>javascripts/react/rc-calendar/assets/index.css" /-->
-
 			<link rel="stylesheet" href="<%- cdn %>javascripts/visualization/rickshaw/rickshaw.min.css" />
-
 			<link rel="stylesheet" href="<%- cdn %>javascripts/react_old/widgets/dist/css/core.css" />
 			<link rel="stylesheet" href="<%- cdn %>javascripts/react_old/widgets/dist/css/react-widgets.css" />
-
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/tables.css" />
-
-			<link rel="stylesheet" href="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.css" />
+			<link rel="stylesheet" type="text/css" href="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.css" />
+			<link rel="stylesheet" type="text/css" href="<%- cdn %>stylesheets/bar_chart.css" />
 
 
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
@@ -107,7 +98,12 @@
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/TableTools.js"></script>
 
 				<script type="text/javascript" src="<%- cdn %>javascripts/react-with-addons.js"></script>
+
+				<!--script src="https://fb.me/react-with-addons-0.14.6.js"></script>
+				<script src="https://fb.me/react-dom-0.14.6.js"></script-->
 				<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+
+				<!--script type="text/javascript" src="<%- cdn %>javascripts/react/build/react-with-addons.js"></script-->
 
 				<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.js"></script>
 
@@ -133,12 +129,8 @@
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.graph.time_extension.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.graph.granularity.js"></script>
 
-    <% } %>
+				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.bar_chart.js"></script>
 
-		<% if (themeFiles && themeFiles.css) { %>
-        <% for(var i=0, l=themeFiles.css.length; i<l; i++) {%>
-    <link href='<%= themeFiles.css[i]%>' rel='stylesheet' type='text/css'>
-        <% } %>
     <% } %>
 
 		<script type="text/javascript">
@@ -250,7 +242,6 @@
 		</script>
 
 </head>
-
 <body>
 
 		<div id="sidebar">
@@ -278,6 +269,40 @@
 		<div id="calendar_block">
 		</div>
 
+
+		<div id="content-container">
+
+		    <div id="content">
+		            <!--div id="content-loader"></div-->
+		    </div>
+
+				<!--svg id="bar_chart"></svg-->
+
+		    <!--div id="content-top"></div-->
+
+				<!--div id="content-footer">
+		            <span><%= countlyTypeName %></span>
+				 <% if (!countlyType) { %>
+					<ul>
+						<li><a href="#" id="Intercom">Feedback & Support</a></li>
+						<li>|</li>
+						<li><a href="http://resources.count.ly/" target="_blank">Documentation</a></li>
+					</ul>
+				 <% }else { %>
+					<ul>
+						<li><a href="#" id="Intercom" >Provide feedback</a></li>
+						<li>|</li>
+						<li><a href="http://support.count.ly/" target="_blank">Support</a></li>
+						<li>|</li>
+						<li><a href="http://count.ly/enterprise-edition" target="_blank">Enterprise Edition (supported)</a></li>
+						<li>|</li>
+						<li><a href="http://resources.count.ly/" target="_blank">Documentation</a></li>
+					</ul>
+				 <% } %>
+			 </div-->
+		</div>
+
+
     <div id="app-tooltip"></div>
 
 	<div id="app-nav">
@@ -292,6 +317,10 @@
 			</div>
 		</div>
 		<div class="apps-scrollable">
+			<div class="app-container app-navigate" data-id="allapps">
+				<div class="logo" style="background-image: url('<%- cdn %>images/favicon.png');"></div>
+				<div class="name" data-localize="allapps.title"></div>
+			</div>
 			<% for (var i = 0; i < userOfApps.length; i++) { %>
 				<div class="app-container app-navigate" data-key="<%= userOfApps[i].key %>" data-id="<%= userOfApps[i]['_id'] %>">
 					<div class="logo" style="background-image: url('<%- cdn %>appimages/<%= userOfApps[i]['_id'] %>.png');"></div>
@@ -321,7 +350,7 @@
  		<div class="indicator"></div>
  		<div class="message"></div>
  		<div class="content">
- 	        <div id="content-loader"></div>
+ 	        <!--div id="content-loader"></div-->
  		</div>
  	</div>
 	<div id="cly-alert" class="dialog">
@@ -428,34 +457,6 @@
             </div>
         </div>
     </div>
-    <div id="content-container">
-        <!--div id="content-top"></div-->
-        <div id="content">
-            <div id="content-loader"></div>
-        </div>
-		<!--div id="content-footer">
-            <span><%= countlyTypeName %></span>
-		 <% if (!countlyType) { %>
-			<ul>
-				<li><a href="#" id="Intercom" data-localize="common.feedback-and-support">Feedback & Support</a></li>
-				<li>|</li>
-				<li><a href="http://resources.count.ly/" target="_blank" data-localize="common.documentation">Documentation</a></li>
-			</ul>
-		 <% }else { %>
-			<ul>
-				<li><a href="#" id="Intercom" data-localize="common.provide-feedback">Provide feedback</a></li>
-				<li>|</li>
-				<li><a href="http://support.count.ly/" target="_blank" data-localize="common.support">Support</a></li>
-				<li>|</li>
-				<li><a href="http://count.ly/enterprise-edition" target="_blank" data-localize="common.enterprise-edition">Enterprise Edition (supported)</a></li>
-				<li>|</li>
-				<li><a href="http://resources.count.ly/" target="_blank" data-localize="common.documentation">Documentation</a></li>
-			</ul>
-		 <% } %>
-	 </div-->
-    </div>
-
-
 
 	<script id="template-app-categories" type="text/x-handlebars-template">
 		<div data-value="1" class="item" data-localize="application-category.books"></div>
@@ -511,6 +512,17 @@
 						</div>
 				</div>
 				<div class="pie-chart-container">
+					<div class="graph-segment-container">
+					{{#if graph-segmentation}}
+                        <div class="cly-button-group">
+                            {{#each graph-segmentation}}
+                            <div class="icon-button light graph-segment" data-name="{{this.name}}">
+                                <div class="os-segment {{this.class}}"></div>
+                            </div>
+                            {{/each}}
+                        </div>
+					{{/if}}
+					</div>
 					<div class="pie-overlay two {{logo-class}}">
 						<div class="title">{{pie-titles.right}}</div>
 					</div>
@@ -719,7 +731,6 @@
 		</div>
 	</script>
 
-
 	<script id="template-management-applications" type="text/x-handlebars-template">
 		<div id="app-management-bar">
 			<div id="app-nav-head">
@@ -762,26 +773,6 @@
 								<td data-localize="management-applications.application-name"></td>
 								<td>
 									<input type="text" value="" placeholder="Enter application name..." data-localize="placeholder.app-name" id="app-add-name">
-								</td>
-							</tr>
-                            <tr class="help-zone-vs" data-help-localize="help.manage-apps.app-type">
-								<td data-localize="management-applications.type"></td>
-								<td>
-									<div class="cly-select select-app-types" style="width:280px;">
-										<div class="select-inner">
-											<div class="text-container">
-												<div class="text" id="app-add-type" data-localize="management-applications.type.tip"></div>
-											</div>
-											<div class="right combo"></div>
-										</div>
-										<div class="select-items square" style="width:280px;">
-											<div>
-												{{#eachOfObject app_types}}
-                                                    <div data-value="{{property}}" class="item">{{value}}</div>
-                                                {{/eachOfObject}}
-											</div>
-										</div>
-									</div>
 								</td>
 							</tr>
 							<tr class="help-zone-vs" data-help-localize="help.manage-apps.app-category">
@@ -895,29 +886,6 @@
 									<div class="read"></div>
 									<div class="edit">
 										<input type="text" value="">
-									</div>
-								</td>
-							</tr>
-                            <tr class="help-zone-vs" data-help-localize="help.manage-apps.app-type">
-								<td data-localize="management-applications.type"></td>
-								<td id="app-edit-type">
-									<div class="read"></div>
-									<div class="edit">
-										<div class="cly-select select-app-types">
-											<div class="select-inner">
-												<div class="text-container">
-													<div class="text"></div>
-												</div>
-												<div class="right combo"></div>
-											</div>
-											<div class="select-items square">
-												<div>
-													{{#eachOfObject app_types}}
-                                                        <div data-value="{{property}}" class="item">{{value}}</div>
-                                                    {{/eachOfObject}}
-												</div>
-											</div>
-										</div>
 									</div>
 								</td>
 							</tr>
@@ -1051,7 +1019,6 @@
                         <th data-localize="events.edit.event-name"></th>
                         <th data-localize="events.table.count"></th>
                         <th data-localize="events.table.sum"></th>
-                        <th data-localize="events.table.dur"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -1064,7 +1031,6 @@
                         <td><input class="event-name" type="text" placeholder="Event name"  data-localize="events.edit.event-name" value="{{this.name}}"/></td>
                         <td><input class="event-count" type="text" placeholder="Count" data-localize="events.table.count" value="{{this.count}}"/></td>
                         <td><input class="event-sum" type="text" placeholder="Sum" data-localize="events.table.sum" value="{{this.sum}}"/></td>
-                        <td><input class="event-dur" type="text" placeholder="Duration" data-localize="events.table.dur" value="{{this.dur}}"/></td>
                     </tr>
                     {{/eachOfObjectValue}}
                     </tbody>
@@ -1129,15 +1095,14 @@
 			</div>
 			{{#if big-numbers}}
 			<div class="widget-footer event-numbers" style="background-color:#EEEEEE;">
-				<div id="big-numbers-container" class="{{big-numbers.class}} event-numbers">
+				<div id="big-numbers-container" class="{{big-numbers.class}}">
 					{{#each big-numbers.items}}
-					<div class="big-numbers selected {{this.class}}" data-type="{{this.class}}">
+					<div class="big-numbers selected">
 						<div class="inner">
 							<div class="select">{{this.title}}</div>
 							<div class="color"></div>
 							<div class="number">{{getFormattedNumber this.total}}</div>
 							<div class="trend" style="background-image:url('<%- cdn %>images/dashboard/{{this.trend}}trend.png');"></div>
-							<div class="check fa fa-square-o"></div>
 						</div>
 					</div>
 					{{/each}}
@@ -1167,83 +1132,6 @@
 		</div>
 		{{/if}}
         </div>
-	</script>
-
-    <script id="dashboard-template" type="text/x-handlebars-template">
-		<div class="widget">
-			<div class="widget-header">
-				<div class="title" style="letter-spacing:-1px; font-size:19px; margin-top:10px; margin-left:5px;">{{toUpperCase page-title}}</div>
-				{{> date-selector }}
-			</div>
-			<div class="widget-content" style="border:none;">
-				<div id="big-numbers-container" class="dashboard">
-					{{#each usage}}
-					<div class="big-numbers six-column help-zone-vs" data-help-localize="help.{{this.help}}">
-						<div class="inner">
-							<div class="logo"></div>
-							<div class="number">
-                                <span class="value">{{getShortNumber this.data.total}}</span>
-                                {{#if this.data.isEstimate}}
-                                    <span id="total-user-estimate-ind"><i class="fa fa-asterisk"></i></span>
-                                    <div id="total-user-estimate-exp" style="display:none;">
-                                        <div style="line-height:20px;">
-                                            Total (unique) user count for this period is estimated and corrected using the biggest time buckets from available daily, weekly and monthly stats.<br/><br/>
-                                            Exact total user counts are available for this year, month and day.
-                                        </div>
-                                    </div>
-                                {{/if}}
-                            </div>
-							<div class="trend" style="background-image:url('../images/dashboard/{{this.data.trend}}trend.png');">
-								<div class="change">{{this.data.change}}</div>
-							</div>
-							<div class="spark"><span class="{{this.data.trend}}sparkline">{{this.data.sparkline}}</span></div>
-							<div class="select" id="{{this.id}}">
-								<div class="title">{{this.title}}</div>
-							</div>
-							<div class="arrow"></div>
-						</div>
-					</div>
-					{{/each}}
-				</div>
-			</div>
-			<div class="widget-footer" style="height:220px; padding-top:20px; padding-bottom:10px; overflow:visible; box-shadow:none; position:relative;">
-                <div id="graph-note">
-                    <div class="main">
-                        Notes
-                        <div class="tail"></div>
-                    </div>
-                </div>
-				<div id="dashboard-graph" class="graph" style="height:100%; margin-left:-10px;"></div>
-			</div>
-		</div>
-		<div class="dashboard-summary">
-			{{#each bars}}
-			<div class="item help-zone-vs" data-help-localize="help.{{this.help}}">
-				<div class="inner">
-					<div class="title">{{this.title}}</div>
-					{{#if this.data}}
-					<div class="bar">
-						{{#each this.data}}
-							<div class="bar-inner" style="width:{{this.percent}}%;" data-item="{{this.name}}"></div>
-						{{/each}}
-					</div>
-					<div class="number" data-item="{{this.data.0.name}}">{{this.data.0.name}}</div>
-					{{else}}
-					<div class="no-data" data-localize="common.bar.no-data"></div>
-					{{/if}}
-				</div>
-			</div>
-			{{/each}}
-		</div>
-		<div class="widget map-list geo-switch help-zone-vb" data-help-localize="help.dashboard.map" style="float:right; width:100%;">
-            <div class="cly-button-group over">
-                <div id="map-list-sessions" style="padding: 6px 8px 7px 8px;" class="icon-button light active" data-localize="sidebar.analytics.sessions"></div>
-                <div id="map-list-users" style="padding: 6px 8px 7px 8px;" class="icon-button light" data-localize="sidebar.analytics.users"></div>
-                <div id="map-list-new" style="padding: 6px 8px 7px 8px;" class="icon-button light" data-localize="common.table.new-users"></div>
-            </div>
-			<div id="map-list-right" style="max-height:236px; overflow:hidden;"></div>
-			<div id="geo-chart-outer" style="padding-bottom: 8px;"><div><div id="geo-chart"></div></div></div>
-		</div>
 	</script>
 
 	<script language="javascript" type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -1297,11 +1185,6 @@
 				<% } %>
 			<% } %>
 	<% } %>
-    <% if (themeFiles && themeFiles.js) { %>
-        <% for(var i=0, l=themeFiles.js.length; i<l; i++) {%>
-    <script language="javascript" type="text/javascript" src="<%=themeFiles.js[i]%>"></script>
-        <% } %>
-    <% } %>
 	<script>
 	Backbone.history.start();
 	</script>

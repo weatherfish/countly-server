@@ -90,8 +90,517 @@
     };
 
     // Draws a graph with the given dataPoints to container. Used for drawing bar and pie charts.
-    countlyCommon.drawGraph = function (dataPoints, container, graphType, inGraphProperties) {
+    countlyCommon.drawGraph = function (dataPoints, container, graphType, width, height) {
         _.defer(function(){
+
+            console.log("========== drawGraph ==========");
+            console.log(dataPoints);
+
+            var get_domain = function(data) {
+
+                // Requires that at least one series contains some data
+                var yMin = +Infinity;
+            		var yMax = -Infinity;
+
+            		data.forEach( function(d) {
+
+            				var y = d.t;
+
+            				if (y < yMin) yMin = y;
+            				if (y > yMax) yMax = y;
+
+            		});
+
+            		return { y: [yMin, yMax] };
+            };
+
+            var margin = {top: 20, right: 150, bottom: 30, left: 40};
+            //var height = 500 - margin.top - margin.bottom;
+
+            var bars_margin_bottom = 40;
+            var text_height = 20;
+
+            var x = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1);
+
+            var yold = d3.scale.linear()
+                .range([height - bars_margin_bottom, 0]);
+
+
+            /*var y = d3.scale.linear()
+                    .range([0, 100]);*/
+
+
+            //var y = d3.scale.log(10000).range([height - bars_margin_bottom, 0]);
+            var y_scale_circle = d3.scale.log(10).range([0, 30]);
+
+            //var y_scale_log = d3.scale.log().range([height - bars_margin_bottom, 0]);
+
+            /*var y = d3.scale.log()
+                .base(10)
+                .domain([1, 50000])
+                .range([0, 300]);*/
+
+//console.log("============== y =================");
+            //console.log(y);
+            //console.log(y(10000));
+
+            x.domain(dataPoints.map(function(d) { return d.f; }));
+            //y.domain([0, d3.max(dataPoints, function(d) { return d.t; })]);
+            y_scale_circle.domain([1, d3.max(dataPoints, function(d) { return d.t; })]).nice();
+            //y_scale_log.domain([1, 10000, d3.max(dataPoints, function(d) { return d.t; })]).nice();
+            //yold.domain([0, d3.max(dataPoints, function(d) { return d.t; })]);
+
+
+            var y_scale_log = d3.scale.log()
+                .domain([1, d3.max(dataPoints, function(d) { return d.t; })]).nice()
+                .range([height - bars_margin_bottom, 0])
+                /*.base(10)*/
+
+
+            //var chart = d3.select(".chart");
+
+            console.log("----------- this.chart --------------");
+            console.log(this.chart);
+
+            if (!this.chart)
+            {
+                this.chart = d3.select(container)
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            }
+
+            //var barWidth = width / dataPoints.length;
+            var one_bar_width = 40;
+            var all_bars_width = one_bar_width * dataPoints.length;
+            var bar_space = (width - all_bars_width) / (dataPoints.length * 2 - 1);
+
+            var tooltip_height = 70;
+            var tooltip_width = 70;
+            var tooltip_margin_bottom = 10;
+
+            var domain = get_domain(dataPoints);
+
+            var total_count = 0;
+            dataPoints.forEach(function(element){
+                total_count += element.t;
+            });
+
+            console.log("total_count:", total_count);
+
+            var bar = this.chart.selectAll("g")
+                            .data(dataPoints)
+                            .enter().append("g")
+                                .attr("transform", function(d, i) {
+                                    return "translate(" + parseInt(i * (bar_space * 2 + one_bar_width) + bar_space) + ",0)";
+                                })
+
+            bar.append("rect")
+                /*.attr("d", function(d){
+                    //var xv = height - y(d.t) - bars_margin_bottom;
+                    var yv = y(d.t);
+                    var height = height - y(d.t) - bars_margin_bottom;
+                    return rightRoundedRect(0, yv, one_bar_width, height, 6);
+                })*/
+                .attr("y", function(d) { return y_scale_log(d.t); })
+                .attr("height", function(d) { return height - y_scale_log(d.t) - bars_margin_bottom; })
+                .attr("width", one_bar_width - 1)
+                .style("fill", function(d) {
+                    return d.color;
+                })
+
+            var checkbox = bar.append("rect")
+                .attr("transform", function(d, i) {
+                    return "translate(20,310)";
+                })
+                .attr("height", 10)
+                .attr("width", 10)
+                .style("fill", function(d) {
+                    return "red";
+                }).on("click", function(d, i)
+                {
+
+                    console.log("---------- mouseclick ------------");
+
+                });
+/*
+                bar.append("g")
+                    .attr("transform", function(d, i) {
+                        return "translate(20,330)";
+                    })
+                    .html("<g class='tick_wrp'><g class='tick'><g class='tick_img'>test</g></g></g>");*/
+
+
+
+/*
+            bar.append("circle")
+                    /*.attr("d", function(d){
+                        //var xv = height - y(d.t) - bars_margin_bottom;
+                        var yv = y(d.t);
+                        var height = height - y(d.t) - bars_margin_bottom;
+                        return rightRoundedRect(0, yv, one_bar_width, height, 6);
+                    })*/
+      /*              .attr("y", function(d) { return 0; })
+                    .attr("r", function(d) {
+                        //console.log("d.t:", d.t, ", y(d.t):", ycir(d.t));
+                        return y_scale_circle(d.t);
+                    })
+                    .attr("width", one_bar_width - 1)
+                    .style("fill", function(d) {
+                        return d.color;
+                    })
+                    .attr("transform", function(d, i) {
+                        return "translate(20,330)";
+                    })
+*/
+
+            bar.append("text")
+                .attr("class", "bar_text")
+                .attr("x", 0/*one_bar_width / 2*/)
+                .attr("y", height - text_height/*function(d) { return y(d.t) + 3; }*/)
+                .text(function(d) { return d.f; });
+                /*.attr("dy", ".75em")*/
+
+
+            bar.on("mouseover", function(d, i)
+            {
+
+                //console.log(this);
+
+                //return false;
+/*
+                var tooltip = d3.select("#bar_chart")
+                                  .append("div")
+                                  .attr("class", "tooltip")
+                                  .attr("height", tooltip_height)
+                                  .attr("width", tooltip_width)
+                                  .style("left", -1 * ((tooltip_width - one_bar_width) / 2))
+                                  .style("top", function(d) { return y(d.t) - tooltip_height - tooltip_margin_bottom; })
+*/
+
+
+                tooltip = d3.select(this)
+                                  .append("g")
+                                  .attr("class", "tooltip")
+                                  .attr("transform", function(d, i) {
+                                      var xv = (-1 * ((tooltip_width - one_bar_width) / 2));
+                                      var yv = y_scale_log(d.t) - tooltip_height - tooltip_margin_bottom;
+                                      return "translate(" + xv + "," + yv + ")";
+                                  })
+
+                tooltip.append("rect")
+                        /*.attr("x", -1 * ((tooltip_width - one_bar_width) / 2))
+                        .attr("y", function(d) { return y(d.t) - tooltip_height - tooltip_margin_bottom; })*/
+                        .attr("height", tooltip_height)
+                        .attr("width", tooltip_width)
+                        .style("fill", function(d) {
+                            return "gray";
+                        })
+
+/*
+                tooltip.append("div")
+                        .attr("class", "triangle_bottom")
+                        .attr("transform", function(d, i) {
+                            return "translate(" + 20 + "," + (tooltip_height + 2) + ")";
+                        })
+*/
+
+                var triangle_width = 14;
+                var triangle_height = 7;
+
+                //var points = "05,10 15,30 25,10";
+                var points = "00,00 07,07 14,00";
+
+                tooltip.append("polygon")
+                      .attr("points", points)
+                      .attr("transform", function(d, i) {
+                          //var xv = (-1 * ((tooltip_width - one_bar_width) / 2));
+                          //var yv = y(d.t) - tooltip_height - tooltip_margin_bottom;
+                          var xv = (tooltip_width - triangle_width) / 2;
+                          var yv = tooltip_height;
+                          return "translate(" + xv + "," + yv + ")";
+                      })
+                      .style("fill", "gray")
+
+                tooltip.append("text")
+                        .attr("class", "count")
+                        .attr("x", function(d) {
+                            var x = (tooltip_width - this.getBBox().width) / 2 - (this.getBBox().width / 2);
+                            return x - 30;
+                        })
+                        .attr("y", function(d) {
+                            //var y = this.getBBox().height;
+                            return 30;
+                        })
+                        .attr("width", tooltip_width + "px")
+                        .text(function(d) { return d.t; })
+                        .style("fill", "white")
+
+                tooltip.append("text")
+                        .attr("class", "percent")
+                        .attr("x", function(d) {
+                            var x = (tooltip_width - this.getBBox().width) / 2 - (this.getBBox().width / 2);
+                            return x - 10;
+                        })
+                        .attr("y", 50)
+                        .text(function(d) {
+                            var percent = Math.round((d.t / total_count) * 100);
+                            return percent + "%";
+                        })
+                        .style("fill", "white")
+
+
+/*
+                tooltip.append("div")
+                        .html(function(d) {
+
+                            var html = "<div class='count'>" + d.t + "</div>";
+
+                            var percent = (d.t / domain.y[1]) * 100;
+
+                            html += "<div class='percent'>" + percent + "%</div>";
+
+                            return html;
+                        })*/
+                        /*.attr("dy", ".75em")*/
+
+
+            })
+            .on("mouseout", function(d, e)
+            {
+                d3.selectAll(".tooltip").remove();
+            });
+
+/*
+            var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom");
+
+            chart.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis);
+*/
+            function rightRoundedRect(x, y, width, height, radius) {
+                return "M" + x + "," + y
+                     + "h" + (width - radius)
+                     + "a" + radius + "," + radius + " 0 0 1 " + radius + "," + radius
+                     + "v" + (height - 2 * radius)
+                     + "a" + radius + "," + radius + " 0 0 1 " + -radius + "," + radius
+                     + "h" + (radius - width)
+                     + "z";
+            }
+
+            // --------------------- AXIS --------------------------
+
+            var draw_y_axis = function(orientation)
+            {
+/*
+              var x = d3.scale.log()
+                  /*.base(100)*/
+    /*              .domain([1, 50000])
+                  .range([300, 0]);
+
+                var xAxis = d3.svg.axis()
+                  .orient("left")
+                  .ticks(10, 100)
+  /*                .scale(x)
+                  /*.innerTickSize(1000)
+                  .tickSize(6, 0);*/
+/*
+                var svg = chart.append("svg")
+                  .attr("width", 900)
+                  .attr("height", 300)
+                .append("g")
+                  .attr("transform", "translate(" + 100 + "," + (0) + ")");
+
+                svg.append("g")
+                  .attr("class", "x axis")
+                  .call(xAxis);
+
+                return false;
+*/
+                //var y_scale_log = d3.scale.log(1000).range([height - bars_margin_bottom, 0]);
+                var axis = d3.svg.axis().ticks(3).tickFormat(function(d) {
+                    //console.log("-- draw tick ---");
+                    //console.log(d);
+                    return formatValue(d).replace('0.0', '0').replace('.0', '');/* return d*/
+                }).orient(orientation).scale(y_scale_log);
+
+                //var ticks = axis.;
+
+                console.log("============ ticks ============");
+                console.log(y_scale_log.ticks());
+
+                var ticks = y_scale_log.ticks();
+
+                //axis.tickFormat(function(x) { return x });
+
+                //if (this.tickValues) axis.tickValues(this.tickValues);
+
+                if (orientation == 'left')
+                {
+                    var transform = 'translate(' + 10 + ', ' + 0/*(10)*/ + ')';
+                }
+                else
+                {
+                    var berth = height * 0.10;
+                    var transform = 'translate(' + width + ', ' + 0/*(berth + 1)*/ + ')';
+                }
+    /*
+                if (this.element) {
+                  this.vis.selectAll('*').remove();
+                }
+    */
+                var y_domain = Math.round(domain.y[1]);
+
+                var first_digit = parseInt(y_domain.toString()[0]);
+
+                //console.log("first digit:", first_digit);
+
+                var y_domain_string = (first_digit + 1).toString();
+
+                for (var i = 0; i < y_domain.toString().length - 1; i++)
+                {
+                    y_domain_string += "0";
+                }
+
+                y_domain = parseInt(y_domain_string);
+
+                //console.log("new domain:", y_domain);
+
+                //var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, height - bars_margin_bottom]);
+                var y_inverted = y_scale_log;
+
+                var tick_values = [];
+
+/*
+                var ticks_count = 5;
+
+                var tick_size = (y_domain) / ticks_count;
+
+                for (var i = 0; i <= ticks_count; i++)
+                {
+                    tick_values.push(Math.round(i * tick_size));
+                }
+*/
+
+                for(var i = 0; i < ticks.length; i+=5)
+                {
+                    tick_values.push(ticks[i]);
+                }
+
+                var formatValue = d3.format(".2s");
+
+                chart
+                    .append("svg:g")
+                    .attr("class", ["y_axis"])
+                    .attr("transform", transform)
+                    .call(axis/*.scale(y_inverted)*//*.ticks(20, "s").tickSize(6, 0)*/.tickValues(tick_values))
+                    .call(function(g){
+                        g.selectAll("path").remove();
+                        g.selectAll("line").remove();
+                    })
+
+                    //.call(axis/*.scale(y_inverted)*/.ticks(5)/*.tickValues(tick_values)*/.tickFormat(function(d) {
+                    //    //console.log("-- draw tick ---");
+                    //    //console.log(d);
+                    //    return formatValue(d).replace('0.0', '0').replace('.0', '');/* return d*/
+                    //}))
+
+                  return axis;
+
+            }
+
+            draw_grid = function(axis) {
+
+                var ticks = y_scale_log.ticks();
+
+                var gridSize = width - 30;
+
+                var y_domain = Math.round(domain.y[1]);
+
+                var first_digit = parseInt(y_domain.toString()[0]);
+
+                //console.log("first digit:", first_digit);
+
+                var y_domain_string = (first_digit + 1).toString();
+
+                for (var i = 0; i < y_domain.toString().length - 1; i++)
+                {
+                    y_domain_string += "0";
+                }
+
+                y_domain = parseInt(y_domain_string);
+
+                //console.log("new domain:", y_domain);
+
+                //var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, height - bars_margin_bottom]);
+                var y_inverted = y_scale_log;
+/*
+                var tick_values = [];
+
+                var ticks_count = 5;
+
+                var tick_size = (y_domain) / ticks_count;
+
+                for (var i = 0; i <= ticks_count; i++)
+                {
+                    tick_values.push(Math.round(i * tick_size));
+                }*/
+/*
+                d3.selection.prototype.last = function() {
+                    var last = this.size() - 1;
+                    return d3.select(this[0][last]);
+                };
+*/
+
+                var tick_values = [];
+
+                for(var i = 0; i < ticks.length; i+=5)
+                {
+                    tick_values.push(ticks[i]);
+                }
+
+                var grids = chart
+                    //.append("svg:g")
+                    .insert("svg:g",":first-child")
+                    .attr("class", "y_grid")
+                    .call(axis.scale(y_inverted).tickSize(gridSize).tickValues(tick_values)) /*.tickSubdivide(0)*/ /*.tickPadding([0])*/
+                    .attr("transform", function(d) {
+                         return "translate(" + (width + 10) + "," + 1 + ")"; }
+                    )
+
+                grids
+                		.selectAll('text')
+                		.each(function() {
+                        //console.log("grid text:", this.textContent);
+                        //this.parentNode.setAttribute('data-y-value', this.textContent)
+                        this.remove();
+                    });
+
+/*
+                grids
+                    .selectAll('g')
+                    .last()
+                    .attr('class','tick first');
+*/
+                /*grids
+                    .selectAll('text')
+                    .each(function() {
+                      //console.log("grid text:", this.textContent);
+                      this.parentNode.setAttribute('data-y-value', this.textContent)
+                    });*/
+            }
+
+            var axis = draw_y_axis("left");
+            draw_y_axis("right");
+            draw_grid(axis);
+
+            return false;
+
             if ((!dataPoints.dp || !dataPoints.dp.length) || (graphType == "bar" && !dataPoints.dp[0].data[0][1] && !dataPoints.dp[0].data[1][1])) {
                 $(container).hide();
                 $(container).siblings(".no-data").show();
@@ -180,7 +689,7 @@
             } else {
                 $(container).unbind("plothover");
             }
-        }, dataPoints, container, graphType, inGraphProperties);
+        }, dataPoints, container, graphType, width/*, inGraphProperties*/);
     };
 
     // Draws a line graph with the given dataPoints to container.
@@ -569,7 +1078,7 @@
         });
     };
 
-    countlyCommon.updateTimeGraph = function (granularity_rows, container, data_items, bucket, granularity_type, small_circles, zero_points) {
+    countlyCommon.updateTimeGraph = function (granularity_rows, container, data_items, bucket, granularity_type, small_circles, zero_points, __callback) {
 
         if (!_rickshaw_graph)
         {
@@ -778,7 +1287,6 @@
         console.log("---------------- single_graph_data ---------------------");
         console.log(single_graph_data);
 
-
         _state_single_graph_data = single_graph_data; // todo: remove
 
         /*
@@ -833,6 +1341,10 @@
 
         _rickshaw_graph.update();
 
+        _.defer(function(){
+            __callback(false, true);
+        });
+
         return true;
 
     }
@@ -877,11 +1389,27 @@
             return dataArr;
         }
 
+        console.log("============== countlyCommon.periodObj.uniquePeriodArr ==============");
+        console.log(countlyCommon.periodObj);
+        console.log(countlyCommon.periodObj.uniquePeriodArr);
+
+        if (countlyCommon.periodObj.uniquePeriodArr.length == 0)
+        {
+            countlyCommon.periodObj.uniquePeriodArr = countlyCommon.periodObj.currentPeriodArr;
+            countlyCommon.periodObj.uniquePeriodCheckArr = countlyCommon.periodObj.currentPeriodArr;
+            countlyCommon.periodObj.isSpecialPeriod = true;
+        }
+
+        console.log("===== transformed =====");
+        console.log(countlyCommon.periodObj);
+
         for (var j = 0; j < rangeArray.length; j++) {
 
             rangeTotal = 0;
 
-            if (!countlyCommon.periodObj.isSpecialPeriod) {
+//            console.log("periodObj.isSpecialPeriod:", countlyCommon.periodObj.isSpecialPeriod);
+
+            if (!countlyCommon.periodObj.isSpecialPeriod || countlyCommon.periodObj.activePeriod) {
                 var tmp_x = countlyCommon.getDescendantProp(db, countlyCommon.periodObj.activePeriod + "." + propertyName);
 
                 if (tmp_x && tmp_x[rangeArray[j]]) {
@@ -898,7 +1426,10 @@
                 }
             } else {
                 var tmpRangeTotal = 0;
-
+/*
+                console.log(":::::::::::::: special period :::::::::::::::");
+                console.log(countlyCommon.periodObj);
+*/
                 for (var i = 0; i < (countlyCommon.periodObj.uniquePeriodArr.length); i++) {
                     var tmp_x = countlyCommon.getDescendantProp(db, countlyCommon.periodObj.uniquePeriodArr[i] + "." + propertyName);
 
@@ -929,6 +1460,9 @@
                 }
             }
         }
+
+        console.log("============== dataArr =====================");
+        console.log(dataArr);
 
         for (var j = 0; j < dataArr.length; j++) {
             dataArr[j].percent = ((dataArr[j]["t"] / total) * 100).toFixed(1);
@@ -1255,9 +1789,6 @@
                 {
                     granularity = _granularity; // todo: will remove this global variable "_granularity"
                 }
-
-                console.log(">>>>>>>>>> get_current_data >>>>>>>>");
-                console.log(granularity);
 
                 switch(granularity)
                 {

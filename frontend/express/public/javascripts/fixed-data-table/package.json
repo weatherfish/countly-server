@@ -1,6 +1,6 @@
 {
   "name": "fixed-data-table",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A React table component designed to allow presenting thousands of rows of data.",
   "main": "main.js",
   "peerDependencies": {
@@ -44,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/facebook/fixed-data-table.git"
+    "url": "https://github.com/facebook/fixed-data-table.git"
   },
   "license": "BSD-3-Clause",
   "bugs": {
@@ -61,36 +61,5 @@
     "table",
     "data-table",
     "fixed-table"
-  ],
-  "gitHead": "d6bac3ccc59612d521b29d12d84f5142e5f252cb",
-  "_id": "fixed-data-table@0.5.0",
-  "_shasum": "b2a9efddd9da5bf4321043604951296687c76c15",
-  "_from": "fixed-data-table@*",
-  "_npmVersion": "2.14.4",
-  "_nodeVersion": "4.1.1",
-  "_npmUser": {
-    "name": "pieterv",
-    "email": "me@pieter.io"
-  },
-  "maintainers": [
-    {
-      "name": "pieterv",
-      "email": "me@pieter.io"
-    },
-    {
-      "name": "wlis",
-      "email": "wojo.lis@gmail.com"
-    },
-    {
-      "name": "ehzhang",
-      "email": "ehzhang@mit.edu"
-    }
-  ],
-  "dist": {
-    "shasum": "b2a9efddd9da5bf4321043604951296687c76c15",
-    "tarball": "http://registry.npmjs.org/fixed-data-table/-/fixed-data-table-0.5.0.tgz"
-  },
-  "directories": {},
-  "_resolved": "https://registry.npmjs.org/fixed-data-table/-/fixed-data-table-0.5.0.tgz",
-  "readme": "ERROR: No README data found!"
+  ]
 }

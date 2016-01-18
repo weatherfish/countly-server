@@ -46,9 +46,6 @@ var TableWrapper = React.createClass({
 
     render : function() {
 
-        var Table  = FixedDataTable.Table;
-        var Column = FixedDataTable.Column;
-
         if (this.state.rows)
         {
             var rows = this.state.rows;
@@ -57,8 +54,6 @@ var TableWrapper = React.createClass({
         {
             var rows = this.props.rows;
         }
-
-        var date_sign = "Date";
 
         console.log("rerender:", this.state.filter);
 
@@ -83,6 +78,8 @@ var TableWrapper = React.createClass({
                         data_function={this.props.data_function}
                         sort_functions={this.props.sort_functions}
                         filter={this.state.filter}
+                        rows_per_page={5}
+                        granularity={this.props.granularity}
                     />
                 </div>
 
