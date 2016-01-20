@@ -96,8 +96,25 @@
 
         chartData.chartData = countlyCommon.extractRangeData(_userDb, "f", _frequencies, countlyUser.explainFrequencyRange);
 
-        console.log(">>>>>>>>>>>> inside function >>>>>>>>>>>");
-        console.log(chartData.chartData);
+        var chart_data = [];
+
+        for (var i = 0; i < _frequencies.length; i++) // reorder
+        {
+            var range_name = countlyUser.explainFrequencyRange(_frequencies[i]);
+
+            for (var j = 0; j < chartData.chartData.length; j++)
+            {
+                if (chartData.chartData[j]['f'] == range_name)
+                {
+                    chart_data.push(chartData.chartData[j]);
+                    break;
+                }
+            }
+
+            //console.log("range_name:", range_name);
+        }
+
+        chartData.chartData = chart_data;
 
         var frequencies = _.pluck(chartData.chartData, "f"),
             frequencyTotals = _.pluck(chartData.chartData, "t"),

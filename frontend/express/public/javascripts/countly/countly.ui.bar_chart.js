@@ -9,9 +9,6 @@ var Chart = React.createClass({
 
         var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654"    , "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
 
-        console.log("=========== getInitialState data ==========");
-        console.log(data);
-
         for (var i = 0; i < data.length; i++)
         {
             var color = this.make_color();
@@ -47,7 +44,26 @@ var Chart = React.createClass({
 
             for (var i = 0; i < data.length; i++)
             {
-                data[i].active = true;
+
+                var found = false;
+
+                for (var j = 0; j < this.state.data.length; j++)
+                {
+
+                    if (data[i].color == this.state.data[j].color)
+                    {
+                        data[i].active = this.state.data[j].active;
+                        found = true;
+                        break;
+                    }
+
+                }
+
+                if (!found)
+                {
+                    data[i].active = true;
+                }
+
             }
 
             this.setState({
@@ -159,7 +175,10 @@ var Chart = React.createClass({
 
         tooltip.append("text")
                 .attr("class", "count")
-                .text(function(d) { return d.t; })
+                .text(function(d) {
+                    var value = d.t.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    return value;
+                })
                 .attr("x", function(d) {
                     var x = (tooltip_width - this.getBBox().width) / 2/* - (this.getBBox().width / 2)*/;
                     return x;
@@ -178,11 +197,8 @@ var Chart = React.createClass({
                     return percent + "%";
                 })
                 .attr("x", function(d) {
-
-                    console.log("this.getBBox().width:", this.getBBox().width);
-
                     var x = (tooltip_width - this.getBBox().width) / 2 /*- (this.getBBox().width * 2)*/;
-                    return x;// x - 20;
+                    return x;
                 })
                 .attr("y", 35)
                 .style("fill", "white")
@@ -208,7 +224,13 @@ var Chart = React.createClass({
         }
 */
 
-        var margin = {top: 20, right: 150, bottom: 30, left: 40};
+        var margin = {
+            top    : 20,
+            right  : 150,
+            bottom : 30,
+            left   : 40
+        };
+
         //var height = 750 - margin.top - margin.bottom;
 
         var height = this.props.height;
@@ -306,11 +328,7 @@ var Chart = React.createClass({
                     var r = 2;
                 }
 
-                //console.log("d.t:", d.t, ", h:", h, ", height:", height, ", y_scale_log:", self.y_scale_log(d.t), ", bars_margin_bottom", bars_margin_bottom);
-
                 var rect = self.rounded_rect(0, yv, one_bar_width, h, r, true, true, false, false);
-
-                //console.log("rect:", rect);
 
                 return rect;
             })
@@ -378,15 +396,11 @@ var Chart = React.createClass({
                 return d.color;
             })
             .attr("d", function(d){
-                //var xv = height - y(d.t) - bars_margin_bottom;
+
                 var yv = self.y_scale_log(d.t);
                 var h = height - self.y_scale_log(d.t) - bars_margin_bottom;
-
-                //console.log("h:", h, ", height:", height, ", y_scale_log:", self.y_scale_log(d.t), ", bars_margin_bottom", bars_margin_bottom);
-
                 var rect = self.rounded_rect(0, yv, one_bar_width, h, 2, true, true, false, false);
 
-                //console.log("rect:", rect);
                 return rect;
             })
 
@@ -420,7 +434,7 @@ var Chart = React.createClass({
 
         var label = enter.append("text")
             .attr("class", "bar_text")
-            .attr("x", 0/*one_bar_width / 2*/)
+            //.attr("x", 0/*one_bar_width / 2*/)
             .attr("y", height - text_height/*function(d) { return y(d.t) + 3; }*/)
             .text(function(d) { return d.f; })
             .attr("x", function(d) {

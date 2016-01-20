@@ -1389,19 +1389,12 @@
             return dataArr;
         }
 
-        console.log("============== countlyCommon.periodObj.uniquePeriodArr ==============");
-        console.log(countlyCommon.periodObj);
-        console.log(countlyCommon.periodObj.uniquePeriodArr);
-
         if (countlyCommon.periodObj.uniquePeriodArr.length == 0)
         {
             countlyCommon.periodObj.uniquePeriodArr = countlyCommon.periodObj.currentPeriodArr;
             countlyCommon.periodObj.uniquePeriodCheckArr = countlyCommon.periodObj.currentPeriodArr;
             countlyCommon.periodObj.isSpecialPeriod = true;
         }
-
-        console.log("===== transformed =====");
-        console.log(countlyCommon.periodObj);
 
         for (var j = 0; j < rangeArray.length; j++) {
 
@@ -1460,9 +1453,6 @@
                 }
             }
         }
-
-        console.log("============== dataArr =====================");
-        console.log(dataArr);
 
         for (var j = 0; j < dataArr.length; j++) {
             dataArr[j].percent = ((dataArr[j]["t"] / total) * 100).toFixed(1);

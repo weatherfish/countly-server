@@ -2093,7 +2093,7 @@ window.FrequencyView = countlyView.extend({
                     "bar_width" : 40,
                 }), document.getElementById("content-container"));
 
-            }, 1000);
+            }, 2000);
 
 /*
             countlyCommon.drawGraph(frequencyData.chartData, "#bar_chart", "bar", graph_width, graph_height);
@@ -2154,12 +2154,12 @@ window.DeviceView = countlyView.extend({
         app.localize();
     },*/
     renderCommon:function (isRefresh) {
+
+        console.log("=========== render common ==============");
+
         var deviceData = countlyDevice.getDeviceData();
 
-        console.log("------------ device data -------------");
         console.log(deviceData);
-
-        return false;
 
         this.templateData = {
             "page-title":jQuery.i18n.map["devices.title"],
@@ -2190,9 +2190,48 @@ window.DeviceView = countlyView.extend({
             "table-helper":""
         };
 
+        var labels_mapping = {
+            "t" : jQuery.i18n.map["common.total-users"],
+            "n" : jQuery.i18n.map["common.new-users"],
+            "u" : jQuery.i18n.map["common.unique-sessions"], // todo: here is not unique-sessions
+        }
+
         if (!isRefresh) {
-            $(this.el).html(this.template(this.templateData));
+
+            //$(this.el).html(this.template(this.templateData));
+
+            console.log("------------ device data 1 -------------");
+            console.log(deviceData.chartDPTotal);
+            console.log("------------ device data 2 -------------");
+            console.log(deviceData.chartDPNew);
+
+            var chart_width = window.innerWidth - 240 - 40 - 80 - 40;
+            var chart_height = 1500;
+
+            setTimeout(function(){
+
+                React.render(React.createElement(CalendarWrapper, {
+                }), document.getElementById("calendar_block"));
+
+                React.render(React.createElement(TopBar, {
+                    "user_name" : "John Black",
+                    "width"     : window.innerWidth - sidebar_width
+                }), document.getElementById("top_bar"));
+
+                React.render(React.createElement(HorizontalBarChart, {
+                    "width"  : chart_width,
+                    "height" : chart_height,
+                    //"data"   : frequencyData.chartData,
+                    "data_function" : countlyDevice.getDeviceData,
+                    "labels_mapping" : labels_mapping
+                }), document.getElementById("content-container"));
+
+            }, 1000);
+
+            return false;
+
             this.pageScript();
+
 
             countlyCommon.drawGraph(deviceData.chartDPTotal, "#dashboard-graph", "pie");
             countlyCommon.drawGraph(deviceData.chartDPNew, "#dashboard-graph2", "pie");
@@ -2211,6 +2250,7 @@ window.DeviceView = countlyView.extend({
         }
     },
     refresh:function () {
+      /*
         var self = this;
         $.when(this.beforeRender()).then(function () {
             if (app.activeView != self) {
@@ -2229,6 +2269,8 @@ window.DeviceView = countlyView.extend({
 
             self.pageScript();
         });
+
+        */
     }
 });
 

@@ -116,6 +116,7 @@ body {
     position: absolute;
     top : 141px;
     z-index : 2000;
+    overflow: visible;
 }
 
 #content {

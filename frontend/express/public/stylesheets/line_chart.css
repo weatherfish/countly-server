@@ -35,13 +35,13 @@
     bottom: 0;
     z-index : 1500;
 }
-
+/*
 .rickshaw_graph .y_grid .tick {
     stroke: 1px solid #D5D5D5;
     stroke-dasharray: 5, 3;
     stroke-width: 1px;
     shape-rendering: geometricPrecision;
-}
+}*/
 
 .rickshaw_graph .y_grid .tick.first {
     stroke-dasharray: 5, 0 !important;
