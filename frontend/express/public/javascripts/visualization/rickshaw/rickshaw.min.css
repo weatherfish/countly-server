@@ -52,7 +52,14 @@
 
 .rickshaw_graph .detail .item {
     position:absolute;z-index:2;
-    border-radius:3px;padding:.25em;font-size:12px;font-family:Arial,sans-serif;opacity:0;background:rgba(0,0,0,.4);color:#fff;border:1px solid rgba(0,0,0,.4);margin-left:1em;margin-top:-1em;white-space:nowrap}.rickshaw_graph .detail .item.active{opacity:1;background:rgba(0,0,0,.8)}.rickshaw_graph .detail .item:before{content:"\25c2";position:absolute;left:-.5em;color:rgba(0,0,0,.7);width:0}.rickshaw_graph .detail .dot{width:4px;height:4px;margin-left:-4px;margin-top:-3px;border-radius:5px;position:absolute;box-shadow:0 0 2px rgba(0,0,0,.6);background:#fff;border-width:2px;border-style:solid;display:none;background-clip:padding-box}.rickshaw_graph .detail .dot.active{display:block}.rickshaw_graph{position:relative}.rickshaw_graph svg{display:block;overflow:hidden}.rickshaw_graph .x_tick{
+    border-radius:3px;padding:.25em;font-size:12px;font-family:Arial,sans-serif;opacity:0;background:rgba(0,0,0,.4);color:#fff;border:1px solid rgba(0,0,0,.4);margin-left:1em;margin-top:-1em;white-space:nowrap}.rickshaw_graph .detail .item.active{opacity:1;background:rgba(0,0,0,.8)}.rickshaw_graph .detail .item:before{content:"\25c2";position:absolute;left:-.5em;color:rgba(0,0,0,.7);width:0}.rickshaw_graph .detail .dot{width:4px;height:4px;margin-left:-4px;margin-top:-3px;border-radius:5px;position:absolute;box-shadow:0 0 2px rgba(0,0,0,.6);background:#fff;border-width:2px;border-style:solid;display:none;background-clip:padding-box}.rickshaw_graph .detail .dot.active{display:block}.rickshaw_graph{position:relative}
+
+.rickshaw_graph svg{
+    display:block;
+    overflow:visible;
+}
+
+    .rickshaw_graph .x_tick{
     position:absolute;top:0;bottom:0;width:0;
     /*border-left:1px dotted rgba(0,0,0,.2);*/
     pointer-events:none

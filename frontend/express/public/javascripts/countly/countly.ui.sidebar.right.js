@@ -3,7 +3,21 @@ var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 var RightPart = React.createClass({
 
     getInitialState: function() {
+
+        if (this.props.selected_item)
+        {
+
+            var nav_data = {
+                fstmenu : this.props.nav_key,
+                sndmenu : this.props.selected_item.charAt(0).toUpperCase() + this.props.selected_item.slice(1),
+            }
+
+            $(event_emitter).trigger('select', nav_data);
+
+        }
+
         return {
+            selected_item : this.props.selected_item,
             transition_finish : false,
         };
     },
@@ -25,7 +39,7 @@ var RightPart = React.createClass({
 
     componentDidUpdate: function() {
 
-        if ( this.props.transition && this.props.change_i == -1)
+        if (this.props.transition && this.props.change_i == -1)
         {
             return this.props.handle_changed();
         }
@@ -62,6 +76,10 @@ var RightPart = React.createClass({
             trigger ui.topbar.js
             todo: move to the root component
         */
+
+        console.log("================== handle_right_changed ==================", item);
+
+        $("#content-container").html("-- loading --");
 
         var nav_data = {
             fstmenu : this.props.nav_key,
@@ -110,7 +128,7 @@ var RightPart = React.createClass({
 
                 var node_class_name = items_class_name;
 
-                if (self.state.selected_item == nav_item[0])
+                if ((self.state.selected_item && self.state.selected_item.toLowerCase()) == nav_item[0].toLowerCase())
                 {
                     node_class_name += " active";
                 }
@@ -143,11 +161,12 @@ var RightPart = React.createClass({
             bottom : description_bottom
         };
 
+        /*<div style={description_style} className="description"><span>{this.props.description}</span></div>*/
+
         return (
             <div className={class_name}>
                 {head_node}
                 {nav_nodes}
-                <div style={description_style} className="description"><span>{this.props.description}</span></div>
             </div>
         );
     },

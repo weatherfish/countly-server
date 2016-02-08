@@ -1,17 +1,10 @@
 .big-numbers-container {
-
     position : relative;
-
     width : 100%;
     height : 100px;
-
     font-family: Lato-Regular;
-
     margin-top : 55px;
-    margin-left : 20px;
-
     background-color : white;
-
 }
 
 .big-numbers-container > div {
@@ -42,7 +35,6 @@
     text-transform:capitalize;
 }
 
-
 .big-numbers-container > div .tick {
     width  : 16px;
     height : 16px;
@@ -59,10 +51,8 @@
     background-image: url("../images/tick.svg");
     background-repeat   : no-repeat;
     background-position : center;
-
     width  : 16px;
     height : 16px;
-
 }
 
 .big-numbers-container div .select {
@@ -82,14 +72,4 @@
     margin-left : 10px;
     font-size : 22px;
     color : #132737;
-}
-
-.big-number {
-    /*float:left; position:relative;*/
-
-    /*width : 33%;
-
-    display : inline-block;
-    margin-left  : auto;
-    margin-right : auto;*/
 }

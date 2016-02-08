@@ -1,0 +1,104 @@
+.radio_buttons_container {
+    position : relative;
+    width : 100%;
+    height : 100px;
+    font-family: Lato-Regular;
+    margin-top : 20px;
+    background-color : white;
+}
+
+.radio_buttons_container > div {
+    width : 33%;
+    display : inline-block;
+    margin-left  : auto;
+    margin-right : auto;
+    position : relative;
+    cursor : pointer;
+    text-align: center;
+    word-wrap: normal;
+}
+
+.radio_buttons_container > div .info_wrp {
+    position : relative;
+    width : 60%;
+    height : 100px;
+    display : inline-block;
+    text-align : left;
+    float : right;
+    text-transform:capitalize;
+}
+
+.radio_buttons_container .circles_wrapper {
+
+    position : relative;
+    width : 40%;
+    height : 100px;
+    display : inline-block;
+
+    text-align : right;
+
+}
+
+.radio_buttons_container .circle_outside {
+
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+
+    background-color : #198af3;
+
+    position : absolute;
+    right : 20px;
+
+}
+
+.radio_buttons_container .circle_inside {
+
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+
+    background-color : #ffffff;
+
+    position : relative;
+    top : 1px;
+    left : 1px;
+
+}
+
+.radio_buttons_container .circle_select {
+
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+
+    background-color : #ffffff;
+
+    position : relative;
+    top : 2px;
+    left : 2px;
+
+}
+
+.radio_buttons_container .circle_select.active {
+    background-color : #198af3;
+}
+
+.radio_buttons_container div .select {
+    /*position : absolute;
+    left : 40px;
+    top : 0px;*/
+    margin-left : 10px;
+    font-size: 15px;
+    color : #3d3d3d;
+}
+
+.radio_buttons_container div .number {
+    /*position : absolute;
+    left : 40px;
+    top : 20px;*/
+
+    margin-left : 10px;
+    font-size : 22px;
+    color : #132737;
+}

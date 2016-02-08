@@ -47,6 +47,9 @@
 
     countlyLocation.drawGeoChart = function (options) {
 
+        console.log("============ drawGeoChart =============");
+        console.log(options);
+
         _periodObj = countlyCommon.periodObj;
 
         if (options) {
@@ -101,6 +104,10 @@
             locationData.chartData[i]['country_flag'] =
                 "<div class='flag' style='background-image:url("+countlyGlobal["path"]+"/images/flags/" + locationData.chartData[i]['code'] + ".png);'></div>" +
                 locationData.chartData[i]['country'];
+        }
+
+        locationData.chartData.get_current_data = function(){
+            return locationData.chartData;
         }
 
         return locationData.chartData;
@@ -283,7 +290,13 @@
 
         $("#" + _chartElementId).empty();
 
+        console.log("{{{{{{{{{{{ draw map }}}}}}}}}}}");
+        console.log(ob);
+
         var countryData = formatData(ob);
+
+        console.log("{{{{{{{{{{{ formatDatap }}}}}}}}}}}");
+        console.log(countryData);
 
         var countryFills = {
             defaultFill : _defaultFill,

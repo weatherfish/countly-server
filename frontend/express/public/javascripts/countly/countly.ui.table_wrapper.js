@@ -7,43 +7,6 @@ var TableWrapper = React.createClass({
         };
     },
 
-    filterFunction : function(filter)
-    {
-
-        if (filter == "")
-        {
-            filter = false;
-        }
-
-        console.log("filter:", filter);
-
-        this.setState({
-            "filter" : filter
-        });
-
-        return false;
-/*
-        var rows = this.props.rows;
-
-        console.log("======== rows ========");
-        console.log(rows);
-
-        var filtered_rows = [];
-
-        for (var i = 0; i < rows.length; i++)
-        {
-            if (rows[i].date.toLowerCase().indexOf(filter) > -1)
-            {
-                filtered_rows.push(rows[i]);
-            }
-        }
-
-        this.setState({
-            rows : filtered_rows
-        });
-*/
-    },
-
     render : function() {
 
         if (this.state.rows)
@@ -54,9 +17,7 @@ var TableWrapper = React.createClass({
         {
             var rows = this.props.rows;
         }
-
-        console.log("rerender:", this.state.filter);
-
+      
         return (
             <div className="table_wrapper">
 
@@ -64,7 +25,7 @@ var TableWrapper = React.createClass({
                 <DataDateSign/>
 
                 <TableFilter
-                    filter_function={this.filterFunction}
+                    filter_function={this.filterFunction.bind(this)}
                     className="table_filter_wrapper"
                 />
 
@@ -78,7 +39,7 @@ var TableWrapper = React.createClass({
                         data_function={this.props.data_function}
                         sort_functions={this.props.sort_functions}
                         filter={this.state.filter}
-                        rows_per_page={5}
+                        rows_per_page={20}
                         granularity={this.props.granularity}
                     />
                 </div>

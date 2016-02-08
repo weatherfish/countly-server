@@ -25,10 +25,6 @@
     	<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.dom.js?<%= countlyVersion %>"></script>
     	<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/min/countly.utils.concat.js?<%= countlyVersion %>"></script>
 
-			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/country_codes.js"></script>
-			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/datamaps.world.min.js"></script>
-			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/topojson.min.js"></script>
-
 			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.js"></script>
 
 			<!--script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script-->
@@ -62,10 +58,14 @@
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/calendar.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/line_chart.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/big_number.css" />
+			<link rel="stylesheet" href="<%- cdn %>stylesheets/radio_button.css" />
 			<link rel="stylesheet" href="<%- cdn %>javascripts/visualization/rickshaw/rickshaw.min.css" />
 			<link rel="stylesheet" href="<%- cdn %>javascripts/react_old/widgets/dist/css/core.css" />
 			<link rel="stylesheet" href="<%- cdn %>javascripts/react_old/widgets/dist/css/react-widgets.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/tables.css" />
+			<link rel="stylesheet" href="<%- cdn %>stylesheets/dashboard.css" />
+			<link rel="stylesheet" href="<%- cdn %>stylesheets/date_sign_block.css" />
+			<link rel="stylesheet" href="<%- cdn %>stylesheets/map.css" />
 			<link rel="stylesheet" type="text/css" href="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.css" />
 			<link rel="stylesheet" type="text/css" href="<%- cdn %>stylesheets/bar_chart.css" />
 			<link rel="stylesheet" type="text/css" href="<%- cdn %>stylesheets/horizontal_bar_chart.css" />
@@ -106,6 +106,10 @@
 				<script src="https://fb.me/react-dom-0.14.6.js"></script-->
 				<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
 
+				<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/topojson.min.js"></script>
+				<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/country_codes.js"></script>
+				<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/datamaps.world.min.js"></script>
+
 				<!--script type="text/javascript" src="<%- cdn %>javascripts/react/build/react-with-addons.js"></script-->
 
 				<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.js"></script>
@@ -113,6 +117,20 @@
 				<script type="text/jsx" src="<%- cdn %>javascripts/utils/react-widgets.js"></script>
 
 				<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/globalize/0.1.1/globalize.min.js"></script>
+
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/dashboard.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/frequency.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/device.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/resolution.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/session.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/user.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/carrier.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/countries.js"></script>
+
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/dashboard.bar_chart.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/map.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/map_full.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/date_sign_block.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.data.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.top.js"></script>
@@ -135,6 +153,9 @@
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.bar_chart.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.pie_chart.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.horizontal_bar_chart.js"></script>
+
+
+
 
     <% } %>
 
@@ -280,32 +301,15 @@
 		            <!--div id="content-loader"></div-->
 		    </div>
 
+				<div class="table_block"></div>
+
 				<!--svg id="bar_chart"></svg-->
 
 		    <!--div id="content-top"></div-->
 
-				<!--div id="content-footer">
-		            <span><%= countlyTypeName %></span>
-				 <% if (!countlyType) { %>
-					<ul>
-						<li><a href="#" id="Intercom">Feedback & Support</a></li>
-						<li>|</li>
-						<li><a href="http://resources.count.ly/" target="_blank">Documentation</a></li>
-					</ul>
-				 <% }else { %>
-					<ul>
-						<li><a href="#" id="Intercom" >Provide feedback</a></li>
-						<li>|</li>
-						<li><a href="http://support.count.ly/" target="_blank">Support</a></li>
-						<li>|</li>
-						<li><a href="http://count.ly/enterprise-edition" target="_blank">Enterprise Edition (supported)</a></li>
-						<li>|</li>
-						<li><a href="http://resources.count.ly/" target="_blank">Documentation</a></li>
-					</ul>
-				 <% } %>
-			 </div-->
 		</div>
 
+		<div id="dashboard-graph"></div>
 
     <div id="app-tooltip"></div>
 
@@ -647,10 +651,6 @@
 			</div>
 		</div>
 		<table class="d-table help-zone-vb" cellpadding="0" cellspacing="0" data-help-localize="help.{{{table-helper}}}"></table>
-
-		<!--script>
-				alert("++++++++++++++++++++++++++++=")
-		</script-->
 
 	</script>
 
@@ -1163,6 +1163,9 @@
 
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/rickshaw/rickshaw.js"></script>
 
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/country_codes.js"></script>
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/datamaps.world.min.js"></script>
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/topojson.min.js"></script>
 
 		<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.common.js?<%= countlyVersion %>"></script>
 		<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/countly/countly.config.js?<%= countlyVersion %>"></script>
@@ -1190,7 +1193,18 @@
 			<% } %>
 	<% } %>
 	<script>
-	Backbone.history.start();
+
+	$(document).ready(function(){
+			_.defer(function(){
+					console.log("========== onload =========");
+
+					//setTimeout(function(){ // todo: remove
+							Backbone.history.start();
+					//}, 2000);
+
+			});
+	})
+
 	</script>
 
     <% if(intercom && member['global_admin'] || config.autonomous) { %>

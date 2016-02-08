@@ -4,6 +4,7 @@ var navigation = [
         icon        : 'user',
         description : 'Metrics offer you a wide overwiew about your apps performance',
         items       : [
+                        ["Frequency", "/analytics/frequency"],
                         ["Countries",   "/analytics/countries"],
                         ["Loyalty",     "/analytics/loyalty"],
                         ["Devices",     "/analytics/devices"],
@@ -13,7 +14,7 @@ var navigation = [
                         ["Frequency",   "/analytics/frequency"],
                         ["Events",      "/analytics/events"],
                         ["Resolutions", "/analytics/resolutions"],
-                        ["Durations",   "/analytics/durations"],
+                        ["Durations",   "/analytics/durations"],                        
                       ]
     },
     {
@@ -21,12 +22,17 @@ var navigation = [
         icon        : 'metrics',
         description : 'User profiles offer you a wide overwiew about your User profiles',
         items       : [
-                        ["Sessions",     "/analytics/sessions"],
-                        ["Devices2",     "/analytics/devices"],
-                        ["Versions2",    "/analytics/versions"],
-                        ["Carriers2",    "/analytics/carriers"],
-                        ["Events2",      "/analytics/events"],
-                        ["Durations2",   "/analytics/durations"],
+                        ["Users", "/analytics/users"],
+                        ["Sessions", "/analytics/sessions"],
+                        ["Countries",   "/analytics/countries"],
+                        ["Devices", "/analytics/devices"],
+                        ["Resolutions", "/analytics/resolutions"],
+                        ["App Versions", "/analytics/durations"],
+                        ["Carriers", "/analytics/carriers"],
+                        ["Platforms", "/analytics/platforms"],
+                        ["Densities", "/analytics/densities"],
+                        ["Sources ", "/analytics/sources"],
+                        ["Languages ", "/analytics/languages"],
                       ]
     },
     {
@@ -39,6 +45,8 @@ var navigation = [
                         ["Frequency3",   "/analytics/frequency"],
                         ["Resolutions3", "/analytics/resolutions"],
                         ["Durations3",   "/analytics/durations"],
+
+
                       ]
     },
     {

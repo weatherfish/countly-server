@@ -97,9 +97,6 @@
             chartData2 = [],
             chartData3 = [];
 
-        console.log("--------- device names ---------");
-        console.log(deviceNames);
-
         var sum = _.reduce(deviceTotal, function (memo, num) {
             return memo + num;
         }, 0);
@@ -127,6 +124,12 @@
 
         chartData.chartDPNew = {};
         chartData.chartDPNew.dp = chartData3;
+
+        chartData.get_current_data = function(){
+
+            return chartData.chartData;
+
+        }
 
         return chartData;
     };

@@ -20,9 +20,7 @@
         if (!countlyCommon.DEBUG) {
             _activeAppKey = countlyCommon.ACTIVE_APP_KEY;
             _initialized = true;
-
-            console.log("---- ajax 1 ---", countlyCommon.API_PARTS.data.r);
-
+            
             return $.ajax({
                 type:"GET",
                 url:countlyCommon.API_PARTS.data.r,

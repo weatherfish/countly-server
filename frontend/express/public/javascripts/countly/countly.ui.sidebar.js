@@ -9,13 +9,37 @@ applications.forEach(function(app){
 var FullSidebar = React.createClass({
 
     getInitialState: function() {
+
+        console.log("current:", Backbone.history.getFragment());
+
+        var current_location = Backbone.history.getFragment();
+
+        current_location = current_location.split('/');
+
+        console.log(current_location);
+
+        if (current_location[2])
+        {
+            var selected_left = 1;
+            var right_selected_item = current_location[2];
+            var right_closed = false;
+        }
+        else
+        {
+            var selected_left = -1;
+            var right_selected_item = false;
+            var right_closed = true;
+        }
+
+
         return {
-            selected_left : -1,
+            selected_left : selected_left,
             in_transition : false,
-            right_closed  : true,
+            right_closed  : right_closed,
             previous_left : -1,
             top_active    : false,
-            active_app    : this.props.active_app
+            active_app    : this.props.active_app,
+            right_selected_item : right_selected_item
         };
     },
 
@@ -45,6 +69,9 @@ var FullSidebar = React.createClass({
 
             if (window.location.hash != "#/")
             {
+
+                $("#content-container").html("-- loading --");
+
                 window.location = "/dashboard#";
 
                 var nav_data = {
@@ -83,6 +110,7 @@ var FullSidebar = React.createClass({
 
     handle_right_changed : function()
     {
+
         if (this.state.right_change_i != -1) // second stage of transition - old hidden, new not shown yet
         {
             this.setState({
@@ -187,7 +215,17 @@ var FullSidebar = React.createClass({
                     <LeftPart navigation={full_navigation} selected_i={this.state.selected_left} is_active={is_left_active} in_transition={this.state.in_transition} handleClick={this.handle_left_click}/>
                 </div>
                 <div id="right_part">
-                    <RightPart transition={this.state.right_change} change_i={this.state.right_change_i} handle_changed={this.handle_right_changed} nav_key={navigation_key} description={description} navigation={navigation_nodes} is_active={!is_left_active} closed={this.state.right_closed} handleClose={this.handle_right_close} />
+                    <RightPart transition={this.state.right_change}
+                        change_i={this.state.right_change_i}
+                        handle_changed={this.handle_right_changed}
+                        nav_key={navigation_key}
+                        description={description}
+                        navigation={navigation_nodes}
+                        is_active={!is_left_active}
+                        closed={this.state.right_closed}
+                        handleClose={this.handle_right_close}
+                        selected_item={this.state.right_selected_item}
+                    />
                 </div>
 
                 <div id="countly_logo_side"></div>

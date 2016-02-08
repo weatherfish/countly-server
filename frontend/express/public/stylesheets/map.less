@@ -1,0 +1,54 @@
+.background_image(@image){
+		background : url('../images/@{image}.png');
+		background-image: url("../images/@{image}.svg");
+		background-repeat   : no-repeat;
+		background-position : center;
+}
+
+#map {
+    margin-top : 50px;
+    text-align : center;
+    position : relative;
+}
+
+#map .hoverinfo {
+    font-family : Lato-Regular;
+}
+
+.search_block {
+		position : relative;
+    font-family : Lato-Regular;
+    text-align : right;
+    padding : 20px;
+}
+.search_block span {
+    margin-right : 10px;
+}
+/*.table_filter_wrapper {
+    position : absolute;
+    right : 40px;
+    top : 20px;
+}*/
+
+
+.search_block div.icon {
+    /*position : absolute;*/
+		position : relative;
+		left : 30px; /* todo : fast fix */
+		top : 10px;
+		display : inline-block;
+    width : 30px;
+    height : 30px;
+    .background_image(search_icon);
+}
+
+.search_block input {
+
+    width  : 200px;
+    height : 30px;
+
+    padding-left : 30px;
+    border-radius : 2px;
+    border : 1px solid #E7E7E7;
+
+}

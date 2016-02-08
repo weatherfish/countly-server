@@ -7,7 +7,7 @@ var Chart = React.createClass({
         var data = this.props.data_function();
         data = data.chartData;
 
-        var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654"    , "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
+        var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
 
         for (var i = 0; i < data.length; i++)
         {

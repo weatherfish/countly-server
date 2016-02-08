@@ -106,15 +106,15 @@ var BigNumber = React.createClass({
         var value = this.props.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
         return (
-            <div className="big-number" onClick={this.handle_click} data-help-localize="help.{{this.help}}">
+            <div className="big-number" onMouseEnter={this.onhover} onMouseLeave={this.onhoverend} onClick={this.handle_click} data-help-localize="help.{{this.help}}">
                 <div className="tick_wrp">
                     <div style={divStyle} className="tick">
                         <div className="tick_img"></div>
                     </div>
                 </div>
                 <div className="info_wrp">
-                    <div onMouseEnter={this.onhover} onMouseLeave={this.onhoverend} style={select_style} className="select">{title}</div>
-                    <div onMouseEnter={this.onhover} onMouseLeave={this.onhoverend} style={number_style} className="number">{value}</div>
+                    <div style={select_style} className="select">{title}</div>
+                    <div style={number_style} className="number">{value}</div>
                 </div>
             </div>
         );

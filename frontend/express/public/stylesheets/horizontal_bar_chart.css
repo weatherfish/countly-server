@@ -1,0 +1,163 @@
+
+
+.horizontal_chart_wrapper {
+    margin-top : 15px;
+    /*height : 600px; /* todo - calculate*/
+    position : relative;
+}
+
+.chart_label {
+    font-family : Lato-Regular;
+    padding-left : 40px;
+    padding-top : 20px;
+}
+
+.horizontal_chart {
+    position : relative;
+    font-size : 13px;
+}
+
+.horizontal_chart .bar_block {
+    position : absolute;
+    font-family : Lato-Regular;
+}
+
+.horizontal_chart .back_rect {
+    position : absolute;
+    /*width : 100px;
+    height : 40px;*/
+}
+
+.horizontal_chart .bar_rect {
+    position : absolute;
+    /*width : 100px;
+    height : 40px;*/
+}
+
+.horizontal_chart .block_label {
+    position : absolute;
+    /*width : 100px;
+    height : 40px;*/
+    font-size : 15px;
+    font-family : Lato-Regular;
+}
+
+.horizontal_chart .percent {
+    position : absolute;
+    top : 0px;
+    right : 10px;
+    font-size : 13px !important;
+    /*width : 100px;
+    height : 40px;*/
+    /*font-size : 15px !important;*/
+}
+
+.bar-outer {
+    /*padding:5px;*/
+    /*height:20px;
+    width:200px;*/
+    /*background-color:#CCC;*/
+    position:relative;
+
+    border-radius : 2px;
+
+}
+
+.bar-inner {
+    /*padding:5px;*/
+    position:absolute;
+    top:0;
+    left:0;
+    z-index: 500;
+    /*height:20px;
+    background-color:blue;*/
+    color:#ffffff;
+    overflow:hidden;
+    white-space:nowrap;
+    padding-left : 10px;
+
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+
+}
+
+.bar-outer-text {
+    /*padding:5px;*/
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:1;
+    font-size : 13px !important;
+    padding-left : 10px;
+}
+
+.load_more {
+
+    position : absolute;
+
+    bottom : 20px;
+
+    width : 100%;
+    text-align : center;
+
+    font-family : Lato-Regular;
+    font-size : 12px;
+    /*margin-top : 10px;*/
+
+}
+
+.load_more span {
+    cursor : pointer;
+    border-bottom : 1px solid #13C35C;
+    color : #13C35C;
+}
+
+/*.horizontal_chart_wrapper {
+    /*background-color : white;*/
+    /*border: 1px solid #eeeeee;*/
+/*}
+
+.horizontal_chart_wrapper .graph_label {
+    font-family: Lato-Regular;
+    font-size : 18px;
+    padding-top : 20px;
+    margin-left : 40px;
+}
+
+#horizontal_chart {
+
+    overflow : visible;
+    position : relative;
+
+    font-family: Lato-Regular;
+
+    background-color : white;
+
+    z-index : 5000;
+
+    padding-top : 20px;
+    padding-bottom : 20px;
+    background-color : white;
+
+}
+
+#horizontal_chart .label {
+    font-size: 15px;
+    color: #3d3d3d;
+}
+
+#horizontal_chart .label_wrapper {
+    overflow : hidden;
+}
+
+#horizontal_chart .bar_label {
+    font-size : 13px;
+}
+
+#horizontal_chart .percent {
+    font-size : 13px;
+    color: #6E6E6E;
+}
+
+
+*/

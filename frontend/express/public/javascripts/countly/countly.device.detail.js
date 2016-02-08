@@ -202,6 +202,12 @@
         chartData.chartDPNew = {};
         chartData.chartDPNew.dp = chartData3;
 
+        chartData.get_current_data = function(){
+
+            return chartData.chartData;
+
+        }
+
         return chartData;
     };
 

@@ -7,7 +7,6 @@
 
     //Public Methods
     countlySession.initialize = function () {
-        console.log("{{{{{{{{{{{{{{{{{{{[ countlySession initialize ]}}}}}}}}}}}}}}}}}}}");
         _sessionDb = countlyUser.getDbObj();
         setMeta();
     };
@@ -292,6 +291,9 @@
 
     countlySession.getSessionDP = function () {
 
+        console.log("((((((((((((((((((( session DB )))))))))))))))))))");
+        console.log(_sessionDb);
+
         var chartData = [
                 { data:[], label:jQuery.i18n.map["common.table.total-sessions"], short:"t" },
                 { data:[], label:jQuery.i18n.map["common.table.new-sessions"], short:"n" },
@@ -311,8 +313,8 @@
     countlySession.getSessionDPTotal = function () {
 
         var chartData = [
-                { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#DDDDDD', mode:"ghost" },
-                { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#333933' }
+                { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#bbbbbb', mode:"ghost" },
+                { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#1A8AF3' } // #333933 - good color
             ];
 
         var dataProps = [
@@ -326,9 +328,13 @@
                 { name:"t" }
             ];
 
-        return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        //console.log("{{{{{{{{{{{{{ extract data }}}}}}}}}}}}}");
+        //console.log(countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps));
+
+        return countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
-    
+
 
     countlySession.getUserDP = function () {
 
@@ -356,8 +362,8 @@
     countlySession.getUserDPActive = function () {
 
         var chartData = [
-                { data:[], label:jQuery.i18n.map["common.table.total-users"], color:'#DDDDDD', mode:"ghost" },
-                { data:[], label:jQuery.i18n.map["common.table.total-users"], color:'#333933' }
+                { data:[], label:jQuery.i18n.map["common.table.total-users"], color:'#bbbbbb', mode:"ghost" },
+                { data:[], label:jQuery.i18n.map["common.table.total-users"], color:'#5DCBFF' }
             ],
             dataProps = [
                 {
@@ -375,14 +381,15 @@
                 }
             ];
 
-        return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        return countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
 
     countlySession.getUserDPNew = function () {
 
         var chartData = [
-                { data:[], label:jQuery.i18n.map["common.table.new-users"], color:'#DDDDDD', mode:"ghost"},
-                { data:[], label:jQuery.i18n.map["common.table.new-users"], color:'#333933' }
+                { data:[], label:jQuery.i18n.map["common.table.new-users"], color:'#bbbbbb', mode:"ghost"},
+                { data:[], label:jQuery.i18n.map["common.table.new-users"], color:'#9521B8' }
             ],
             dataProps = [
                 {
@@ -395,7 +402,8 @@
                 { name:"n" }
             ];
 
-        return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        return countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
 
     countlySession.getMsgUserDPActive = function () {
@@ -413,14 +421,15 @@
                 }
             ];
 
-        return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        return countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
 
     countlySession.getDurationDP = function () {
 
         var chartData = [
-                { data:[], label:jQuery.i18n.map["common.graph.time-spent"], color:'#DDDDDD', mode:"ghost"},
-                { data:[], label:jQuery.i18n.map["common.graph.time-spent"], color:'#333933' }
+                { data:[], label:jQuery.i18n.map["common.graph.time-spent"], color:'#bbbbbb', mode:"ghost"},
+                { data:[], label:jQuery.i18n.map["common.graph.time-spent"], color:'#F9BD34' }
             ],
             dataProps = [
                 {
@@ -438,14 +447,15 @@
                 }
             ];
 
-        return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        return countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
 
     countlySession.getDurationDPAvg = function () {
 
         var chartData = [
-                { data:[], label:jQuery.i18n.map["common.graph.average-time"], color:'#DDDDDD', mode:"ghost"},
-                { data:[], label:jQuery.i18n.map["common.graph.average-time"], color:'#333933' }
+                { data:[], label:jQuery.i18n.map["common.graph.average-time"], color:'#bbbbbb', mode:"ghost"},
+                { data:[], label:jQuery.i18n.map["common.graph.average-time"], color:'#9FC126' }
             ],
             dataProps = [
                 {
@@ -463,13 +473,14 @@
                 }
             ];
 
-        return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        return countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
 
     countlySession.getEventsDP = function () {
 
         var chartData = [
-                { data:[], label:jQuery.i18n.map["common.graph.reqs-received"], color:'#DDDDDD', mode:"ghost"},
+                { data:[], label:jQuery.i18n.map["common.graph.reqs-received"], color:'#bbbbbb', mode:"ghost"},
                 { data:[], label:jQuery.i18n.map["common.graph.reqs-received"], color:'#333933' }
             ],
             dataProps = [
@@ -491,8 +502,8 @@
     countlySession.getEventsDPAvg = function () {
 
         var chartData = [
-                { data:[], label:jQuery.i18n.map["common.graph.avg-reqs-received"], color:'#DDDDDD', mode:"ghost"},
-                { data:[], label:jQuery.i18n.map["common.graph.avg-reqs-received"], color:'#333933' }
+                { data:[], label:jQuery.i18n.map["common.graph.avg-reqs-received"], color:'#bbbbbb', mode:"ghost"},
+                { data:[], label:jQuery.i18n.map["common.graph.avg-reqs-received"], color:'#0FB654' }
             ],
             dataProps = [
                 {
@@ -510,7 +521,8 @@
                 }
             ];
 
-        return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        return countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+        //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
 
     countlySession.clearSessionObject = function (obj) {

@@ -699,8 +699,11 @@
     var _state_single_graph_data = false;
     var initial_single_graph_data = false;
 
-    countlyCommon.drawTimeGraph = function (granularity_rows, container, data_items, graph_width, graph_height, bucket, granularity_type, small_circles, zero_points) {
+    countlyCommon.drawTimeGraph = function (granularity_rows, container, tmp_colors, graph_width, graph_height, bucket, granularity_type, small_circles, zero_points) {
         _.defer(function(){
+
+            console.log("============ granularity_rows =============");
+            console.log(granularity_rows);
 
             if (container.indexOf("#") > -1)
             {
@@ -771,11 +774,25 @@
 
                 var set_data = granularity_rows[i];
 
+                if (set_data.color)
+                {
+                    var color = set_data.color;
+                }
+                else
+                {
+                    var color = tmp_colors[i].color;
+                }
+
+                console.log("set line color:", color);
+
                 var obj = {
                     "name"   : set_data.label,
                     "values" : [],
-                    "color"  : data_items[i].color
+                    "color"  : color
                 }
+
+                console.log("=========== push object ===========");
+                console.log(obj);
 
                 for(var j = 0; j < set_data.data.length; j++){
 
@@ -815,7 +832,7 @@
                 granularity : granularity_type,
                 left_time_extension : false,
                 small_circle_r : 0,
-                big_circle_r : 4,
+                big_circle_r : 3,
                 small_circles : small_circles,
                 zero_points : zero_points,
                 period : _period
@@ -983,8 +1000,11 @@
 
                               var color = false;
 
-                              data_items.every(function(element){
-
+                              tmp_colors.every(function(element){
+/*
+                                  console.log("---------- tmp_colors element ----------");
+                                  console.log(element);
+*/
                                   if (element.title.toLowerCase() == data.name.toLowerCase())
                                   {
                                       color = element.color;
@@ -1097,6 +1117,8 @@
         console.log("======== updateTimeGraph =============");
         console.log(granularity_rows);
 
+        //return false;
+
         var time_period = countlyCommon.periodObj.currentPeriodArr;
 
         var graphTicks = [],
@@ -1161,17 +1183,41 @@
 
                 var set_data = granularity_rows[i];
 
+                console.log("--- set data ----");
+                console.log(set_data);
+
+                if (set_data.color)
+                {
+                    var color = set_data.color;
+                }
+                else
+                {
+                    var color = false;
+
+                    for (var c = 0; c < initial_single_graph_data.length; c++)
+                    {
+                        if (initial_single_graph_data[c].name == set_data.label)
+                        {
+                            color = initial_single_graph_data[c].color;
+                            break;
+                        }
+                    }
+                }
+
                 var obj = {
                     "name"   : set_data.label,
                     "values" : [],
-                    "color"  : set_data.color
+                    "color"  : color
                 }
+
+                console.log("--- set obj ----");
+                console.log(obj);
 
                 for(var j = 0; j < set_data.data.length; j++){
 
                     var point_data = {
                         "x" : set_data.data[j][0]/*.unix() * 1000*/,
-                        "y" : set_data.data[j][1],
+                        "y" : Math.round(parseInt(set_data.data[j][1])), // todo!!! maybe inaccuracy
                     }
 
                     if (set_data.data[j][2])
@@ -1316,7 +1362,10 @@
         {
             for (var i = 0; i < _rickshaw_graph.series.length; i++)
             {
-                _rickshaw_graph.series[i].data = single_graph_data[i].values;
+                _rickshaw_graph.series[i].data  = single_graph_data[i].values;
+                _rickshaw_graph.series[i].color = single_graph_data[i].color;
+                _rickshaw_graph.series[i].name  = single_graph_data[i].name;
+
             }
         }
 
@@ -1558,7 +1607,16 @@
             keyEvents[k].max = _.max(chartVals);
         }
 
-        return {"chartDP":chartData, "chartData":_.compact(tableData), "keyEvents":keyEvents, "time_period" : countlyCommon.periodObj.currentPeriodArr, "time_format" : countlyCommon.periodObj.dateString };
+        return {
+            "chartDP":chartData,
+            "chartData":_.compact(tableData),
+            "keyEvents":keyEvents,
+            "time_period" : countlyCommon.periodObj.currentPeriodArr,
+            "time_format" : countlyCommon.periodObj.dateString,
+            "get_current_data" : function(granularity){
+                return chartData;
+            }
+        };
     };
 
     countlyCommon.extractChartData_granularity = function(db, clearFunction, chartData, dataProperties) {
@@ -1619,25 +1677,25 @@
             activeDate,
             activeDateArr;
 
-        if (currOrPrevious[j] === "previous") {
-            if (countlyCommon.periodObj.isSpecialPeriod) {
-                periodMin = 0;
-                periodMax = countlyCommon.periodObj.previousPeriodArr.length;
-                activeDateArr = countlyCommon.periodObj.previousPeriodArr;
-            } else {
-                activeDate = countlyCommon.periodObj.previousPeriod;
-            }
-        } else {
-            if (countlyCommon.periodObj.isSpecialPeriod) {
-                periodMin = 0;
-                periodMax = countlyCommon.periodObj.currentPeriodArr.length;
-                activeDateArr = countlyCommon.periodObj.currentPeriodArr;
-            } else {
-                activeDate = countlyCommon.periodObj.activePeriod;
-            }
-        }
-
         for (var j = 0; j < propertyNames.length; j++) {
+
+            if (currOrPrevious[j] === "previous") {
+                if (countlyCommon.periodObj.isSpecialPeriod) {
+                    periodMin = 0;
+                    periodMax = countlyCommon.periodObj.previousPeriodArr.length;
+                    activeDateArr = countlyCommon.periodObj.previousPeriodArr;
+                } else {
+                    activeDate = countlyCommon.periodObj.previousPeriod;
+                }
+            } else {
+                if (countlyCommon.periodObj.isSpecialPeriod) {
+                    periodMin = 0;
+                    periodMax = countlyCommon.periodObj.currentPeriodArr.length;
+                    activeDateArr = countlyCommon.periodObj.currentPeriodArr;
+                } else {
+                    activeDate = countlyCommon.periodObj.activePeriod;
+                }
+            }
 
             var week_count = 0;
             var week_days_count = 0;
@@ -1762,6 +1820,9 @@
 
         countlyCommon.previous_period_length = daily_granularity[0].data.length;
 
+        console.log("-------- chartData 000 -----");
+        console.log(chartData);
+
         return {
             "chartDP"        : chartData,
             "hourly_granularity"  : hourly_granularity,
@@ -1775,9 +1836,10 @@
             "previous_period_length" : previous_period_length,
             get_current_data : function(granularity){
 
+
                 if (!granularity)
                 {
-                    granularity = _granularity; // todo: will remove this global variable "_granularity"
+                    granularity = "daily"; // = _granularity // todo: "daily" is fix, which change another fix with global var
                 }
 
                 switch(granularity)

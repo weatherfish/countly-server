@@ -50,17 +50,9 @@ var TableHeader = (function (_React$Component) {
                 var sort_icons = <div className="header_sort_button"><div className="up_icon"></div><div className="down_icon"></div></div>;
             }
 
-            //console.log("header_render label 1:", label);
-
             var label = this.props.label.toLowerCase().replace(/\w\S*/g, function(txt){
-              //console.log("---> process txt -->>>", txt);
               return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
             });
-
-            // onClick={this.sort_rows_by.bind(null, this.props.data_key)}
-
-            // <Cell className="header_sort_button">
-            // </Cell>
 
             return (
                     <div className="table_header" onClick={this.props.sort_function.bind(null, this.props.data_key)}>
@@ -68,32 +60,6 @@ var TableHeader = (function (_React$Component) {
                         {sort_icons}
                     </div>
             );
-
-            /*var _props = this.props;
-            var rowIndex = _props.rowIndex;
-            var data = _props.data;
-            var field = _props.field;
-
-            var props = _objectWithoutProperties(_props, ['rowIndex', 'data', 'field']);
-/*
-            console.log("------------- render cell ---------------");
-            //console.log(rowIndex, data, field);
-            console.log(data[rowIndex]["date"]);
-*/
-/*
-            var key = data[rowIndex].date.replace(new RegExp(" ", 'g'), '') + field;
-
-            //console.log("key:", key);
-
-            props.key = key + "toplevel";
-            props.dataKey = key;
-
-            return React.createElement(
-                Cell,
-                //_extends({}, props, { key: key, dataKey: key }),
-                props,
-                data[rowIndex][field]
-            );*/
         }
     }]);
 
@@ -119,20 +85,6 @@ var TableCell = (function (_React$Component) {
             var field = _props.field;
 
             var props = _objectWithoutProperties(_props, ['rowIndex', 'data', 'field']);
-/*
-            console.log("------------- render cell ---------------");
-            //console.log(rowIndex, data, field);
-            console.log(data[rowIndex]["date"]);
-*/
-
-            var key = data[rowIndex].date.replace(new RegExp(" ", 'g'), '') + field;
-
-            //console.log("key:", key);
-
-            props.key = key + "toplevel";
-            props.dataKey = key;
-
-            props.className = "table_content";
 
             if (data[rowIndex][field])
             {
@@ -140,27 +92,24 @@ var TableCell = (function (_React$Component) {
             }
             else
             {
-                var cell_data = "";
+                var cell_data = "0";
             }
 
-            var cell_data = cell_data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
+            if (cell_data === parseInt(cell_data, 10))
+            {
+                cell_data = cell_data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+        
             return (
                 <Cell className="table_content header_sort_button">
                     {cell_data}
                 </Cell>
             );
-/*
-            return React.createElement(
-                Cell,
-                //_extends({}, props, { key: key, dataKey: key }),
-                props,
-                data[rowIndex][field]
-            );*/
         }
     }]);
 
     return TableCell;
+
 })(React.Component);
 
 
@@ -170,64 +119,30 @@ var SortTable = React.createClass({
 
         var headers = JSON.parse(JSON.stringify(this.props.headers));
 
-        headers.unshift({
-            "title" : this.props.date_sign,
-            //"help"  : "sessions.unique-sessions", // todo: add translate
-            "short" : "date",
-        })
-
-
         var full_rows = this.props.data_function().get_current_data(this.props.granularity);
 
-        console.log("============= full_rows =========", this.props.granularity);
-        console.log(full_rows);
-
-        full_rows = this.convert_data_rows(full_rows);
-
-        //var full_rows = this.convert_data_rows(this.props.rows);
-
-        var page = 0;
-        var rows_per_page = this.props.rows_per_page;
-        //max_num = 4;
-
-        var page_rows = full_rows.slice( (page) * rows_per_page, (page + 1) * rows_per_page );
-
-        var pages = [];
-        var pages_length = Math.ceil(full_rows.length / rows_per_page);
-
-        for (var i = 0; i < pages_length; i++) {
-            pages.push(i);
+        if (this.props.convert_data_function)
+        {
+            full_rows = this.convert_data_rows(full_rows);
         }
 
-        return {
+        var init_object = {
             sortBy  : 'date',
             sortDir : 'ASC',
             headers : headers,
-            rows    : page_rows,
-            full_rows : full_rows,
             table_height : 700,
-            active_page : page,
-            rows_per_page : rows_per_page,
-            pages : pages
-        };
+            rows_per_page : this.props.rows_per_page,
+        }
+
+        var pagination = this.make_pagination(full_rows);
+
+        for (var attrname in pagination) { init_object[attrname] = pagination[attrname]; }
+
+        return init_object;
     },
 
     componentWillMount: function() {
 
-/*
-        $(event_emitter).on('granularity', function(e, granularity_type){
-
-            var rows = this.props.data_function().get_current_data(granularity_type);
-            var rows = this.convert_data_rows(rows);
-
-            this.setState({
-                rows : rows
-            });
-
-        }.bind(this));
-*/
-
-        //$(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
         $(event_emitter).on('granularity_data', function(e, data){
 
             var self = this;
@@ -237,14 +152,14 @@ var SortTable = React.createClass({
             //console.log("==== date_choise ====", period);
             var rows = this.props.data_function().get_current_data(granularity);
 
-            var rows = this.convert_data_rows(rows);
+            if (this.props.convert_data_function)
+            {
+                rows = this.convert_data_rows(rows);
+            }
 
             if (rows.length > 50000)
             {
                 var splitted = split(rows, 100);
-
-                console.log("-------- splitted --------");
-                console.log(splitted);
 
                 var combined = [];
 
@@ -277,21 +192,14 @@ var SortTable = React.createClass({
             else
             {
 
+                var pagination = this.make_pagination(rows);
+
+                this.setState(pagination);
+
+/*
                 var full_rows = rows;
 
                 var page = 0;
-/*
-                max_num = 4;
-
-                var page_rows = full_rows.slice( (page - 1) * max_num, page * max_num );
-
-                var pages = [];
-                var pages_length = Math.ceil(full_rows.length / rows_per_page);
-
-                for (var i = 0; i < pages_length; i++) {
-                    pages.push(i);
-                }
-*/
 
                 var page_rows = full_rows.slice( (page) * this.state.rows_per_page, (page + 1) * this.state.rows_per_page );
 
@@ -311,7 +219,7 @@ var SortTable = React.createClass({
                     active_page : 0,
                     pages : pages
                     //table_height : 700
-                });
+                });*/
 /*
                 var self = this;
 
@@ -366,6 +274,54 @@ var SortTable = React.createClass({
         }
 
     },*/
+
+    filterFunction : function(filter)
+    {
+
+        if (filter == "")
+        {
+
+            var pagination = this.make_pagination(this.state.full_rows);
+
+            this.setState(pagination);
+
+          /*
+            this.setState({
+                "filter" : false
+            });*/
+
+            return false;
+        }
+
+        console.log("filter:", filter);
+
+        var rows = this.state.full_rows;
+
+        console.log("======== rows ========");
+        console.log(rows);
+
+        var filtered_rows = [];
+
+        for (var i = 0; i < rows.length; i++)
+        {
+            if (rows[i].date.toLowerCase().indexOf(filter) > -1)
+            {
+                filtered_rows.push(rows[i]);
+            }
+        }
+
+        var pagination = this.make_pagination(filtered_rows, true);
+
+        this.setState(pagination);
+
+/*
+        this.setState({
+            "filter" : filter,
+            "filtered_rows" : filtered_rows
+        });
+*/
+
+    },
 
     sort_rows_by(cellDataKey) {
 /*
@@ -423,9 +379,6 @@ var SortTable = React.createClass({
                 return this.props.sort_functions[sortBy](a, b, sortBy, sortDir);
             });
         }
-
-        console.log("============= sorted rows ==============");
-        console.log(rows);
 
         var page = 0;
 
@@ -559,6 +512,40 @@ var SortTable = React.createClass({
         });
     },
 
+    make_pagination : function(full_rows, old_data)
+    {
+
+        //var full_rows = rows;
+
+        var page = 0;
+
+        var page_rows = full_rows.slice( (page) * this.props.rows_per_page, (page + 1) * this.props.rows_per_page );
+
+        var pages = [];
+        var pages_length = Math.ceil(full_rows.length / this.props.rows_per_page);
+
+        for (var i = 0; i < pages_length; i++) {
+            pages.push(i);
+        }
+
+        console.log("================= pages ================");
+        console.log(pages);
+
+        var pagination = {
+            rows : page_rows,
+            active_page : 0,
+            pages : pages
+        }
+
+        if (!old_data)
+        {
+            pagination.full_rows = full_rows;
+        }
+
+        return pagination;
+
+    },
+
     pagination : function(page)
     {
         if (page == "prev")
@@ -646,6 +633,9 @@ var SortTable = React.createClass({
 
         var sortDirArrow = ''; // todo: the variable is not used
 
+        console.log("============ render this.state.rows ==============");
+        console.log(this.state.rows);
+
         if (this.state.sortDir !== null)
         {
             sortDirArrow = this.state.sortDir === SortTypes.DESC ? '' + this.state.sortBy[0] : '.' + this.state.sortBy[0];
@@ -675,10 +665,23 @@ var SortTable = React.createClass({
 
         if (this.state.pages.length > 7)
         {
-            var available_pages = this.state.pages.slice(0, 3); // show only first and last 3 pages links [1][2][3][...][50][51][52]
-            var last_available_pages = this.state.pages.slice(this.state.pages.length - 3, this.state.pages.length);
-            available_pages.push("...");
-            var available_pages = available_pages.concat(last_available_pages);
+            if (this.state.active_page < 3 || this.state.active_page > this.state.pages.length - 3)
+            {
+                var available_pages = this.state.pages.slice(0, 3); // show only first and last 3 pages links [1][2][3][...][50][51][52]
+                var last_available_pages = this.state.pages.slice(this.state.pages.length - 3, this.state.pages.length);
+                available_pages.push("...");
+                var available_pages = available_pages.concat(last_available_pages);
+            }
+            else
+            {
+                var available_pages = this.state.pages.slice(0, 1);
+                available_pages.push("...");
+                available_pages.push(this.state.active_page - 1);
+                available_pages.push(this.state.active_page);
+                available_pages.push(this.state.active_page + 1);
+                available_pages.push("...");
+                available_pages.push(this.state.pages.length - 1);
+            }
 
         }
         else
@@ -696,7 +699,18 @@ var SortTable = React.createClass({
         }
 
         return (
-            <div>
+
+        <div className="table_wrapper">
+
+            <div className="data_sign">{this.props.data_sign}</div>
+            <DataDateSign/>
+
+            <TableFilter
+                filter_function={this.filterFunction.bind(this)}
+                className="table_filter_wrapper"
+            />
+
+            <div className="sort_table_wrapper">
                 <Table
                     rowHeight = {row_height}
                     rowsCount = {this.state.rows.length}
@@ -732,6 +746,7 @@ var SortTable = React.createClass({
                     <div className="infinity" onClick={self.infinity.bind(null, "inf")}>inf</div>
                 </div>
             </div>
+        </div>
         );
 
 
