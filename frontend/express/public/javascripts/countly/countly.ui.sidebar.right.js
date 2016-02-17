@@ -155,7 +155,7 @@ var RightPart = React.createClass({
 
         var screen_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
-        var description_bottom = ((1500 - screen_height) + 60 + 40 + 50) + "px";
+        var description_bottom = ((1500 - screen_height) + 60 + 40 + 50) + "px"; // todo
 
         var description_style = {
             bottom : description_bottom

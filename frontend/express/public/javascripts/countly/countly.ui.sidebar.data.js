@@ -14,7 +14,7 @@ var navigation = [
                         ["Frequency",   "/analytics/frequency"],
                         ["Events",      "/analytics/events"],
                         ["Resolutions", "/analytics/resolutions"],
-                        ["Durations",   "/analytics/durations"],                        
+                        ["Durations",   "/analytics/durations"],
                       ]
     },
     {
@@ -95,6 +95,19 @@ var navigation = [
                         ["Resolutions5", "/analytics/resolutions"],
                         ["Durations5",   "/analytics/durations"],
                       ]
+    },
+    {
+        key: 'Management',
+        icon        : 'manage',
+        description : '',
+        arrow       : -1, // todo: tmp
+        items       : [
+                        ["My Account", "/manage/apps"],
+                        ["Applications", "/manage/apps"],
+                        ["User Roles", "/manage/apps"],
+                        ["E-mails reports", "/manage/apps"],
+                      ]
+
     }
 ];
 

@@ -1,3 +1,8 @@
+d3.selection.prototype.last = function() {
+    var last = this.size() - 1;
+    return d3.select(this[0][last]);
+};
+
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define(['d3'], function (d3) {
@@ -445,7 +450,7 @@ Rickshaw.Graph = function(args) {
 			.append("svg:svg")
       .attr("id", "graph_svg")
 			.attr('width', this.width)
-			.attr('height', this.height + this.circle_radius)
+			.attr('height', this.height/* + this.circle_radius*/)
       /*.attr("transform", function(d) {
            return "translate(" + margins + ", 0)"; }
       )*/
@@ -567,7 +572,7 @@ Rickshaw.Graph = function(args) {
         var left_extension_width = _left_extension_width;
     }
 
-		this.x = (this.xScale || d3.scale.linear()).copy().domain(domain.x).range([0, this.width - (this.circle_radius * 2) - this.max_tick_width]);
+		this.x = (this.xScale || d3.scale.linear()).copy().domain(domain.x).range([0, this.width -/* (this.circle_radius * 2) -*/ this.max_tick_width]);
     this.y = (this.yScale || d3.scale.linear()).copy().domain([domain.y[0], y_domain]).range([this.height, 0]);
 
 		this.x.magnitude = d3.scale.linear()
@@ -1664,7 +1669,7 @@ Rickshaw.Graph.Axis.Time = function(args) {
         else
         {*/
 
-        element.style.left = (self.graph.circle_radius + (self.graph.max_tick_width / 2)) + (self.graph.x(o.value) - (tick_title_width / 2) + points_offset) + 'px'; // todo: change 16 to var.
+        element.style.left = (/*self.graph.circle_radius +*/ (self.graph.max_tick_width / 2)) + (self.graph.x(o.value) - (tick_title_width / 2) + points_offset) + 'px'; // todo: change 16 to var.
 
         /*}*/
 
@@ -1853,7 +1858,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 		this.width = args.width || elementWidth || this.graph.width * this.berthRate;
 		this.height = args.height || elementHeight || this.graph.height;
 
-    this.height += 40;
+    this.height += 40; // todo: variable
 
 		this.vis
 			.attr('width', this.width)
@@ -1991,7 +1996,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
     y_domain = parseInt(y_domain_string);
 
-    var y_inverted = d3.scale.linear().domain([0, y_domain]).rangeRound([0, this.graph.height - 2]); // todo: +20 !!!!!!!!!!!!! // todo: change 300 to variable
+    var y_inverted = d3.scale.linear().domain([0, y_domain]).rangeRound([0, this.graph.height]);
 
     var tick_values = [];
 
@@ -2004,10 +2009,8 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
         tick_values.push(Math.round(i * tick_size));
     }
 
-    d3.selection.prototype.last = function() {
-        var last = this.size() - 1;
-        return d3.select(this[0][last]);
-    };
+    console.log("============ this.ticks ================");
+    console.log(this.ticks);
 
     var grids = this.graph.vis
   			//.append("svg:g")
@@ -2015,7 +2018,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
   			.attr("class", "y_grid")
   			.call(axis.ticks(this.ticks).scale(y_inverted).tickSize(gridSize).tickValues(tick_values)) /*.tickSubdivide(0)*/ /*.tickPadding([0])*/
         .attr("transform", function(d) {
-             return "translate(" + 0 + "," + 1 + ")"; }
+             return "translate(" + 0 + "," + 0 + ")"; }
         )
 
     grids
@@ -2372,6 +2375,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 	initialize: function(args) {
 
+    console.log("{{{{{{{{{{{{{ init hover }}}}}}}}}}}}}");
+
     var self = this;
 
 		var graph = this.graph = args.graph;
@@ -2457,11 +2462,11 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 		var eventX = e.offsetX || e.layerX;
 		var eventY = e.offsetY || e.layerY;
 
-    eventX -= graph.circle_radius + (graph.max_tick_width / 2);
+    eventX -= /*graph.circle_radius +*/ (graph.max_tick_width / 2);
 
     if (this.hasClass(e.target, "y_axis") && this.hasClass(e.target, "right"))
     {
-        eventX = this.graph.width - 10; // todo: change to var
+        eventX = this.graph.width/* - 10*/; // todo: change to var
     }
 
 		var j = 0;
@@ -2687,7 +2692,6 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
   point_leave : function()
   {
-
       var self = this;
 
       this.current_point = false;
@@ -2823,7 +2827,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
         var left_extension_width = _left_extension_width;
     }
 
-    var tooltip_left = Math.ceil((graph.x(point.value.x) + graph.circle_radius + (graph.max_tick_width / 2) + this.graph.points_offset));
+    var tooltip_left = Math.ceil((graph.x(point.value.x) + /*graph.circle_radius +*/ (graph.max_tick_width / 2) + this.graph.points_offset));
 
     this.element.style.left = tooltip_left + 'px';
 
@@ -2996,7 +3000,11 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 			false
 		);
 
-		this.graph.onUpdate( function() { this.update() }.bind(this) );
+		this.graph.onUpdate( function() {
+
+      //this.update()
+
+    }.bind(this) );
 
 		this.graph.element.addEventListener(
 			'mouseout',
@@ -3781,7 +3789,7 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 			.enter().append("svg:path")
 			.classed('path', true)
       .attr("transform", function(d) {
-           return "translate(" + (graph.circle_radius + (graph.max_tick_width / 2)) + ", 0)"; } // tode: here in library is function for cross browser transform
+           return "translate(" + (/*graph.circle_radius + */(graph.max_tick_width / 2)) + ", 0)"; } // tode: here in library is function for cross browser transform
       )
       .attr("class", function(d, i) {
           var class_name = "graph_path path_" + series[i].color.replace("#", "");
@@ -3795,7 +3803,7 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
                             .data(data)
                             .enter().append("svg:path")
                             .attr("transform", function(d) {
-                                 return "translate(" + (graph.circle_radius + (graph.max_tick_width / 2)) + ", 0)"; } // tode: here in library is function for cross browser transform
+                                 return "translate(" + (/*graph.circle_radius +*/ (graph.max_tick_width / 2)) + ", 0)"; } // tode: here in library is function for cross browser transform
                             )
                     				.classed('stroke', true)
                     				.attr("d", this.seriesStrokeFactory());
@@ -3837,7 +3845,7 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
           .append("g")
                     .attr("class", "dots")
                     .attr("transform", function(d) {
-                         return "translate(" + (graph.circle_radius + (graph.max_tick_width / 2) + points_offset) + ", 0)"; } // tode: here in library is function for cross browser transform
+                         return "translate(" + (/*graph.circle_radius +*/ (graph.max_tick_width / 2) + points_offset) + ", 0)"; } // tode: here in library is function for cross browser transform
                     )
 
     var points = points_paths

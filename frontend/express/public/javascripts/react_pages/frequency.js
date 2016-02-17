@@ -15,11 +15,39 @@ var FrequencyPage = React.createClass({
 
         var frequencyData = countlyUser.getFrequencyData();
 
+        console.log("======== frequencyData.chartData =========");
+        console.log(frequencyData.chartData);
+
+        var headers = [{
+            "title":jQuery.i18n.map["session-frequency.table.time-after"], // todo : not common.total-sessions
+            "short" : "f",
+        },
+        {
+            "title":jQuery.i18n.map["common.number-of-users"],
+            "short" : "t"
+        },
+        {
+            "title":jQuery.i18n.map["common.percent"],
+            "short" : "percent"
+        }]
+
+        var sort_functions = {
+            "t" : math_sort,
+            "f" : math_sort,
+            "percent" : math_sort
+        }
+
+      /*  { "mData": "f", sType:"frequency", "sTitle": jQuery.i18n.map["session-frequency.table.time-after"] },
+        { "mData": "t", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.number-of-users"] },
+        { "mData": "percent", "sType":"percent", "sTitle": jQuery.i18n.map["common.percent"] }*/
+        /*
+        */
+
         return (
 
             <div className="page">
 
-                <Chart trend_sign={false}
+                <Chart headline_sign={"FREQUENCY"}
                     width={chart_width}
                     height={chart_height}
                     data={frequencyData.chartData}
@@ -29,8 +57,16 @@ var FrequencyPage = React.createClass({
                     bar_width={40}
                 />
 
-                <DateSign
-                    sign={"most frequent"}
+                <SortTable
+                    headers={headers}
+                    width={chart_width}
+                    row_height={50}
+                    data_sign={"DATA"}
+                    sort_functions={sort_functions}
+                    data_function={countlyUser.getFrequencyData}
+                    convert_data_function={false}
+                    initial_sort={"frequency"}   
+                    rows_per_page={20}
                 />
 
             </div>

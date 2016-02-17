@@ -93,7 +93,7 @@ var LeftPart = React.createClass({
             full_classname += " active";
         }
 
-        if (selected < 0)
+        if (selected == -1)
         {
             dashboard_sign_class += " selected";
         }
@@ -104,8 +104,8 @@ var LeftPart = React.createClass({
 
         return (
             <div className={full_classname}>
-                <div className={dashboard_sign_class}>
-                    <div className="icon"  onClick={this.handleClick.bind(this, -1)}></div>
+                <div className={dashboard_sign_class} onClick={this.handleClick.bind(this, -1)}>
+                    <div className="icon"></div>
                     <span className={menu_sign_class}><span>Dashboard</span></span>
                 </div>
                 {navNodes}

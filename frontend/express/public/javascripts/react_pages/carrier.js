@@ -62,7 +62,7 @@ var CarrierPage = React.createClass({
                     data_function={countlyCarrier.getCarrierData}
                     labels_mapping={labels_mapping}
                     graph_label={"CARRIERS"}
-                    label_key={"resolution"}
+                    label_key={"carrier"}
                     bar_height={34}
                     bar_margin_bottom={15}
                 />
@@ -75,8 +75,7 @@ var CarrierPage = React.createClass({
                     sort_functions={sort_functions}
                     data_function={countlyCarrier.getCarrierData}
                     convert_data_function={false}
-                    date_sign={"Date"}
-                    granularity={"daily_granularity"}
+                    date_sign={"Date"}                  
                     rows_per_page={20}
                 />
 

@@ -126,7 +126,7 @@ var UserPage = React.createClass({
                             sort_functions={sort_functions}
                             data_function={countlySession.getUserDP}
                             convert_data_function={true}
-                            date_sign={"Date"}
+                            initial_sort={"date"}   
                             granularity={this.state.granularity}
                             rows_per_page={20}
                         />)

@@ -2,17 +2,19 @@ var Chart = React.createClass({
 
     y_scale_log : false,
 
+    colors : ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"],
+
     getInitialState: function() {
 
         var data = this.props.data_function();
         data = data.chartData;
 
-        var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
+        //var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
 
         for (var i = 0; i < data.length; i++)
         {
             var color = this.make_color();
-            data[i].color = colors[i];
+            data[i].color = this.colors[i];
         }
 
         for (var i = 0; i < data.length; i++)
@@ -34,12 +36,12 @@ var Chart = React.createClass({
 
             data = data.chartData;
 
-            var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654"    , "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
+            //var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654"    , "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
 
             for (var i = 0; i < data.length; i++)
             {
                 var color = this.make_color();
-                data[i].color = colors[i];
+                data[i].color = this.colors[i];
             }
 
             for (var i = 0; i < data.length; i++)
@@ -685,8 +687,19 @@ var Chart = React.createClass({
         }
 
         return (
-            <svg className="bar_chart" style={style} id="bar_chart">
-            </svg>
+            <div className="bar_chart_wrapper">
+
+                {(() => {
+
+                    if (this.props.headline_sign){
+                        return(<div className="headline_sign">{this.props.headline_sign}</div>)
+                    }
+
+                })()}
+
+                <svg className="bar_chart" style={style} id="bar_chart">
+                </svg>
+            </div>
         );
     },
 

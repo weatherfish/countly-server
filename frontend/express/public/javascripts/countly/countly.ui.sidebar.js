@@ -10,6 +10,9 @@ var FullSidebar = React.createClass({
 
     getInitialState: function() {
 
+        console.log("========== this.props.navigation =============");
+        console.log(this.props.navigation);
+
         console.log("current:", Backbone.history.getFragment());
 
         var current_location = Backbone.history.getFragment();
@@ -20,7 +23,19 @@ var FullSidebar = React.createClass({
 
         if (current_location[2])
         {
-            var selected_left = 1;
+
+            var selected_left = 0;
+
+            for (var i = 0; i < this.props.navigation.length; i++)
+            {
+                if (current_location[1] == this.props.navigation[i]['icon']) // todo: now it compare icon property, this is not right
+                {
+                    selected_left = i;
+                    break;
+                }
+            }
+
+            //var selected_left = selected_left;
             var right_selected_item = current_location[2];
             var right_closed = false;
         }
@@ -83,10 +98,10 @@ var FullSidebar = React.createClass({
 
             }
 
-            return this.handle_right_close();
+            return this.handle_right_close(-1);
         }
 
-        if (this.state.selected_left == -1)
+        if (this.state.selected_left == -1 || this.state.selected_left == -2)
         {
             this.setState({
                 selected_left : i,
@@ -137,11 +152,20 @@ var FullSidebar = React.createClass({
         close right part, maximize left part
     */
 
-    handle_right_close : function()
+    handle_right_close : function(value)
     {
+
+        console.log("previous state:", this.state.selected_left, " > ", value);
+        console.log("right_selected_item:", this.state.right_selected_item);
+
+        if (this.state.selected_left == -1)
+        {
+            value = -1;
+        }
+
         this.setState({
             previous_left : this.state.selected_left,
-            selected_left : -1,
+            selected_left : value,
             in_transition : true,
             right_closed  : true
         });
@@ -172,7 +196,16 @@ var FullSidebar = React.createClass({
 
         var full_navigation = this.props.navigation;
 
-        if (this.state.selected_left == -1)
+        if (this.state.selected_left == -2)
+        {
+
+            var is_left_active = false;
+            var navigation_key   = "-";
+            var navigation_nodes = ["-"];
+            var description      = "-";
+
+        }
+        else if (this.state.selected_left == -1)
         {
             /*
                 initial state. 1st leve menu is open. nothing selected
@@ -180,7 +213,7 @@ var FullSidebar = React.createClass({
 
             var is_left_active = true;
 
-            if (this.state.previous_left != -1)
+            if (this.state.previous_left != -1 && this.state.previous_left != -2)
             {
                 var navigation_key   = full_navigation[this.state.previous_left].key;
                 var navigation_nodes = full_navigation[this.state.previous_left].items;
@@ -223,7 +256,7 @@ var FullSidebar = React.createClass({
                         navigation={navigation_nodes}
                         is_active={!is_left_active}
                         closed={this.state.right_closed}
-                        handleClose={this.handle_right_close}
+                        handleClose={this.handle_right_close.bind(this, -2)}
                         selected_item={this.state.right_selected_item}
                     />
                 </div>

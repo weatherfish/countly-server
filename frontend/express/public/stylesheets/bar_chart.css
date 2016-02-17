@@ -7,9 +7,19 @@
 
     background-color : white;
     z-index : 5000;
-    border: 1px solid #eeeeee;
+    /*border: 1px solid #eeeeee;*/
     padding-top : 20px;
     padding-bottom : 20px;
+}
+
+.bar_chart_wrapper .headline_sign
+{
+    font-family: Lato-Semibold;
+    font-size: 17px;
+    color: #132737;
+    letter-spacing: 1.39px;
+    margin-top : 30px;
+    margin-left : 30px;
 }
 
 #bar_chart g {

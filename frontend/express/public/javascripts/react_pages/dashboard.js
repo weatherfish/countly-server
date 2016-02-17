@@ -49,15 +49,14 @@ var Dashboard = React.createClass({
         var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - 80;
 
         var elements_width = window.innerWidth - sidebar_width - margin_left;
-        /*var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 36; // todo*/
-        var map_width   = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 300 - 110;
+        var map_width   = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 300 - 110; // todo
 
         var dashboard_style = {
-            "width" : window.innerWidth - sidebar_width - margin_left - margin_right + 14
+            "width" : window.innerWidth - sidebar_width - margin_left - margin_right + 24
         }
 
         var top_tab_style = {
-            "width" : window.innerWidth - sidebar_width - margin_left - margin_right + 14/*+ 1*/ /* +1 because of relative -1px left position, need for hide left darkr border if tab is active */
+            "width" : window.innerWidth - sidebar_width - margin_left - margin_right + 24/*+ 1*/ /* +1 because of relative -1px left position, need for hide left darkr border if tab is active */
         }
 
         console.log("block width:", top_tab_style.width);
@@ -88,51 +87,13 @@ var Dashboard = React.createClass({
                 "label" : "Current Time Range"
             }
         ]
-/*
 
-*/
         var style = {
             width : "23%"
         }
 
         return (
             <div id="dashboard" style={dashboard_style}>
-
-                <div className="live_block">
-
-                    <div className="bar_block first">
-                        <div className="sign">LIVE: TOTAL USERS</div>
-                        <div className="bar_rect">
-                            <div className="bar-outer">
-                            <div className="bar-inner" style={style}>
-                              <span className="bar-inner-text">2,348</span>
-                            </div>
-                            <span className="bar-outer-text">2,348</span>
-                            </div>
-                        </div>
-                        <div className="max">
-                            <span>MAX</span><span className="count">2,429</span>
-                        </div>
-                    </div>
-
-                    <div className="bar_block second">
-                        <div className="sign">LIVE: NEW USERS</div>
-                        <div className="bar_rect">
-                            <div className="bar-outer">
-                            <div className="bar-inner" style={style}>
-                              <span className="bar-inner-text">1,225</span>
-                            </div>
-                            <span className="bar-outer-text">1,225</span>
-                            </div>
-                        </div>
-                        <div className="max">
-                            <span>MAX</span><span className="count">1,923</span>
-                        </div>
-                    </div>
-
-                </div>
-
-                <CalendarWrapper />
 
                 <div className="top_tabs" style={top_tab_style}>
                 {
@@ -179,7 +140,7 @@ var Dashboard = React.createClass({
                         {
                             var style = {
                                 width : tab_item_style.width + last_tab_width_difference
-                            }                          
+                            }
                         }
                         else
                         {
@@ -238,10 +199,46 @@ var Dashboard = React.createClass({
 
                 <DashboardMap
                     width={map_width}
-                    height={400}
+                    height={420}
                 />
 
             </div>
         );
+
+        /*
+        <div className="live_block">
+
+            <div className="bar_block first">
+                <div className="sign">LIVE: TOTAL USERS</div>
+                <div className="bar_rect">
+                    <div className="bar-outer">
+                    <div className="bar-inner" style={style}>
+                      <span className="bar-inner-text">2,348</span>
+                    </div>
+                    <span className="bar-outer-text">2,348</span>
+                    </div>
+                </div>
+                <div className="max">
+                    <span>MAX</span><span className="count">2,429</span>
+                </div>
+            </div>
+
+            <div className="bar_block second">
+                <div className="sign">LIVE: NEW USERS</div>
+                <div className="bar_rect">
+                    <div className="bar-outer">
+                    <div className="bar-inner" style={style}>
+                      <span className="bar-inner-text">1,225</span>
+                    </div>
+                    <span className="bar-outer-text">1,225</span>
+                    </div>
+                </div>
+                <div className="max">
+                    <span>MAX</span><span className="count">1,923</span>
+                </div>
+            </div>
+
+        </div>
+        */
     },
 });

@@ -1,15 +1,16 @@
-
-
 .horizontal_chart_wrapper {
-    margin-top : 15px;
+    /*margin-top : 15px;*/
     /*height : 600px; /* todo - calculate*/
     position : relative;
 }
 
-.chart_label {
-    font-family : Lato-Regular;
-    padding-left : 40px;
-    padding-top : 20px;
+.chart_label {    
+    padding-left : 30px;
+    padding-top : 30px;
+    font-family: Lato-Semibold;
+		font-size: 17px;
+		color: #132737;
+		letter-spacing: 1.39px;
 }
 
 .horizontal_chart {

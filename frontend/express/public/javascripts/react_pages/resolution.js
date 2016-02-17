@@ -76,8 +76,7 @@ var ResolutionPage = React.createClass({
                     sort_functions={sort_functions}
                     data_function={countlyDeviceDetails.getResolutionData}
                     convert_data_function={false}
-                    date_sign={"Date"}
-                    granularity={"daily_granularity"}
+                    initial_sort={"resolution"}       
                     rows_per_page={20}
                 />
 

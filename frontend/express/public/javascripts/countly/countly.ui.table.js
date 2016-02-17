@@ -95,11 +95,36 @@ var TableCell = (function (_React$Component) {
                 var cell_data = "0";
             }
 
-            if (cell_data === parseInt(cell_data, 10))
+            if (cell_data !== null && typeof cell_data === 'object')
+            {
+                if (cell_data.type == "percent"){
+
+                    var wrapper_style = {
+                        width : "100px", //todo: calculate
+                        /*"background-color" : "green"*/
+                    }
+
+                    var bar_style = {
+                        width : cell_data.value + "%"
+                    }
+
+                    cell_data = <div><span className="cell_value">{cell_data.value + "%"}</span><div style={wrapper_style} className="percent_cell"><div style={bar_style}></div></div></div>;
+                }
+                else if (cell_data.type == "img"){
+
+                    var wrapper_style = {
+                        width : "40px",
+                        height : "40px"
+                    }
+
+                    cell_data = <div className="img_cell"><img src={cell_data.src}/><span className="img_text">{cell_data.value}</span></div>;
+                }
+            }
+            else if (cell_data === parseInt(cell_data, 10)) // is int
             {
                 cell_data = cell_data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
-        
+
             return (
                 <Cell className="table_content header_sort_button">
                     {cell_data}
@@ -119,7 +144,21 @@ var SortTable = React.createClass({
 
         var headers = JSON.parse(JSON.stringify(this.props.headers));
 
-        var full_rows = this.props.data_function().get_current_data(this.props.granularity);
+        if (this.props.granularity)
+        {
+            var granularity = this.props.granularity;
+            var with_granularity = true;
+        }
+        else
+        {
+            var granularity = 'daily_granularity';
+            var with_granularity = false;
+        }
+
+        var full_rows = this.props.data_function().get_current_data(granularity);
+
+        console.log("{{{{{{{{{ full_rows }}}}}}}}}");
+        console.log(full_rows);
 
         if (this.props.convert_data_function)
         {
@@ -127,11 +166,12 @@ var SortTable = React.createClass({
         }
 
         var init_object = {
-            sortBy  : 'date',
+            sortBy  : this.props.initial_sort,
             sortDir : 'ASC',
             headers : headers,
             table_height : 700,
             rows_per_page : this.props.rows_per_page,
+            with_granularity : with_granularity
         }
 
         var pagination = this.make_pagination(full_rows);
@@ -143,99 +183,88 @@ var SortTable = React.createClass({
 
     componentWillMount: function() {
 
-        $(event_emitter).on('granularity_data', function(e, data){
+        if (this.state.with_granularity)
+        {
+            /*
+                granularity_data event comes from line chart element
+            */
 
-            var self = this;
+            $(event_emitter).on('granularity_data', function(e, data){
 
-            var granularity = data.new_granularity;
-
-            //console.log("==== date_choise ====", period);
-            var rows = this.props.data_function().get_current_data(granularity);
-
-            if (this.props.convert_data_function)
-            {
-                rows = this.convert_data_rows(rows);
-            }
-
-            if (rows.length > 50000)
-            {
-                var splitted = split(rows, 100);
-
-                var combined = [];
-
-                var i = 0;
-
-                var load_part = function()
-                {
-
-                    combined = combined.concat(splitted[i]);
-
-                    //console.log(combined);
-
-                    self.setState({
-                        rows : combined
-                    });
-
-                    i++;
-
-                    if (i < splitted.length)
-                    {
-                        setTimeout(function(){
-                              load_part();
-                        }, 100);
-                    }
-                }
-
-                load_part();
-
-            }
-            else
-            {
-
-                var pagination = this.make_pagination(rows);
-
-                this.setState(pagination);
-
-/*
-                var full_rows = rows;
-
-                var page = 0;
-
-                var page_rows = full_rows.slice( (page) * this.state.rows_per_page, (page + 1) * this.state.rows_per_page );
-
-                var pages = [];
-                var pages_length = Math.ceil(full_rows.length / this.state.rows_per_page);
-
-                for (var i = 0; i < pages_length; i++) {
-                    pages.push(i);
-                }
-
-                console.log("================= pages ================");
-                console.log(pages);
-
-                this.setState({
-                    full_rows : full_rows,
-                    rows : page_rows,
-                    active_page : 0,
-                    pages : pages
-                    //table_height : 700
-                });*/
-/*
                 var self = this;
 
-                var height    = 50 * (rows.length + 1) + 2;*/
-/*
-                setTimeout(function(){
+                var granularity = data.new_granularity;
 
-                    self.setState({
-                        table_height : height
-                    })
-*/
-                //}, 3000);
+                //console.log("==== date_choise ====", period);
+                var rows = this.props.data_function().get_current_data(granularity);
 
-            }
+                if (this.props.convert_data_function)
+                {
+                    rows = this.convert_data_rows(rows);
+                }
 
-        }.bind(this));
+                if (rows.length > 50000)
+                {
+                    var splitted = split(rows, 100);
+
+                    var combined = [];
+
+                    var i = 0;
+
+                    var load_part = function()
+                    {
+
+                        combined = combined.concat(splitted[i]);
+
+                        //console.log(combined);
+
+                        self.setState({
+                            rows : combined
+                        });
+
+                        i++;
+
+                        if (i < splitted.length)
+                        {
+                            setTimeout(function(){
+                                  load_part();
+                            }, 100);
+                        }
+                    }
+
+                    load_part();
+
+                }
+                else
+                {
+                    var pagination = this.make_pagination(rows);
+                    this.setState(pagination);
+                }
+
+            }.bind(this));
+
+      } else {
+
+          /*
+              date_choise event comes from calendar selectors element
+          */
+
+          $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
+
+              var rows = this.props.data_function().get_current_data('daily_granularity');
+
+              if (this.props.convert_data_function)
+              {
+                  rows = this.convert_data_rows(rows);
+              }
+
+              var pagination = this.make_pagination(rows);
+              this.setState(pagination);
+
+          }.bind(this));
+
+      }
+
 
         function split(a, n) {
             var len = a.length,out = [], i = 0;
@@ -357,8 +386,6 @@ var SortTable = React.createClass({
 
                 var sortVal = 0;
 
-                //console.log("a:", a, " : b :", b);
-
                 if (a[sort_by] > b[sort_by]) {
                     sortVal = 1;
                 }
@@ -376,6 +403,25 @@ var SortTable = React.createClass({
         else
         {
             rows.sort((a, b) => {
+
+                //console.log(sortBy, "+ a:", a, " : b :", b);
+
+                if (a[sortBy] !== null && typeof a[sortBy] === 'object')
+                {
+
+                    /*a = parseFloat(a[sortBy]['value']); // todo: somewhere is necessary parseFloat
+                    b = parseFloat(b[sortBy]['value']);*/
+                    a = a[sortBy]['value'];
+                    b = b[sortBy]['value'];
+                }
+                else
+                {
+                    a = a[sortBy];
+                    b = b[sortBy];
+                }
+
+                //console.log("== a:", a, " : b :", b);
+
                 return this.props.sort_functions[sortBy](a, b, sortBy, sortDir);
             });
         }
@@ -474,7 +520,7 @@ var SortTable = React.createClass({
         this.setState({ rows : rows })
     },
 
-    columns_render : function columns_render(headers, sortDirArrow) {
+    columns_render : function columns_render(headers) {
 
         var self = this;
 
@@ -497,7 +543,7 @@ var SortTable = React.createClass({
             */
 
             return React.createElement(Column, {
-                label: header.title + sortDirArrow,
+                label: header.title,
                 width: self.props.width / headers.length,
                 header:React.createElement(TableHeader, {
                     label: header.title,
@@ -519,7 +565,7 @@ var SortTable = React.createClass({
 
         var page = 0;
 
-        var page_rows = full_rows.slice( (page) * this.props.rows_per_page, (page + 1) * this.props.rows_per_page );
+        var page_rows = full_rows.slice((page) * this.props.rows_per_page, (page + 1) * this.props.rows_per_page );
 
         var pages = [];
         var pages_length = Math.ceil(full_rows.length / this.props.rows_per_page);
@@ -534,7 +580,8 @@ var SortTable = React.createClass({
         var pagination = {
             rows : page_rows,
             active_page : 0,
-            pages : pages
+            pages : pages,
+            full_rows : full_rows
         }
 
         if (!old_data)
@@ -631,15 +678,10 @@ var SortTable = React.createClass({
 
         var row_height = this.props.row_height;
 
-        var sortDirArrow = ''; // todo: the variable is not used
-
-        console.log("============ render this.state.rows ==============");
-        console.log(this.state.rows);
-
-        if (this.state.sortDir !== null)
+        /*if (this.state.sortDir !== null)
         {
             sortDirArrow = this.state.sortDir === SortTypes.DESC ? '' + this.state.sortBy[0] : '.' + this.state.sortBy[0];
-        }
+        }*/
 
         var headers = this.state.headers;
 
@@ -707,6 +749,7 @@ var SortTable = React.createClass({
 
             <TableFilter
                 filter_function={this.filterFunction.bind(this)}
+                full_rows={this.state.full_rows}
                 className="table_filter_wrapper"
             />
 
@@ -720,7 +763,7 @@ var SortTable = React.createClass({
                     onCellMouseEnter={this.onCellMouseEnter}
                     onCellMouseLeave={this.onCellMouseLeave}
                 >
-                {this.columns_render(headers, sortDirArrow)}
+                {this.columns_render(headers)}
                 </Table>
                 <div className="pagination" style={pagination_style}>
                     <div className="prev_page" onClick={self.pagination.bind(null, "prev")} style={prev_page_style}>prev</div>

@@ -101,9 +101,7 @@
         }
 
         for (var i = 0; i < locationData.chartData.length; i++) {
-            locationData.chartData[i]['country_flag'] =
-                "<div class='flag' style='background-image:url("+countlyGlobal["path"]+"/images/flags/" + locationData.chartData[i]['code'] + ".png);'></div>" +
-                locationData.chartData[i]['country'];
+            locationData.chartData[i]['country_flag'] = { "type" : "img", "src" : "/images/flags/" + locationData.chartData[i]['code'] + ".png", "value" : locationData.chartData[i].country };
         }
 
         locationData.chartData.get_current_data = function(){

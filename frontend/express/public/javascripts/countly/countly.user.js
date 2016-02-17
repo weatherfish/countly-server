@@ -20,7 +20,7 @@
         if (!countlyCommon.DEBUG) {
             _activeAppKey = countlyCommon.ACTIVE_APP_KEY;
             _initialized = true;
-            
+
             return $.ajax({
                 type:"GET",
                 url:countlyCommon.API_PARTS.data.r,
@@ -134,7 +134,12 @@
         chartData.chartDP.dp = chartDP;
 
         for (var i = 0; i < chartData.chartData.length; i++) {
-            chartData.chartData[i]["percent"] = "<div class='percent-bar' style='width:" + (2 * chartData.chartData[i]["percent"]) + "px;'></div>" + chartData.chartData[i]["percent"] + "%";
+            chartData.chartData[i]["percent"] = { type : "percent", value : chartData.chartData[i]["percent"] }; //"<div class='percent-bar' style='width:" + (2 * chartData.chartData[i]["percent"]) + "px;'></div>" + chartData.chartData[i]["percent"] + "%";
+        }
+
+        chartData.get_current_data = function()
+        {
+            return chartData.chartData;
         }
 
         return chartData;

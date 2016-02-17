@@ -1,31 +1,31 @@
 var Map = React.createClass({
 
     cityPoints : false,
+    previous_data : false,
+    loaded : false,
 
     getInitialState : function() {
 
         var self = this;
 
-        console.log("{{{{{{{{{{{{{{{[ this.props.metric ]}}}}}}}}}}}}}}}");
-        console.log(this.props.metric);
-
-        this.formatCountryData(this.props.metric, function(error, cityPoints){
-
-            console.log("------- cityPoints ------------");
-            console.log(cityPoints);
-
-            self.cityPoints = cityPoints;
-
-        });
-
         return {
             element_id : "map",
+
             //current_metric : this.props.metric
         }
 
     },
 
-    previous_data : false,
+    componentDidMount: function() {
+
+        var self = this;
+
+        this.formatCountryData(this.props.metric, function(error, cityPoints){
+            self.setState({
+                city_points : cityPoints
+            })
+        });
+    },
 
     world_map_popup : function(geography, data) {
 
@@ -66,27 +66,17 @@ var Map = React.createClass({
 
         $("#" + this.state.element_id).empty();
 
-        console.log("============ draw this.props.metric =================");
-        console.log(this.props.metric);
-
         //var ob = {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric : this.props.metric/*this.state.current_metric*//*"t"*/};
 
-        var ob = this.props.metric;
+        var metric = this.props.metric;
 
         var countryFills = {
-            defaultFill : "#c0dffb"
+            defaultFill : "#ffffff"
         }
 
-        console.log("========== draw ob ============");
-        console.log(ob);
-
-        var countryData = this.formatData(ob);
+        var countryData = this.formatData(metric);
 
         this.previous_data = countryData;
-
-        console.log("++++++++++++++= countryData =+++++++++++++");
-        console.log(countryData);
-
 
         /*
           create 10 gradations of brightness
@@ -98,22 +88,21 @@ var Map = React.createClass({
 
         var gradient = this.make_gradient("#198af3", "#c0dffb", 10);
 
-        console.log("==== gradient ===");
-        console.log(gradient);
-
         var j = 0;
 
-        for (var i = 0/* 0.1*/; i < 1; i+=0.1)
+        //countryFills["0.0"] = "#ffffff";
+
+        for (var i = 0/*0.1*/; i < 1; i+=0.1)
         {
             //countryFills[i.toFixed(1).toString()] = this.colorLuminance(countryFills["0.0"], i * (-1)); // .toFixed(1) because Javascript have some problem with float: http://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
             countryFills[i.toFixed(1).toString()] = "#" + gradient[j];
             j++
         }
 
-        countryFills["1.0"] = "#198af3"; // todo:
-
-        console.log("=========== country fills ========");
+        console.log("======== countryFills ==========");
         console.log(countryFills);
+
+        countryFills["1.0"] = "#198af3"; // todo:
 
         var chart_options = {
             borderWidth: 1,
@@ -123,14 +112,18 @@ var Map = React.createClass({
             highlightFillColor: "#024873",
             highlightBorderColor: '#aaa',
             highlightBorderWidth: 1,
-            popupTemplate : this.world_map_popup
+            popupTemplate : this.world_map_popup,
+            hideAntarctica: true,
         }
+
+        console.log("=========== turkey topology =============");
+        //console.log(new Datamap().turTopo);
 
         _datamap = new Datamap({
             element : document.getElementById(this.state.element_id),
             height  : this.props.height,
             width   : this.props.width,
-            //projection : 'mercator',
+            projection : 'mercator',//'eckert3',
             fills      : countryFills,
             geographyConfig : chart_options,
             data : countryData
@@ -159,9 +152,12 @@ var Map = React.createClass({
 
         //var ob = {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric : this.props.metric/*this.state.current_metric*//*"t"*/};
 
-        var ob = this.props.metric;
+        var metric = this.props.metric;
 
-        var countryData = this.formatData(ob);
+        var countryData = this.formatData(metric);
+
+        console.log("========= countryData ===========");
+        console.log(countryData);
 
         for (var iso3 in this.previous_data)
         {
@@ -174,9 +170,6 @@ var Map = React.createClass({
             }
         }
 
-        console.log("================ redraw countryData ================");
-        console.log(countryData);
-
         this.previous_data = countryData;
 
         _datamap.updateChoropleth(countryData);
@@ -188,6 +181,14 @@ var Map = React.createClass({
 
         var self = this;
 
+        if (options.countryIso3.toLowerCase() != "rus") // no russia in topojson files
+        {
+            var dataUrl = "/javascripts/visualization/datamaps/tjson/" + options.countryIso3.toLowerCase() + ".tjson";
+        }
+        else {
+            var dataUrl = false;
+        }
+
         var chart_options = {
             borderWidth: 1,
             borderColor: "#575757"/*'#E6E6E6'*/,
@@ -196,11 +197,9 @@ var Map = React.createClass({
             highlightFillColor: "#024873",
             highlightBorderColor: '#aaa',
             highlightBorderWidth: 1,
-            popupTemplate : this.country_return_popup
+            popupTemplate : this.country_return_popup,
+            dataUrl: dataUrl
         }
-
-        console.log("- draw country ---");
-        console.log(options);
 
         _periodObj = countlyCommon.periodObj;
 
@@ -241,10 +240,6 @@ var Map = React.createClass({
                         Get country size for calculate scale
                     */
 
-                    console.log("country data 00000000000:");
-                    console.log(json);
-
-
                     var lat_size = json.location_box.max_lat - json.location_box.min_lat;
                     var lon_size = json.location_box.max_lon - json.location_box.min_lon;
 
@@ -268,36 +263,21 @@ var Map = React.createClass({
                         "location_box"    : json.location_box
                     }
 
-                    console.log("=========== zoomParams ===========");
-                    console.log(zoomParams);
-
-                    self._draw_country(options.metric, zoomParams, chart_options);
+                    self._draw_country(options.metric, zoomParams, chart_options, options.countryIso3);
 
                 }
             });
         }
         else
         {
-            console.log("error");
+            alert("error ISO3");
             return false;
         }
     },
 
-    _draw_country : function(ob, zoomParams, chart_options) {
+    _draw_country : function(ob, zoomParams, chart_options, country_iso3) {
 
         var self = this;
-/*
-        var chart_options = {
-            borderWidth: 1,
-            borderColor: '#333333',
-            popupOnHover: true,
-            highlightOnHover: true,
-            highlightFillColor: "#024873",
-            highlightBorderColor: '#024873',
-            highlightBorderWidth: 1,
-            popupTemplate : this.countrypopupTemplate
-        }
-*/
 
         if (!zoomParams/* || !zoomParams.size*/)
         {
@@ -311,56 +291,44 @@ var Map = React.createClass({
 
         $("#" + _chartElementId).empty();
 
-            console.log("------- cityPoints ------------");
-            console.log(this.cityPoints);
+        /*
+          create map
+        */
 
-            /*
-              create map
-            */
+        //var containerHeigth = d3.select("#" + self.state.element_id).node().getBoundingClientRect().height;
+        //var containerWidth  = d3.select("#" + self.state.element_id).node().getBoundingClientRect().width;
 
-            var containerHeigth = d3.select("#" + self.state.element_id).node().getBoundingClientRect().height;
-            var containerWidth  = d3.select("#" + self.state.element_id).node().getBoundingClientRect().width;
+        containerHeigth = this.props.height;
 
-            containerHeigth = 400; // todo!!!
+        var mapHeight = containerHeigth - 50;
+        var mapWidth  = mapHeight * 1.48;
 
-            console.log("containerHeigth:", containerHeigth);
-            console.log("containerWidth:", containerWidth);
+        var colors = d3.scale.category10();
 
-            var mapHeight = containerHeigth - 50;
-            var mapWidth  = mapHeight * 1.48;
+        var wScale = mapWidth  / (Math.abs(zoomParams.lon_size) / 360) / 2 / Math.PI;
+        var hScale = mapHeight / (Math.abs(zoomParams.lat_size) / 360) / 2 / Math.PI;
+        var scale = Math.min(wScale, hScale)
 
-            /*$("#" + _chartElementId).css("margin-left", containerWidth/2 * -1); // center the map element
-            $("#" + _chartElementId).css("margin-top", 10);
-*/
-            var colors = d3.scale.category10();
+        if (scale > 300)
+        {
+            scale -= 200;
+        }
 
-            //var scale = 1000 - (zoomParams.size * 0.00005);
-            //var scale = parseInt(600 - zoomParams.max_latlon_size);
-            //scale = 310;
+        var map_data = { };
 
-            var wScale = mapWidth  / (Math.abs(zoomParams.lon_size) / 360) / 2 / Math.PI;
-            var hScale = mapHeight / (Math.abs(zoomParams.lat_size) / 360) / 2 / Math.PI;
-            var scale = Math.min(wScale, hScale)
+        map_data[zoomParams.iso3] = {
+            "fillKey" : "selected"
+        }
 
-            //scale = 400;
+        if (country_iso3.toLowerCase() != "rus") // no russia in topojson files
+        {
+            var scope = country_iso3.toLowerCase()
+        }
+        else {
+            var scope = "world";
+        }
 
-            console.log("zoomParams.max_latlon_size:", zoomParams.max_latlon_size);
-            console.log("country scale:", scale);
-            console.log("zoom params:");
-            console.log(zoomParams);
-
-            if (scale > 300)
-            {
-                scale -= 200;
-            }
-
-            var map_data = { };
-
-            map_data[zoomParams.iso3] = {
-                "fillKey" : "selected"
-            }
-
-            _datamap = new Datamap({
+        var country_map = new Datamap({
                 element    : document.getElementById(_chartElementId),
                 height     : mapHeight,
                 width      : mapWidth,
@@ -369,18 +337,7 @@ var Map = React.createClass({
                     var center_lat = parseFloat(zoomParams.lat.toFixed(3));
                     var center_lon = parseFloat(zoomParams.lon.toFixed(3));
 
-                    /* override */
-                    //center_lat = 51.5;
-                    //center_lon = 0;
-                    //scale      = 600;
-
                     var width_projection = (element.offsetHeight / 2) * 1.92;
-
-                    console.log("translate:", element.offsetWidth / 2, " -- ", element.offsetHeight / 2);
-                    console.log("center_lon:", center_lon);
-                    console.log("center_lat:", center_lat);
-
-                    //center_lon += 34;
 
                     var projection = d3.geo.mercator()
                             .center([center_lon, center_lat])
@@ -403,31 +360,43 @@ var Map = React.createClass({
                     "selected"    : "#198af3",
                     "bubble"      : "#12fa34",
                 },
-                geographyConfig: chart_options,
-                data : map_data
-            });
+                geographyConfig : chart_options,
+                data : map_data,
+                scope : scope,
+        });
 
-            _datamap.bubbles(this.cityPoints, { "popupTemplate" : this.city_popup });
+        country_map.bubbles(this.state.city_points, { "popupTemplate" : this.city_popup });
 
-            _datamap.svg.selectAll('path').on('click', function(elem) {
+        var bind_events = function()
+        {
+            if (country_map.svg.selectAll('path')[0].length > 1)
+            {
+                country_map.svg.selectAll('path').on('click', function(elem) {
 
-                console.log("------- return click ------");
+                    self.draw();
 
-                self.draw();
+                    //countlyLocation.drawGeoChart(false);
+                    //store.set("countly_location_city", false);
+                    return true;
+                });
+            }
+            else
+            {
+                setTimeout(function(){
+                    bind_events();
+                }, 100);
+            }
+        }
 
-                //countlyLocation.drawGeoChart(false);
-                //store.set("countly_location_city", false);
-                return true;
-            });
+        bind_events();
 
-            _datamap.graticule();
+        country_map.graticule();
 
     },
 
-    formatData : function (ob){
+    formatData : function (data_metric){
 
-        console.log("=========== formatData ===========");
-        console.log(ob);
+        console.log(">>> start format >>>>", data_metric);
 
         var chartData = {cols:[], rows:[]};
 
@@ -455,9 +424,12 @@ var Map = React.createClass({
         chartData.cols = [
             {id:'country', label:$.i18n.map["countries.table.country"], type:'string'}
         ];
-        chartData.cols.push(ob);
+        //chartData.cols.push(ob);
 
         var maxMetric = 0;
+
+        console.log("]]]]]]]]]]]]]]]]]]");
+        console.log(tt.chartData);
 
         chartData.rows = _.map(tt.chartData, function (value, key, list) {
 
@@ -467,15 +439,15 @@ var Map = React.createClass({
                 };
             }
 
-            if (value[ob.metric] > maxMetric)
+            if (value[data_metric] > maxMetric)
             {
-                maxMetric = value[ob.metric];
+                maxMetric = value[data_metric];
             }
 
             return {
                 code    : value.code,
                 country : value.country,
-                metric  : value[ob.metric]
+                metric  : value[data_metric]
             };
         });
 
@@ -515,17 +487,12 @@ var Map = React.createClass({
             /*}*/
         }
 
-        console.log("============= formatted data ==========");
-        console.log(countryData);
-
         return countryData;
     },
 
     formatCountryData : function(ob, __callback){
 
-
         _period = countlyCommon.getPeriodForAjax();
-
 
         _activeAppKey = countlyCommon.ACTIVE_APP_KEY;
         _initialized = true;
@@ -703,6 +670,15 @@ var Map = React.createClass({
 
         return (
             <div className="map_wrapper">
+
+                {(() => {
+
+                    if (this.props.headline_sign){
+                        return(<div className="headline_sign">{this.props.headline_sign}</div>)
+                    }
+
+                })()}
+
                 <div className="search_block">
                     <div className="icon"></div>
                     <input type="search" placeholder="Search for Country"/>
@@ -713,15 +689,27 @@ var Map = React.createClass({
             </div>
         )
     },
-
+/*
     componentDidMount : function()
     {
-        this.draw();
+        //this.draw();
     },
-
+*/
     componentDidUpdate : function()
     {
-        this.redraw();
-    }
 
+        if (!this.state.city_points)
+        {
+            return false;
+        }
+        else if (!this.loaded)
+        {
+            this.draw();
+            this.loaded = true;
+        }
+        else
+        {
+            this.redraw();
+        }
+    }
 })

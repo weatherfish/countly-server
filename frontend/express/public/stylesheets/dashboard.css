@@ -1,35 +1,7 @@
-.color_description {
-    margin-top : 50px;
-    text-align : center;
-
-    font-family : Lato-Regular;
-
-    font-size: 13px;
-}
-
-.color_description > div {
-    display : inline-block;
-    width : 300px;
-}
-
-.color_description > div .circle {
-    display : inline-block;
-    border-radius: 50%;
-    width: 9px;
-    height: 9px;
-}
-
-.color_description > div .sign {
-    display : inline-block;
-    margin-left : 10px;
-    color: #3D3D3D  ;
-}
-
-
 #dashboard {
     background-color : #ffffff;
     position : relative;
-    top : -60px;
+    top : -10px;
 }
 
 #dashboard .date_sign_block {
@@ -176,6 +148,33 @@
 #dashboard #line_chart_wrapper {
     margin-top : 30px;
     margin-bottom : 45px;
+}
+
+.color_description {
+    margin-top : 50px;
+    text-align : center;
+
+    font-family : Lato-Regular;
+
+    font-size: 13px;
+}
+
+.color_description > div {
+    display : inline-block;
+    width : 300px;
+}
+
+.color_description > div .circle {
+    display : inline-block;
+    border-radius: 50%;
+    width: 9px;
+    height: 9px;
+}
+
+.color_description > div .sign {
+    display : inline-block;
+    margin-left : 10px;
+    color: #3D3D3D  ;
 }
 
 #dashboard .horizontal_chart_wrapper {

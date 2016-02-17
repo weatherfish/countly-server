@@ -45,7 +45,7 @@
     width: 20px;
     height: 20px;
 
-    background-color : #198af3;
+    /*background-color : #198af3;*/
 
     position : absolute;
     right : 20px;
@@ -81,7 +81,7 @@
 }
 
 .radio_buttons_container .circle_select.active {
-    background-color : #198af3;
+    /*background-color : #198af3;*/
 }
 
 .radio_buttons_container div .select {

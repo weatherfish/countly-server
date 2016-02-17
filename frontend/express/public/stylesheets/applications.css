@@ -1,0 +1,342 @@
+#applications_page {
+    background-color : #f5f5f5;
+    position : relative;
+    top : -70px;
+}
+
+#applications_page .top_block {
+    position : relative;
+    height : 60px;
+    border : 1px solid #E9E9E9;
+    background-color : white;
+
+    font-family: Lato-Semibold;
+    font-size: 14px;
+    color: #132737;
+    letter-spacing: 1.15px;
+
+}
+
+#applications_page .top_block .sign {
+    margin-left : 30px;
+    line-height : 60px;
+}
+
+#applications_page .top_block .new_app_button {
+
+    width : 100px;
+    height : 35px;
+    line-height : 35px;
+    background-color : #19CC63;
+    cursor : pointer;
+    font-family: Lato-Regular;
+    font-size: 11px;
+    color: #FFFFFF;
+    text-align : center;
+    border-radius: 2px;
+    position : absolute;
+    right : 30px;
+    top : 12px;
+}
+
+#applications_page .top_block .new_app_button:hover {
+
+    background-color : #13B757;
+
+}
+
+#applications_page .wrapper {
+    margin-top : 20px;
+    background-color : white;
+}
+
+#applications_page .selectors_block {
+    position : relative;
+    width : 100%;
+    /*height : 60px;*/
+    border-bottom : 1px solid #E9E9E9;
+    z-index : 100;
+
+    padding-top : 30px;
+    padding-bottom : 30px;
+}
+
+#applications_page .application_selector {
+    /*position : absolute;
+    top : 10px;
+    left : 10px;*/
+    /*margin-top : 30px;*/
+    margin-left : 30px;
+    /*margin-bottom : 30px;*/
+}
+
+#applications_page .application_selector .open_button {
+    width : 160px;
+    height : 30px;
+    line-height : 30px;
+    border : 1px solid #E9E9E9;
+    cursor : pointer;
+    position : relative;
+    border-radius : 2px;
+    font-family : Lato-Regular;
+}
+
+#applications_page .application_selector .open_button div {
+
+    display : inline-block;
+
+}
+
+#applications_page .application_selector .open_button .logo {
+    width : 20px;
+    height : 20px;
+    background-size : 20px;
+    position : relative;
+    top : 5px;
+    margin-left : 5px;
+    margin-right : 10px;
+}
+
+#applications_page .application_selector .open_button .arrow {
+
+    background-image: url("../images/time_range_arrow.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+#applications_page .application_selector .app_list {
+    position : absolute;
+}
+
+#applications_page .application_selector .app_list div {
+    width : 140px;
+    height : 40px;
+    line-height : 40px;
+    background-color: green;
+    cursor : pointer;
+}
+
+#applications_page .action_selector {
+    position : absolute;
+    top : 30px;
+    right : 30px;
+}
+
+#applications_page .action_selector .open_button {
+    width : 140px;
+    height : 30px;
+    line-height : 30px;
+    border : 1px solid #E9E9E9;
+    cursor : pointer;
+    border-radius : 2px;
+    font-family : Lato-Regular;
+}
+
+#applications_page .action_selector .open_button .sign {
+
+    margin-left : 10px;
+
+}
+
+#applications_page .action_selector .open_button .arrow {
+
+    background-image: url("../images/time_range_arrow.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+
+    position: absolute;
+    top : 5px;
+    right : 5px;
+    /*position: relative;
+    top: 6px;
+    left: 4px;*/
+
+}
+
+#applications_page .action_selector .actions_list div {
+    width : 130px;
+    height : 40px;
+    line-height : 40px;
+    background-color : blue;
+    cursor : pointer;
+}
+
+#applications_page .application_block {
+    padding-top : 20px;
+}
+
+#applications_page .application_block > .sign {
+    display : block;
+    font-family : Lato-Regular;
+    font-size : 18px;
+    margin-left : 30px;
+    /*margin-top : 20px;*/
+    margin-bottom : 20px;
+
+}
+
+#applications_page .info_block {
+    margin-left : 30px;
+    margin-right : 30px;
+    border : 1px solid #E9E9E9;
+}
+
+#applications_page .info_block > div {
+    display : inline-block;
+}
+
+#applications_page .table {
+    width : 70%;
+    border-right : 1px solid #E9E9E9;;
+}
+
+#applications_page .table > span.row {
+    display : block;
+    position : relative;
+    border-bottom : 1px solid #E9E9E9;
+    padding : 10px;
+    font-family: Lato-Regular;
+    height : 40px;
+    line-height : 40px;
+}
+
+#applications_page .table > span.row:last-child {
+    border-bottom : 0px solid white;
+}
+
+#applications_page .table > span.row:hover {
+    background-color: #FBFBFB;
+}
+
+#applications_page .table > span.row .key {
+    display : inline-block;
+    width : 30%;
+    font-family: Lato-Semibold;
+    font-size: 14px;
+    color: #3D3D3D;
+}
+
+#applications_page .table > span.row .value {
+    display : inline-block;
+    font-family: Lato-Regular;
+    font-size: 12px;
+    color: #6E6E6E;
+}
+
+#applications_page .table > span.row .edit {
+    display : block;
+    position : absolute;
+    top : 10px;
+    right : 10px;
+    /*border-bottom : 1px solid #19CC63;*/
+    cursor : pointer;
+    display : none;
+    color : #19CC63;
+}
+
+#applications_page .table > span.row:hover .edit {
+
+    display : block;
+
+}
+
+#applications_page .table > span.row .save_block .save {
+    color : #19CC63;
+    cursor : pointer;
+}
+
+#applications_page .table > span.row .save_block .cancel {
+    color : red;
+    cursor : pointer;
+}
+
+#applications_page .icon_block {
+    /*width : 30px;
+    height : 30px;*/
+    position: relative;
+    height: 100%;
+    width: 29%;
+    float: right;
+    text-align: left;
+}
+
+#applications_page .icon_block .sign {
+    /*position : absolute;
+    top : 10px;
+    left : 10px;*/
+}
+/*
+#applications_page .icon_block .icon_wrapper {
+    width : 100%;
+}
+*/
+#applications_page .icon_block .icon {
+    width : 140px;
+    height : 140px;
+    background-size : 140px;
+    margin-top : 40px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#applications_page .sdk_block {
+    /*height : 400px;*/
+    background-color : #FBFBFB;
+    border-radius : 2px;
+    border : 1px solid #E9E9E9;
+    margin-top : 30px;
+    margin-left : 30px;
+    margin-right : 30px;
+}
+
+#applications_page .sdk_block .sign {
+    display : block;
+    font-family: Lato-Regular;
+    font-size: 23px;
+    color: #132737  ;
+    letter-spacing: 1.89px;
+    margin-left : 30px;
+    margin-top : 30px;
+    /*margin-bottom : 20px;*/
+}
+
+#applications_page .sdk_block .description {
+    display : block;
+    font-family: Lato-Regular;
+    font-size: 12px;
+    color: #6E6E6E;
+    line-height: 18px;
+    margin-left : 30px;
+    margin-top : 15px;
+}
+
+#applications_page .sdk_block .button {
+    display: block;
+    width : 140px;
+    height : 40px;
+    line-height : 40px;
+    background-color : #198AF3;
+    margin-left : 30px;
+    color : #fff;
+    cursor : pointer;
+    text-align : center;
+    margin-top : 30px;
+    margin-bottom : 30px;
+    font-family: Lato-Regular;
+    font-size: 11px;
+    border-radius : 2px;
+}
+
+#applications_page .sdk_block .button:hover {
+    background-color : #1B72C2;
+}

@@ -58,18 +58,31 @@ var DevicePage = React.createClass({
             "device" : natural_sort
         }
 
-        var chart_width = window.innerWidth - 240 - 40 - 80 - 40;
+        var chart_width = window.innerWidth - 240 - 146;
         var chart_height = 300;
+
+        var table_width = window.innerWidth - 240 - 146;
 
         var frequencyData = countlyUser.getFrequencyData();
 
         var headers = templateData["bars"];
+
+        var margins = {
+            top    : 20,
+            right  : 30,
+            bottom : 30,
+            left   : 30,
+            bar_bottom : 15,
+            label_bottom : 20
+        };
 
         headers.unshift({
             "title" : "Device",
             //"help"  : "sessions.unique-sessions", // todo: add translate
             "short" : "device",
         })
+
+        // bar_margin_bottom={15}
 
         return (
 
@@ -82,19 +95,18 @@ var DevicePage = React.createClass({
                     graph_label={"DEVICES DISTRIBUTION"}
                     label_key={"device"}
                     bar_height={34}
-                    bar_margin_bottom={15}
+                    margins={margins}
                 />
 
                 <SortTable
                     headers={headers}
-                    width={chart_width}
+                    width={table_width}
                     row_height={50}
                     data_sign={"DATA"}
                     sort_functions={sort_functions}
                     data_function={countlyDevice.getDeviceData}
                     convert_data_function={false}
-                    date_sign={"Date"}
-                    granularity={"daily_granularity"}
+                    initial_sort={"device"}
                     rows_per_page={20}
                 />
 

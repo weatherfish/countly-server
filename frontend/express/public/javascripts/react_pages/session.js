@@ -10,9 +10,6 @@ var SessionPage = React.createClass({
 
     on_graph_mount : function(mount_data) {
 
-        console.log("=========== mount ===========");
-        console.log(mount_data);
-
         this.setState({
             "granularity" : mount_data.granularity
         });
@@ -72,9 +69,6 @@ var SessionPage = React.createClass({
             }
         };
 
-        console.log("=================== templateData ==================");
-        console.log(templateData);
-
         var sort_functions = {
             "t" : math_sort,
             "n" : math_sort,
@@ -88,8 +82,7 @@ var SessionPage = React.createClass({
 
         var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
 
-        var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
-
+        var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 32;
 
         var headers = JSON.parse(JSON.stringify(templateData["big-numbers"].items));
 
@@ -128,7 +121,7 @@ var SessionPage = React.createClass({
                             sort_functions={sort_functions}
                             data_function={countlySession.getSessionDP}
                             convert_data_function={true}
-                            date_sign={"Date"}
+                            initial_sort={"date"}
                             granularity={this.state.granularity}
                             rows_per_page={20}
                         />)
@@ -138,7 +131,6 @@ var SessionPage = React.createClass({
 
             </div>
         )
-
       }
 })
 

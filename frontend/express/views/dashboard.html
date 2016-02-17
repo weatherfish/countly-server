@@ -66,6 +66,7 @@
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/dashboard.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/date_sign_block.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/map.css" />
+			<link rel="stylesheet" href="<%- cdn %>stylesheets/applications.css" />
 			<link rel="stylesheet" type="text/css" href="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.css" />
 			<link rel="stylesheet" type="text/css" href="<%- cdn %>stylesheets/bar_chart.css" />
 			<link rel="stylesheet" type="text/css" href="<%- cdn %>stylesheets/horizontal_bar_chart.css" />
@@ -97,6 +98,7 @@
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/jquery.dataTables.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/ZeroClipboard.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/dataTables/js/TableTools.js"></script>
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/utils/simple-excel.js"></script>
 
 				<script type="text/javascript" src="<%- cdn %>javascripts/react-with-addons.js"></script>
 
@@ -108,7 +110,14 @@
 
 				<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/topojson.min.js"></script>
 				<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/country_codes.js"></script>
-				<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/datamaps.world.min.js"></script>
+				<!--script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/datamaps.world.min.js"></script-->
+
+
+
+				<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/datamaps/datamaps.tur.js"></script>
+
+
+
 
 				<!--script type="text/javascript" src="<%- cdn %>javascripts/react/build/react-with-addons.js"></script-->
 
@@ -126,11 +135,13 @@
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/user.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/carrier.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/countries.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/applications.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/dashboard.bar_chart.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/map.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/map_full.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/date_sign_block.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/editable_field.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.data.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.top.js"></script>
@@ -146,7 +157,7 @@
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table_filter.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table_wrapper.js"></script>
 
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.graph.wrapper.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/line_chart.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.graph.time_extension.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.graph.granularity.js"></script>
 
@@ -154,7 +165,7 @@
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.pie_chart.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.horizontal_bar_chart.js"></script>
 
-
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/radio_button.js"></script>
 
 
     <% } %>
@@ -1160,6 +1171,7 @@
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/flot/jquery.flot.stack.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/gauge.min.js"></script>
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/d3/d3.min.js"></script>
+			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/d3/d3.geo.projection.min.js"></script>
 
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/visualization/rickshaw/rickshaw.js"></script>
 

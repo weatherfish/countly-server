@@ -502,6 +502,25 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+/* manage */
+#sidebar #left_part div.manage {
+  background: url('../images/sidebar/manage.png');
+  background-image: url("../images/sidebar/manage.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#sidebar #left_part div.manage_active {
+  background: url('../images/sidebar/manage_active.png');
+  background-image: url("../images/sidebar/manage_active.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#sidebar #left_part .item_wrap.hoverable:hover div.manage {
+  background: url('../images/sidebar/manage_hover.png');
+  background-image: url("../images/sidebar/manage_hover.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
 /********************* right side *********************/
 #sidebar #right_part {
   position: absolute;

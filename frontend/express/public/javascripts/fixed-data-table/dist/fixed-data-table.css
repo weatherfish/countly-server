@@ -32,6 +32,7 @@
     line-height : 50px;
     padding-left : 15px;
     cursor : pointer;
+    border-right : 1px solid #E7E7E7;
  }
 
 .table_header .header_sort_button {
@@ -46,13 +47,19 @@
 
 .table_header .header_sort_button .up_icon {
 
-    background-image: url("../../../images/arrow_up.svg");
+    /*background-image: url("../../../images/arrow_up.svg");
     /*background: url('../images/search_icon.png');*/
     /*background-image: url("./arrow_down_active.svg");*/
-    background-repeat: no-repeat;
+  /*  background-repeat: no-repeat;
     background-position: center;
     width : 10px;
-    height : 10px;
+    height : 10px;*/
+
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 3px 6px 3px;
+    border-color: transparent transparent #CDCDCD transparent;
 
     position : absolute;
     top : 15px;
@@ -62,12 +69,17 @@
 .table_header .header_sort_button .down_icon {
 
      /*background: url('../images/search_icon.png');*/
-    background-image: url("../../../images/arrow_up.svg");
+    /*background-image: url("../../../images/arrow_up.svg");
     transform: rotate(180deg);
     background-repeat: no-repeat;
-    background-position: center;
-    width : 10px;
-    height : 10px;
+    background-position: center;*/
+    /*width : 10px;
+    height : 10px;*/
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 6px 3px 0 3px;
+    border-color: #CDCDCD transparent transparent transparent;
 
     position : absolute;
     top      : 25px;
@@ -77,16 +89,19 @@
 
  .table_header .header_sort_button .up_icon.active {
 
+    border-color: transparent transparent #19CC63 transparent;
+/*
      background-image : url("../../../images/arrow_down_active.svg") !important;
      transform : rotate(180deg);
-
+*/
  }
 
 .table_header .header_sort_button .down_icon.active {
-
+/*
     background-image: url("../../../images/arrow_down_active.svg") !important;
     transform: rotate(0deg);
-
+*/
+    border-color: #19CC63 transparent transparent transparent;
 }
 
 .table_header .header_sort_button a {
