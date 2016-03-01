@@ -82,7 +82,9 @@ var SessionPage = React.createClass({
 
         var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
 
-        var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 32;
+        //var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 32;
+
+        var table_width = get_viewport_width() + 20;
 
         var headers = JSON.parse(JSON.stringify(templateData["big-numbers"].items));
 

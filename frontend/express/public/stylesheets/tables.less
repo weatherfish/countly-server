@@ -14,12 +14,12 @@
 .table_wrapper {
     position : relative;
     padding-top : 20px;
-    padding-bottom : 20px;
+    padding-bottom : 40px;
     /*margin-left : 20px;*/
-    width : 100%;
+    /*width : 100%;*/
     background-color : white;
     border-top : 1px solid #E7E7E7;
-    /*padding-left : 30px;*/
+    padding-left : 30px;
 }
 
 .data_sign {
@@ -28,7 +28,7 @@
 		font-size: 17px;
 		color: #132737;
 		letter-spacing: 1.39px;
-		padding-left : 30px;
+		/*padding-left : 40px;*/
 }
 
 .data_date_sign {
@@ -37,7 +37,7 @@
 		font-size: 11px;
 		color: #9D9D9E;
 		letter-spacing: 0.5px;
-		padding-left : 30px;
+		/*padding-left : 40px;*/
 }
 
 .table_filter_wrapper {
@@ -53,6 +53,8 @@
 		right : 80px;
 		top : 20px;*/
 
+		position : relative;
+
 		width : 100px;
 		display : inline-block;
 
@@ -63,23 +65,40 @@
 		font-size : 12px;
 }
 
-.save_as {
-		width : 170px;
-		height : 90px;
-		position : absolute;
-		top : 30px;
-		left : 10px;
+.export_block .sign {
+		color : #00c652;
+}
 
-		background: #273743;
-		border: 1px solid #324656;
-		box-sizing: border-box;
-		box-shadow: 0px 2px 7px 0px rgba(0,0,0,0.38);
-		border-radius: 2px;
+.export_block .down_arrow {
+
+		background-image: url("../images/time_range_arrow.svg");
+		background-repeat: no-repeat;
+		background-position: center;
+		display: inline-block;
+		width: 20px;
+		height: 20px;
+		position: relative;
+		top: 6px;
+		left : 4px;
 
 }
 
+.save_as {
+		width : 170px;
+		/*height : 90px;*/
+		position : absolute;
+		top : 35px;
+		left : 10px;
+
+		background-color : #273743;
+		/*border: 1px solid #324656;*/
+		box-sizing: border-box;
+		/*box-shadow: 0px 2px 7px 0px rgba(0,0,0,0.38);*/
+		border-radius: 2px;
+}
+
 .save_as div {
-		width : 100%;
+		/*width : 100%;*/
 		height : 45px;
 		line-height : 45px;
 		/*border : 1px solid green;
@@ -111,6 +130,17 @@
 		.background_image(export_csv);
 }
 
+.save_as .top_arrow {
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 0 7px 7px 7px;
+		border-color: transparent transparent #202531 transparent;
+		position: relative;
+		top: -7px;
+		left: 62px;
+}
+
 .filter_block {
 		position : relative;
 		display : inline-block;
@@ -136,7 +166,7 @@
 
 .sort_table_wrapper {
 		margin-top : 20px;
-		padding-left : 30px;
+		/*padding-left : 40px;*/
 }
 
 .cell {
@@ -168,15 +198,15 @@
 }
 
 .percent_cell {
-		background-color: #c0dffb;
+		background-color: #EFEFF2;
 		border-radius : 2px;
 		position : relative;
-		top : 5px;
+		top : 0px;
 }
 
 .percent_cell > div {
-		height : 20px;
-		background-color: #1A8AF3;
+		height : 10px;
+		background-color: #1B8AF3;
 		/*margin-top : 10px;*/
 		border-radius : 2px;
 		/*position : relative;

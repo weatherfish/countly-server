@@ -1,7 +1,7 @@
 #dashboard {
     background-color : #ffffff;
     position : relative;
-    top : -10px;
+    /*top : -10px;*/
 }
 
 #dashboard .date_sign_block {
@@ -11,7 +11,7 @@
 #dashboard .top_tabs {
     /*width : 100%;*/
     /*font-family : Lato-Regular;*/
-    height : 110px;
+    /*height : 110px;*/
 
     /*background-color: red;*/
 
@@ -30,7 +30,7 @@
 
     position : relative;
 
-    height : 110px;
+    /*height : 110px;*/
 
     display : inline-block;
 
@@ -135,8 +135,11 @@
     letter-spacing: 0.98px;
 
     width : 100%;
-    position : absolute;
-    bottom : 15px;
+
+    margin-top : 15px;
+
+  /*  position : absolute;
+    bottom : 15px;*/
 }
 
 #dashboard .top_tabs > div.tab.active .title {

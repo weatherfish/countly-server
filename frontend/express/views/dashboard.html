@@ -27,6 +27,9 @@
 
 			<script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.js"></script>
 
+			<script language="javascript" type="text/jsx" src="<%- cdn %>javascripts/min/countly.react_pages.js?<%= countlyVersion %>"></script>
+			<script language="javascript" type="text/jsx" src="<%- cdn %>javascripts/min/countly.react_components.js?<%= countlyVersion %>"></script>
+
 			<!--script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script-->
 
 			<script language="javascript" type="text/javascript" src="http://ricostacruz.com/jquery.transit/jquery.transit.min.js"></script>
@@ -54,7 +57,7 @@
 			<!-- DEVELOPMENT -->
 
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/v2.css" />
-			<link rel="stylesheet" href="<%- cdn %>stylesheets/ui.v2.topbar.css" />
+			<link rel="stylesheet" href="<%- cdn %>stylesheets/topbar.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/calendar.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/line_chart.css" />
 			<link rel="stylesheet" href="<%- cdn %>stylesheets/big_number.css" />
@@ -70,6 +73,8 @@
 			<link rel="stylesheet" type="text/css" href="<%- cdn %>javascripts/fixed-data-table/dist/fixed-data-table.css" />
 			<link rel="stylesheet" type="text/css" href="<%- cdn %>stylesheets/bar_chart.css" />
 			<link rel="stylesheet" type="text/css" href="<%- cdn %>stylesheets/horizontal_bar_chart.css" />
+			<link rel="stylesheet" type="text/css" href="<%- cdn %>stylesheets/manage_users.css" />
+			<link rel="stylesheet" type="text/css" href="<%- cdn %>stylesheets/configurations.css" />
 
 
 	    <script language="javascript" type="text/javascript" src="<%- cdn %>javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
@@ -129,6 +134,8 @@
 
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/dashboard.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/frequency.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/loyalty.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/duration.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/device.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/resolution.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/session.js"></script>
@@ -136,6 +143,8 @@
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/carrier.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/countries.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/applications.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/manage_users.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_pages/configurations.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/dashboard.bar_chart.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/map.js"></script>
@@ -143,30 +152,31 @@
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/date_sign_block.js"></script>
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/editable_field.js"></script>
 
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.data.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.top.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.right.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.left.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.applist.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.sidebar.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.topbar.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.calendar.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.big_number.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.data_date_sign.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table_filter.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.table_wrapper.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/sidebar.data.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/sidebar.top.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/sidebar.right.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/sidebar.left.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/sidebar.applist.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/sidebar.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/topbar.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/calendar.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/big_number.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/data_date_sign.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/table.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/table_filter.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/table_wrapper.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/line_chart.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.graph.time_extension.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.graph.granularity.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/graph.time_extension.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/graph.granularity.js"></script>
 
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.bar_chart.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.pie_chart.js"></script>
-				<script type="text/jsx" src="<%- cdn %>javascripts/countly/countly.ui.horizontal_bar_chart.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/bar_chart.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/pie_chart.js"></script>
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/horizontal_bar_chart.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/radio_button.js"></script>
 
+				<script type="text/jsx" src="<%- cdn %>javascripts/react_components/manage_user_block.js"></script>
 
     <% } %>
 
@@ -178,6 +188,34 @@
             var d= new Date(this.getFullYear(), this.getMonth()+1, 0);
             return d.getDate();
         }
+
+				var cached_viewport_width = false;
+
+				var get_viewport_width = function() // first time it gives width without vertical scroll block
+				{
+
+						if (cached_viewport_width)
+						{
+								return cached_viewport_width;
+						}
+
+						var width = document.body.clientWidth - 240 - 20 - 20 - 16; // todo : variables
+
+						console.log("get_viewport_width:", width);
+
+						cached_viewport_width = width;
+
+						return width;
+/*
+						var $window = $(window);
+						var wWidth  = $window.width();
+
+						var $body = $(this.ie6 ? document.body : document);
+
+						console.log(">>+1++> body width:", $body.width());
+						console.log(">>+2++> body width:", $(window).width());
+												*/
+				}
 
     </script>
 
@@ -1214,6 +1252,16 @@
 							Backbone.history.start();
 					//}, 2000);
 
+/*
+					var elements_width = get_viewport_width();
+
+					$("#content-container").html("<div class='loader'><img src='images/loader.svg'/></div>");
+
+					$("#content-container").css("width", elements_width + "px");
+					$("#content-container").css("height", ($(document).height() - 20) + "px");
+
+					console.log("!!!!!!!!! body height:", $(document).height());
+*/
 			});
 	})
 
@@ -1254,22 +1302,6 @@
     </script>
     <% } %>
     <!---->
-
-		<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-				 xmlns:xlink="http://www.w3.org/1999/xlink" >
-
-			<pattern id="increase"
-					 width="8" height="8"
-					 patternUnits="userSpaceOnUse">
-						 <polygon points="3,0 6,6 0,6" fill="#385831"/>
-					</pattern>
-
-			<pattern id="decrease"
-					 width="8" height="8"
-					 patternUnits="userSpaceOnUse">
-						 <polygon points="0,0 6,0 3,6" fill="#F35D4D"/>
-					</pattern>
-		</svg>
 
 </body>
 </html>

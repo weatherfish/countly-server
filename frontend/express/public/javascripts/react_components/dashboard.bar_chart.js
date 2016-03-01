@@ -78,6 +78,9 @@ var DashboardBarChart = React.createClass({
             .domain([0, 100])
             .range([0, width])
 
+        var text_check_style = "normal 15pt Lato-Regular"; // toto: non-english languages will have another font-family
+
+        var long_text_flag = false;
 
         if (!this.chart)
         {
@@ -101,7 +104,26 @@ var DashboardBarChart = React.createClass({
                         return data[di].title.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
                     })
             }
+        }
 
+        data.every(function(element){
+
+            var text_width = self.getTextWidth(element.title, text_check_style); // toto: non-english languages will have another font-family
+
+            console.log("text_width check:", text_width);
+
+            if (text_width > width)
+            {
+                long_text_flag = true;
+                return false;
+            }
+
+            return true;
+        })
+
+        if (long_text_flag)
+        {
+            bar_blocks_top_margin += 15;
         }
 
         for (var di = 0; di < data.length; di++)
@@ -130,19 +152,16 @@ var DashboardBarChart = React.createClass({
 
             var update_bar_outer = bar_block.selectAll(".bar-outer")
 
-            console.log("============ update_bar_outer =============");
-            console.log(update_bar_outer);
-
             update_bar_outer.selectAll(".bar-inner")
                 .style("width", function(d, i){
 
-                    return (d.percent - 15) + "%"; // todo: remove -10 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    return (d.percent) + "%";
 
                 })
 
             bar_block.selectAll(".percent")
                     .html(function(d, i) {
-                        return (d.percent - 15) + "%";
+                        return (d.percent) + "%";
                     })
 
             // --- enter ---
@@ -691,7 +710,15 @@ var DashboardBarChart = React.createClass({
     componentDidUpdate : function()
     {
         this.draw("#horizontal_chart");
-    }
+    },
 
+    getTextWidth : function(text, font) {
+        // re-use canvas object for better performance
+        var canvas = this.getTextWidth.canvas || (this.getTextWidth.canvas = document.createElement("canvas"));
+        var context = canvas.getContext("2d");
+        context.font = font;
+        var metrics = context.measureText(text);
+        return metrics.width;
+    }
 
 });

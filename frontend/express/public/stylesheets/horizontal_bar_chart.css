@@ -4,7 +4,7 @@
     position : relative;
 }
 
-.chart_label {    
+.chart_label {
     padding-left : 30px;
     padding-top : 30px;
     font-family: Lato-Semibold;
@@ -111,6 +111,16 @@
     cursor : pointer;
     border-bottom : 1px solid #13C35C;
     color : #13C35C;
+}
+
+.horizontal_chart_wrapper .nodata_block {
+    position : absolute;
+    top : 10%;
+    /*left : 20px;*/
+
+    text-align : center;
+    z-index : 5000;
+    font-size : 24px;
 }
 
 /*.horizontal_chart_wrapper {

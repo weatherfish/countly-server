@@ -1,0 +1,198 @@
+#manage_users_page {
+    background-color : #ffffff;
+    position : relative;
+    top : -70px;
+}
+
+#manage_users_page .top_block {
+    position : relative;
+    height : 60px;
+    border : 1px solid #E9E9E9;
+    background-color : white;
+
+    font-family: Lato-Semibold;
+    font-size: 14px;
+    color: #132737;
+    letter-spacing: 1.15px;
+
+}
+
+#manage_users_page .top_block .sign {
+    line-height : 60px;
+    font-family: Lato-Regular;
+    font-size: 18px;
+    margin-left: 30px;
+    /* margin-top: 20px; */
+    margin-bottom: 20px;
+}
+
+#manage_users_page .top_block .new_user_button {
+
+    width : 100px;
+    height : 35px;
+    line-height : 35px;
+    background-color : #19CC63;
+    cursor : pointer;
+    font-family: Lato-Regular;
+    font-size: 11px;
+    color: #FFFFFF;
+    text-align : center;
+    border-radius: 2px;
+    position : absolute;
+    right : 30px;
+    top : 12px;
+}
+
+#manage_users_page .top_block .new_user_button:hover {
+    background-color : #13B757;
+}
+
+#manage_users_page > .sign {
+    margin-left : 30px;
+    margin-top : 30px;
+    margin-right : 30px;
+    line-height : 60px;
+
+    font-family : Lato-Regular;
+}
+
+#manage_users_page .users_table {
+    font-family: Lato-Regular;
+    margin-left : 20px;
+    margin-right : 20px;
+}
+
+#manage_users_page .users_table_header {
+    background-color : #FBFBFB;
+    width : 100%;
+
+    height : 50px;
+    line-height : 50px;
+
+    border-bottom : 1px solid #E9E9E9;
+    border-top : 1px solid #E9E9E9;
+    border-left : 1px solid #E9E9E9;
+
+    box-sizing: border-box;
+}
+
+#manage_users_page .users_table .users_table_header > div {
+    display : inline-block;
+    /*padding-left : 10px;*/
+    border-right : 1px solid #E9E9E9;
+    box-sizing: border-box;
+    padding-left : 10px;
+}
+
+#manage_users_page .users_table .user_info {
+
+    width : 100%;
+
+    border-bottom : 1px solid #E9E9E9;
+    border-left : 1px solid #E9E9E9;
+    border-right : 1px solid #E9E9E9;
+
+    position : relative;
+
+    box-sizing: border-box;
+}
+
+#manage_users_page .users_table .user_info:hover {
+
+    background-color : #FBFBFB;
+
+}
+
+#manage_users_page .users_table .user_info > div {
+    display : inline-block;
+    /*padding-left : 10px;*/
+    height : 40px;
+    line-height : 40px;
+    box-sizing: border-box;
+    padding-left : 10px;
+}
+
+#manage_users_page .users_table .user_info .email, #manage_users_page .users_table .users_table_header .email {
+    width : 30%;
+}
+
+#manage_users_page .users_table .user_info .admin_of, #manage_users_page .users_table .users_table_header .admin_of {
+    width : 30%;
+}
+
+#manage_users_page .users_table .user_info .user_of, #manage_users_page .users_table .users_table_header .user_of {
+    width : 40%;
+}
+
+#manage_users_page .users_table .user_info .edit_button {
+    display : none;
+    position : absolute;
+    right : 10px;
+    top : 0px;
+    color : #19CC63;
+    font-family : Lato-Regular;
+    font-size : 14px;
+
+    cursor : pointer;
+    height : 40px;
+    line-height : 40px;
+    text-decoration : underline;
+}
+
+#manage_users_page .users_table .user_info:hover .edit_button {
+    display : block;
+}
+
+#manage_users_page .users_table .user_info .save_block {
+    display : none;
+    position : absolute;
+    right : 10px;
+    top : 0px;
+    font-family : Lato-Regular;
+    font-size : 14px;
+
+    height : 40px;
+    line-height : 40px;
+
+}
+
+#manage_users_page .users_table .user_info .edit_button {
+    color : #19CC63;
+    cursor : pointer;
+    text-decoration : underline;
+}
+
+#manage_users_page .users_table .user_info .save_block .save {
+    color : #19CC63;
+    cursor : pointer;
+    text-decoration : underline;
+    margin-right : 20px;
+}
+
+#manage_users_page .users_table .user_info .save_block .cancel {
+    color : red;
+    cursor : pointer;
+    text-decoration : underline;
+}
+
+
+.admin_of div.app, .user_of div.app {
+    border : 1px solid gray;
+    cursor : pointer;
+    /*margin : 6px;*/
+    width : 100px;
+    height : 20px;
+    line-height : 20px;
+}
+
+.admin_of div.app:hover, .user_of div.app:hover {
+    border : 1px solid gray;
+    cursor : pointer;
+    background-color : #FBFBFB;
+}
+
+.admin_of div.app.selected, .user_of div.app.selected {
+    border : 1px solid gray;
+    cursor : pointer;
+    background-color : green;
+}

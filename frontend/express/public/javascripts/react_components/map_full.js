@@ -101,7 +101,18 @@ var Map = React.createClass({
 
         console.log("======== countryFills ==========");
         console.log(countryFills);
-
+/*
+        countryFills['0.0'] = "red";
+        countryFills['0.1'] = "green";
+        countryFills['0.2'] = "blue";
+        countryFills['0.3'] = "yellow";
+        countryFills['0.4'] = "#f16712";
+        countryFills['0.5'] = "#12fa11";
+        countryFills['0.6'] = "#a3f117";
+        countryFills['0.7'] = "#b12345";
+        countryFills['0.8'] = "#116712";
+        countryFills['0.9'] = "#1f6777";*/
+        
         countryFills["1.0"] = "#198af3"; // todo:
 
         var chart_options = {
@@ -116,9 +127,6 @@ var Map = React.createClass({
             hideAntarctica: true,
         }
 
-        console.log("=========== turkey topology =============");
-        //console.log(new Datamap().turTopo);
-
         _datamap = new Datamap({
             element : document.getElementById(this.state.element_id),
             height  : this.props.height,
@@ -129,14 +137,9 @@ var Map = React.createClass({
             data : countryData
         });
 
-
         _datamap.svg.selectAll('path').on('click', function(elem) {
 
             var countryIso = elem.id;
-
-            console.log("countly iso:", countryIso);
-
-            console.log("tihs props:", self.props.metric);
 
             self.draw_country({
                 height : 450,
@@ -156,8 +159,8 @@ var Map = React.createClass({
 
         var countryData = this.formatData(metric);
 
-        console.log("========= countryData ===========");
-        console.log(countryData);
+        console.log("========= countryData USA ===========");
+        console.log(countryData["USA"]);
 
         for (var iso3 in this.previous_data)
         {
@@ -171,6 +174,9 @@ var Map = React.createClass({
         }
 
         this.previous_data = countryData;
+
+        console.log("========= new countryData ===========");
+        console.log(countryData);
 
         _datamap.updateChoropleth(countryData);
 

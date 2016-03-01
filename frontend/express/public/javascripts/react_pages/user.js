@@ -86,7 +86,7 @@ var UserPage = React.createClass({
 
         var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
 
-        var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 36;
+        var table_width = get_viewport_width() + 20;
 
 
         var headers = JSON.parse(JSON.stringify(templateData["big-numbers"].items));
@@ -126,7 +126,7 @@ var UserPage = React.createClass({
                             sort_functions={sort_functions}
                             data_function={countlySession.getUserDP}
                             convert_data_function={true}
-                            initial_sort={"date"}   
+                            initial_sort={"date"}
                             granularity={this.state.granularity}
                             rows_per_page={20}
                         />)

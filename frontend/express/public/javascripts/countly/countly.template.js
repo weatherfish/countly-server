@@ -164,6 +164,7 @@ var countlyView = Backbone.View.extend({
     templateData:{}, //data to be used while rendering the template
     el:$('#content'), //jquery element to render view into
     initialize:function () {    //compile view template
+        $("#preloader").html("<div id='loader'></div>");
         this.template = Handlebars.compile($("#template-analytics-common").html());
     },
     dateChanged:function () {    //called when user changes the date selected
@@ -186,21 +187,30 @@ var countlyView = Backbone.View.extend({
     },
     afterRender: function() {},
     render:function () {    //backbone.js view render function
-        $("#content-top").html("");
-        //this.el.html('<div id="content-loader"></div>');
+        //$("#content-top").html("");
 
-        if (countlyCommon.ACTIVE_APP_ID) {
-            var self = this;
-            $.when(this.beforeRender(), initializeOnce()).then(function() {
-                self.renderCommon();
-                self.afterRender();
+        $("#preloader").html("");
+
+        //this.el.html("<div id='content_container'<div id='loader'></div></div>");
+
+        //setTimeout(function(){
+
+            if (countlyCommon.ACTIVE_APP_ID) {
+                var self = this;
+                $.when(this.beforeRender(), initializeOnce()).then(function() {
+                    self.renderCommon();
+                    self.afterRender();
+                    app.pageScript();
+                });
+            } else {
+                this.renderCommon();
+                this.afterRender();
                 app.pageScript();
-            });
-        } else {
-            this.renderCommon();
-            this.afterRender();
-            app.pageScript();
-        }
+            }
+
+        //}, 100000);
+
+
 
         return this;
     },
@@ -1485,74 +1495,23 @@ window.SessionView = countlyView.extend({
             var self = this;
 
             //setTimeout(function(){ // todo: remove setTimeout
-            //onload = function() {
+                //onload = function() {
 
-            React.render(React.createElement(CalendarWrapper, {
-            }), document.getElementById("calendar_block"));
+                React.render(React.createElement(CalendarWrapper, {
+                }), document.getElementById("calendar_block"));
 
-            React.render(React.createElement(TopBar, {
-                "user_name" : "John Black",
-                "width"     : window.innerWidth - sidebar_width
-            }), document.getElementById("top_bar"));
+                React.render(React.createElement(TopBar, {
+                    "user_name" : "John Black",
+                    "width"     : window.innerWidth - sidebar_width
+                }), document.getElementById("top_bar"));
 
-            React.render(React.createElement(SessionPage, {
+                React.render(React.createElement(SessionPage, {
 
-            }), document.getElementById("content-container"));
+                }), document.getElementById("content-container"));
 
-            /*
 
-            React.render(React.createElement(GraphWrapper, {
-                "trend_sign"  : "SESSIONS TREND",
-                "width"       : graph_width - 70 - 70,
-                "height"      : 300,
-                "margin_left" : 40,
-                //"granularity_rows" : granularity_rows,
-                //"data"        : sessionDP,
-                "graph_width" : graph_width, // todo: combine
-                //"granularity" : _granularity,
-                "period"      : countlyCommon.getPeriod(),
-                "big_numbers" : self.templateData["big-numbers"].items,
-                //"big_number_click" : update_graph,
-                "data_function" : countlySession.getSessionDP,
-                "update_graph_function" : countlyCommon.updateTimeGraph,
-                "with_granularity" : true,
-                "mount_callback" : function(mount_data){
 
-                    document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
-                    document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
-                    document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
-
-                    /* TABLE WRAPPER */
-/*
-                    var headers = JSON.parse(JSON.stringify(self.templateData["big-numbers"].items));
-
-                    headers.unshift({
-                        "title" : "Date",
-                        //"help"  : "sessions.unique-sessions", // todo: add translate
-                        "short" : "date",
-                    })
-
-                    var table_wrapper = React.createElement(SortTable, {
-                        //"rows"    : granularity_rows,
-                        "headers" : headers,
-                        "width"   : table_width,
-                        "row_height" : 50,
-                        "data_sign" : "DATA",
-                        "sort_functions" : sort_functions,
-                        "data_function" : countlySession.getSessionDP,
-                        "convert_data_function" : true, // todo: change to function
-                        "date_sign" : "Date",
-                        "granularity" : mount_data.granularity,
-                        "rows_per_page" : 20
-                    }, null);
-
-                    React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
-
-                }
-
-            }), document.getElementById("widget-content"));
-
-          }, 2000);*/
+            //}, 200000);
 
         }
         else
@@ -1999,6 +1958,33 @@ window.LoyaltyView = countlyView.extend({
 
             console.log("============= template loyaltyData.chartDP ============");
             console.log(loyaltyData.chartDP);
+
+            var chart_width = window.innerWidth - 240 - 40 - 80 - 40;
+            var chart_height = 300;
+
+            //frequencyData.chartDP.dp.shift();
+/*
+            var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654"    , "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
+
+            for (var i = 0; i < frequencyData.chartData.length; i++)
+            {
+                var color = make_color();
+                frequencyData.chartData[i].color = colors[i];
+            }
+*/
+            //setTimeout(function(){
+
+                React.render(React.createElement(CalendarWrapper, {
+                }), document.getElementById("calendar_block"));
+
+                React.render(React.createElement(TopBar, {
+                    "user_name" : "John Black",
+                    "width"     : window.innerWidth - sidebar_width
+                }), document.getElementById("top_bar"));
+
+                React.render(React.createElement(LoyaltyPage, {
+
+                }), document.getElementById("content-container"));
 /*
             countlyCommon.drawGraph(loyaltyData.chartDP, "#dashboard-graph", "bar");
 
@@ -2232,10 +2218,10 @@ window.FrequencyView = countlyView.extend({
 
             console.log("============= frequencyData =============");
             console.log(frequencyData);
-
+/*
             var chart_width = window.innerWidth - 240 - 40 - 80 - 40;
             var chart_height = 300;
-
+*/
             //frequencyData.chartDP.dp.shift();
 /*
             var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654"    , "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
@@ -3014,6 +3000,8 @@ window.DurationView = countlyView.extend({
     renderCommon:function (isRefresh) {
         var durationData = countlySession.getDurationData();
 
+        console.log("================ DurationView render ====================");
+
         this.templateData = {
             "page-title":jQuery.i18n.map["session-duration.title"],
             "logo-class":"durations",
@@ -3023,7 +3011,7 @@ window.DurationView = countlyView.extend({
 
         if (!isRefresh) {
             $(this.el).html(this.template(this.templateData));
-
+/*
             countlyCommon.drawGraph(durationData.chartDP, "#dashboard-graph", "bar");
 
             this.dtable = $('.d-table').dataTable($.extend({}, $.fn.dataTable.defaults, {
@@ -3033,12 +3021,42 @@ window.DurationView = countlyView.extend({
                     { "mData": "t", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.number-of-users"] },
                     { "mData": "percent", "sType":"percent", "sTitle": jQuery.i18n.map["common.percent"] }
                 ]
-            }));
+            }));*/
+/*
+            var chart_width = window.innerWidth - 240 - 40 - 80 - 40;
+            var chart_height = 300;
+*/
+            //frequencyData.chartDP.dp.shift();
+/*
+            var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654"    , "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
+
+            for (var i = 0; i < frequencyData.chartData.length; i++)
+            {
+                var color = make_color();
+                frequencyData.chartData[i].color = colors[i];
+            }
+*/
+            //setTimeout(function(){
+
+                React.render(React.createElement(CalendarWrapper, {
+                }), document.getElementById("calendar_block"));
+
+                React.render(React.createElement(TopBar, {
+                    "user_name" : "John Black",
+                    "width"     : window.innerWidth - sidebar_width
+                }), document.getElementById("top_bar"));
+
+                React.render(React.createElement(DurationPage, {
+
+                }), document.getElementById("content-container"));
+
+
 
             //$(".d-table").stickyTableHeaders();
         }
     },
     refresh:function () {
+      /*
         var self = this;
         $.when(countlyUser.initialize()).then(function () {
             if (app.activeView != self) {
@@ -3048,7 +3066,7 @@ window.DurationView = countlyView.extend({
             var durationData = countlySession.getDurationData();
             countlyCommon.drawGraph(durationData.chartDP, "#dashboard-graph", "bar");
             CountlyHelpers.refreshTable(self.dtable, durationData.chartData);
-        });
+        });*/
     }
 });
 
@@ -3672,27 +3690,23 @@ window.ManageAppsView = countlyView.extend({
 window.ManageUsersView = countlyView.extend({
     template:null,
     initialize:function () {
-        var self = this;
+
+        /*var self = this;
         T.render('templates/users', function (t) {
             self.template = t;
-        });
+        });*/
     },
     renderCommon:function (isRefresh) {
-        var self = this;
-        $.ajax({
-            url:countlyCommon.API_PARTS.users.r + '/all',
-            data:{
-                api_key:countlyGlobal['member'].api_key
-            },
-            dataType:"jsonp",
-            success:function (users) {
-                $('#content').html(self.template({
-                    users:users,
-                    apps:countlyGlobal['apps'],
-                    is_global_admin: (countlyGlobal["member"].global_admin) ? true : false
-                }));
-            }
-        });
+
+        React.render(React.createElement(TopBar, {
+            "user_name" : "John Black",
+            "width"     : window.innerWidth - sidebar_width
+        }), document.getElementById("top_bar"));
+
+        React.render(React.createElement(ManageUsersPage, {
+
+        }), document.getElementById("content-container"));
+
     }
 });
 
@@ -4092,6 +4106,43 @@ window.EventsView = countlyView.extend({
     }
 });
 
+window.configurationsView = countlyView.extend({
+    beforeRender: function() {
+        //return $.when(countlyCarrier.initialize()).then(function () {});
+    },
+    renderCommon:function (isRefresh) {
+
+        if (!isRefresh) {
+
+            var self = this;
+
+            //$(this.el).html(this.template(this.templateData));
+
+            var chart_width = window.innerWidth - 240 - 40 - 80 - 40;
+            var chart_height = 1500;
+
+            //setTimeout(function(){
+
+            React.render(React.createElement(CalendarWrapper, {
+            }), document.getElementById("calendar_block"));
+
+            React.render(React.createElement(TopBar, {
+                "user_name" : "John Black",
+                "width"     : window.innerWidth - sidebar_width
+            }), document.getElementById("top_bar"));
+
+            React.render(React.createElement(ConfigurationsPage, {
+
+            }), document.getElementById("content-container"));
+
+        }
+
+    },
+    refresh:function () {
+
+    }
+});
+
 var AppRouter = Backbone.Router.extend({
 
     routes:{
@@ -4111,6 +4162,7 @@ var AppRouter = Backbone.Router.extend({
 		"/all":"allapps",
         "/manage/apps":"manageApps",
         "/manage/users":"manageUsers",
+        "/manage/configurations":"configurations",
         "*path":"main"
     },
     activeView:null, //current view
@@ -4168,6 +4220,9 @@ var AppRouter = Backbone.Router.extend({
     },
     durations:function () {
         this.renderWhenReady(this.durationsView);
+    },
+    configurations:function () {
+        this.renderWhenReady(this.configurationsView);
     },
     refreshActiveView:function () {
     }, //refresh interval function
@@ -4260,6 +4315,7 @@ var AppRouter = Backbone.Router.extend({
         this.eventsView = new EventsView();
         this.resolutionsView = new ResolutionView();
         this.durationsView = new DurationView();
+        this.configurationsView = new configurationsView();
 
         Handlebars.registerPartial("date-selector", $("#template-date-selector").html());
         Handlebars.registerPartial("timezones", $("#template-timezones").html());

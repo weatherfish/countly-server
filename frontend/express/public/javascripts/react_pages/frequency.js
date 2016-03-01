@@ -10,8 +10,10 @@ var FrequencyPage = React.createClass({
 
     render : function(){
 
-        var chart_width = window.innerWidth - 240 - 40 - 80 - 40;
+        var elements_width = get_viewport_width();
         var chart_height = 300;
+
+        console.log("chart_width:", elements_width);
 
         var frequencyData = countlyUser.getFrequencyData();
 
@@ -43,13 +45,20 @@ var FrequencyPage = React.createClass({
         /*
         */
 
+        var page_style = {
+            "width" : elements_width
+        }
+
         return (
 
-            <div className="page">
+            <div className="page" style={page_style}>
 
-                <Chart headline_sign={"FREQUENCY"}
-                    width={chart_width}
+                <Chart headline_sign={"SESSION FREQUENCY"}
+                    headers={headers}
+                    width={elements_width}
                     height={chart_height}
+                    side_margin={30}
+                    bar_width={40}
                     data={frequencyData.chartData}
                     data_function={countlyUser.getFrequencyData}
                     tooltip_width={60}
@@ -59,13 +68,13 @@ var FrequencyPage = React.createClass({
 
                 <SortTable
                     headers={headers}
-                    width={chart_width}
+                    width={elements_width}
                     row_height={50}
                     data_sign={"DATA"}
                     sort_functions={sort_functions}
                     data_function={countlyUser.getFrequencyData}
                     convert_data_function={false}
-                    initial_sort={"frequency"}   
+                    initial_sort={"frequency"}
                     rows_per_page={20}
                 />
 

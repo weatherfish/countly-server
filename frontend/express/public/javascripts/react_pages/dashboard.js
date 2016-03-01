@@ -2,16 +2,28 @@ var Dashboard = React.createClass({
 
     getInitialState: function() {
 
+        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
+
+            console.log("========= date choise getInitialState ============");
+
+        }.bind(this));
+
         return {
             "active_top_tab" : 0,
-            "graph_data_function" : this.props.graph_data_function
+            "graph_data_function" : this.props.graph_data_function,
+            "date_period" : false
         }
 
     },
 
     componentWillMount: function() {
 
-        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
+        console.log("{{{{{{{{{{{{{ dashboar will mount }}}}}}}}}}}}}");
+
+        $(event_emitter).on('date_choise_test', function(e, period){
+
+            console.log("========= date choise ============");
+            //console.log(period);
 
             this.setState({ "date_period" : period })
     /*
@@ -36,9 +48,20 @@ var Dashboard = React.createClass({
 
     },
 
+    getTextWidth : function(text, font) {
+        // re-use canvas object for better performance
+        var canvas = this.getTextWidth.canvas || (this.getTextWidth.canvas = document.createElement("canvas"));
+        var context = canvas.getContext("2d");
+        context.font = font;
+        var metrics = context.measureText(text);
+        return metrics.width;
+    },
+
     render : function(){
 
         var self = this;
+
+        console.log("{{{{{{{{{{{{{{{{ render }}}}}}}}}}}}}}}}");
 
         var sidebar_width = 240;
         var margin_left   = 40 + 10;
@@ -92,6 +115,36 @@ var Dashboard = React.createClass({
             width : "23%"
         }
 
+        var text_check_style = "normal 12pt Lato-Semibold"; // toto: non-english languages will have another font-family
+
+        var long_text_flag = false;
+
+        this.props.graph_tabs.every(function(element){
+
+            var text_width = self.getTextWidth(element.title, text_check_style); // toto: non-english languages will have another font-family
+
+            console.log("text_width check:", text_width);
+
+            if (text_width > tab_item_style.width)
+            {
+                long_text_flag = true;
+                return false;
+            }
+
+            return true;
+        })
+
+        console.log("long_text_flag:", long_text_flag);
+
+        if (long_text_flag)
+        {
+            top_tab_style.height = "130px"
+        }
+        else
+        {
+            top_tab_style.height = "110px"
+        }
+
         return (
             <div id="dashboard" style={dashboard_style}>
 
@@ -136,6 +189,19 @@ var Dashboard = React.createClass({
                             var title = "---";
                         }
 
+                        var text_width = self.getTextWidth(title, text_check_style); // toto: non-english languages will have another font-family
+
+                        console.log("text_width:", text_width);
+/*
+                        if (text_width > tab_item_style.width)
+                        {
+                            var long_text_flag = true;
+                        }
+                        else
+                        {
+                            var long_text_flag = false;
+                        }
+*/
                         if (id == self.props.graph_tabs.length - 1)
                         {
                             var style = {
@@ -145,6 +211,15 @@ var Dashboard = React.createClass({
                         else
                         {
                             var style = tab_item_style;
+                        }
+
+                        if (long_text_flag)
+                        {
+                            style.height = "130px";
+                        }
+                        else
+                        {
+                            style.height = "110px";
                         }
 
                         return (
@@ -241,4 +316,5 @@ var Dashboard = React.createClass({
         </div>
         */
     },
+
 });

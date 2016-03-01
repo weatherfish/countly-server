@@ -1,0 +1,21 @@
+.configurations_page {
+
+
+
+}
+
+.configurations_page .block {
+
+}
+
+.configurations_page .block > div {
+
+    display : inline-block;
+
+}
+
+.configurations_page .block > div.block_label {
+
+    width : 200px;
+
+}

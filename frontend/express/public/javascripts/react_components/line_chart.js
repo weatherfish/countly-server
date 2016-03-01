@@ -137,6 +137,9 @@ var GraphWrapper = React.createClass({
 
     componentWillMount: function() {
 
+        $(event_emitter).off('granularity');
+        //$(event_emitter).off('date_choise');
+
         $(event_emitter).on('granularity', function(e, granularity_type){
 
             console.log("}}}}}}}}}}}}}}}}}}}}}} granularity }}}}}}}}}}}}}}}}}}}}}}");

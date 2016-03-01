@@ -58,16 +58,16 @@ var DevicePage = React.createClass({
             "device" : natural_sort
         }
 
-        var chart_width = window.innerWidth - 240 - 146;
+        var elements_width = get_viewport_width();
         var chart_height = 300;
 
-        var table_width = window.innerWidth - 240 - 146;
+        //var table_width = get_viewport_width();
 
         var frequencyData = countlyUser.getFrequencyData();
 
         var headers = templateData["bars"];
 
-        var margins = {
+        var chart_margins = {
             top    : 20,
             right  : 30,
             bottom : 30,
@@ -82,25 +82,29 @@ var DevicePage = React.createClass({
             "short" : "device",
         })
 
+        var page_style = {
+            "width" : elements_width
+        }
+
         // bar_margin_bottom={15}
 
         return (
 
-            <div className="page">
+            <div className="page" style={page_style}>
 
                 <HorizontalBarChart
-                    width={chart_width}
+                    width={elements_width}
                     data_function={countlyDevice.getDeviceData}
                     labels_mapping={labels_mapping}
                     graph_label={"DEVICES DISTRIBUTION"}
                     label_key={"device"}
                     bar_height={34}
-                    margins={margins}
+                    margins={chart_margins}
                 />
 
                 <SortTable
                     headers={headers}
-                    width={table_width}
+                    width={elements_width}
                     row_height={50}
                     data_sign={"DATA"}
                     sort_functions={sort_functions}
@@ -108,6 +112,7 @@ var DevicePage = React.createClass({
                     convert_data_function={false}
                     initial_sort={"device"}
                     rows_per_page={20}
+                    filter_field={"device"}
                 />
 
             </div>

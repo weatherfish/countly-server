@@ -6,7 +6,7 @@ var child_process = require('child_process');
 
 var exec = require('exec');
 
-var folder = '/home/ubuntu/countly_sidebar/frontend/express/public/stylesheets';
+var folder = '/home/ubuntu/countly_sidebar_work/frontend/express/public/stylesheets';
 
 deploying = false;
 

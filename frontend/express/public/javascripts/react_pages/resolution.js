@@ -2,14 +2,6 @@ var ResolutionPage = React.createClass({
 
     getInitialState: function() {
 
-        return({
-
-        });
-
-    },
-
-    render : function(){
-
         var labels_mapping = {
             "t" : jQuery.i18n.map["common.total-users"],
             "n" : jQuery.i18n.map["common.new-users"],
@@ -53,6 +45,16 @@ var ResolutionPage = React.createClass({
             "short" : "resolution",
         })
 
+        return({
+            "labels_mapping" : labels_mapping,
+            "sort_functions" : sort_functions,
+            "headers" : headers
+        });
+
+    },
+
+    render : function(){
+
         return (
 
             <div className="page">
@@ -61,7 +63,7 @@ var ResolutionPage = React.createClass({
                     width={chart_width}
                     height={chart_height}
                     data_function={countlyDeviceDetails.getResolutionData}
-                    labels_mapping={labels_mapping}
+                    labels_mapping={this.state.labels_mapping}
                     graph_label={"RESOLUTIONS DISTRIBUTION"}
                     label_key={"resolution"}
                     bar_height={34}
@@ -69,14 +71,14 @@ var ResolutionPage = React.createClass({
                 />
 
                 <SortTable
-                    headers={headers}
+                    headers={this.state.headers}
                     width={chart_width}
                     row_height={50}
                     data_sign={"DATA"}
-                    sort_functions={sort_functions}
+                    sort_functions={this.state.sort_functions}
                     data_function={countlyDeviceDetails.getResolutionData}
                     convert_data_function={false}
-                    initial_sort={"resolution"}       
+                    initial_sort={"resolution"}
                     rows_per_page={20}
                 />
 

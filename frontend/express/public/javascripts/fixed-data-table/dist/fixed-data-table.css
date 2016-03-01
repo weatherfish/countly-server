@@ -58,7 +58,7 @@
     width: 0;
     height: 0;
     border-style: solid;
-    border-width: 0 3px 6px 3px;
+    border-width: 0 3px 5px 3px;
     border-color: transparent transparent #CDCDCD transparent;
 
     position : absolute;
@@ -78,7 +78,7 @@
     width: 0;
     height: 0;
     border-style: solid;
-    border-width: 6px 3px 0 3px;
+    border-width: 5px 3px 0 3px;
     border-color: #CDCDCD transparent transparent transparent;
 
     position : absolute;

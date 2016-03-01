@@ -152,8 +152,8 @@
   cursor: pointer;
   padding-left: 20px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #2e3545;
-  border-left: 1px solid #2e3545;
+  border-bottom: 1px solid #2E3545;
+  border-left: 1px solid #2E3545;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 }
@@ -261,15 +261,15 @@
   height: 24px;
   width: 24px;
   line-height: 24px;
-  border-left: 1px solid #2e3545;
-  border-top: 1px solid #2e3545;
+  border-left: 1px solid #2E3545;
+  border-top: 1px solid #2E3545;
   border-radius: 2px;
 }
 #calendar .rw-calendar table > tbody > tr > td:last-child span {
-  border-right: 1px solid #2e3545;
+  border-right: 1px solid #2E3545;
 }
 #calendar .rw-calendar table > tbody > tr:last-child > td span {
-  border-bottom: 1px solid #2e3545;
+  border-bottom: 1px solid #2E3545;
 }
 #calendar .rw-calendar table > tbody > tr > td span.month_selector {
   height: 41px;
@@ -309,11 +309,11 @@
   background-color: #19cc5d;
 }
 #calendar .confirm_button {
-  border: 1px solid #03cf57;
+  border: 1px solid #03CF57;
   width: 120px;
   height: 35px;
   line-height: 35px;
-  color: #03cf57;
+  color: #03CF57;
   position: absolute;
   bottom: 20px;
   right: 20px;

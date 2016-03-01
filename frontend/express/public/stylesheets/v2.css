@@ -4,9 +4,6 @@
 */
 @font-face {
   font-family: Lato-Light;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -23,9 +20,6 @@
 }
 @font-face {
   font-family: Lato-Regular;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -52,7 +46,7 @@
 }
 /************************** TOP *************************/
 #sidebar_top {
-  background-color: #03cf57;
+  background-color: #03CF57;
   height: 59px;
   border-bottom: 1px solid #06BB51;
   cursor: pointer;
@@ -62,7 +56,7 @@
 }
 #sidebar_top:hover,
 #sidebar_top.pushed {
-  background-color: #00c652;
+  background-color: #00C652;
 }
 #sidebar_top div.app_data {
   display: inline-block;
@@ -92,7 +86,7 @@
   display: block;
   font-family: Lato-Semibold;
   font-size: 9px;
-  color: #eaeaea;
+  color: #EAEAEA;
   letter-spacing: 0.74px;
 }
 #sidebar_top .down_arrow {
@@ -216,7 +210,7 @@
 .dashboard_sign {
   font-family: Lato-Regular;
   background-color: #202531;
-  border-bottom: 1px solid #2e3545 !important;
+  border-bottom: 1px solid #2E3545 !important;
   -webkit-transition: all 0.2s 0s linear;
   -moz-transition: all 0.2s 0s linear;
   -o-transition: all 0.2s 0s linear;
@@ -272,7 +266,7 @@
   display: block;
   float: left;
   color: white;
-  border-top: 10px solid #0f131c;
+  border-top: 10px solid #0F131C;
   z-index: 20;
   position: absolute;
   top: 60px;
@@ -294,7 +288,7 @@
   transition: all 0s 0s linear;
 }
 #sidebar #left_part .item_wrap {
-  border-bottom: 1px solid #2e3545;
+  border-bottom: 1px solid #2E3545;
   height: 50px;
   /*background-color : @bg_color_3;*/
   position: relative;
@@ -429,6 +423,25 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+/* engagement */
+#sidebar #left_part div.engagement {
+  background: url('../images/sidebar/engagement.png');
+  background-image: url("../images/sidebar/engagement.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#sidebar #left_part div.engagement_active {
+  background: url('../images/sidebar/engagement_active.png');
+  background-image: url("../images/sidebar/engagement_active.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#sidebar #left_part .item_wrap.hoverable:hover div.engagement {
+  background: url('../images/sidebar/engagement_hover.png');
+  background-image: url("../images/sidebar/engagement_hover.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
 /* messaging */
 #sidebar #left_part div.messaging {
   background: url('../images/sidebar/messaging.png');
@@ -529,7 +542,7 @@
 }
 #sidebar #right_part div.navitem {
   position: absolute;
-  border-top: 10px solid #0f131c;
+  border-top: 10px solid #0F131C;
   -webkit-transform: translate3d(240px, 0, 0);
   -moz-transform: translate3d(240px, 0, 0);
   -ms-transform: translate3d(240px, 0, 0);
@@ -590,7 +603,7 @@
 }
 #sidebar #right_part div.navitem div.menu_element {
   position: relative;
-  color: #b8b8b8;
+  color: #B8B8B8;
   opacity: 1;
   -webkit-transition: all 0.1s 0s linear;
   -moz-transition: all 0.1s 0s linear;
@@ -640,7 +653,7 @@
 #sidebar #right_part .description span {
   display: block;
   font-size: 12px;
-  color: #b8b8b8;
+  color: #B8B8B8;
   width: 140px;
   margin-top: 10px;
 }
@@ -729,7 +742,7 @@
   height: 50px;
   width: 240px;
   /* in win firefox parent block ""#app_info .search" will be 240(width) + 40px(padding) */
-  background-color: #1eb65d;
+  background-color: #1EB65D;
   /*color          : #BBDCC8 !important;*/
   border: 0px;
   padding: 0 0 0 48px;
@@ -798,6 +811,7 @@
   /*left     : 10px;*/
   width: 30px;
   height: 30px;
+  border-radius: 2px;
 }
 #app_info div.app span {
   display: inline-block;
@@ -817,30 +831,31 @@
   color: white;
 }
 #sidebar #countly_logo_side {
+  display: none;
   position: absolute;
   bottom: 0px;
   left: 0px;
   height: 50px;
   width: 240px;
-  background-color: #0f131c;
+  background-color: #0F131C;
   z-index: 700;
 }
 #sidebar #countly_logo {
   position: absolute;
   bottom: 16px;
-  left: 10px;
-  /*background-image : url('../images/countly_logo_bottom.png') !important;*/
-  background: url('../images/sidebar/countly_logo_bottom.png');
-  background-image: url("../images/sidebar/countly_logo_bottom.svg");
+  /*left     : 12px;*/
+  background-image: url('../images/sidebar/countly_logo_bottom.png') !important;
   background-repeat: no-repeat;
   background-position: center;
-  width: 100px;
+  /*.background_image(countly_logo_bottom);*/
+  width: 140px;
   height: 30px;
   z-index: 701;
 }
 #countly_version {
+  display: none;
   position: absolute;
-  left: 15px;
+  left: 20px;
   bottom: 8px;
   font-family: Lato-Light;
   font-size: 9px;
@@ -880,22 +895,43 @@
     -webkit-transform: rotate(360deg);
   }
 }
-#preloader {
-  display: none;
-  position: absolute;
-  right: 20px;
-  top: 20px;
+#content-container .loader {
+  position: relative;
+  top: -130px;
+  /*width : 200px;
+		height : 200px;*/
+  /*background-color : green;*/
+  text-align: center;
+  background-color: white;
+  height: 300px;
+}
+#loader_wrapper {
+  width: 100%;
+  height: 80px;
+  text-align: center;
+}
+#loader {
+  /*display: none;*/
+  /*position : absolute;
+		right : 20px;
+		top : 20px;*/
   width: 80px;
   height: 80px;
   z-index: 2000;
-  background: url('../images/sidebar/preloader.png');
-  background-image: url("../images/sidebar/preloader.svg");
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  /*
+		.background_image(preloader);
+*/
+  background: url('../images/loader.png');
+  background-image: url("../images/loader.png");
   background-repeat: no-repeat;
   background-position: center;
-  animation: 3s rotate infinite linear  ;
+  animation: 2s rotate infinite linear  ;
   transform-origin: 50% 50%;
-  -moz-animation: 3s rotate infinite linear  ;
+  -moz-animation: 2s rotate infinite linear  ;
   -moz-transform-origin: 50% 50%;
-  -webkit-animation: 3s rotate infinite linear  ;
+  -webkit-animation: 2s rotate infinite linear  ;
   -webkit-transform-origin: 50% 50%;
 }

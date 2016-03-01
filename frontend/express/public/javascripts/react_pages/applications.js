@@ -1,12 +1,6 @@
 var ApplicationsPage = React.createClass({
 
     app_categories : false,
-/*
-    app_name : false,
-    name:appName,
-    category:$("#app-edit-category .cly-select .text").data("value") + '',
-    timezone:
-    */
 
     getAppCategories: function(){
         return { 1:jQuery.i18n.map["application-category.books"], 2:jQuery.i18n.map["application-category.business"], 3:jQuery.i18n.map["application-category.education"], 4:jQuery.i18n.map["application-category.entertainment"], 5:jQuery.i18n.map["application-category.finance"], 6:jQuery.i18n.map["application-category.games"], 7:jQuery.i18n.map["application-category.health-fitness"], 8:jQuery.i18n.map["application-category.lifestyle"], 9:jQuery.i18n.map["application-category.medical"], 10:jQuery.i18n.map["application-category.music"], 11:jQuery.i18n.map["application-category.navigation"], 12:jQuery.i18n.map["application-category.news"], 13:jQuery.i18n.map["application-category.photography"], 14:jQuery.i18n.map["application-category.productivity"], 15:jQuery.i18n.map["application-category.reference"], 16:jQuery.i18n.map["application-category.social-networking"], 17:jQuery.i18n.map["application-category.sports"], 18:jQuery.i18n.map["application-category.travel"], 19:jQuery.i18n.map["application-category.utilities"], 20:jQuery.i18n.map["application-category.weather"]};
@@ -22,11 +16,6 @@ var ApplicationsPage = React.createClass({
 
         this.app_categories = this.getAppCategories();
         var timezones = this.getTimeZones();
-
-        console.log("------------------ app_categories ------------------");
-        console.log(this.app_categories);
-        console.log("------------------ timezones ------------------");
-        console.log(timezones);
 
         this.timezones_options = [];
 
@@ -69,15 +58,7 @@ var ApplicationsPage = React.createClass({
             this.app_categories_options[key] = value;
         }
 
-        console.log("<<<<<<<<<<<<<<<<<<< options timezones_options >>>>>>>>>>>>>>>>");
-        console.log(this.timezones_options);
-
         var current_app = countlyGlobal['apps'][app_id];
-        console.log(":::::::::::::: current app :::::::::::::::");
-        console.log(current_app);
-
-        console.log("{{{{{{{{{{{ this.timezones_options }}}}}}}}}}}");
-        console.log(this.timezones_options);
 
         return({
             current_app : current_app,
@@ -130,13 +111,6 @@ var ApplicationsPage = React.createClass({
 
     saveApp : function(props, state){
 
-        console.log("========== current_app ===========");
-        console.log(this.state.current_app);
-        console.log("==== click state ============");
-        console.log(state);
-        console.log("==== click props ============");
-        console.log(props);
-
         var updated_app = this.state.current_app;
 
         if (state.value_key)
@@ -146,9 +120,6 @@ var ApplicationsPage = React.createClass({
         else {
             updated_app[props.save_key] = state.value;
         }
-
-        console.log("=========== updated_app ===============");
-        console.log(updated_app);
 
 /*
         $("#save-app-edit").click(function () {
@@ -185,11 +156,11 @@ var ApplicationsPage = React.createClass({
                 url:countlyCommon.API_PARTS.apps.w + '/update',
                 data:{
                     args:JSON.stringify({
-                        app_id:updated_app._id,
-                        name:updated_app.name,
-                        category:updated_app.category,
-                        timezone:updated_app.timezone,
-                        country:"CN" // todo!!
+                        app_id : updated_app._id,
+                        name : updated_app.name,
+                        category : updated_app.category,
+                        timezone : updated_app.timezone,
+                        country : "CN" // todo!!!!!!!!!!!!!!!!!!
                     }),
                     api_key:countlyGlobal['member'].api_key
                 },
@@ -198,6 +169,12 @@ var ApplicationsPage = React.createClass({
 
                     console.log("========= saved ==============");
                     console.log(data);
+
+                    initAppManagement(updated_app._id);
+
+                    $(event_emitter).trigger("app_renamed", {
+                        "updated_app" : updated_app
+                    });
 
                   /*
                     for (var modAttr in data) {
