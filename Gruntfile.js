@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
- 
+
   grunt.initConfig({
     jshint: {
 		//http://www.jshint.com/docs/options/
@@ -77,8 +77,11 @@ module.exports = function(grunt) {
 				'frontend/express/public/javascripts/visualization/gauge.min.js',
 				'frontend/express/public/javascripts/visualization/d3/d3.min.js',
 				'frontend/express/public/javascripts/visualization/rickshaw/rickshaw.min.js',
+        'frontend/express/public/javascripts/visualization/datamaps/topojson.min.js',
+        'frontend/express/public/javascripts/visualization/datamaps/country_codes.js',
+        'frontend/express/public/javascripts/visualization/datamaps/datamaps.world.min.js',
 			],
-			dest: 'frontend/express/public/javascripts/min/countly.visualization.concat.js'
+			dest: 'frontend/express/public/javascripts/min/countly.visualization.js'
 		},
 		lib: {
 			src: [
@@ -96,12 +99,24 @@ module.exports = function(grunt) {
 				'frontend/express/public/javascripts/countly/countly.allapps.js',
 				'frontend/express/public/javascripts/countly/countly.template.js',
 			],
-			dest: 'frontend/express/public/javascripts/min/countly.lib.concat.js'
+			dest: 'frontend/express/public/javascripts/min/countly.lib.js'
+		},
+    pages: {
+			src: [
+				'frontend/express/public/javascripts/react_pages/*',
+			],
+			dest: 'frontend/express/public/javascripts/min/countly.react_pages.js'
+		},
+    components: {
+			src: [
+				'frontend/express/public/javascripts/react_components/*',
+			],
+			dest: 'frontend/express/public/javascripts/min/countly.react_components.js'
 		}
     },
     uglify: {
 		options: {
-			banner: '/*! Countly <%= grunt.template.today("dd-mm-yyyy") %> */\n',
+			banner: '/*! Countly <%= grunt.template.today("dd-mm-yyyy") %> *//*\n',
             mangle: {
                 except: ["$super"]
             }
@@ -121,36 +136,50 @@ module.exports = function(grunt) {
     		files: {
     			'frontend/express/public/stylesheets/main.min.css': [
 	    		    'frontend/express/public/stylesheets/main.css',
-	    			'frontend/express/public/stylesheets/amaranjs/amaran.min.css',
-	    			'frontend/express/public/javascripts/dom/tipsy/tipsy.css',
+	    			  'frontend/express/public/stylesheets/amaranjs/amaran.min.css',
+	    			  'frontend/express/public/javascripts/dom/tipsy/tipsy.css',
 	    		    'frontend/express/public/javascripts/visualization/rickshaw/rickshaw.min.css',
+              'frontend/express/public/javascripts/visualization/rickshaw/rickshaw.min.css',
+              'frontend/express/public/stylesheets/applications.css',
+              'frontend/express/public/stylesheets/bar_chart.css',
+              'frontend/express/public/stylesheets/big_number.css',
+              'frontend/express/public/stylesheets/calendar.css',
+              'frontend/express/public/stylesheets/configurations.css',
+              'frontend/express/public/stylesheets/dashboard.css',
+              'frontend/express/public/stylesheets/date_sign_block.css',
+              'frontend/express/public/stylesheets/horizontal_bar_chart.css',
+              'frontend/express/public/stylesheets/line_chart.css',
+              'frontend/express/public/stylesheets/radio_button.css',
+              'frontend/express/public/stylesheets/topbar.css',
+              'frontend/express/public/stylesheets/v2.css',
 	    		],
     		}
     	}
     },
-    mochaTest: {
+    /*mochaTest: {
       test: {
         options: {
           reporter: 'spec',
 		  timeout: 50000
         },
-        src: ['test/**/*.js']
+        src: ['test/**//*.js']
       }
-    }
+    }*/
   });
- 
+
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
+  //grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-mocha-test');
 
   grunt.registerTask('default', ['jshint', 'mochaTest']);
-  
-  grunt.registerTask('dist', ['concat', 'uglify', 'cssmin']);
-  
+
+  grunt.registerTask('dist', ['concat', /*'uglify',*/ 'cssmin']);
+
   grunt.registerTask('plugins', 'Minify plugin JS / CSS files and copy images', function(){
+
   	var plugins = require('./plugins/plugins.json'), js = [], css = [], img = [], fs = require('fs'), path = require('path');
   	console.log('Preparing production files for following plugins: %j', plugins);
 
@@ -211,7 +240,7 @@ module.exports = function(grunt) {
 
 	// grunt.task.loadTasks(['copy:plugins', 'concat:plugins', 'uglify:plugins']);
 	// grunt.task.run(['concat', 'uglify']);
-	grunt.task.run(['concat:plugins', 'uglify:plugins', 'copy:plugins', 'cssmin:plugins']);
+	//grunt.task.run(['concat:plugins', 'uglify:plugins', 'copy:plugins', 'cssmin:plugins']);
 
   	console.log('Done preparing production files');
   });
@@ -234,7 +263,7 @@ module.exports = function(grunt) {
   		locales[lang].push(path);
   	};
 
-  	[path.join(__dirname, 'frontend/express/public/localization/dashboard'), path.join(__dirname, 'frontend/express/public/localization/help'), path.join(__dirname, 'frontend/express/public/localization/mail')].forEach(function(dir){
+  	[path.join(__dirname, 'frontend/express/public/localization/dashboard'), path.join(__dirname, 'frontend/express/public/localization/help')].forEach(function(dir){
   		fs.readdirSync(dir).forEach(function(name){
   			var file = path.join(dir, name);
   		  	if (fs.statSync(file).isFile()) {
@@ -269,7 +298,7 @@ module.exports = function(grunt) {
 
   	console.log('Done preparing locale files');
   });
- 
-  grunt.registerTask('dist-all', ['dist', 'plugins', 'locales']);
+
+  grunt.registerTask('dist-all', ['dist', 'plugins'/*, 'locales'*/]);
 
 };
