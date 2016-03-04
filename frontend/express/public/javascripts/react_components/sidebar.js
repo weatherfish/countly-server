@@ -1,21 +1,10 @@
-/** @jsx React.DOM */
-
-/* icons pre-load */
-applications.forEach(function(app){
-    var icon_src = "./images/" + app.icon;
-    $(new Image()).attr('src', icon_src).load(function() { });
-});
-
 var FullSidebar = React.createClass({
 
     getInitialState: function() {
 
-        console.log("========== this.props.navigation =============");
-        console.log(this.props.navigation);
+        //console.log("current:", Backbone.history.getFragment());
 
-        console.log("current:", Backbone.history.getFragment());
-
-        var current_location = Backbone.history.getFragment();
+        var current_location = "/";//Backbone.history.getFragment();
 
         current_location = current_location.split('/');
 

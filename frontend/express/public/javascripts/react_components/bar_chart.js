@@ -9,11 +9,8 @@ var Chart = React.createClass({
         var data = this.props.data_function();
         data = data.chartData;
 
-        //var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
-
         for (var i = 0; i < data.length; i++)
         {
-            var color = this.make_color();
             data[i].color = this.colors[i];
         }
 
@@ -28,24 +25,17 @@ var Chart = React.createClass({
         };
     },
 
-    componentWillMount: function() {
+    componentWillReceiveProps: function(nextProps) {
 
-        //$(event_emitter).off('date_choise');
-
-        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
-
-            console.log("============= date choise ============");
-            console.log(period);
+        /*if (nextProps.date != this.props.date) // todo !!!!!!!!!!!!!!!!!!!!!!
+        {*/
 
             var data = this.props.data_function();
 
             data = data.chartData;
 
-            //var colors = ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654"    , "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"]
-
             for (var i = 0; i < data.length; i++)
             {
-                var color = this.make_color();
                 data[i].color = this.colors[i];
             }
 
@@ -76,10 +66,10 @@ var Chart = React.createClass({
             this.setState({
                 data : data
             });
+        //}
+    },
 
-            //this.draw_bars("#bar_chart");
-
-        }.bind(this));
+    componentWillMount: function() {
 
         $(event_emitter).on('data_changed', function(e, data){
 
@@ -87,17 +77,6 @@ var Chart = React.createClass({
 
     },
 
-    componentWillUnmount: function() {
-        console.log("[[[[[[[[[[[[[[[[[[[ componentWillUnmount ]]]]]]]]]]]]]]]]]]]");
-    },
-/*
-    componentWillUnmount : function()
-    {
-        console.log("[[[[[[[[[[[[[[[[[[[ componentWillUnmount ]]]]]]]]]]]]]]]]]]]");
-        $(event_emitter).on('date_choise', null);
-        $(event_emitter).off('date_choise');
-    },
-*/
     get_domain : function(data) {
 
         // Requires that at least one series contains some data
@@ -131,8 +110,6 @@ var Chart = React.createClass({
         this.setState({
             "data" : data
         });
-
-        //this.draw_bars("#bar_chart");
 
     },
 
@@ -737,16 +714,5 @@ var Chart = React.createClass({
     {
         this.draw_bars("#bar_chart");
     },
-
-    make_color : function()
-    {
-        var text = "";
-        var possible = "ABCDEF0123456789";
-
-        for( var i=0; i < 6; i++ )
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-        return "#" + text;
-    }
 
 });

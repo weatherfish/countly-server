@@ -111,9 +111,9 @@ var navigation = [
         description : '',
         arrow       : -1, // todo: tmp
         items       : [
-                        ["My Account", "/manage/apps"],
+                        ["My Account", "/manage/settings"],
                         ["Applications", "/manage/apps"],
-                        ["User Roles", "/manage/apps"],
+                        ["User Roles", "/manage/users"],
                         ["E-mails reports", "/manage/apps"],
                       ]
 

@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var BigNumber = React.createClass({
 
     getInitialState: function() {

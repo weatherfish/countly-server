@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var TopBar = React.createClass({
 
     getInitialState: function() {
@@ -28,6 +26,24 @@ var TopBar = React.createClass({
     },
 
     handleOpenUserMenu : function(){
+
+        if (this.state.user_menu_open == false)
+        {
+            var self = this;
+
+            document.onclick = function(event) {
+
+                if(self.clickedOutsideElement(event, 'top_bar'))
+                {
+
+                    document.onclick = false;
+
+                    console.log("===== click outside =============");
+
+                }
+
+            }
+        }
 
         this.setState({
             "user_menu_open" : !this.state.user_menu_open

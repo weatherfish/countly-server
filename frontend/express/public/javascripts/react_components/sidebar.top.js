@@ -5,7 +5,7 @@ var SidebarTop = React.createClass({
             pushed : false,
         };
     },*/
-    
+
     handleClick : function(){
         //this.setState({ pushed : !this.state.pushed });
         this.props.onClick();
@@ -23,7 +23,7 @@ var SidebarTop = React.createClass({
             class_name += " closed";
         }
 
-        var logo_src = "appimages/" + this.props.active_app.logo;
+        var logo_src = "/appimages/" + this.props.active_app.logo;
 
         return (
             <div id="sidebar_top" className={class_name} onClick={this.handleClick}>

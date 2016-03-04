@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var DataDateSign = React.createClass({
 
     getInitialState : function() {

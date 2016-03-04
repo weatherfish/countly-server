@@ -2,23 +2,11 @@ var FrequencyPage = React.createClass({
 
     getInitialState: function() {
 
-        return({
-
-        });
-
-    },
-
-    render : function(){
-
-        var elements_width = get_viewport_width();
-        var chart_height = 300;
-
-        console.log("chart_width:", elements_width);
-
-        var frequencyData = countlyUser.getFrequencyData();
-
-        console.log("======== frequencyData.chartData =========");
-        console.log(frequencyData.chartData);
+        var sort_functions = {
+            "t" : math_sort,
+            "f" : math_sort,
+            "percent" : math_sort
+        }
 
         var headers = [{
             "title":jQuery.i18n.map["session-frequency.table.time-after"], // todo : not common.total-sessions
@@ -33,52 +21,69 @@ var FrequencyPage = React.createClass({
             "short" : "percent"
         }]
 
-        var sort_functions = {
-            "t" : math_sort,
-            "f" : math_sort,
-            "percent" : math_sort
-        }
+        return({
+            sort_functions : sort_functions,
+            headers : headers,
+            inited : false
+        });
 
-      /*  { "mData": "f", sType:"frequency", "sTitle": jQuery.i18n.map["session-frequency.table.time-after"] },
-        { "mData": "t", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.number-of-users"] },
-        { "mData": "percent", "sType":"percent", "sTitle": jQuery.i18n.map["common.percent"] }*/
-        /*
-        */
+    },
+
+    componentDidMount : function() {
+
+        var self = this;
+
+        $.when(countlyUser.initialize()).then(function () {
+
+            self.setState({
+                inited : true,
+            })
+
+        });
+    },
+
+    render : function(){
+
+        var elements_width = get_viewport_width();
+        var chart_height = 300;
 
         var page_style = {
             "width" : elements_width
         }
 
-        return (
+        if (this.state.inited)
+        {
+            return (<Loader/>);
+        }
 
+        return (
             <div className="page" style={page_style}>
 
                 <Chart headline_sign={"SESSION FREQUENCY"}
-                    headers={headers}
+                    headers={this.state.headers}
                     width={elements_width}
                     height={chart_height}
                     side_margin={30}
                     bar_width={40}
-                    data={frequencyData.chartData}
                     data_function={countlyUser.getFrequencyData}
                     tooltip_width={60}
                     tooltip_height={44}
                     bar_width={40}
+                    date={this.props.date}
                 />
 
                 <SortTable
-                    headers={headers}
+                    headers={this.state.headers}
                     width={elements_width}
                     row_height={50}
                     data_sign={"DATA"}
-                    sort_functions={sort_functions}
+                    sort_functions={this.state.sort_functions}
                     data_function={countlyUser.getFrequencyData}
                     convert_data_function={false}
                     initial_sort={"frequency"}
                     rows_per_page={20}
+                    date={this.props.date}
                 />
-
-            </div>
-        )
+          </div>)
     }
 })

@@ -29,7 +29,7 @@ var ConfigurationsPage = React.createClass({
 
               _configsData = json;
 
-              json.frontend.production = false;
+              json.frontend.production = true;
 
               self.updateConfigs(json);
           }

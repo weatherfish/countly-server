@@ -51,7 +51,7 @@ var AppList = React.createClass({
                 class_name += " active";
             }
 
-            var logo_src = "./appimages/" + app.logo;
+            var logo_src = "/appimages/" + app.logo;
 
             return (
                 <div className={class_name} onClick={self.props.onAppChange.bind(self, app/*.key, app.id*/)}>

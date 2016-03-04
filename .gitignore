@@ -12,3 +12,5 @@ plugins/plugins.json
 frontend/express/public/sdk/
 **/.DS_Store
 **/node_modules
+frontend/express/public/javascripts/react_pages_compiled
+frontend/express/public/javascripts/react_components_compiled

@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var GraphTimeExtension = React.createClass({
 
     getInitialState: function() {
@@ -13,7 +11,7 @@ var GraphTimeExtension = React.createClass({
         this.setState({
             is_open : !this.state.is_open
         });
-    },    
+    },
 
     render : function() {
 

@@ -50,16 +50,6 @@ var HorizontalBarChart = React.createClass({
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-/*
-        data = data.chartDPTotal.dp;
-
-        var formatted_data = [];
-
-        for (var i = 0; i < data.length; i++)
-        {
-            formatted_data.push({ label : data[i]['label'], value: data[i]["data"][0][1] })
-        }
-*/
         return {
             data : data,
             fully_opened : false
@@ -70,14 +60,9 @@ var HorizontalBarChart = React.createClass({
 
         $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
 
-            console.log("+++++++++++++++++ bar chart will mount ++++++++++");
-            console.log(period);
-
             var data = this.props.data_function();
 
             data = data.chartData;
-
-            //var test_data = [];
 
             if (!data[0] || !data[0]["t"]) // todo: t change to key
             {
@@ -141,9 +126,6 @@ var HorizontalBarChart = React.createClass({
         var bar_height = this.props.bar_height;
 
         var data = this.state.data;
-
-        console.log("{{{{{{{{{{ draw data }}}}}}}}}}");
-        console.log(data);
 
         if (!data)
         {
@@ -255,33 +237,23 @@ var HorizontalBarChart = React.createClass({
             var key = keys[k];
 
             var total = 0;
-
-            data.forEach(function(elem){
-
-                total += elem[key];
-
-            });
-
             var other_total = 0;
             var other_percent = 0;
+
+            data.forEach(function(elem){
+                total += elem[key];
+            });
 
             other_data.forEach(function(elem){
                 other_total += elem[key];
                 other_percent += Math.round((elem[key] / total) * 100);
             });
-                  /*
-            other_data.forEach(function(data){
 
-                console.log("------------> count percent -------------->");
-                console.log(data);
+            var other_block = { };
 
-            });*/
-
-            var other_block = { "device" : "Other" };
+            other_block[data_key_label] = "Other";
 
             other_block[key] = other_total;
-
-            //current_data.push(other_block);
 
             var combined_data = current_data.concat([/*other_block*/]);
 
@@ -292,9 +264,6 @@ var HorizontalBarChart = React.createClass({
                                     var key = d[data_key_label].replace(new RegExp(" ", 'g'), '');
                                     return key;
                                 })
-
-            console.log("==================== combined_data combined_data ===================");
-            console.log(combined_data);
 
             // --- enter ---
 
@@ -330,19 +299,14 @@ var HorizontalBarChart = React.createClass({
                   {
                       var top = (parseInt(i * (self.props.margins.bar_bottom + bar_height)) + self.props.margins.top) + self.props.margins.label_bottom;
                   }
-                  else {
-
-                                            //var m = i - 5;
-                      //var x = (k * (width + self.props.margins.right)) + skip_width;
-
+                  else
+                  {
                       var y = parseInt(5 * (self.props.margins.bar_bottom + bar_height)) + self.props.margins.top;
-
                       var top = y + self.props.margins.label_bottom;
                   }
 
                   return top + "px";
 
-                    //return ((parseInt(i * (self.props.margins.bar_bottom + bar_height)) + self.props.margins.top) + "px");
               })
               .style("opacity", 0)
 
@@ -424,16 +388,6 @@ var HorizontalBarChart = React.createClass({
                           return self.colors[k];
                       }
 
-/*
-                      if (i < (50) || self.state.fully_opened)
-                      {
-                          return self.colors[k];
-                      }
-                      else
-                      {
-                          return "#cccccc";
-                      }
-*/
                   })
                   .append("span")
                       .attr("class", "bar-inner-text")
@@ -450,7 +404,6 @@ var HorizontalBarChart = React.createClass({
                           }
                           else
                           {
-
                               return "";
                           }
                       })
@@ -807,9 +760,6 @@ var HorizontalBarChart = React.createClass({
     },
 
     render : function(){
-
-        console.log("============= render data ============");
-        console.log(this.state.data);
 
         var wrapper_height
 

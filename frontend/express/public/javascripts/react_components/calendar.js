@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var fast_choises = [
     ["hour", "Today"],
     ["7days", "Last Week"],
@@ -185,9 +183,6 @@ var CalendarWrapper = React.createClass({
                 }
             //}
         }
-
-        console.log("computed first_date_year:", first_date_year);
-        console.log("computed last_date_year:", last_date_year);
 
         return {
             from_string : first_date_year,  // first_date_year - wrong variable name
@@ -378,13 +373,14 @@ var CalendarWrapper = React.createClass({
 
         this.setState(state_obj);
 
-
+        this.props.onDateChange({ "period" : choise, "state" : state_obj });
 
         //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
-
+/*
         $(event_emitter).trigger("date_choise", { "period" : choise, "state" : state_obj });
 
         $(event_emitter).trigger("date_choise_test", { "period" : choise, "state" : state_obj });
+*/
 
     },
 

@@ -526,7 +526,7 @@
     height           : 1500px;
 }
 
-#sidebar #right_part div.navitem div {
+#sidebar #right_part div.navitem > div {
     margin-left        : 20px;
     opacity            : 1;
     .transition(all, @right_fadeinout_duration);
@@ -552,9 +552,7 @@
 
 
 #sidebar #right_part div.navitem .close_icon:hover {
-
 		.background_image(cross_2ndlevel_hover);
-
 }
 
 #sidebar #right_part div.navitem div.menu_element {
@@ -566,10 +564,6 @@
 
 #sidebar #right_part div.navitem div.menu_element:hover {
     cursor : pointer;
-    color  : white;
-}
-
-#sidebar #right_part div.navitem div.menu_element.active {
     color  : white;
 }
 
@@ -587,7 +581,7 @@
     opacity: 0.4;
 }
 
-#sidebar #right_part .navitem div a {
+#sidebar #right_part .navitem div .router_link {
     display   : inline-block;
     height    : 40px;
     width     : 170px;
@@ -595,6 +589,12 @@
 
     line-height : 40px;
     white-space : nowrap;
+
+		margin-left : 0px;
+}
+
+#sidebar #right_part div.menu_element.active .router_link {
+    color  : white;
 }
 
 #sidebar #right_part .description {
@@ -770,9 +770,6 @@
 }
 
 #sidebar #countly_logo_side {
-
-		display : none;
-
     position : absolute;
     bottom   : 0px;
     left     : 0px;
@@ -781,6 +778,7 @@
     background-color: @bg_color_6;
     z-index  : 700;
 }
+
 
 #sidebar #countly_logo {
     position : absolute;
@@ -796,9 +794,6 @@
 }
 
 #countly_version {
-
-		display : none;
-
 		position		: absolute;
 		left				: 20px;
 		bottom 			: 8px;

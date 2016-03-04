@@ -1,4 +1,17 @@
-var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
+var RouterLink = React.createClass({
+    mixins: [ ReactRouter.History ],
+    _handleClick: function(path){
+        this.history.pushState(null, path);
+    },
+    render: function() {
+      return (
+        <div className="router_link" onClick={this._handleClick.bind(self, this.props.action_path)}>
+            {this.props.label}
+        </div>
+      );
+    },
+});
 
 var RightPart = React.createClass({
 
@@ -12,7 +25,7 @@ var RightPart = React.createClass({
                 sndmenu : this.props.selected_item.charAt(0).toUpperCase() + this.props.selected_item.slice(1),
             }
 
-            $(event_emitter).trigger('select', nav_data);
+            //$(event_emitter).trigger('select', nav_data);
 
         }
 
@@ -64,7 +77,7 @@ var RightPart = React.createClass({
         items is simple links, and they change window location
     */
 
-    onItemClick: function(item) {
+    onItemClick: function(item, action_path) {
 
         //event.preventDefault();
 
@@ -77,24 +90,27 @@ var RightPart = React.createClass({
             todo: move to the root component
         */
 
+        window.history.pushState({}, "Title", action_path);
+        //window.location.hash = action_path;
+
         console.log("================== handle_right_changed ==================", item);
 
         //$("#content-container").html("-- loading --");
 
         var element_width = get_viewport_width();
-        var element_height = $(document).height() - 10;
+        var element_height = $(document).height();
 
-        $("#content-container").html("<div id='loader_wrapper'><div id='loader'></div></div>");
-
+        /*$("#content-container").html("<div id='loader_wrapper'><div id='loader'></div></div>");*/
+/*
         $("#content-container").css("width", element_width + "px");
         $("#content-container").css("height", element_height + "px");
-
+*/
         var nav_data = {
             fstmenu : this.props.nav_key,
             sndmenu : item,
         }
 
-        $(event_emitter).trigger('select', nav_data);
+        //$(event_emitter).trigger('select', nav_data);
 
     },
 
@@ -132,7 +148,7 @@ var RightPart = React.createClass({
 
             var nav_nodes = this.props.navigation.map(function (nav_item, i) {
 
-                var action_path = "#" + nav_item[1];
+                var action_path = nav_item[1];
 
                 var node_class_name = items_class_name;
 
@@ -140,14 +156,28 @@ var RightPart = React.createClass({
                 {
                     node_class_name += " active";
                 }
-
-                return (
+                // href={action_path}
+                /*return (
                     <div key={nav_item[0]} className={node_class_name}>
-                        <a href={action_path} onClick={self.onItemClick.bind(self, nav_item[0])} className="item">
+                        <a onClick={self.onItemClick.bind(self, nav_item[0], action_path)} className="item">
                             {nav_item[0]}
                         </a>
                     </div>
                 );
+
+
+                <a onClick={self.onItemClick.bind(self, nav_item[0], action_path)} className="item">
+                    {nav_item[0]}
+                </a>
+
+                */
+
+                return (
+                    <div key={nav_item[0]} className={node_class_name}>
+                        <RouterLink label={nav_item[0]} action_path={action_path}/>
+                    </div>
+                );
+
             });
         }
 

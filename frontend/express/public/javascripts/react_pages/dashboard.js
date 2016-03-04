@@ -2,6 +2,118 @@ var Dashboard = React.createClass({
 
     getInitialState: function() {
 
+        var sessionData = countlySession.getSessionData(),
+            locationData = countlyLocation.getLocationData({maxCountries:7}),
+            sessionDP = countlySession.getSessionDPTotal();
+
+        var graph_tabs = [
+        {
+              "title":jQuery.i18n.map["common.total-sessions"],
+              "data":sessionData.usage['total-sessions'],
+              "id":"draw-total-sessions",
+              "help":"dashboard.total-sessions",
+              "data_function" : countlySession.getSessionDPTotal,
+              "data_item" : "total-sessions"
+        },
+        {
+              "title":jQuery.i18n.map["common.total-users"],
+              "data":sessionData.usage['total-users'],
+              "id":"draw-total-users",
+              "help":"dashboard.total-users",
+              "data_function" : countlySession.getUserDPActive,
+              "data_item" : "total-users"
+        },
+        {
+              "title":jQuery.i18n.map["common.new-users"],
+              "data":sessionData.usage['new-users'],
+              "id":"draw-new-users",
+              "help":"dashboard.new-users",
+              "data_function" : countlySession.getUserDPNew,
+              "data_item" : "new-users"
+        },
+        {
+              "title":jQuery.i18n.map["dashboard.time-spent"],
+              "data":sessionData.usage['total-duration'],
+              "id":"draw-total-time-spent",
+              "help":"dashboard.total-time-spent",
+              "data_function" : countlySession.getDurationDP,
+              "data_item" : "total-duration"
+        },
+        {
+              "title":jQuery.i18n.map["dashboard.avg-time-spent"],
+              "data":sessionData.usage['avg-duration-per-session'],
+              "id":"draw-time-spent",
+              "help":"dashboard.avg-time-spent2",
+              "data_function" : countlySession.getDurationDPAvg,
+              "data_item" : "avg-duration-per-session"
+        },
+        {
+              "title":jQuery.i18n.map["dashboard.avg-reqs-received"],
+              "data":sessionData.usage['avg-events'],
+              "id":"draw-avg-events-served",
+              "help":"dashboard.avg-reqs-received",
+              "data_function" : countlySession.getEventsDPAvg,
+              "data_item" : "avg-events"
+        }]
+
+        var top_items_bars = [
+            {
+                "title":jQuery.i18n.map["common.bar.top-platform"],
+                "data_function":countlyDeviceDetails.getPlatformBars,
+                "help":"dashboard.top-platforms"
+            },
+            {
+                "title":jQuery.i18n.map["common.bar.top-resolution"],
+                "data_function":countlyDeviceDetails.getResolutionBars,
+                "help":"dashboard.top-resolutions"
+            },
+            {
+                "title":jQuery.i18n.map["common.bar.top-carrier"],
+                "data_function":countlyCarrier.getCarrierBars,
+                "help":"dashboard.top-carriers"
+            },
+            {
+                "title":jQuery.i18n.map["common.bar.top-users"],
+                "data_function":countlySession.getTopUserBars,
+                "help":"dashboard.top-users"
+            }
+        ];
+
+        console.log("================== top_items_bars ======================");
+        console.log(top_items_bars);
+
+        //setTimeout(function(){
+
+        var tmp_colors = [
+            {
+                  "title":jQuery.i18n.map["common.total-sessions"],
+                  "total":sessionData.usage["total-sessions"].total,
+                  "trend":sessionData.usage["total-sessions"].trend,
+                  "help":"sessions.total-sessions",
+                  "short" : "t",
+                  "color" : "#1B8AF3",
+                  "active" : true
+            },
+            {
+                  "title":jQuery.i18n.map["common.new-sessions"],
+                  "total":sessionData.usage["new-users"].total,
+                  "trend":sessionData.usage["new-users"].trend,
+                  "help":"sessions.new-sessions",
+                  "short" : "n",
+                  "color" : "#F2B702",
+                  "active" : true
+            },
+            {
+                  "title":jQuery.i18n.map["common.unique-sessions"],
+                  "total":sessionData.usage["total-users"].total,
+                  "trend":sessionData.usage["total-users"].trend,
+                  "help":"sessions.unique-sessions",
+                  "short" : "u",
+                  "color" : "#FF7D7D",
+                  "active" : true
+            }
+        ]
+
         $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
 
             console.log("========= date choise getInitialState ============");
@@ -10,8 +122,14 @@ var Dashboard = React.createClass({
 
         return {
             "active_top_tab" : 0,
-            "graph_data_function" : this.props.graph_data_function,
-            "date_period" : false
+            //"graph_data_function" : this.state.graph_data_function,
+            "date_period" : false,
+            "graph_tabs" : graph_tabs,
+            "top_items_bars" : top_items_bars,
+            "tmp_colors" : tmp_colors,
+            "tabs_data_function" : countlySession.getSessionData,
+            "graph_data_function" : graph_tabs[0].data_function,
+            "inited" : false
         }
 
     },
@@ -33,6 +151,25 @@ var Dashboard = React.createClass({
         }.bind(this));
 
     },
+
+    componentDidMount : function() {
+
+        var self = this;
+
+        console.log("======= did mount, init ---");
+
+        $.when(countlyUser.initialize(), countlyCarrier.initialize(), countlyDeviceDetails.initialize()).then(function () {
+
+            console.log(".... inited ....");
+
+            self.setState({
+                inited : true
+            })
+
+        });
+
+    },
+
 
     top_tab_click : function(i, tab) {
 
@@ -61,8 +198,6 @@ var Dashboard = React.createClass({
 
         var self = this;
 
-        console.log("{{{{{{{{{{{{{{{{ render }}}}}}}}}}}}}}}}");
-
         var sidebar_width = 240;
         var margin_left   = 40 + 10;
         var padding_left  = 30;
@@ -82,19 +217,11 @@ var Dashboard = React.createClass({
             "width" : window.innerWidth - sidebar_width - margin_left - margin_right + 24/*+ 1*/ /* +1 because of relative -1px left position, need for hide left darkr border if tab is active */
         }
 
-        console.log("block width:", top_tab_style.width);
-        console.log("calc tab width:", Math.round(top_tab_style.width / this.props.graph_tabs.length));
-
         var tab_item_style = {
-            "width" : Math.round(top_tab_style.width / this.props.graph_tabs.length)
+            "width" : Math.round(top_tab_style.width / this.state.graph_tabs.length)
         }
 
-        console.log(":: tab_item_style ::");
-        console.log(tab_item_style);
-
-        var last_tab_width_difference = top_tab_style.width - (tab_item_style.width * this.props.graph_tabs.length);
-
-        console.log("last_tab_width_difference:", last_tab_width_difference);
+        var last_tab_width_difference = top_tab_style.width - (tab_item_style.width * this.state.graph_tabs.length);
 
         var labels_mapping = {
             "t" : jQuery.i18n.map["common.total-users"],
@@ -110,16 +237,16 @@ var Dashboard = React.createClass({
                 "label" : "Current Time Range"
             }
         ]
-
+/*
         var style = {
             width : "23%"
         }
-
+*/
         var text_check_style = "normal 12pt Lato-Semibold"; // toto: non-english languages will have another font-family
 
         var long_text_flag = false;
 
-        this.props.graph_tabs.every(function(element){
+        this.state.graph_tabs.every(function(element){
 
             var text_width = self.getTextWidth(element.title, text_check_style); // toto: non-english languages will have another font-family
 
@@ -133,9 +260,9 @@ var Dashboard = React.createClass({
 
             return true;
         })
-
+/*
         console.log("long_text_flag:", long_text_flag);
-
+*/
         if (long_text_flag)
         {
             top_tab_style.height = "130px"
@@ -145,140 +272,149 @@ var Dashboard = React.createClass({
             top_tab_style.height = "110px"
         }
 
-        return (
-            <div id="dashboard" style={dashboard_style}>
+        if (this.state.inited)
+        {
 
-                <div className="top_tabs" style={top_tab_style}>
-                {
-                    _.map(this.props.graph_tabs, function(tab, id) {
+            return (
+                <div id="dashboard" style={dashboard_style}>
 
-                        var data = self.props.tabs_data_function();
+                    <div className="top_tabs" style={top_tab_style}>
+                    {
+                        _.map(this.state.graph_tabs, function(tab, id) {
 
-                        data = data.usage[tab.data_item];
+                            var data = self.state.tabs_data_function();
 
-                        //var total = tab.data.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); ;
+                            data = data.usage[tab.data_item];
 
-                        //var data = tab.data;
+                            //var total = tab.data.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); ;
 
-                        var total = data.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            //var data = tab.data;
 
-                        var class_name = "tab";
+                            var total = data.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-                        if (id == self.state.active_top_tab)
-                        {
-                            class_name += " active";
-                        }
+                            var class_name = "tab";
 
-                        if (data.trend == "u")
-                        {
-                            var trend_class_name = "trend up";
-                            var percent_change = "+ " + data.change;
-                        }
-                        else
-                        {
-                            var trend_class_name = "trend down";
-                            var percent_change = /*"- " + */data.change;
-                        }
-
-                        if (tab.title)
-                        {
-                            var title = tab.title.toUpperCase();
-                        }
-                        else
-                        {
-                            var title = "---";
-                        }
-
-                        var text_width = self.getTextWidth(title, text_check_style); // toto: non-english languages will have another font-family
-
-                        console.log("text_width:", text_width);
-/*
-                        if (text_width > tab_item_style.width)
-                        {
-                            var long_text_flag = true;
-                        }
-                        else
-                        {
-                            var long_text_flag = false;
-                        }
-*/
-                        if (id == self.props.graph_tabs.length - 1)
-                        {
-                            var style = {
-                                width : tab_item_style.width + last_tab_width_difference
+                            if (id == self.state.active_top_tab)
+                            {
+                                class_name += " active";
                             }
-                        }
-                        else
-                        {
-                            var style = tab_item_style;
-                        }
 
-                        if (long_text_flag)
-                        {
-                            style.height = "130px";
-                        }
-                        else
-                        {
-                            style.height = "110px";
-                        }
+                            if (data.trend == "u")
+                            {
+                                var trend_class_name = "trend up";
+                                var percent_change = "+ " + data.change;
+                            }
+                            else
+                            {
+                                var trend_class_name = "trend down";
+                                var percent_change = /*"- " + */data.change;
+                            }
 
-                        return (
-                          <div  onClick={self.top_tab_click.bind(self, id, tab)} className={class_name} style={style}>
-                              <div className={"green_line"}>
-                              </div>
-                              <div className={"total"}>
-                                  {total}
-                              </div>
-                              <div className={trend_class_name}>
-                                  {percent_change}
-                              </div>
-                              <div className={"title"}>
-                                  {title}
-                              </div>
-                          </div>)
-                    })
-                }
+                            if (tab.title)
+                            {
+                                var title = tab.title.toUpperCase();
+                            }
+                            else
+                            {
+                                var title = "---";
+                            }
+
+                            var text_width = self.getTextWidth(title, text_check_style); // toto: non-english languages will have another font-family
+
+                            console.log("text_width:", text_width);
+    /*
+                            if (text_width > tab_item_style.width)
+                            {
+                                var long_text_flag = true;
+                            }
+                            else
+                            {
+                                var long_text_flag = false;
+                            }
+    */
+                            if (id == self.state.graph_tabs.length - 1)
+                            {
+                                var style = {
+                                    width : tab_item_style.width + last_tab_width_difference
+                                }
+                            }
+                            else
+                            {
+                                var style = tab_item_style;
+                            }
+
+                            if (long_text_flag)
+                            {
+                                style.height = "130px";
+                            }
+                            else
+                            {
+                                style.height = "110px";
+                            }
+
+                            return (
+                              <div  onClick={self.top_tab_click.bind(self, id, tab)} className={class_name} style={style}>
+                                  <div className={"green_line"}>
+                                  </div>
+                                  <div className={"total"}>
+                                      {total}
+                                  </div>
+                                  <div className={trend_class_name}>
+                                      {percent_change}
+                                  </div>
+                                  <div className={"title"}>
+                                      {title}
+                                  </div>
+                              </div>)
+                        })
+                    }
+                    </div>
+
+                    <LineChart trend_sign={false}
+                        width={graph_width}
+                        height={260}
+                        margin_left={margin_left}
+                        graph_width={graph_width}
+                        period={countlyCommon.getPeriod()}
+                        big_numbers={false}
+                        with_granularity={false}
+                        data_function={this.state.graph_data_function}
+                        update_graph_function={countlyCommon.updateTimeGraph}
+                        tmp_colors={this.state.tmp_colors}
+                        lines_descriptions={lines_descriptions}
+                    />
+
+                    <DateSign
+                        sign={"most frequent"}
+                    />
+
+                    <DashboardBarChart
+                        width={elements_width - 40}
+                        height={300}
+                        data_function={false}
+                        labels_mapping={labels_mapping}
+                        graph_label={"DEVICES DISTRIBUTION"}
+                        label_key={"device"}
+                        data={this.state.top_items_bars}
+                    />
+
+                    <DateSign
+                        sign={"countries"}
+                    />
+
+                    <DashboardMap
+                        width={map_width}
+                        height={420}
+                    />
+
                 </div>
+            );
+        }
+        else
+        {
+            return (<Loader/>);
+        }
 
-                <GraphWrapper trend_sign={false}
-                    width={graph_width}
-                    height={260}
-                    margin_left={margin_left}
-                    graph_width={graph_width}
-                    period={countlyCommon.getPeriod()}
-                    big_numbers={false}
-                    with_granularity={false}
-                    data_function={this.state.graph_data_function}
-                    update_graph_function={countlyCommon.updateTimeGraph}
-                    tmp_colors={this.props.tmp_colors}
-                    lines_descriptions={lines_descriptions}
-                />
-
-                <DateSign
-                    sign={"most frequent"}
-                />
-
-                <DashboardBarChart
-                    width={elements_width - 40}
-                    height={300}
-                    data_function={false}
-                    labels_mapping={labels_mapping}
-                    graph_label={"DEVICES DISTRIBUTION"}
-                    label_key={"device"}
-                    data={this.props.top_items_bars}
-                />
-
-                <DateSign
-                    sign={"countries"}
-                />
-
-                <DashboardMap
-                    width={map_width}
-                    height={420}
-                />
-
-            </div>
-        );
 
         /*
         <div className="live_block">

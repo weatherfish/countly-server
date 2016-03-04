@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var RadioButton = React.createClass({
 
     getInitialState: function() {

@@ -1,4 +1,4 @@
-var ResolutionPage = React.createClass({
+var ResolutionsPage = React.createClass({
 
     getInitialState: function() {
 
@@ -36,9 +36,6 @@ var ResolutionPage = React.createClass({
             }
         ]
 
-        var chart_width = window.innerWidth - 240 - 40 - 80 - 40;
-        var chart_height = 300;
-
         headers.unshift({
             "title" : "Resolution",
             //"help"  : "sessions.unique-sessions", // todo: add translate
@@ -53,26 +50,60 @@ var ResolutionPage = React.createClass({
 
     },
 
+    componentDidMount : function() {
+
+        var self = this;
+
+        $.when(countlyDeviceDetails.initialize()).then(function () {
+
+            self.setState({
+                inited : true,
+            })
+
+        });
+    },
+
     render : function(){
+
+        if (!this.state.inited)
+        {
+            return (<Loader/>);
+        }
+
+        var elements_width = get_viewport_width();
+        var chart_height = 300;
+
+        var chart_margins = {
+            top    : 20,
+            right  : 30,
+            bottom : 30,
+            left   : 30,
+            bar_bottom : 15,
+            label_bottom : 20
+        };
+
+        var page_style = {
+            "width" : elements_width
+        }
 
         return (
 
-            <div className="page">
+            <div className="page" style={page_style}>
 
                 <HorizontalBarChart
-                    width={chart_width}
+                    width={elements_width}
                     height={chart_height}
                     data_function={countlyDeviceDetails.getResolutionData}
                     labels_mapping={this.state.labels_mapping}
                     graph_label={"RESOLUTIONS DISTRIBUTION"}
                     label_key={"resolution"}
                     bar_height={34}
-                    bar_margin_bottom={15}
+                    margins={chart_margins}
                 />
 
                 <SortTable
                     headers={this.state.headers}
-                    width={chart_width}
+                    width={elements_width}
                     row_height={50}
                     data_sign={"DATA"}
                     sort_functions={this.state.sort_functions}
@@ -80,6 +111,7 @@ var ResolutionPage = React.createClass({
                     convert_data_function={false}
                     initial_sort={"resolution"}
                     rows_per_page={20}
+                    filter_field={"resolution"}
                 />
 
             </div>

@@ -1,6 +1,4 @@
-//_circle_radius = 4;
-
-var GraphWrapper = React.createClass({
+var LineChart = React.createClass({
 
     circle_radius : 4,
 
@@ -36,7 +34,7 @@ var GraphWrapper = React.createClass({
             {
                 var granularity_rows = data_points.weekly_granularity;
             }
-            else if (_granularity == "monthly")
+            else if (granularity == "monthly")
             {
                 var granularity_rows = data_points.monthly_granularity;
             }
@@ -99,14 +97,9 @@ var GraphWrapper = React.createClass({
             var tmp_colors = this.props.big_numbers;
         }
 
-        console.log("======== data_points ========");
-        console.log(data_points);
-        console.log("============= granularity_rows =============");
-        console.log(granularity_rows);
+        var line_chart_width = this.props.graph_width - 100;
 
-        console.log("draw graph height:", this.props.height);
-
-        countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", tmp_colors, this.props.graph_width, this.props.height, false, granularity, false, zero_points);
+        countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", tmp_colors, line_chart_width, this.props.height, false, granularity, false, zero_points);
 
         if (this.props.lines_descriptions)
         {
@@ -122,9 +115,6 @@ var GraphWrapper = React.createClass({
         {
             lines_descriptions = false;
         }
-
-        console.log("=========================== tmp_colors ==================");
-        console.log(tmp_colors);
 
         return {
             big_numbers : tmp_colors,
@@ -142,15 +132,11 @@ var GraphWrapper = React.createClass({
 
         $(event_emitter).on('granularity', function(e, granularity_type){
 
-            console.log("}}}}}}}}}}}}}}}}}}}}}} granularity }}}}}}}}}}}}}}}}}}}}}}");
-
             this.update(-1, granularity_type);
 
         }.bind(this));
 
         $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
-
-            console.log("---------------------- date_choise >>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
             if (period.period == "hour")
             {
@@ -180,9 +166,6 @@ var GraphWrapper = React.createClass({
         var self = this;
 
         return _.map(this.state.big_numbers, function(item, id) {
-
-            console.log("====== render big number ============");
-            console.log(item);
 
             return <BigNumber
                       title={item.title}
@@ -244,9 +227,6 @@ var GraphWrapper = React.createClass({
         var sessionDP = this.props.data_function();
         var big_numbers = this.state.big_numbers;
 
-        console.log("============= update big_numbers ===============");
-        console.log(big_numbers);
-
         if (id > -1)
         {
             big_numbers[id].active = !big_numbers[id].active;
@@ -254,6 +234,8 @@ var GraphWrapper = React.createClass({
 
         var active = false;
         var no_data = true;
+
+        var zero_points = true;
 
         for (var i = 0; i < big_numbers.length; i++)
         {
@@ -264,9 +246,6 @@ var GraphWrapper = React.createClass({
                 break;
             }
         }
-
-        console.log("<<<<<< sessionDP >>>>>>>>>>>");
-        console.log(sessionDP);
 
         if (sessionDP.daily_granularity)
         {
@@ -282,7 +261,6 @@ var GraphWrapper = React.createClass({
                 new_granularity = this.state.granularity_type;
             }
 
-            console.log("new_granularity:", new_granularity, "->", time_range_difference);
 
             if ((!new_granularity/* && id == -1*/ && (time_range_difference < 0.5 || time_range_difference > 2)) || this.state.granularity_type == "hourly") // if previous period is hourly
             {
@@ -290,9 +268,6 @@ var GraphWrapper = React.createClass({
                 /*
                     auto granularity is active, event from date selection
                 */
-
-                console.log("... auto granularity ...");
-                console.log();
 
                 if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
                 {
@@ -323,8 +298,6 @@ var GraphWrapper = React.createClass({
             {
                 var granularity_rows = sessionDP.daily_granularity;
 
-                console.log("compare:", granularity_rows[0].data.length, ' --- ', (granularity_rows[0].data.length * this.circle_radius * 2 * 2),  " ::: ", this.props.graph_width);
-
                 if ((granularity_rows[0].data.length * this.circle_radius * 2 * 2) > this.props.graph_width)
                 {
                     var without_circles = true;
@@ -338,21 +311,7 @@ var GraphWrapper = React.createClass({
         else // todo: this is a fix for refactoring
         {
             var granularity_rows = this.props.data_function().get_current_data();
-            console.log(">> fix >>");
         }
-
-        console.log(":::::::::: granularity_rows ::::::::::");
-        console.log(granularity_rows);
-
-
-/*
-        $(event_emitter).trigger('granularity_data', {
-            "session_dp" : sessionDP,
-            "new_granularity" : new_granularity,
-            "period" : countlyCommon.getPeriod()
-        });
-*/
-        var zero_points = true;
 
         granularity_rows.every(function(datapath){
 
@@ -414,68 +373,9 @@ var GraphWrapper = React.createClass({
                 }
             }
 
-            console.log("{{{{{{{{{{{{{{{{{{[ active_array ]}}}}}}}}}}}}}}}}}}");
-            console.log(active_array);
-
             granularity_rows = active_array;
 
         }
-
-
-/*
-        var single_graph_data = [];
-
-        for (var i = 0; i < granularity_rows.length; i++)
-        {
-
-            var set_data = granularity_rows[i];
-
-            var obj = {
-                "name"   : set_data.label,
-                "values" : [],
-                "color"  : big_numbers[i].color
-            }
-
-            for(var j = 0; j < set_data.data.length; j++){
-
-                var point_data = {
-                    "x" : set_data.data[j][0],
-                    "y" : set_data.data[j][1],
-                }
-
-                if (set_data.data[j][2])
-                {
-                    point_data["days_count"] = set_data.data[j][2];
-                }
-
-                obj.values.push(point_data);
-            }
-
-            single_graph_data.push(obj);
-        }
-
-        console.log("///////////////// single_graph_data ///////////////");
-        console.log(single_graph_data);
-
-        var series = [];
-
-        single_graph_data.forEach(function(data, i){
-
-            series.push({
-                color : data.color, //data_items[i].color,
-                data  : data.values,
-                name  : data.name
-            });
-        });
-*/
-        // ---------------
-
-        console.log("<<<<<<<<<<<< granularity_rows >>>>>>>>>>>>>..", new_granularity, " > small > ", without_circles);
-        console.log(granularity_rows);
-
-        /*
-          todo: here is 11 colors. 11 not using
-        */
 
         /*
             todo !!! remove array indexes below
@@ -494,8 +394,6 @@ var GraphWrapper = React.createClass({
                 granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0];
             }
         }
-
-        //return false;
 
         _granularity = new_granularity; // todo: remove global variable
 
@@ -526,7 +424,7 @@ var GraphWrapper = React.createClass({
     render() {
 
         var graph_style = {
-            "width"       : this.props.width + "px",
+            "width"       : (this.props.width - 120) + "px",
             "height"      : this.props.height + "px",
             "margin-left" : this.props.margin_left + "px"
         }
@@ -535,10 +433,7 @@ var GraphWrapper = React.createClass({
             "left" : this.props.graph_width + "px"
         }
 
-        var nodata_block_style = {
-    /*        "height"      : "100px", // todo: move above
-            "padding-top" : "140px"*/
-        }
+        var nodata_block_style = { };
 
         if (this.state.active)
         {
@@ -634,22 +529,15 @@ var GraphWrapper = React.createClass({
 
     componentDidUpdate : function()
     {
-        console.log("[[[[[[[[[[[[[[[[[[[ did update ]]]]]]]]]]]]]]]]]]]");
         var updated_data = this.update(-1, this.state.granularity_type, true);
     },
 
-
     componentWillReceiveProps: function(nextProps) {
-
-        console.log("--------------- receive props ------------");
 
         if (this.props.lines_descriptions)
         {
 
             var granularity_rows = nextProps.data_function().get_current_data();
-
-            console.log(">>>> granular >>>");
-            console.log(granularity_rows);
 
             var lines_descriptions = this.props.lines_descriptions;
 

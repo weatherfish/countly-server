@@ -2,109 +2,117 @@ var SessionPage = React.createClass({
 
     getInitialState : function() {
 
-        return({
-            granularity : false
-        });
-
-    },
-
-    on_graph_mount : function(mount_data) {
-
-        this.setState({
-            "granularity" : mount_data.granularity
-        });
-
-    },
-
-    render : function(){
-
-        var self = this;
-
-        var chart_width = window.innerWidth - 240 - 40 - 80 - 40;
-        var chart_height = 300;
-
-        var margin_left   = 30;
-        var padding_left  = 30;
-        var margin_right  = 30;
-        var graph_height  = 300;
-
-        var table = false;
-
-        var sessionData = countlySession.getSessionData(),
-            sessionDP = countlySession.getSessionDP();
-
-      /*  var rows = sessionDP.chartData;*/
-
-        var templateData = {
-            "page-title":jQuery.i18n.map["sessions.title"],
-            "logo-class":"sessions",
-            "big-numbers":{
-                "count":3,
-                "items":[
-                    {
-                        "title":jQuery.i18n.map["common.total-sessions"],
-                        "total":sessionData.usage["total-sessions"].total,
-                        "trend":sessionData.usage["total-sessions"].trend,
-                        "help":"sessions.total-sessions",
-                        "short" : "t",
-                        "color" : "#1B8AF3"
-                    },
-                    {
-                        "title":jQuery.i18n.map["common.new-sessions"],
-                        "total":sessionData.usage["new-users"].total,
-                        "trend":sessionData.usage["new-users"].trend,
-                        "help":"sessions.new-sessions",
-                        "short" : "n",
-                        "color" : "#F2B702"
-                    },
-                    {
-                        "title":jQuery.i18n.map["common.unique-sessions"],
-                        "total":sessionData.usage["total-users"].total,
-                        "trend":sessionData.usage["total-users"].trend,
-                        "help":"sessions.unique-sessions",
-                        "short" : "u",
-                        "color" : "#FF7D7D"
-                    }
-                ]
-            }
-        };
-
         var sort_functions = {
             "t" : math_sort,
             "n" : math_sort,
             "u" : math_sort,
         }
 
-        for (var i = 0; i < templateData["big-numbers"].items.length; i++)
+        return({
+            granularity : false,
+            sort_functions : sort_functions,
+            inited : false
+        });
+
+    },
+
+    componentDidMount : function() {
+
+        var self = this;
+
+        $.when(countlyUser.initialize()).then(function () {
+
+            var sessionData = countlySession.getSessionData();
+                //sessionDP = countlySession.getSessionDP();
+
+            var templateData = {
+                "page-title":jQuery.i18n.map["sessions.title"],
+                "logo-class":"sessions",
+                "big-numbers":{
+                    "count":3,
+                    "items":[
+                        {
+                            "title":jQuery.i18n.map["common.total-sessions"],
+                            "total":sessionData.usage["total-sessions"].total,
+                            "trend":sessionData.usage["total-sessions"].trend,
+                            "help":"sessions.total-sessions",
+                            "short" : "t",
+                            "color" : "#1B8AF3"
+                        },
+                        {
+                            "title":jQuery.i18n.map["common.new-sessions"],
+                            "total":sessionData.usage["new-users"].total,
+                            "trend":sessionData.usage["new-users"].trend,
+                            "help":"sessions.new-sessions",
+                            "short" : "n",
+                            "color" : "#F2B702"
+                        },
+                        {
+                            "title":jQuery.i18n.map["common.unique-sessions"],
+                            "total":sessionData.usage["total-users"].total,
+                            "trend":sessionData.usage["total-users"].trend,
+                            "help":"sessions.unique-sessions",
+                            "short" : "u",
+                            "color" : "#FF7D7D"
+                        }
+                    ]
+                }
+            };
+
+            for (var i = 0; i < templateData["big-numbers"].items.length; i++)
+            {
+                templateData["big-numbers"].items[i].active = true;
+            }
+
+            var headers = JSON.parse(JSON.stringify(templateData["big-numbers"].items));
+
+            headers.unshift({
+                "title" : "Date",
+                //"help"  : "sessions.unique-sessions", // todo: add translate
+                "short" : "date",
+            })
+
+            self.setState({
+                inited : true,
+                templateData : templateData,
+                headers : headers
+            })
+        })
+    },
+
+    on_graph_mount : function(mount_data) {
+        this.setState({
+            "granularity" : mount_data.granularity
+        });
+    },
+
+    render : function(){
+
+        var self = this;
+
+        if (!this.state.inited)
         {
-            templateData["big-numbers"].items[i].active = true;
+            return (<Loader/>);
         }
 
-        var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 40;
+        var elements_width = get_viewport_width();
+        var chart_height = 300;
 
-        //var table_width = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 32;
-
-        var table_width = get_viewport_width() + 20;
-
-        var headers = JSON.parse(JSON.stringify(templateData["big-numbers"].items));
-
-        headers.unshift({
-            "title" : "Date",
-            //"help"  : "sessions.unique-sessions", // todo: add translate
-            "short" : "date",
-        })
+        var page_style = {
+            "width" : elements_width
+        }
 
         return(
-            <div className="page">
+            <div className="page" style={page_style}>
 
-                <GraphWrapper
+                <LineChart
                     trend_sign={"SESSIONS TREND"}
-                    width={graph_width + 14}
-                    height={300}
+                    width={elements_width}
+                    height={chart_height}
                     margin_left={40 + 20}
-                    graph_width={graph_width - 40}
+                    graph_width={elements_width}
                     period={countlyCommon.getPeriod()}
-                    big_numbers={templateData["big-numbers"].items}
+                    big_numbers={this.state.templateData["big-numbers"].items}
                     data_function={countlySession.getSessionDP}
                     update_graph_function={countlyCommon.updateTimeGraph}
                     with_granularity={true}
@@ -116,11 +124,11 @@ var SessionPage = React.createClass({
                     if (self.state.granularity)
                     {
                         return(<SortTable
-                            headers={headers}
-                            width={table_width}
+                            headers={self.state.headers}
+                            width={elements_width}
                             row_height={50}
                             data_sign={"DATA"}
-                            sort_functions={sort_functions}
+                            sort_functions={this.state.sort_functions}
                             data_function={countlySession.getSessionDP}
                             convert_data_function={true}
                             initial_sort={"date"}
@@ -133,61 +141,5 @@ var SessionPage = React.createClass({
 
             </div>
         )
-      }
+    }
 })
-
-
-/*
-        var frequencyData = countlyUser.getFrequencyData();
-
-        return (
-
-            React.createElement(GraphWrapper, {
-                "trend_sign"  : "SESSIONS TREND",
-                "width"       : graph_width - 70 - 70,
-                "height"      : 300,
-                "margin_left" : 40,
-                //"granularity_rows" : granularity_rows,
-                //"data"        : sessionDP,
-                "graph_width" : graph_width, // todo: combine
-                //"granularity" : _granularity,
-                "period"      : countlyCommon.getPeriod(),
-                "big_numbers" : self.templateData["big-numbers"].items,
-                //"big_number_click" : update_graph,
-                "data_function" : countlySession.getSessionDP,
-                "update_graph_function" : countlyCommon.updateTimeGraph,
-                "with_granularity" : true,
-                "mount_callback" : function(mount_data){
-
-                    document.getElementsByClassName("widget")[0].setAttribute("style","width:" + graph_width + "px");
-                    document.getElementById('content').style.width = (graph_width + padding_left + 4) + 40 + "px";
-                    document.getElementsByClassName('table_block')[0].style.width = (graph_width + 4) + 40 + "px";
-
-                    /* TABLE WRAPPER */
-/*
-                    var headers = JSON.parse(JSON.stringify(self.templateData["big-numbers"].items));
-
-                    headers.unshift({
-                        "title" : "Date",
-                        //"help"  : "sessions.unique-sessions", // todo: add translate
-                        "short" : "date",
-                    })
-
-                    var table_wrapper = React.createElement(SortTable, {
-                        //"rows"    : granularity_rows,
-                        "headers" : headers,
-                        "width"   : table_width,
-                        "row_height" : 50,
-                        "data_sign" : "DATA",
-                        "sort_functions" : sort_functions,
-                        "data_function" : countlySession.getSessionDP,
-                        "convert_data_function" : true, // todo: change to function
-                        "date_sign" : "Date",
-                        "granularity" : mount_data.granularity,
-                        "rows_per_page" : 20
-                    }, null);
-
-                    React.render(table_wrapper, document.getElementsByClassName('table_block')[0]);
-
-                }
-*/

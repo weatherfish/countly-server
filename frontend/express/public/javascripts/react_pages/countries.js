@@ -111,7 +111,7 @@ var CountriesPage = React.createClass({
         var table_width = get_viewport_width();
 
         var elements_width = get_viewport_width();
-        var map_width = elements_width - 320;
+        var map_width = elements_width - 360;
 
         var page_style = {
             "width" : elements_width

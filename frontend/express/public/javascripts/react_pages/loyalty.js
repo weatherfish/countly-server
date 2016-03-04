@@ -2,30 +2,14 @@ var LoyaltyPage = React.createClass({
 
     getInitialState: function() {
 
-        return({
-
-        });
-
-    },
-
-    render : function(){
-
-        var elements_width = get_viewport_width();
-        var chart_height = 300;
-
-        var loyaltyData = countlyUser.getLoyaltyData();
-
-        console.log("======== frequencyData.chartData =========");
-        console.log(loyaltyData.chartData);
-
-        /*
-                { "mData": "l", sType:"loyalty", "sTitle": jQuery.i18n.map["user-loyalty.table.session-count"] },
-                { "mData": "t", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.number-of-users"] },
-                { "mData": "percent", "sType":"percent", "sTitle": jQuery.i18n.map["common.percent"] }
-        */
+        var sort_functions = {
+            "l" : math_sort,
+            "t" : math_sort,
+            "percent" : math_sort
+        }
 
         var headers = [{
-            "title":jQuery.i18n.map["user-loyalty.table.session-count"], // todo : not common.total-sessions
+            "title":jQuery.i18n.map["user-loyalty.table.session-count"],
             "short" : "l",
         },
         {
@@ -37,52 +21,72 @@ var LoyaltyPage = React.createClass({
             "short" : "percent"
         }]
 
-        var sort_functions = {
-            "l" : math_sort,
-            "t" : math_sort,
-            "percent" : math_sort
-        }
+        return({
+            sort_functions : sort_functions,
+            headers : headers,
+            inited : false
+        });
 
-      /*  { "mData": "f", sType:"frequency", "sTitle": jQuery.i18n.map["session-frequency.table.time-after"] },
-        { "mData": "t", sType:"formatted-num", "mRender":function(d) { return countlyCommon.formatNumber(d); }, "sTitle": jQuery.i18n.map["common.number-of-users"] },
-        { "mData": "percent", "sType":"percent", "sTitle": jQuery.i18n.map["common.percent"] }*/
-        /*
-        */
+    },
+
+    componentDidMount : function() {
+
+        var self = this;
+
+        $.when(countlyUser.initialize()).then(function () {
+
+            self.setState({
+                inited : true,
+            })
+
+        });
+    },
+
+    render : function(){
+
+        var elements_width = get_viewport_width();
+        var chart_height = 300;
 
         var page_style = {
             "width" : elements_width
         }
 
-        return (
+        if (this.state.inited)
+        {
+            return (
 
-            <div className="page" style={page_style}>
+                <div className="page" style={page_style}>
 
-                <Chart headline_sign={"LOYALTY"}
-                    headers={headers}
-                    width={elements_width}
-                    height={chart_height}
-                    side_margin={30}
-                    bar_width={40}
-                    data={loyaltyData.chartData}
-                    data_function={countlyUser.getLoyaltyData}
-                    tooltip_width={60}
-                    tooltip_height={44}
-                    bar_width={40}
-                />
+                    <Chart headline_sign={"LOYALTY"}
+                        headers={this.state.headers}
+                        width={elements_width}
+                        height={chart_height}
+                        side_margin={30}
+                        bar_width={40}
+                        data_function={countlyUser.getLoyaltyData}
+                        tooltip_width={60}
+                        tooltip_height={44}
+                        bar_width={40}
+                    />
 
-                <SortTable
-                    headers={headers}
-                    width={elements_width}
-                    row_height={50}
-                    data_sign={"DATA"}
-                    sort_functions={sort_functions}
-                    data_function={countlyUser.getLoyaltyData}
-                    convert_data_function={false}
-                    initial_sort={"loyalty"}
-                    rows_per_page={20}
-                />
+                    <SortTable
+                        headers={this.state.headers}
+                        width={elements_width}
+                        row_height={50}
+                        data_sign={"DATA"}
+                        sort_functions={this.state.sort_functions}
+                        data_function={countlyUser.getLoyaltyData}
+                        convert_data_function={false}
+                        initial_sort={"loyalty"}
+                        rows_per_page={20}
+                    />
 
-            </div>
-        )
+                </div>
+            )
+        }
+        else
+        {
+            return (<Loader/>);
+        }
     }
 })
