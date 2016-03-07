@@ -101,6 +101,7 @@ var DevicesPage = React.createClass({
                     label_key={"device"}
                     bar_height={34}
                     margins={chart_margins}
+                    date={this.props.date}
                 />
 
                 <SortTable
@@ -114,6 +115,7 @@ var DevicesPage = React.createClass({
                     initial_sort={"device"}
                     rows_per_page={20}
                     filter_field={"device"}
+                    date={this.props.date}
                 />
 
             </div>

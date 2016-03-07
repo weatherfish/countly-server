@@ -6,6 +6,8 @@ var LineChart = React.createClass({
 
         var data_points = this.props.data_function();
 
+        var line_chart_width = this.props.width - (this.props.sides_padding * 2);
+
         if (this.props.with_granularity)
         {
 
@@ -13,11 +15,11 @@ var LineChart = React.createClass({
             {
                 var granularity = "hourly";
             }
-            else if ((data_points.daily_granularity[0].data.length / 30) > 6) // more then 6 months
+            else if ((data_points.daily_granularity[0].data.length / 30) > 6) // more than 6 months
             {
                 var granularity = "monthly";
             }
-            else if (data_points.daily_granularity[0].data.length * (this.circle_radius * 2) * 2 > this.props.graph_width) // todo: combine with block from update
+            else if (data_points.daily_granularity[0].data.length * (this.circle_radius * 2) * 2 > line_chart_width) // todo: combine with block from update
             {
                 var granularity = "weekly";
             }
@@ -97,9 +99,7 @@ var LineChart = React.createClass({
             var tmp_colors = this.props.big_numbers;
         }
 
-        var line_chart_width = this.props.graph_width - 100;
-
-        countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", tmp_colors, line_chart_width, this.props.height, false, granularity, false, zero_points);
+        countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", tmp_colors, line_chart_width - 40 - 40, this.props.height, false, granularity, false, zero_points); // !remove
 
         if (this.props.lines_descriptions)
         {
@@ -121,8 +121,24 @@ var LineChart = React.createClass({
             active : true,
             session_dp : data_points,
             granularity_type : granularity,
-            lines_descriptions : lines_descriptions
+            lines_descriptions : lines_descriptions,
+            line_chart_width : line_chart_width
         };
+    },
+
+    componentWillReceiveProps : function(nextProps) {
+
+        var period = nextProps.date.period;
+
+        if (false && period.period == "hour")
+        {
+            var updated_data = this.update(-1, "hourly");
+        }
+        else
+        {
+            var updated_data = this.update(-1, false);
+        }
+
     },
 
     componentWillMount: function() {
@@ -135,7 +151,7 @@ var LineChart = React.createClass({
             this.update(-1, granularity_type);
 
         }.bind(this));
-
+/*
         $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
 
             if (period.period == "hour")
@@ -151,7 +167,9 @@ var LineChart = React.createClass({
             var rows = updated_data.rows;
             var granularity = updated_data.new_granularity;
 */
-        }.bind(this));
+/*        }.bind(this));*/
+
+
 
         $(event_emitter).on('data_changed', function(e, data){
 
@@ -273,7 +291,7 @@ var LineChart = React.createClass({
                 {
                     var new_granularity = "monthly";
                 }
-                else if ((sessionDP.daily_granularity[0].data.length * this.circle_radius * 2 * 2) > this.props.graph_width)
+                else if ((sessionDP.daily_granularity[0].data.length * this.circle_radius * 2 * 2) > this.state.line_chart_width)
                 {
                     var new_granularity = "weekly";
                 }
@@ -298,7 +316,7 @@ var LineChart = React.createClass({
             {
                 var granularity_rows = sessionDP.daily_granularity;
 
-                if ((granularity_rows[0].data.length * this.circle_radius * 2 * 2) > this.props.graph_width)
+                if ((granularity_rows[0].data.length * this.circle_radius * 2 * 2) > this.state.line_chart_width)
                 {
                     var without_circles = true;
                 }
@@ -395,7 +413,7 @@ var LineChart = React.createClass({
             }
         }
 
-        _granularity = new_granularity; // todo: remove global variable
+        //_granularity = new_granularity; // todo: remove global variable
 
         this.props.update_graph_function(granularity_rows, "#dashboard-graph", big_numbers, false, new_granularity, without_circles, zero_points, function(error, result){
             $(event_emitter).trigger('granularity_data', {
@@ -423,15 +441,19 @@ var LineChart = React.createClass({
 
     render() {
 
+        var axis_width = 40;
+
         var graph_style = {
-            "width"       : (this.props.width - 120) + "px",
+            "width"       : (this.state.line_chart_width) + "px",
             "height"      : this.props.height + "px",
-            "margin-left" : this.props.margin_left + "px"
+            "margin-left" : this.props.sides_padding/*this.props.margin_left*/ + "px"
         }
 
         var axis_right_style = {
-            "left" : this.props.graph_width + "px"
+            "left" : (this.state.line_chart_width - axis_width) + "px"
         }
+
+        console.log("chart:", this.state.line_chart_width, " --> ", axis_width);
 
         var nodata_block_style = { };
 
@@ -452,6 +474,8 @@ var LineChart = React.createClass({
             description_blocks.reverse();
         }
 
+        // graph_width={this.props.width}
+
         return (
             <div id="line_chart_wrapper">
 
@@ -466,7 +490,6 @@ var LineChart = React.createClass({
                 <Granularity
                     class_name={granularity_class_name}
                     data={this.state.session_dp}
-                    graph_width={this.props.graph_width}
                     type={this.state.granularity_type}
                     period={this.props.period} />
 

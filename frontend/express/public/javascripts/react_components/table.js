@@ -159,9 +159,6 @@ var SortTable = React.createClass({
 
         var full_rows = this.props.data_function().get_current_data(granularity);
 
-        console.log("{{{{{{{{{ full_rows }}}}}}}}}");
-        console.log(full_rows);
-
         if (this.props.convert_data_function)
         {
             full_rows = this.convert_data_rows(full_rows);
@@ -245,27 +242,26 @@ var SortTable = React.createClass({
 
             }.bind(this));
 
-      } else {
+        } else {
 
-          /*
-              date_choise event comes from calendar selectors element
-          */
+            /*
+                date_choise event comes from calendar selectors element
+            */
 
-          $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
+            $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
 
-              var rows = this.props.data_function().get_current_data('daily_granularity');
+                var rows = this.props.data_function().get_current_data('daily_granularity');
 
-              if (this.props.convert_data_function)
-              {
-                  rows = this.convert_data_rows(rows);
-              }
+                if (this.props.convert_data_function)
+                {
+                    rows = this.convert_data_rows(rows);
+                }
 
-              var pagination = this.make_pagination(rows);
-              this.setState(pagination);
+                var pagination = this.make_pagination(rows);
+                this.setState(pagination);
 
-          }.bind(this));
-
-      }
+            }.bind(this));
+        }
 
 
         function split(a, n) {
@@ -309,8 +305,6 @@ var SortTable = React.createClass({
     filterFunction : function(filter)
     {
 
-        console.log("filter:", filter);
-
         if (filter == "")
         {
 
@@ -327,9 +321,6 @@ var SortTable = React.createClass({
         }
 
         var rows = this.state.full_rows;
-
-        console.log("======== rows ========");
-        console.log(rows);
 
         if (this.props.filter_field)
         {

@@ -14,8 +14,6 @@ var LeftPart = React.createClass({
             selected : i,
         });
 
-        console.log("select i:", i);
-
         this.props.handleClick(i);
     },
 

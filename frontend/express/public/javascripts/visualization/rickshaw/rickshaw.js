@@ -424,6 +424,8 @@ Rickshaw.Graph = function(args) {
 
     this.space_between_points = false;
 
+    this.axis_width = 40; // todo
+
 		this.defaults = {
 			interpolation: 'linear', // 'cardinal',
 			offset: 'zero',
@@ -451,6 +453,7 @@ Rickshaw.Graph = function(args) {
       .attr("id", "graph_svg")
 			.attr('width', this.width)
 			.attr('height', this.height/* + this.circle_radius*/)
+      .style("left", "40px") // !remove
       /*.attr("transform", function(d) {
            return "translate(" + margins + ", 0)"; }
       )*/
@@ -1602,6 +1605,8 @@ Rickshaw.Graph.Axis.Time = function(args) {
 
 	this.render = function() {
 
+    var self = this;
+
 		this.elements.forEach( function(e) {
 			e.parentNode.removeChild(e);
 		} );
@@ -1650,6 +1655,8 @@ Rickshaw.Graph.Axis.Time = function(args) {
 
   			element.appendChild(title);
 
+        //element.style("left", "40px");
+
   			self.graph.element.appendChild(element);
 
         var tick_title_width = title.offsetWidth;
@@ -1669,7 +1676,7 @@ Rickshaw.Graph.Axis.Time = function(args) {
         else
         {*/
 
-        element.style.left = (/*self.graph.circle_radius +*/ (self.graph.max_tick_width / 2)) + (self.graph.x(o.value) - (tick_title_width / 2) + points_offset) + 'px'; // todo: change 16 to var.
+        element.style.left = self.graph.axis_width + (/*self.graph.circle_radius +*/ (self.graph.max_tick_width / 2)) + (self.graph.x(o.value) - (tick_title_width / 2) + points_offset) + 'px'; // todo: change 16 to var.
 
         /*}*/
 
@@ -1709,7 +1716,8 @@ Rickshaw.Graph.Axis.X = function(args) {
 				.append("svg:svg")
 				.attr('height', this.height)
 				.attr('width', this.width)
-				.attr('class', 'rickshaw_graph x_axis_d3');
+				.attr('class', 'rickshaw_graph x_axis_d3')
+
 
 			this.element = this.vis[0][0];
 			this.element.style.position = 'relative';
@@ -1829,7 +1837,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 			this.element = this.vis[0][0];
 			this.element.style.position = 'relative';
 
-			this.setSize({ width: args.width, height: args.height + 20 }); // todo: +10 because the trimmed portion of the number
+			this.setSize({ width: args.width, height: args.height /*+ 20*/ }); // todo: +10 because the trimmed portion of the number
 
 		} else {
 			this.vis = this.graph.vis;
@@ -1858,7 +1866,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 		this.width = args.width || elementWidth || this.graph.width * this.berthRate;
 		this.height = args.height || elementHeight || this.graph.height;
 
-    this.height += 40; // todo: variable
+    //this.height += 40; // todo: variable
 
 		this.vis
 			.attr('width', this.width)
@@ -1872,6 +1880,9 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
     else {
       this.element.style.top = -10 + 'px';
     }
+
+    //this.element.style.left = "40px";
+
 	},
 
 	render: function() {
@@ -1922,7 +1933,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 			var transform = 'translate(' + this.width + ', ' + (berth + 1) + ')';
 		}
     else {
-      var transform = 'translate(' + 0 + ', ' + (10) + ')';
+      var transform = 'translate(' + 0 + ', ' + (10) + ')'; // todo: variable
     }
 
 		if (this.element) {
@@ -1946,7 +1957,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
     //console.log("new domain:", y_domain);
 
-    var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, this.graph.height - 2]); // todo: change to height variable
+    var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, this.graph.height]); // todo: change to height variable
 
     var tick_values = [];
 
@@ -1979,9 +1990,11 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
 	_drawGrid: function(axis) {
 
+    //var axis_width = 40;
+
     var domain = this.graph.renderer.domain();
 
-		var gridSize = (this.orientation == 'right' ? 1 : -1) * this.graph.width;
+		var gridSize = (this.orientation == 'right' ? 1 : -1) * this.graph.width/* - ((this.orientation == 'right' ? 1 : -1) * axis_width *//** 2*/ /*)*/;
 
     var y_domain = Math.round(domain.y[1]);
 
@@ -2009,17 +2022,14 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
         tick_values.push(Math.round(i * tick_size));
     }
 
-    console.log("============ this.ticks ================");
-    console.log(this.ticks);
-
     var grids = this.graph.vis
   			//.append("svg:g")
         .insert("svg:g",":first-child")
   			.attr("class", "y_grid")
   			.call(axis.ticks(this.ticks).scale(y_inverted).tickSize(gridSize).tickValues(tick_values)) /*.tickSubdivide(0)*/ /*.tickPadding([0])*/
-        .attr("transform", function(d) {
-             return "translate(" + 0 + "," + 0 + ")"; }
-        )
+        /*.attr("transform", function(d) {
+             return "translate(" + axis_width + "," + 0 + ")"; }
+        )*/
 
     grids
         .selectAll('g')
@@ -2827,7 +2837,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
         var left_extension_width = _left_extension_width;
     }
 
-    var tooltip_left = Math.ceil((graph.x(point.value.x) + /*graph.circle_radius +*/ (graph.max_tick_width / 2) + this.graph.points_offset));
+    var tooltip_left = this.graph.axis_width + Math.ceil((graph.x(point.value.x) + /*graph.circle_radius +*/ (graph.max_tick_width / 2) + this.graph.points_offset));
 
     this.element.style.left = tooltip_left + 'px';
 

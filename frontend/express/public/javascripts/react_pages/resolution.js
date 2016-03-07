@@ -38,7 +38,7 @@ var ResolutionsPage = React.createClass({
 
         headers.unshift({
             "title" : "Resolution",
-            //"help"  : "sessions.unique-sessions", // todo: add translate
+            //"help"  : "sessions.unique-sessions", // todo: add translation
             "short" : "resolution",
         })
 
@@ -99,6 +99,7 @@ var ResolutionsPage = React.createClass({
                     label_key={"resolution"}
                     bar_height={34}
                     margins={chart_margins}
+                    date={this.props.date}
                 />
 
                 <SortTable
@@ -112,6 +113,7 @@ var ResolutionsPage = React.createClass({
                     initial_sort={"resolution"}
                     rows_per_page={20}
                     filter_field={"resolution"}
+                    date={this.props.date}
                 />
 
             </div>

@@ -9,11 +9,10 @@ var SessionPage = React.createClass({
         }
 
         return({
-            granularity : false,
+            granularity : "daily",//false, // todo - should be false
             sort_functions : sort_functions,
             inited : false
         });
-
     },
 
     componentDidMount : function() {
@@ -68,7 +67,7 @@ var SessionPage = React.createClass({
 
             headers.unshift({
                 "title" : "Date",
-                //"help"  : "sessions.unique-sessions", // todo: add translate
+                //"help"  : "sessions.unique-sessions", // todo: add translation
                 "short" : "date",
             })
 
@@ -102,6 +101,11 @@ var SessionPage = React.createClass({
             "width" : elements_width
         }
 
+        /*
+        margin_left={40 + 20}
+        graph_width={elements_width}
+        */
+
         return(
             <div className="page" style={page_style}>
 
@@ -109,14 +113,14 @@ var SessionPage = React.createClass({
                     trend_sign={"SESSIONS TREND"}
                     width={elements_width}
                     height={chart_height}
-                    margin_left={40 + 20}
-                    graph_width={elements_width}
+                    sides_padding={20}
                     period={countlyCommon.getPeriod()}
                     big_numbers={this.state.templateData["big-numbers"].items}
                     data_function={countlySession.getSessionDP}
                     update_graph_function={countlyCommon.updateTimeGraph}
                     with_granularity={true}
                     mount_callback={this.on_graph_mount}
+                    date={this.props.date}
                 />
 
                 {(() => {
@@ -134,6 +138,7 @@ var SessionPage = React.createClass({
                             initial_sort={"date"}
                             granularity={this.state.granularity}
                             rows_per_page={20}
+                            date={this.props.date}
                         />)
                     }
 

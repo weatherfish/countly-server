@@ -29,7 +29,7 @@ var DashboardMap = React.createClass({
         var ob = { id: "total", label: "Sessions", type: "number", metric: "t" };
 
         var countryFills = {
-            defaultFill : "#c0dffb"
+            defaultFill : "#ffffff"
         }
 
         /*
@@ -42,9 +42,6 @@ var DashboardMap = React.createClass({
 
         var gradient = this.make_gradient("#198af3", "#c0dffb", 10);
 
-        console.log("==== gradient ===");
-        console.log(gradient);
-
         var j = 0;
 
         for (var i = 0/* 0.1*/; i < 1; i+=0.1)
@@ -56,11 +53,7 @@ var DashboardMap = React.createClass({
 
         countryFills["1.0"] = "#198af3"; // todo:
 
-
-        console.log("=========== country fills ========");
-        console.log(countryFills);
-
-        _chartOptions = {
+        var geographyConfig = {
             borderWidth: 1,
             borderColor: '#E6E6E6',
             popupOnHover: true,
@@ -75,16 +68,13 @@ var DashboardMap = React.createClass({
 
         this.previous_data = countryData;
 
-        console.log("++++++++++++++= countryData =+++++++++++++");
-        console.log(countryData);
-
         _datamap = new Datamap({
             element    : document.getElementById("map"),
             height     : this.props.height,
             width      : this.props.width,
             projection : 'mercator',
             fills      : countryFills,
-            geographyConfig: _chartOptions,
+            geographyConfig: geographyConfig,
             data       : countryData
         });
 
@@ -120,9 +110,6 @@ var DashboardMap = React.createClass({
         var _locationsDb = countlyUser.getDbObj();
         var _countries = _locationsDb['meta']['countries'];// countlyCommon.union({}, _locationsDb['meta']['countries']);
 
-        console.log("{{{{{{{{{{{{ _locationsDb }}}}}}}}}}}}");
-        console.log(_locationsDb);
-
         var tt = countlyCommon.extractTwoLevelData(_locationsDb, _countries, countlyLocation.clearLocationObject, [
             {
                 "name":"country",
@@ -147,9 +134,6 @@ var DashboardMap = React.createClass({
         chartData.cols.push(ob);
 
         var maxMetric = 0;
-
-        console.log("=========== tt.chartData ===========");
-        console.log(tt.chartData);
 
         chartData.rows = _.map(tt.chartData, function (value, key, list) {
 
@@ -206,9 +190,6 @@ var DashboardMap = React.createClass({
                 }
             /*}*/
         }
-
-        console.log("============= formatted data ==========");
-        console.log(countryData);
 
         return countryData;
     },

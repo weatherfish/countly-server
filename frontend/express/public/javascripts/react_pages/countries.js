@@ -46,11 +46,16 @@ var CountriesPage = React.createClass({
 
     getInitialState: function() {
 
-        console.log("======== initial metric ================");
-        console.log(this.props.selector.metric);
 
-        var templateData = this.get_data();
+/*
+        var maps = {
+            "map-list-sessions": {id:'total', label:jQuery.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"},
+            "map-list-users": {id:'total', label:jQuery.i18n.map["sidebar.analytics.users"], type:'number', metric:"u"},
+            "map-list-new": {id:'total', label:jQuery.i18n.map["common.table.new-users"], type:'number', metric:"n"}
+        };
 
+        var cur_map = "map-list-sessions";
+*/
         var sort_functions = {
             "t" : math_sort,
             "n" : math_sort,
@@ -59,14 +64,17 @@ var CountriesPage = React.createClass({
         }
 
         return {
-            template_data : templateData,
             sort_functions : sort_functions,
-            metric : this.props.selector.metric,
-            radio_button : 0
+            metric : "t",
+            radio_button : 0,
+            inited : false,
+            /*maps : maps,
+            cur_map : cur_map*/
         }
 
     },
 
+/*
     componentWillMount: function() {
 
         $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
@@ -76,13 +84,29 @@ var CountriesPage = React.createClass({
             this.setState({
                 "template_data" : templateData,
                 "date_period" : period
-            })
+            })*/
     /*
             var rows = updated_data.rows;
             var granularity = updated_data.new_granularity;
     */
-        }.bind(this));
+  /*      }.bind(this));
 
+},*/
+
+    componentDidMount : function() {
+
+        var self = this;
+
+        $.when(countlyUser.initialize(), countlyCity.initialize()).then(function () {
+
+            var templateData = self.get_data();
+
+            self.setState({
+                inited : true,
+                template_data : templateData,
+            })
+
+        });
     },
 
     radio_button_click : function(id)
@@ -94,8 +118,7 @@ var CountriesPage = React.createClass({
 
         var metric = this.state.template_data["big-numbers"]["items"][id]["short"];
 
-        console.log("======== metric ===========");
-        console.log(metric);
+        console.log("new map metric:", metric);
 
         this.setState({
             radio_button : id,
@@ -107,6 +130,11 @@ var CountriesPage = React.createClass({
     render : function(){
 
         var self = this;
+
+        if (!this.state.inited)
+        {
+            return (<Loader/>);
+        }
 
         var table_width = get_viewport_width();
 
@@ -124,9 +152,6 @@ var CountriesPage = React.createClass({
             //"help"  : "sessions.unique-sessions", // todo: add translate
             "short" : "country_flag",
         })
-
-        console.log("============= render current state ==================");
-        console.log(self.state.template_data["big-numbers"].items);
 
         return (
             <div className="page" style={page_style}>

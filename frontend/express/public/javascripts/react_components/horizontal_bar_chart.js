@@ -56,9 +56,10 @@ var HorizontalBarChart = React.createClass({
         };
     },
 
-    componentWillMount: function() {
+    componentWillReceiveProps: function(nextProps) {
 
-        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
+        /*if (nextProps.date != this.props.date) // todo !!!!!!!!!!!!!!!!!!!!!!
+        {*/
 
             var data = this.props.data_function();
 
@@ -108,6 +109,16 @@ var HorizontalBarChart = React.createClass({
                 return Math.floor(Math.random() * (max - min + 1)) + min;
             }
 
+        //}
+
+    },
+/*
+    componentWillMount: function() {
+
+        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
+
+
+
         }.bind(this));
 
         $(event_emitter).on('data_changed', function(e, data){
@@ -117,7 +128,7 @@ var HorizontalBarChart = React.createClass({
         }.bind(this));
 
     },
-
+*/
     draw : function(container)
     {
 
@@ -126,11 +137,6 @@ var HorizontalBarChart = React.createClass({
         var bar_height = this.props.bar_height;
 
         var data = this.state.data;
-
-        if (!data)
-        {
-            return false;
-        }
 
         var keys = [];
         var data_key_label = this.props.label_key;
@@ -194,6 +200,13 @@ var HorizontalBarChart = React.createClass({
                 .attr("height", height)
         }
 
+        this.chart.selectAll('*').remove();
+
+        if (!data)
+        {
+            return false;
+        }
+
         if (self.state.fully_opened)
         {
             var bars_count = 10;
@@ -228,8 +241,6 @@ var HorizontalBarChart = React.createClass({
             }
         }
 */
-
-        this.chart.selectAll('*').remove();
 
         for (var k = 0; k < keys.length; k++)
         {
@@ -308,12 +319,12 @@ var HorizontalBarChart = React.createClass({
                   return top + "px";
 
               })
-              .style("opacity", 0)
+              /*.style("opacity", 0)
 
             enter_blocks
                     .transition()
                     .duration(750)
-                    .style("opacity", 1)
+                    .style("opacity", 1)*/
 
             var bar_outer = enter_blocks.append("div")
                     .attr("class", "bar-outer")

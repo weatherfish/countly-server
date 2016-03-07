@@ -3,6 +3,7 @@ var Map = React.createClass({
     cityPoints : false,
     previous_data : false,
     loaded : false,
+    datamap : false,
 
     getInitialState : function() {
 
@@ -10,8 +11,6 @@ var Map = React.createClass({
 
         return {
             element_id : "map",
-
-            //current_metric : this.props.metric
         }
 
     },
@@ -82,37 +81,16 @@ var Map = React.createClass({
           create 10 gradations of brightness
         */
 
-        //countryFills["0.0"] = "#c0dffb";
-
-        //var gradient = this.make_gradient("#c0dffb", "#198AF3", 10);
-
         var gradient = this.make_gradient("#198af3", "#c0dffb", 10);
 
         var j = 0;
 
-        //countryFills["0.0"] = "#ffffff";
-
         for (var i = 0/*0.1*/; i < 1; i+=0.1)
         {
-            //countryFills[i.toFixed(1).toString()] = this.colorLuminance(countryFills["0.0"], i * (-1)); // .toFixed(1) because Javascript have some problem with float: http://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
             countryFills[i.toFixed(1).toString()] = "#" + gradient[j];
             j++
         }
 
-        console.log("======== countryFills ==========");
-        console.log(countryFills);
-/*
-        countryFills['0.0'] = "red";
-        countryFills['0.1'] = "green";
-        countryFills['0.2'] = "blue";
-        countryFills['0.3'] = "yellow";
-        countryFills['0.4'] = "#f16712";
-        countryFills['0.5'] = "#12fa11";
-        countryFills['0.6'] = "#a3f117";
-        countryFills['0.7'] = "#b12345";
-        countryFills['0.8'] = "#116712";
-        countryFills['0.9'] = "#1f6777";*/
-        
         countryFills["1.0"] = "#198af3"; // todo:
 
         var chart_options = {
@@ -127,7 +105,7 @@ var Map = React.createClass({
             hideAntarctica: true,
         }
 
-        _datamap = new Datamap({
+        this.datamap = new Datamap({
             element : document.getElementById(this.state.element_id),
             height  : this.props.height,
             width   : this.props.width,
@@ -137,7 +115,7 @@ var Map = React.createClass({
             data : countryData
         });
 
-        _datamap.svg.selectAll('path').on('click', function(elem) {
+        this.datamap.svg.selectAll('path').on('click', function(elem) {
 
             var countryIso = elem.id;
 
@@ -159,9 +137,6 @@ var Map = React.createClass({
 
         var countryData = this.formatData(metric);
 
-        console.log("========= countryData USA ===========");
-        console.log(countryData["USA"]);
-
         for (var iso3 in this.previous_data)
         {
             if (!countryData[iso3])
@@ -175,10 +150,7 @@ var Map = React.createClass({
 
         this.previous_data = countryData;
 
-        console.log("========= new countryData ===========");
-        console.log(countryData);
-
-        _datamap.updateChoropleth(countryData);
+        this.datamap.updateChoropleth(countryData);
 
         return true;
     },
@@ -226,10 +198,7 @@ var Map = React.createClass({
 
         if (options.countryIso3)
         {
-/*
-            console.log("----------- ajax request ---------");
-            console.log(countlyCommon.API_PARTS.data.r);
-*/
+
             return $.ajax({
                 type:"GET",
                 url:countlyCommon.API_PARTS.data.r,
@@ -300,9 +269,6 @@ var Map = React.createClass({
         /*
           create map
         */
-
-        //var containerHeigth = d3.select("#" + self.state.element_id).node().getBoundingClientRect().height;
-        //var containerWidth  = d3.select("#" + self.state.element_id).node().getBoundingClientRect().width;
 
         containerHeigth = this.props.height;
 
@@ -402,12 +368,13 @@ var Map = React.createClass({
 
     formatData : function (data_metric){
 
-        console.log(">>> start format >>>>", data_metric);
-
         var chartData = {cols:[], rows:[]};
 
         var _locationsDb = countlyUser.getDbObj();
         var _countries = _locationsDb['meta']['countries'];// countlyCommon.union({}, _locationsDb['meta']['countries']);
+
+        console.log("========= _locationsDb ==========");
+        console.log(_locationsDb);
 
         var tt = countlyCommon.extractTwoLevelData(_locationsDb, _countries, countlyLocation.clearLocationObject, [
             {
@@ -434,8 +401,8 @@ var Map = React.createClass({
 
         var maxMetric = 0;
 
-        console.log("]]]]]]]]]]]]]]]]]]");
-        console.log(tt.chartData);
+        console.log("=========== tt =================");
+        console.log(tt);
 
         chartData.rows = _.map(tt.chartData, function (value, key, list) {
 
@@ -456,6 +423,9 @@ var Map = React.createClass({
                 metric  : value[data_metric]
             };
         });
+
+        console.log("===== chartData.rows =======");
+        console.log(chartData.rows);
 
         var linear = d3.scale.linear()
           .domain([0, maxMetric])
@@ -715,6 +685,7 @@ var Map = React.createClass({
         }
         else
         {
+            console.log("------- map redraw ----");
             this.redraw();
         }
     }

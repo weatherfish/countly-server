@@ -71,6 +71,7 @@ module.exports = function(grunt) {
   				'frontend/express/public/javascripts/utils/jquery.titlealert.js',
           'frontend/express/public/javascripts/utils/globalize.min.js',
   				'frontend/express/public/javascripts/countly/countly.common.js',
+          'frontend/express/public/javascripts/sort_functions.js',
   			],
   			dest: 'frontend/express/public/javascripts/min/countly.utils.concat.js'
         //dest: 'frontend/express/public/javascripts/min/countly.utils.js'
@@ -85,12 +86,16 @@ module.exports = function(grunt) {
   				'frontend/express/public/javascripts/visualization/flot/jquery.flot.stack.js',
   				'frontend/express/public/javascripts/visualization/gauge.min.js',
   				'frontend/express/public/javascripts/visualization/d3/d3.min.js',
+          'frontend/express/public/javascripts/visualization/d3/d3.geo.projection.min.js',          
   				'frontend/express/public/javascripts/visualization/rickshaw/rickshaw.js',
           'frontend/express/public/javascripts/react-with-addons.js',
           //'frontend/express/public/javascripts/JSXTransformer.js',
           'frontend/express/public/javascripts/react-widgets.js',
           'frontend/express/public/javascripts/fixed-data-table/dist/fixed-data-table.js',
           'frontend/express/public/javascripts/ReactRouter.min.js',
+          'frontend/express/public/javascripts/visualization/datamaps/country_codes.js',
+          'frontend/express/public/javascripts/visualization/datamaps/datamaps.world.min.js',
+          'frontend/express/public/javascripts/visualization/datamaps/topojson.min.js',
   			],
   			dest: 'frontend/express/public/javascripts/min/countly.visualization.concat.js'
         //dest: 'frontend/express/public/javascripts/min/countly.visualization.js'

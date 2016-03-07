@@ -79,11 +79,6 @@ var Dashboard = React.createClass({
             }
         ];
 
-        console.log("================== top_items_bars ======================");
-        console.log(top_items_bars);
-
-        //setTimeout(function(){
-
         var tmp_colors = [
             {
                   "title":jQuery.i18n.map["common.total-sessions"],
@@ -114,11 +109,13 @@ var Dashboard = React.createClass({
             }
         ]
 
+/*
         $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
 
             console.log("========= date choise getInitialState ============");
 
         }.bind(this));
+*/
 
         return {
             "active_top_tab" : 0,
@@ -134,6 +131,17 @@ var Dashboard = React.createClass({
 
     },
 
+    componentWillReceiveProps: function(nextProps) {
+
+        /*if (nextProps.date != this.props.date) // todo !!!!!!!!!!!!!!!!!!!!!!
+        {*/
+
+            this.setState({ "date_period" : nextProps.date.period })
+
+        //}
+
+    },
+/*
     componentWillMount: function() {
 
         console.log("{{{{{{{{{{{{{ dashboar will mount }}}}}}}}}}}}}");
@@ -148,26 +156,20 @@ var Dashboard = React.createClass({
             var rows = updated_data.rows;
             var granularity = updated_data.new_granularity;
     */
-        }.bind(this));
+  /*      }.bind(this));
 
-    },
+},*/
 
     componentDidMount : function() {
 
         var self = this;
 
-        console.log("======= did mount, init ---");
-
         $.when(countlyUser.initialize(), countlyCarrier.initialize(), countlyDeviceDetails.initialize()).then(function () {
-
-            console.log(".... inited ....");
 
             self.setState({
                 inited : true
             })
-
         });
-
     },
 
 
@@ -204,17 +206,20 @@ var Dashboard = React.createClass({
         var margin_right  = 30;
         var graph_height  = 300;
 
-        var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - 80;
+        //var graph_width = window.innerWidth - sidebar_width - margin_left - margin_right - 80;
 
-        var elements_width = window.innerWidth - sidebar_width - margin_left;
-        var map_width   = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 300 - 110; // todo
+        var elements_width = get_viewport_width();
+        //var map_width   = window.innerWidth - sidebar_width - margin_left - margin_right - padding_left - 300 - 110; // todo
+
+        var chart_width = elements_width - 40; // todo
+        var map_width = elements_width - 500; // todo
 
         var dashboard_style = {
-            "width" : window.innerWidth - sidebar_width - margin_left - margin_right + 24
+            "width" : elements_width
         }
 
         var top_tab_style = {
-            "width" : window.innerWidth - sidebar_width - margin_left - margin_right + 24/*+ 1*/ /* +1 because of relative -1px left position, need for hide left darkr border if tab is active */
+            "width" : elements_width/*+ 1*/ /* +1 because of relative -1px left position, need for hide left darkr border if tab is active */
         }
 
         var tab_item_style = {
@@ -237,11 +242,7 @@ var Dashboard = React.createClass({
                 "label" : "Current Time Range"
             }
         ]
-/*
-        var style = {
-            width : "23%"
-        }
-*/
+
         var text_check_style = "normal 12pt Lato-Semibold"; // toto: non-english languages will have another font-family
 
         var long_text_flag = false;
@@ -249,8 +250,6 @@ var Dashboard = React.createClass({
         this.state.graph_tabs.every(function(element){
 
             var text_width = self.getTextWidth(element.title, text_check_style); // toto: non-english languages will have another font-family
-
-            console.log("text_width check:", text_width);
 
             if (text_width > tab_item_style.width)
             {
@@ -260,9 +259,7 @@ var Dashboard = React.createClass({
 
             return true;
         })
-/*
-        console.log("long_text_flag:", long_text_flag);
-*/
+
         if (long_text_flag)
         {
             top_tab_style.height = "130px"
@@ -310,18 +307,11 @@ var Dashboard = React.createClass({
                                 var percent_change = /*"- " + */data.change;
                             }
 
-                            if (tab.title)
-                            {
-                                var title = tab.title.toUpperCase();
-                            }
-                            else
-                            {
-                                var title = "---";
-                            }
+                            var title = tab.title.toUpperCase();
 
                             var text_width = self.getTextWidth(title, text_check_style); // toto: non-english languages will have another font-family
 
-                            console.log("text_width:", text_width);
+
     /*
                             if (text_width > tab_item_style.width)
                             {
@@ -371,10 +361,11 @@ var Dashboard = React.createClass({
                     </div>
 
                     <LineChart trend_sign={false}
-                        width={graph_width}
+                        width={elements_width}
                         height={260}
                         margin_left={margin_left}
-                        graph_width={graph_width}
+                        sides_padding={20}
+                        graph_width={elements_width}
                         period={countlyCommon.getPeriod()}
                         big_numbers={false}
                         with_granularity={false}
@@ -389,7 +380,7 @@ var Dashboard = React.createClass({
                     />
 
                     <DashboardBarChart
-                        width={elements_width - 40}
+                        width={chart_width}
                         height={300}
                         data_function={false}
                         labels_mapping={labels_mapping}

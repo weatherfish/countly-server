@@ -51,42 +51,41 @@ var LoyaltyPage = React.createClass({
             "width" : elements_width
         }
 
-        if (this.state.inited)
-        {
-            return (
-
-                <div className="page" style={page_style}>
-
-                    <Chart headline_sign={"LOYALTY"}
-                        headers={this.state.headers}
-                        width={elements_width}
-                        height={chart_height}
-                        side_margin={30}
-                        bar_width={40}
-                        data_function={countlyUser.getLoyaltyData}
-                        tooltip_width={60}
-                        tooltip_height={44}
-                        bar_width={40}
-                    />
-
-                    <SortTable
-                        headers={this.state.headers}
-                        width={elements_width}
-                        row_height={50}
-                        data_sign={"DATA"}
-                        sort_functions={this.state.sort_functions}
-                        data_function={countlyUser.getLoyaltyData}
-                        convert_data_function={false}
-                        initial_sort={"loyalty"}
-                        rows_per_page={20}
-                    />
-
-                </div>
-            )
-        }
-        else
+        if (!this.state.inited)
         {
             return (<Loader/>);
         }
+
+        return (
+            <div className="page" style={page_style}>
+
+                <Chart headline_sign={"LOYALTY"}
+                    headers={this.state.headers}
+                    width={elements_width}
+                    height={chart_height}
+                    side_margin={30}
+                    bar_width={40}
+                    data_function={countlyUser.getLoyaltyData}
+                    tooltip_width={60}
+                    tooltip_height={44}
+                    bar_width={40}
+                    date={this.props.date}
+                />
+
+                <SortTable
+                    headers={this.state.headers}
+                    width={elements_width}
+                    row_height={50}
+                    data_sign={"DATA"}
+                    sort_functions={this.state.sort_functions}
+                    data_function={countlyUser.getLoyaltyData}
+                    convert_data_function={false}
+                    initial_sort={"loyalty"}
+                    rows_per_page={20}
+                    date={this.props.date}
+                />
+
+            </div>
+        )
     }
 })

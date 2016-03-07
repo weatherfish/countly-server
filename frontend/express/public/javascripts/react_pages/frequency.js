@@ -43,7 +43,7 @@ var FrequencyPage = React.createClass({
     },
 
     render : function(){
-
+      
         var elements_width = get_viewport_width();
         var chart_height = 300;
 
@@ -51,7 +51,7 @@ var FrequencyPage = React.createClass({
             "width" : elements_width
         }
 
-        if (this.state.inited)
+        if (!this.state.inited)
         {
             return (<Loader/>);
         }

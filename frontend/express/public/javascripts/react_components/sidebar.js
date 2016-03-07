@@ -1,5 +1,7 @@
 var FullSidebar = React.createClass({
 
+    mixins: [ ReactRouter.History ],
+
     getInitialState: function() {
 
         //console.log("current:", Backbone.history.getFragment());
@@ -7,8 +9,6 @@ var FullSidebar = React.createClass({
         var current_location = "/";//Backbone.history.getFragment();
 
         current_location = current_location.split('/');
-
-        console.log(current_location);
 
         if (current_location[2])
         {
@@ -58,6 +58,10 @@ var FullSidebar = React.createClass({
         the select element from main menu
     */
 
+    _handleClick: function(path){
+        this.history.pushState(null, path);
+    },
+
     handle_left_click : function(i)
     {
 
@@ -74,16 +78,14 @@ var FullSidebar = React.createClass({
             if (window.location.hash != "#/")
             {
 
-                $("#content-container").html("-- loading --");
-
-                window.location = "/dashboard#";
-
                 var nav_data = {
                     fstmenu : false,
                     sndmenu : "Dashboard",
                 }
 
-                $(event_emitter).trigger('select', nav_data);
+                this._handleClick("/dashboard");
+
+                //$(event_emitter).trigger('select', nav_data);
 
             }
 

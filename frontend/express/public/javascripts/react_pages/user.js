@@ -9,7 +9,7 @@ var UserPage = React.createClass({
         }
 
         return({
-            granularity : false,
+            granularity : "daily", // false, // todo - should be false
             sort_functions : sort_functions,
             inited : false
         });
@@ -21,8 +21,8 @@ var UserPage = React.createClass({
 
         $.when(countlyUser.initialize()).then(function () {
 
-            var sessionData = countlySession.getSessionData(),
-                sessionDP = countlySession.getSessionDP();
+            var sessionData = countlySession.getSessionData();
+            //    sessionDP = countlySession.getSessionDP();
 
             var templateData = {
                 "page-title":jQuery.i18n.map["sessions.title"],
@@ -67,7 +67,7 @@ var UserPage = React.createClass({
 
             headers.unshift({
                 "title" : "Date",
-                //"help"  : "sessions.unique-sessions", // todo: add translate
+                //"help"  : "sessions.unique-sessions", // todo: add translation
                 "short" : "date",
             })
 
@@ -91,57 +91,55 @@ var UserPage = React.createClass({
 
         var self = this;
 
+        if (!this.state.inited)
+        {
+            return (<Loader/>);
+        }
+
         var elements_width = get_viewport_width();
         var chart_height = 300;
 
-        if (this.state.inited)
-        {
-
-            return(
-                <div className="page">
-
-                    <LineChart
-                        trend_sign={"USERS TREND"}
-                        width={elements_width}
-                        height={chart_height}
-                        margin_left={40 + 20}
-                        graph_width={elements_width}
-                        period={countlyCommon.getPeriod()}
-                        big_numbers={this.state.templateData["big-numbers"].items}
-                        data_function={countlySession.getUserDP}
-                        update_graph_function={countlyCommon.updateTimeGraph}
-                        with_granularity={true}
-                        mount_callback={this.on_graph_mount}
-                    />
-
-                    {(() => {
-
-                        if (self.state.granularity)
-                        {
-                            return(<SortTable
-                                headers={this.state.headers}
-                                width={elements_width}
-                                row_height={50}
-                                data_sign={"DATA"}
-                                sort_functions={this.state.sort_functions}
-                                data_function={countlySession.getUserDP}
-                                convert_data_function={true}
-                                initial_sort={"date"}
-                                granularity={this.state.granularity}
-                                rows_per_page={20}
-                            />)
-                        }
-
-                    })()}
-
-                </div>
-            )
-
-        } else {
-
-            return (
-                <div id='loader_wrapper'><div id='loader'></div></div>
-            )
+        var page_style = {
+            "width" : elements_width
         }
+
+        return(
+            <div className="page" style={page_style}>
+
+                <LineChart
+                    trend_sign={"USERS TREND"}
+                    width={elements_width}
+                    height={chart_height}
+                    sides_padding={20}
+                    period={countlyCommon.getPeriod()}
+                    big_numbers={this.state.templateData["big-numbers"].items}
+                    data_function={countlySession.getUserDP}
+                    update_graph_function={countlyCommon.updateTimeGraph}
+                    with_granularity={true}
+                    mount_callback={this.on_graph_mount}
+                />
+
+                {(() => {
+
+                    if (self.state.granularity)
+                    {
+                        return(<SortTable
+                            headers={this.state.headers}
+                            width={elements_width}
+                            row_height={50}
+                            data_sign={"DATA"}
+                            sort_functions={this.state.sort_functions}
+                            data_function={countlySession.getUserDP}
+                            convert_data_function={true}
+                            initial_sort={"date"}
+                            granularity={this.state.granularity}
+                            rows_per_page={20}
+                        />)
+                    }
+
+                })()}
+
+            </div>
+        )
     }
 })
