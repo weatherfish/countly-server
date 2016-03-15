@@ -1,5 +1,7 @@
 var DashboardMap = React.createClass({
 
+    datamap : false,
+
     getInitialState : function() {
 
         return {
@@ -68,7 +70,7 @@ var DashboardMap = React.createClass({
 
         this.previous_data = countryData;
 
-        _datamap = new Datamap({
+        this.datamap = new Datamap({
             element    : document.getElementById("map"),
             height     : this.props.height,
             width      : this.props.width,
@@ -97,7 +99,7 @@ var DashboardMap = React.createClass({
 
         this.previous_data = countryData;
 
-        _datamap.updateChoropleth(countryData);
+        this.datamap.updateChoropleth(countryData);
 
         return true;
     },

@@ -45,9 +45,6 @@
             previousEvents = 0,
             isEstimate = false;
 
-        console.log("============ getSessionData _periodObj ==============");
-        console.log(_periodObj);
-
         if (_periodObj.isSpecialPeriod) {
 
             isEstimate = true;
@@ -72,8 +69,6 @@
                 tmpCurrentPaying += tmpUniqObj["p"];
                 tmpCurrentMsgEnabled += tmpUniqObj["m"];
             }
-
-            //console.log(currentPayingTotal + " " + tmpCurrentPaying)
 
             if (currentUnique > tmpCurrentUniq) {
                 currentUnique = tmpCurrentUniq;
@@ -300,9 +295,6 @@
 
     countlySession.getSessionDP = function () {
 
-        console.log("((((((((((((((((((( session DB )))))))))))))))))))");
-        console.log(_sessionDb);
-
         var chartData = [
                 { data:[], label:jQuery.i18n.map["common.table.total-sessions"], short:"t" },
                 { data:[], label:jQuery.i18n.map["common.table.new-sessions"], short:"n" },
@@ -319,11 +311,29 @@
         //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
     };
 
+    countlySession.getSessionDP_map = function (iso2) {
+
+        var chartData = [
+                { data:[], label:jQuery.i18n.map["common.table.total-sessions"], short:"t" },
+                { data:[], label:jQuery.i18n.map["common.table.new-sessions"], short:"n" },
+                { data:[], label:jQuery.i18n.map["common.table.unique-sessions"], short:"u" }
+            ],
+            dataProps = [
+                { name:"t" },
+                { name:"n" },
+                { name:"u" }
+            ];
+
+        return countlyCommon.extractChartData_granularity_custom(_sessionDb, countlySession.clearSessionObject, chartData, dataProps, iso2);
+
+        //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
+    };
+
     countlySession.getSessionDPTotal = function () {
 
         var chartData = [
                 { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#bbbbbb', mode:"ghost" },
-                { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#1A8AF3' } // #333933 - good color
+                { data:[], label:jQuery.i18n.map["common.table.total-sessions"], color:'#1A8AF3' }
             ];
 
         var dataProps = [
@@ -336,9 +346,6 @@
                 },
                 { name:"t" }
             ];
-
-        //console.log("{{{{{{{{{{{{{ extract data }}}}}}}}}}}}}");
-        //console.log(countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps));
 
         return countlyCommon.extractChartData_granularity(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);
         //return countlyCommon.extractChartData(_sessionDb, countlySession.clearSessionObject, chartData, dataProps);

@@ -2,9 +2,6 @@ var ManageUserBlock = React.createClass({
 
     getInitialState: function() {
 
-        console.log("============ ManageUserBlock ============");
-        console.log(this.props.user);
-
         return({
             edit_open : false,
             user : this.props.user
@@ -40,12 +37,7 @@ var ManageUserBlock = React.createClass({
     },
 
     save : function() {
-/*
-        console.log("--- save ----");
-        console.log(this);
 
-        this.props.on_save(this.props, this.state);
-*/
         this.setState({
             "edit_open" : false
         })
@@ -62,15 +54,13 @@ var ManageUserBlock = React.createClass({
 
     },
 
-    add_admin_app : function(app_id) {
-
-        var user_id = this.props.user._id;
-
-        console.log("{{{{{{{{{{ app_id }}}}}}}}}}");
-        console.log(app_id, user_id);
+    add_admin_app : function(apps) {
 
         var user = this.state.user;
 
+        user.admin_of = apps;
+
+/*
         if (user.admin_of.indexOf(app_id) > -1)
         {
             user.admin_of.splice(user.admin_of.indexOf(app_id), 1);
@@ -79,7 +69,7 @@ var ManageUserBlock = React.createClass({
         {
             user.admin_of.push(app_id);
         }
-
+*/
         this.setState({
             //edit_open : false,
             user : user
@@ -89,23 +79,11 @@ var ManageUserBlock = React.createClass({
 
     },
 
-    add_user_app : function(app_id) {
-
-        var user_id = this.props.user._id;
-
-        console.log("{{{{{{{{{{ app_id }}}}}}}}}}");
-        console.log(app_id, user_id);
+    add_user_app : function(apps) {
 
         var user = this.state.user;
 
-        if (user.user_of.indexOf(app_id) > -1)
-        {
-            user.user_of.splice(user.user_of.indexOf(app_id), 1);
-        }
-        else
-        {
-            user.user_of.push(app_id);
-        }
+        user.admin_of = apps;
 
         this.setState({
             //edit_open : false,
@@ -129,15 +107,17 @@ var ManageUserBlock = React.createClass({
                     api_key: countlyGlobal['member'].api_key
                 },
                 dataType: "jsonp",
-            success: function(error, result) {
+            success: function(result) {
 
                 console.log("============ save user result ===========");
-                console.log(error);
                 console.log(result);
 
+            },
+            error : function(error){
+                console.log("========= error save =========");
+                console.log(error);
             }
         });
-
     },
 
     render : function() {
@@ -147,13 +127,28 @@ var ManageUserBlock = React.createClass({
         var save_block_style = {};
         var edit_button_style = {};
 
-        if(this.state.edit_open)
+        if(this.state.edit_open) // show multi sellect
         {
+
+            var admin_of_block = <MultiSelectBlock
+                label="admin of apps"
+                selectors={this.props.apps}
+                active_selectors_keys={this.state.user.admin_of}
+                onChange={this.add_admin_app}
+                className={false}
+            />
+
+            var user_of_block = <MultiSelectBlock
+                label="user of apps"
+                selectors={this.props.apps}
+                active_selectors_keys={this.state.user.user_of}
+                onChange={this.add_user_app}
+                className={false}
+            />
+
+          /*
             var admin_of_block = [];
             var user_of_block = [];
-
-            console.log("===== countlyGlobal['apps'] ====");
-            console.log(countlyGlobal['apps']);
 
             for (var app_id in countlyGlobal['apps']){
 
@@ -180,7 +175,7 @@ var ManageUserBlock = React.createClass({
                 user_of_block.push(<div className={class_name} onClick={self.add_user_app.bind(self, app_id)}>{app.name}</div>);
 
             }
-
+*/
             edit_button_style.display = "none";
             save_block_style.display = "block";
 
@@ -238,9 +233,6 @@ var ManageUserBlock = React.createClass({
             })
         }
 
-        console.log("============ edit_button_style =========");
-        console.log(edit_button_style);
-
         return(
                 <div className="user_info">
 
@@ -254,13 +246,13 @@ var ManageUserBlock = React.createClass({
                         {user_of_block}
                     </div>
 
-                    <div className="edit_button" onClick={self.edit_click.bind(self)} style={edit_button_style}>
+                    <div className="edit_button" onClick={this.edit_click} style={edit_button_style}>
                         Click to Edit
                     </div>
 
                     <span className="save_block" style={save_block_style}>
-                        <span className="save" onClick={self.save}>Save</span>
-                        <span className="cancel" onClick={self.cancel.bind(self)}>Cancel</span>
+                        <span className="save" onClick={this.save}>Save</span>
+                        <span className="cancel" onClick={this.cancel}>Cancel</span>
                     </span>
               </div>
         )

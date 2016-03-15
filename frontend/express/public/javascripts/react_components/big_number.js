@@ -103,8 +103,12 @@ var BigNumber = React.createClass({
 
         var value = this.props.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
+        var style = {
+            width : this.props.width
+        }
+
         return (
-            <div className="big-number" onMouseEnter={this.onhover} onMouseLeave={this.onhoverend} onClick={this.handle_click} data-help-localize="help.{{this.help}}">
+            <div className="big-number" style={style} onMouseEnter={this.onhover} onMouseLeave={this.onhoverend} onClick={this.handle_click} data-help-localize="help.{{this.help}}">
                 <div className="tick_wrp">
                     <div style={divStyle} className="tick">
                         <div className="tick_img"></div>

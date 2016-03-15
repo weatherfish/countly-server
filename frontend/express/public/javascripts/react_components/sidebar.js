@@ -4,9 +4,7 @@ var FullSidebar = React.createClass({
 
     getInitialState: function() {
 
-        //console.log("current:", Backbone.history.getFragment());
-
-        var current_location = "/";//Backbone.history.getFragment();
+        var current_location = this.props.current_location;
 
         current_location = current_location.split('/');
 
@@ -17,7 +15,8 @@ var FullSidebar = React.createClass({
 
             for (var i = 0; i < this.props.navigation.length; i++)
             {
-                if (current_location[1] == this.props.navigation[i]['icon']) // todo: now it compare icon property, this is not right
+
+                if (current_location[1] == this.props.navigation[i]['path']) // todo: now it compare icon property, this is not right
                 {
                     selected_left = i;
                     break;
@@ -146,9 +145,6 @@ var FullSidebar = React.createClass({
     handle_right_close : function(value)
     {
 
-        console.log("previous state:", this.state.selected_left, " > ", value);
-        console.log("right_selected_item:", this.state.right_selected_item);
-
         if (this.state.selected_left == -1)
         {
             value = -1;
@@ -233,7 +229,12 @@ var FullSidebar = React.createClass({
 
                 <SidebarTop is_active={this.state.top_active} active_app={this.state.active_app} onClick={this.handle_top_click}/>
 
-                <ApplicationsList active_app={this.state.active_app} onAppChange={this.handle_active_app_change} active={this.state.top_active}/>
+                <ApplicationsList
+                    applications={this.props.applications}
+                    active_app={this.state.active_app}
+                    onAppChange={this.handle_active_app_change}
+                    active={this.state.top_active}
+                />
 
                 <div id="left_part">
                     <LeftPart navigation={full_navigation} selected_i={this.state.selected_left} is_active={is_left_active} in_transition={this.state.in_transition} handleClick={this.handle_left_click}/>

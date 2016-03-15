@@ -103,9 +103,6 @@ function natural_sort(as, bs, sortBy, sortDir){
 
                if (a1 > b1)
                {
-
-                   console.log("as:", as, ">", ", bs:", bs);
-
                    if (sortDir === SortTypes.DESC)
                    {
                        return -1;
@@ -117,9 +114,6 @@ function natural_sort(as, bs, sortBy, sortDir){
                }
                else
                {
-
-                   console.log("as:", as, "<", ", bs:", bs);
-
                    if (sortDir === SortTypes.DESC)
                    {
                        return 1;

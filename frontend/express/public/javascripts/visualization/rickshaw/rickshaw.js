@@ -2385,8 +2385,6 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 	initialize: function(args) {
 
-    console.log("{{{{{{{{{{{{{ init hover }}}}}}}}}}}}}");
-
     var self = this;
 
 		var graph = this.graph = args.graph;

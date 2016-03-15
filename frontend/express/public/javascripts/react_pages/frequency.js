@@ -2,12 +2,6 @@ var FrequencyPage = React.createClass({
 
     getInitialState: function() {
 
-        var sort_functions = {
-            "t" : math_sort,
-            "f" : math_sort,
-            "percent" : math_sort
-        }
-
         var headers = [{
             "title":jQuery.i18n.map["session-frequency.table.time-after"], // todo : not common.total-sessions
             "short" : "f",
@@ -20,6 +14,12 @@ var FrequencyPage = React.createClass({
             "title":jQuery.i18n.map["common.percent"],
             "short" : "percent"
         }]
+
+        var sort_functions = {
+            "t" : math_sort,
+            "f" : math_sort,
+            "percent" : math_sort
+        }
 
         return({
             sort_functions : sort_functions,
@@ -43,17 +43,17 @@ var FrequencyPage = React.createClass({
     },
 
     render : function(){
-      
+
+        if (!this.state.inited)
+        {
+            return (<Loader/>);
+        }
+
         var elements_width = get_viewport_width();
         var chart_height = 300;
 
         var page_style = {
             "width" : elements_width
-        }
-
-        if (!this.state.inited)
-        {
-            return (<Loader/>);
         }
 
         return (

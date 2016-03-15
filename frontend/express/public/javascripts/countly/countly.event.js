@@ -177,6 +177,9 @@
 
     countlyEvent.getEventData = function () {
 
+        console.log("====== _activeEvent ==========");
+        console.log(_activeEvent);
+
         var eventData = {},
             eventMap = (_activeEvents) ? ((_activeEvents.map) ? _activeEvents.map : {}) : {},
             countString = (eventMap[_activeEvent] && eventMap[_activeEvent].count) ? eventMap[_activeEvent].count : jQuery.i18n.map["events.table.count"],
@@ -241,6 +244,10 @@
                     list[index] = _.pick(element, "curr_segment", "c");
                 });
             }
+
+            console.log("=========== segmentation events data ==============");
+            console.log(eventData);
+
         } else {
             var chartData = [
                     { data:[], label:countString, color: countlyCommon.GRAPH_COLORS[0] },
@@ -251,7 +258,9 @@
                     { name:"s" }
                 ];
 
-            eventData = countlyCommon.extractChartData(_activeEventDb, countlyEvent.clearEventsObject, chartData, dataProps);
+            //eventData = countlyCommon.extractChartData(_activeEventDb, countlyEvent.clearEventsObject, chartData, dataProps);
+
+            eventData = countlyCommon.extractChartData_granularity(_activeEventDb, countlyEvent.clearEventsObject, chartData, dataProps);
 
             eventData["eventName"] = countlyEvent.getEventLongName(_activeEvent);
             eventData["dataLevel"] = 1;
@@ -281,6 +290,9 @@
         if (sumArr.length) {
             eventData.totalSum = _.reduce(sumArr, function(memo, num){ return memo + num; }, 0);
         }
+
+        console.log("{{{{{{{{{{ event data }}}}}}}}}}");
+        console.log(eventData);
 
         return eventData;
     };

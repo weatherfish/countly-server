@@ -4,6 +4,9 @@ var LineChart = React.createClass({
 
     getInitialState() {
 
+        console.log(":::::::::: initial ::::::::::::");
+        console.log(this.props.data_function());
+
         var data_points = this.props.data_function();
 
         var line_chart_width = this.props.width - (this.props.sides_padding * 2);
@@ -90,16 +93,7 @@ var LineChart = React.createClass({
             }
         }
 
-        if (this.props.tmp_colors)
-        {
-            var tmp_colors = this.props.tmp_colors;
-        }
-        else
-        {
-            var tmp_colors = this.props.big_numbers;
-        }
-
-        countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", tmp_colors, line_chart_width - 40 - 40, this.props.height, false, granularity, false, zero_points); // !remove
+        countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", this.props.big_numbers/*tmp_colors*/, line_chart_width - 40 - 40, this.props.height, false, granularity, false, zero_points); // !remove
 
         if (this.props.lines_descriptions)
         {
@@ -117,7 +111,7 @@ var LineChart = React.createClass({
         }
 
         return {
-            big_numbers : tmp_colors,
+            big_numbers : this.props.big_numbers,
             active : true,
             session_dp : data_points,
             granularity_type : granularity,
@@ -128,16 +122,34 @@ var LineChart = React.createClass({
 
     componentWillReceiveProps : function(nextProps) {
 
-        var period = nextProps.date.period;
+        var self = this;
 
-        if (false && period.period == "hour")
+        var period = nextProps.date;
+
+        var new_state = {};
+
+        if (this.props.lines_descriptions)
         {
-            var updated_data = this.update(-1, "hourly");
+
+            var granularity_rows = nextProps.data_function().get_current_data();
+
+            var lines_descriptions = this.props.lines_descriptions;
+
+            for (var i = 0; i < lines_descriptions.length; i++)
+            {
+                lines_descriptions[i]['color'] = granularity_rows[i].color;
+            }
+/*
+            this.setState({
+                lines_descriptions : lines_descriptions
+            });
+*/
+            new_state.lines_descriptions = lines_descriptions;
         }
-        else
-        {
-            var updated_data = this.update(-1, false);
-        }
+
+        new_state.big_numbers = nextProps.big_numbers;
+
+        this.setState(new_state)
 
     },
 
@@ -183,6 +195,8 @@ var LineChart = React.createClass({
 
         var self = this;
 
+        var width = Math.round(100 / this.state.big_numbers.length) + "%";
+
         return _.map(this.state.big_numbers, function(item, id) {
 
             return <BigNumber
@@ -193,7 +207,9 @@ var LineChart = React.createClass({
                       hover={item.hover}
                       on_click={self.update}
                       on_hover={self.big_number_hover}
-                      id={id} />
+                      id={id}
+                      width={width}
+                    />
         });
     },
 
@@ -255,14 +271,22 @@ var LineChart = React.createClass({
 
         var zero_points = true;
 
-        for (var i = 0; i < big_numbers.length; i++)
+        if (big_numbers)
         {
-            if (big_numbers[i].active)
+            for (var i = 0; i < big_numbers.length; i++)
             {
-                active = true;
-                no_data = false;
-                break;
+                if (big_numbers[i].active)
+                {
+                    active = true;
+                    no_data = false;
+                    break;
+                }
             }
+        }
+        else
+        {
+            active = true;
+            no_data = false;
         }
 
         if (sessionDP.daily_granularity)
@@ -331,6 +355,9 @@ var LineChart = React.createClass({
             var granularity_rows = this.props.data_function().get_current_data();
         }
 
+        console.log("{{{{{{{{{{{{{{{{ granularity_rows }}}}}}}}}}}}}}}}");
+        console.log(granularity_rows);
+
         granularity_rows.every(function(datapath){
 
             datapath.data.every(function(datapoint){
@@ -373,7 +400,7 @@ var LineChart = React.createClass({
                     var is_found = false;
 
                     /*//if (big_numbers[i]['title'].toLowerCase() == granularity_rows[j].label.toLowerCase()){*/
-                    if (big_numbers[i].short == granularity_rows[j].short){
+                    if (((big_numbers[i].short && granularity_rows[j].short) && (big_numbers[i].short == granularity_rows[j].short)) || (big_numbers[i]['title'].toLowerCase() == granularity_rows[j].label.toLowerCase())){
                         if (big_numbers[i].active)
                         {
                             granularity_rows[j].color = big_numbers[i].color;
@@ -453,8 +480,6 @@ var LineChart = React.createClass({
             "left" : (this.state.line_chart_width - axis_width) + "px"
         }
 
-        console.log("chart:", this.state.line_chart_width, " --> ", axis_width);
-
         var nodata_block_style = { };
 
         if (this.state.active)
@@ -491,7 +516,8 @@ var LineChart = React.createClass({
                     class_name={granularity_class_name}
                     data={this.state.session_dp}
                     type={this.state.granularity_type}
-                    period={this.props.period} />
+                    period={this.props.period}
+                    disable_hover={this.props.disable_hover} />
 
                 <div id="dashboard-graph" style={graph_style}>
 
@@ -552,28 +578,12 @@ var LineChart = React.createClass({
 
     componentDidUpdate : function()
     {
+        console.log("====== did update ====");
         var updated_data = this.update(-1, this.state.granularity_type, true);
-    },
-
-    componentWillReceiveProps: function(nextProps) {
-
-        if (this.props.lines_descriptions)
-        {
-
-            var granularity_rows = nextProps.data_function().get_current_data();
-
-            var lines_descriptions = this.props.lines_descriptions;
-
-            for (var i = 0; i < lines_descriptions.length; i++)
-            {
-                lines_descriptions[i]['color'] = granularity_rows[i].color;
-            }
-
-            this.setState({
-                lines_descriptions : lines_descriptions
-            });
-        }
-
+/*
+        this.setState({
+            big_numbers : this.props.big_numbers
+        })*/
     },
 
     hasClass : function(el, cls) {

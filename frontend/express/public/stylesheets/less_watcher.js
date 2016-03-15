@@ -26,9 +26,7 @@ watcher
 
           deploying = true;
 
-
             var cmd = 'cd ' + folder + ' && lessc ui.v2.less v2.css && lessc ui.calendar.less calendar.css && lessc tables.less tables.css && lessc map.less map.css && grunt dist-all';
-
 
             setTimeout(function(){
                 exec(cmd, function(err, out, code) {

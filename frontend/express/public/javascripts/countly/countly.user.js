@@ -32,6 +32,10 @@
                 },
                 dataType:"jsonp",
                 success:function (json) {
+
+                    console.log("====== from server =======");
+                    console.log(json);
+
                     _userDb = json;
                     setMeta();
 
@@ -54,8 +58,6 @@
                 _activeAppKey = countlyCommon.ACTIVE_APP_KEY;
                 return countlyUser.initialize();
             }
-
-            console.log("---- ajax 2 ---", countlyCommon.API_PARTS.data.r);
 
             return $.ajax({
                 type:"GET",
@@ -172,7 +174,7 @@
 
         for (var i = 0; i < chartData.chartData.length; i++) {
             //chartData.chartData[i]["percent"] = "<div class='percent-bar' style='width:" + (2 * chartData.chartData[i]["percent"]) + "px;'></div>" + chartData.chartData[i]["percent"] + "%";
-            chartData.chartData[i]["percent"] = { type : "percent", value : chartData.chartData[i]["percent"] }; //"<div class='percent-bar' style='width:" + (2 * chartData.chartData[i]["percent"]) + "px;'></div>" + chartData.chartData[i]["percent"] + "%";        
+            chartData.chartData[i]["percent"] = { type : "percent", value : chartData.chartData[i]["percent"] }; //"<div class='percent-bar' style='width:" + (2 * chartData.chartData[i]["percent"]) + "px;'></div>" + chartData.chartData[i]["percent"] + "%";
         }
 
         chartData.get_current_data = function()

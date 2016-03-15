@@ -1,61 +1,7 @@
 var CountriesPage = React.createClass({
 
-    get_data : function(){
-
-        var sessionData = countlySession.getSessionData();
-
-        var templateData = {
-            "page-title":jQuery.i18n.map["countries.title"],
-            "logo-class":"countries",
-            "big-numbers":{
-                "count":3,
-                "items":[
-                    {
-                        "title":jQuery.i18n.map["common.total-sessions"],
-                        "total":sessionData.usage["total-sessions"].total,
-                        "trend":sessionData.usage["total-sessions"].trend,
-                        "help":"countries.total-sessions",
-                        "short" : "t",
-                        "color" : "#1B8AF3"
-                    },
-                    {
-                        "title":jQuery.i18n.map["common.total-users"],
-                        "total":sessionData.usage["total-users"].total,
-                        "trend":sessionData.usage["total-users"].trend,
-                        "help":"countries.total-users",
-                        "short" : "u",
-                        "color" : "#F2B702"
-                    },
-                    {
-                        "title":jQuery.i18n.map["common.new-users"],
-                        "total":sessionData.usage["new-users"].total,
-                        "trend":sessionData.usage["new-users"].trend,
-                        "help":"countries.new-users",
-                        "short" : "n",
-                        "color" : "#FF7D7D"
-                    }
-                ]
-            },
-            "chart-helper":"countries.chart",
-            "table-helper":"countries.table"
-        };
-
-        return templateData;
-
-    },
-
     getInitialState: function() {
 
-
-/*
-        var maps = {
-            "map-list-sessions": {id:'total', label:jQuery.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"},
-            "map-list-users": {id:'total', label:jQuery.i18n.map["sidebar.analytics.users"], type:'number', metric:"u"},
-            "map-list-new": {id:'total', label:jQuery.i18n.map["common.table.new-users"], type:'number', metric:"n"}
-        };
-
-        var cur_map = "map-list-sessions";
-*/
         var sort_functions = {
             "t" : math_sort,
             "n" : math_sort,
@@ -72,26 +18,17 @@ var CountriesPage = React.createClass({
             cur_map : cur_map*/
         }
 
+        /*
+                var maps = {
+                    "map-list-sessions": {id:'total', label:jQuery.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"},
+                    "map-list-users": {id:'total', label:jQuery.i18n.map["sidebar.analytics.users"], type:'number', metric:"u"},
+                    "map-list-new": {id:'total', label:jQuery.i18n.map["common.table.new-users"], type:'number', metric:"n"}
+                };
+
+                var cur_map = "map-list-sessions";
+        */
+
     },
-
-/*
-    componentWillMount: function() {
-
-        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
-
-            var templateData = this.get_data();
-
-            this.setState({
-                "template_data" : templateData,
-                "date_period" : period
-            })*/
-    /*
-            var rows = updated_data.rows;
-            var granularity = updated_data.new_granularity;
-    */
-  /*      }.bind(this));
-
-},*/
 
     componentDidMount : function() {
 
@@ -99,7 +36,43 @@ var CountriesPage = React.createClass({
 
         $.when(countlyUser.initialize(), countlyCity.initialize()).then(function () {
 
-            var templateData = self.get_data();
+            var sessionData = countlySession.getSessionData();
+
+            var templateData = {
+                "page-title":jQuery.i18n.map["countries.title"],
+                "logo-class":"countries",
+                "big-numbers":{
+                    "count":3,
+                    "items":[
+                        {
+                            "title":jQuery.i18n.map["common.total-sessions"],
+                            "total":sessionData.usage["total-sessions"].total,
+                            "trend":sessionData.usage["total-sessions"].trend,
+                            "help":"countries.total-sessions",
+                            "short" : "t",
+                            "color" : "#1B8AF3"
+                        },
+                        {
+                            "title":jQuery.i18n.map["common.total-users"],
+                            "total":sessionData.usage["total-users"].total,
+                            "trend":sessionData.usage["total-users"].trend,
+                            "help":"countries.total-users",
+                            "short" : "u",
+                            "color" : "#F2B702"
+                        },
+                        {
+                            "title":jQuery.i18n.map["common.new-users"],
+                            "total":sessionData.usage["new-users"].total,
+                            "trend":sessionData.usage["new-users"].trend,
+                            "help":"countries.new-users",
+                            "short" : "n",
+                            "color" : "#FF7D7D"
+                        }
+                    ]
+                },
+                "chart-helper":"countries.chart",
+                "table-helper":"countries.table"
+            };
 
             self.setState({
                 inited : true,
@@ -164,18 +137,17 @@ var CountriesPage = React.createClass({
                 />
 
                 <div className="radio_buttons_container">
+                {
+                    _.map(self.state.template_data["big-numbers"].items, function(radio_button, i) {
 
-                    {
-                        _.map(self.state.template_data["big-numbers"].items, function(radio_button, i) {
-
-                            return <RadioButton
-                                      id={i}
-                                      data={radio_button}
-                                      on_click={self.radio_button_click.bind(self, i)}
-                                      current_button_id={self.state.radio_button}
-                                      />
-                        })
-                    }
+                        return <RadioButton
+                                  id={i}
+                                  data={radio_button}
+                                  on_click={self.radio_button_click.bind(self, i)}
+                                  current_button_id={self.state.radio_button}
+                                  />
+                    })
+                }
 
                 </div>
 

@@ -25,7 +25,7 @@
         _countryData_previous = false;
 
     // Load local country names
-    $.get('localization/countries/' + countlyCommon.BROWSER_LANG_SHORT + '/country.json', function (data) {
+    $.get('/localization/countries/' + countlyCommon.BROWSER_LANG_SHORT + '/country.json', function (data) {
         _countryMap = data;
     });
 
@@ -46,9 +46,6 @@
     };
 
     countlyLocation.drawGeoChart = function (options) {
-
-        console.log("============ drawGeoChart =============");
-        console.log(options);
 
         _periodObj = countlyCommon.periodObj;
 
@@ -148,7 +145,7 @@
 
     countlyLocation.changeLanguage = function () {
         // Load local country names
-        return $.get('localization/countries/' + countlyCommon.BROWSER_LANG_SHORT + '/country.json', function (data) {
+        return $.get('/localization/countries/' + countlyCommon.BROWSER_LANG_SHORT + '/country.json', function (data) {
             _countryMap = data;
         });
     };
@@ -288,13 +285,7 @@
 
         $("#" + _chartElementId).empty();
 
-        console.log("{{{{{{{{{{{ draw map }}}}}}}}}}}");
-        console.log(ob);
-
         var countryData = formatData(ob);
-
-        console.log("{{{{{{{{{{{ formatDatap }}}}}}}}}}}");
-        console.log(countryData);
 
         var countryFills = {
             defaultFill : _defaultFill,
@@ -336,42 +327,8 @@
             geographyConfig: _chartOptions,
             data       : countryData
         });
-/*
-        _datamap
-            .svg.call(d3.behavior.zoom()
-                .scale(0.1)
-                .scaleExtent([0, 0.5])
-                .on("zoom", redraw));
 
-
-        function redraw() {
-
-            console.log("==== translate ====");
-            console.log(d3.event.translate);
-            console.log("==== scale ====");
-            console.log(d3.event.scale);
-
-            _datamap.svg
-                .transition()
-                .duration(1000)
-                //.style("stroke-width", 1.5 / d3.event.scale + "px")
-                .attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-        }
-*/
         _datamap.svg.selectAll('path').on('click', function(elem) {
-
-/*
-            var scale     = 4;
-            //var translate = [-400, -500];
-
-            var translate = [-600, -600];
-
-            _datamap.svg.selectAll("g")
-                .transition()
-                .duration(5000)
-                .style("stroke-width", 1.5 / scale + "px")
-                .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
-*/
 
             if (_activeContainer != _chartElementContainer)
             {

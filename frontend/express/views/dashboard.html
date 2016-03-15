@@ -11,11 +11,11 @@
 <head>
 	<title><%- countlyTitle %></title>
     <script><%- javascript %></script>
-		<link rel="icon" type="image/png" href="<%- cdn %>images/favicon.png">
-    <link rel="stylesheet" href="<%- cdn %>/stylesheets/font-awesome/css/font-awesome.min.css" />
-		<link rel="stylesheet" href="<%- cdn %>/stylesheets/entypo/css/entypo.css" />
-		<link rel="stylesheet" href="<%- cdn %>/javascripts/dom/jqueryui/jquery.ui.base.css" />
-		<link rel="stylesheet" href="<%- cdn %>/javascripts/dom/jqueryui/jquery.ui.theme.css" />
+		<link rel="icon" type="image/png" href="<%- cdn %>/images/favicon.png">
+    <!--link rel="stylesheet" href="<%- cdn %>/stylesheets/font-awesome/css/font-awesome.min.css" />
+		<link rel="stylesheet" href="<%- cdn %>/stylesheets/entypo/css/entypo.css" /-->
+		<!--link rel="stylesheet" href="<%- cdn %>/javascripts/dom/jqueryui/jquery.ui.base.css" />
+		<link rel="stylesheet" href="<%- cdn %>/javascripts/dom/jqueryui/jquery.ui.theme.css" /-->
 
     <% if (production) { %>
 
@@ -49,13 +49,13 @@
 
 				<!-- DEVELOPMENT -->
 				<link rel="stylesheet" href="<%- cdn %>/stylesheets/main.css?<%= countlyVersion %>" />
-		    <link rel="stylesheet" href="<%- cdn %>/javascripts/dom/tipsy/tipsy.css" />
-		    <link rel="stylesheet" href="<%- cdn %>/stylesheets/amaranjs/amaran.min.css" />
+		    <!--link rel="stylesheet" href="<%- cdn %>/javascripts/dom/tipsy/tipsy.css" />
+		    <link rel="stylesheet" href="<%- cdn %>/stylesheets/amaranjs/amaran.min.css" /-->
 
 
 			<% if (plugins) { %>
 				<% for(var i=0, l=plugins.length; i<l; i++) {%>
-				<link rel="stylesheet" href="<%- cdn %>/<%= plugins[i] %>/stylesheets/main.css?<%= countlyVersion %>" />
+				<!--link rel="stylesheet" href="<%- cdn %>/<%= plugins[i] %>/stylesheets/main.css?<%= countlyVersion %>" /-->
 				<% } %>
 			<% } %>
 
@@ -67,8 +67,8 @@
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/big_number.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/radio_button.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/javascripts/visualization/rickshaw/rickshaw.min.css" />
-				<!--link rel="stylesheet" type="text/css" href="<%- cdn %>/javascripts/react_old/widgets/dist/css/core.css" />
-				<link rel="stylesheet" type="text/css" href="<%- cdn %>/javascripts/react_old/widgets/dist/css/react-widgets.css" /-->
+				<link rel="stylesheet" type="text/css" href="<%- cdn %>/javascripts/react-widgets/core.css" />
+				<link rel="stylesheet" type="text/css" href="<%- cdn %>/javascripts/react-widgets/react-widgets.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/tables.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/dashboard.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/date_sign_block.css" />
@@ -79,57 +79,64 @@
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/horizontal_bar_chart.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/manage_users.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/configurations.css" />
+				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/events_page.css" />
+				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/crashes_page.css" />
+				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/selector_with_search.css" />
+				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/select.css" />
+				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/multi_select.css" />
 
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.form.js"></script>
+		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.form.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/tipsy/jquery.tipsy.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.noisy.min.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.sticky.headers.js"></script>
+		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.sticky.headers.js"></script-->
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jqueryui/jquery-ui-1.8.22.custom.min.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jqueryui/jquery-ui-i18n.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/slimScroll.min.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.easing.1.3.js"></script>
+		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/slimScroll.min.js"></script>
+		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.easing.1.3.js"></script-->
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/underscore-min.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/prefixfree.min.js"></script>
+		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/prefixfree.min.js"></script-->
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/moment/moment.min.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/moment/moment.isocalendar.min.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/moment/lang-all.min.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/handlebars.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/backbone-min.js"></script>
+		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/handlebars.js"></script>
+		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/backbone-min.js"></script-->
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/jquery.i18n.properties-min-1.0.9.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/jstz.min.js"></script>
+		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/jstz.min.js"></script-->
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/store+json2.min.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/jquery.idle-timer.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/initialAvatar.js"></script>
+		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/initialAvatar.js"></script>
 				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/jquery.amaran.min.js"></script>
 				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/jquery.titlealert.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/dataTables/js/jquery.dataTables.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/dataTables/js/ZeroClipboard.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/dataTables/js/TableTools.js"></script>
+		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/dataTables/js/TableTools.js"></script-->
+
 				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/simple-excel.js"></script>
 
-				<script type="text/javascript" src="<%- cdn %>/javascripts/react-with-addons.js"></script>
-				<script type="text/javascript" src="<%- cdn %>/javascripts/ReactRouter.min.js"></script>
+				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/react-with-addons.js"></script>
+				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/ReactRouter.min.js"></script>
 
 				<!--script type="text/javascript" src="<%- cdn %>/javascripts/visualization/d3pie.js"></script-->
 
 				<script type="text/javascript" src="<%- cdn %>/javascripts/JSXTransformer.js"></script>
 
-				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/fixed-data-table/dist/fixed-data-table.js"></script>
+				<script type="text/javascript" src="<%- cdn %>/javascripts/fixed-data-table/dist/fixed-data-table.js"></script>
 
-				<script type="text/jsx" src="<%- cdn %>/javascripts/react-widgets.js"></script>
+				<script type="text/javascript" src="<%- cdn %>/javascripts/utils/globalize.min.js"></script>
 
-				<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/globalize/0.1.1/globalize.min.js"></script>
+				<script type="text/javascript" src="<%- cdn %>/javascripts/react-widgets/react-widgets.js"></script>
+
 
 				<!-- DEVELOPMENT -->
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/textcounter.min.js"></script>
+		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/textcounter.min.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/jquery.peity.min.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/flot/jquery.flot.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/flot/jquery.flot.tickrotor.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/flot/jquery.flot.pie.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/flot/jquery.flot.resize.js"></script>
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/flot/jquery.flot.stack.js"></script>
-		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/gauge.min.js"></script>
+		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/gauge.min.js"></script-->
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/d3/d3.min.js"></script>
 				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/d3/d3.geo.projection.min.js"></script>
 
@@ -155,6 +162,7 @@
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/countly/countly.allapps.js?<%= countlyVersion %>"></script>
 
 				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/sort_functions.js?<%= countlyVersion %>"></script>
+				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/superagent.min.js?<%= countlyVersion %>"></script>
 
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/dashboard.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/frequency.js"></script>
@@ -166,9 +174,12 @@
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/user.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/carrier.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/countries.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/events.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/crashes.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/applications.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/manage_users.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/configurations.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/map_session.js"></script>
 
 				<!--script type="text/jsx" src="<%- cdn %>/javascripts/react_pages_compiled/router.js"></script-->
 
@@ -190,7 +201,6 @@
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/data_date_sign.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/table.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/table_filter.js"></script>
-				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/table_wrapper.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/line_chart.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/graph.time_extension.js"></script>
@@ -205,9 +215,21 @@
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/manage_user_block.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/loader.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/search_select.js"></script>
+
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/select.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/multi_select.js"></script>
 
 				<!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/countly/countly.template.js?<%= countlyVersion %>"></script-->
 
+				<style>
+						#countly_logo {
+								display : none !important;
+						}
+						#countly_version {
+								display : none !important;
+						}
+				</style>
 
     <% } %>
 
@@ -263,6 +285,9 @@
 
 				var sidebar_width = 240;
 
+				console.log("=========== countlyGlobal['apps'] ============");
+				console.log(countlyGlobal['apps']);
+
 				/* icons pre-load */
 				/*
 				applications.forEach(function(app){
@@ -270,6 +295,46 @@
 				    $(new Image()).attr('src', icon_src).load(function() { });
 				});
 */
+
+				try {
+						moment.lang(countlyCommon.BROWSER_LANG_SHORT);
+				} catch(e) {
+						moment.lang("en");
+				}
+
+				if (!countlyCommon.ACTIVE_APP_ID) {
+						for (var appId in countlyGlobal['apps']) {
+
+								//console.log(countlyCommon);
+
+								countlyCommon.setActiveApp(appId);
+				/*
+								countlyCommon.ACTIVE_APP_KEY = countlyGlobal['apps'][appId].key;
+								countlyCommon.ACTIVE_APP_ID = appId;
+								store.set("countly_active_app", appId);
+				*/
+
+								store.set("countly_active_app", appId);
+
+								//self.activeAppName = countlyGlobal['apps'][appId].name;
+								break;
+						}
+				} else {
+						//self.activeAppName = countlyGlobal['apps'][countlyCommon.ACTIVE_APP_ID].name;
+				}
+				/*
+				$(event_emitter).on('app_changed', function(e, data){ // todo: remove
+
+						self.activeAppName = "hello";
+						self.activeAppKey  = data.app_key;
+
+						countlyCommon.setActiveApp(data.app_id);
+
+						self.activeView.appChanged();
+
+				}.bind(self));
+				*/
+
     </script>
 
 </head>
@@ -300,18 +365,23 @@
 		<% } else { %>
 				<% if (plugins) { %>
 					<% for(var i=0, l=plugins.length; i<l; i++) {%>
-						<!--script language="javascript" type="text/javascript" src="<%- cdn %><%= plugins[i] %>/javascripts/countly.models.js?<%= countlyVersion %>"></script>
-						<script language="javascript" type="text/javascript" src="<%- cdn %><%= plugins[i] %>/javascripts/countly.views.js?<%= countlyVersion %>"></script-->
+						<script language="javascript" type="text/javascript" src="<%- cdn %>/<%= plugins[i] %>/javascripts/countly.models.js?<%= countlyVersion %>"></script>
+						<!--script language="javascript" type="text/javascript" src="<%- cdn %><%= plugins[i] %>/javascripts/countly.views.js?<%= countlyVersion %>"></script-->
 					<% } %>
 				<% } %>
 		<% } %>
 
 		<script type="text/jsx">
 
-				var sidebar_width = 240;
-
 				var wrapComponent = function(Component, props) {
+
 						return React.createClass({
+
+								componentWillReceiveProps: function(nextProps) {
+										console.log("== wrapper receive ===");
+										console.log(nextProps);
+								},
+
 								render: function() {
 									return React.createElement(Component, props);
 								}
@@ -343,7 +413,30 @@
 				var Route = ReactRouter.Route;
 
 				const App = React.createClass({
+
 					  render() {
+
+								if (this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1)
+								{
+
+										var calendar = <div id="calendar_block">
+																			<CalendarWrapper onDateChange={this.props.route.onDateChange}/>
+																	</div>
+
+										var container_style = {
+												"border-width" : "1px"
+										}
+								}
+								else
+								{
+
+										var calendar = false;
+
+										var container_style = {
+												"top" : "80px",
+												"border-width" : "0px"
+										}
+								}
 
 						    return (
 						      <div className="app">
@@ -352,6 +445,8 @@
 													<FullSidebar
 															navigation={navigation}
 															active_app={active_app_data}
+															current_location={this.props.location.pathname}
+															applications={this.props.route.applications}
 													/>
 											</div>
 
@@ -362,11 +457,9 @@
 													/>
 											</div>
 
-											<div id="calendar_block">
-													<CalendarWrapper onDateChange={this.props.route.onDateChange}/>
-											</div>
+											{calendar}
 
-											<div id="content-container">
+											<div id="content-container" style={container_style}>
 													{this.props.children}
 											</div>
 
@@ -380,7 +473,8 @@
 						getInitialState: function() {
 
 								return({
-										date : false
+										date : false,
+										applications : applications
 								})
 
 						},
@@ -391,6 +485,35 @@
 										date : new_date
 								})
 						},
+
+						on_app_rename : function(app){
+
+								var applications = this.state.applications;
+
+								for (var i = 0; i < applications.length; i++)
+								{
+										console.log(">>>> app >>>>");
+										console.log(applications[i]["id"], " > ", app["_id"]);
+										//console.log(app);
+
+										if (applications[i]["id"] == app["_id"])
+										{
+												app["id"] = app["_id"];
+												delete app["_id"];
+												applications[i] = app;
+												break;
+										}
+								}
+
+								console.log("========= new applications =======");
+								console.log(applications);
+
+								this.setState({
+										applications : applications
+								})
+
+						},
+
 					  render() {
 
 								// <Route path="frequency" component={FrequencyPage} date={this.state.date}/>
@@ -409,15 +532,16 @@
 																<Route path="devices" 		component={DevicesPage}/>
 														</Route>
 												</Route>
-										</Router>)*/
+										</Router>)
+*/
 
 
 						    return (
 										<Router history={ReactRouter.browserHistory}>
-												<Route path="/" component={App} onDateChange={this.date_change.bind(this)}> // this.props.route.onDateChange
+												<Route path="/" component={App} applications={this.state.applications} onDateChange={this.date_change.bind(this)}> // this.props.route.onDateChange
 														<Route path="dashboard" component={wrapComponent(Dashboard, {date : this.state.date})}/>
 														<Route path="analytics">
-																<Route path="sessions" 		component={wrapComponent(SessionPage, 		{date : this.state.date})}/>
+																<Route path="sessions" 		component={wrapComponent(SessionPage, 		{date : this.state.date})} date={this.state.date}/>
 																<Route path="users" 			component={wrapComponent(UserPage, 				{date : this.state.date})}/>
 																<Route path="frequency" 	component={wrapComponent(FrequencyPage, 	{date : this.state.date})}/>
 																<Route path="loyalty" 		component={wrapComponent(LoyaltyPage, 		{date : this.state.date})}/>
@@ -426,10 +550,16 @@
 																<Route path="devices" 		component={wrapComponent(DevicesPage, 		{date : this.state.date})}/>
 																<Route path="countries"   component={wrapComponent(CountriesPage, 	{date : this.state.date})}/>
 																<Route path="carriers"    component={wrapComponent(CarrierPage, 	  {date : this.state.date})}/>
+																<Route path="map_sessions" component={wrapComponent(MapSessionPage, {date : this.state.date})}/>
+														</Route>
+														<Route path="events" component={wrapComponent(EventsPage, {date : this.state.date})}>
+														</Route>
+														<Route path="crashes" component={wrapComponent(CrashesPage, {date : this.state.date})}>
 														</Route>
 														<Route path="manage">
-																<Route path="apps"  component={ApplicationsPage}/>
+																<Route path="apps" component={wrapComponent(ApplicationsPage, {on_app_rename : this.on_app_rename})} />
 																<Route path="users" component={ManageUsersPage}/>
+																<Route path="configurations" component={ConfigurationsPage}/>
 														</Route>
 												</Route>
 										</Router>)
@@ -478,13 +608,11 @@
 
 		<script type="text/javascript">
 
-
-
 				/*
 					todo: move icons load inside component
 				*/
 
-/*
+
 				var loaded = 0;
 
 				var icons = ['user.svg',
@@ -520,7 +648,7 @@
 
 								}
 						});
-				});*/
+				});
 
 		</script>
 

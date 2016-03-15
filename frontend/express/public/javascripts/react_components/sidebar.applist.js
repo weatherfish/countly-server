@@ -27,7 +27,13 @@ var AppList = React.createClass({
 
         var self = this;
 
-        var app_list = this.props.applications.map(function (app, i) {
+        //var app_list = this.props.applications.map(function (app, i) {
+
+        var app_list = [];
+
+        for (var app_id in countlyGlobal['apps']){
+
+            var app = countlyGlobal['apps'][app_id];
 
             if (self.props.app_filter_text != "" && app.name.toLowerCase().indexOf(self.props.app_filter_text) == -1)
             {
@@ -46,20 +52,27 @@ var AppList = React.createClass({
                 var class_name = "app search_result";
             }
 
-            if (self.props.active_app.id == app.id)
+            if (self.props.active_app.id == app._id)
             {
                 class_name += " active";
             }
 
             var logo_src = "/appimages/" + app.logo;
 
+            app_list.push(<div className={class_name} onClick={self.props.onAppChange.bind(self, app)}>
+                <img src={logo_src}/>
+                <span>{app.name}</span>
+            </div>)
+
+/*
             return (
-                <div className={class_name} onClick={self.props.onAppChange.bind(self, app/*.key, app.id*/)}>
+                <div className={class_name} onClick={self.props.onAppChange.bind(self, app/*.key, app.id*/ /*)}>
                     <img src={logo_src}/>
                     <span>{app.name}</span>
                 </div>
-            );
-        });
+            );*/
+        //});
+        }
 
         return (
             <div className="app_list">
@@ -80,7 +93,6 @@ var ApplicationsList = React.createClass({
     },
 
     app_filter: function(filter) {
-        console.log("app_filter:", filter);
         this.setState({
             app_filter_text : filter
         });
@@ -103,14 +115,14 @@ var ApplicationsList = React.createClass({
         document.getElementById('app_info').style.msTransform     = initial_top;
         document.getElementById('app_info').style.OTransform      = initial_top;
         document.getElementById('app_info').style.transform       = initial_top;
-
+/*
         $(event_emitter).on('app_renamed', function(e, data){
 
             this.setState({
                 "applications" : applications
             });
 
-        }.bind(this));
+        }.bind(this));*/
     },
 
     componentDidUpdate: function() {
@@ -124,10 +136,6 @@ var ApplicationsList = React.createClass({
         }
     },
 
-    /*
-        todo : applications is global variable
-    */
-
     render: function() {
 
         var class_name = "";
@@ -137,13 +145,10 @@ var ApplicationsList = React.createClass({
             class_name += " active";
         }
 
-        console.log("================ applications ==================");
-        console.log(applications);
-
         return (
             <div id="app_info" className={class_name}>
                 <AppListSearch app_filter={this.app_filter}/>
-                <AppList applications={applications} active_app={this.props.active_app} onAppChange={this.props.onAppChange} app_filter_text={this.state.app_filter_text}/>
+                <AppList applications={this.props.applications} active_app={this.props.active_app} onAppChange={this.props.onAppChange} app_filter_text={this.state.app_filter_text}/>
             </div>
         );
     }

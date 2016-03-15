@@ -432,12 +432,14 @@ var CalendarWrapper = React.createClass({
 
         this.setState(state_obj);
 
-        //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
+        this.props.onDateChange({ "period" : [date_from, date_to], "state" : state_obj });
 
+        //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
+/*
         $(event_emitter).trigger("date_choise", { "period" : [date_from, date_to], "state" : state_obj }); // todo: change date_fast_choise
 
         $(event_emitter).trigger("date_choise_test", { "period" : [date_from, date_to], "state" : state_obj }); // todo: change date_fast_choise
-
+*/
     },
 
     componentDidUpdate : function() {
@@ -459,7 +461,7 @@ var CalendarWrapper = React.createClass({
 
                 if (active_elements.length > 0)
                 {
-                    transitionEvent = self.whichTransitionEvent(active_elements[0]);
+                    var transitionEvent = self.whichTransitionEvent(active_elements[0]);
 
                     if(transitionEvent){
                         active_elements[0].addEventListener(transitionEvent, self.transitionEnd);
@@ -491,7 +493,7 @@ var CalendarWrapper = React.createClass({
 
             if (active_elements.length > 0)
             {
-                transitionEvent = this.whichTransitionEvent(active_elements[0]);
+                var transitionEvent = this.whichTransitionEvent(active_elements[0]);
 
                 /*
                     need to change menu items style for change opacity
@@ -508,7 +510,7 @@ var CalendarWrapper = React.createClass({
 
             if (active_elements.length > 0)
             {
-                transitionEvent = this.whichTransitionEvent(active_elements[0]);
+                var transitionEvent = this.whichTransitionEvent(active_elements[0]);
 
                 if(transitionEvent){
                     active_elements[0].addEventListener(transitionEvent, this.transitionEnd);

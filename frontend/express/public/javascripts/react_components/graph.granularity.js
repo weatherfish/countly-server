@@ -137,6 +137,12 @@ var Granularity = React.createClass({
 
     onhover : function()
     {
+
+        if (this.props.disable_hover)
+        {
+            return false;
+        }
+
         this.setState({
             info_open : true
         });

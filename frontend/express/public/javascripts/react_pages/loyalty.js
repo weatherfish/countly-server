@@ -2,12 +2,6 @@ var LoyaltyPage = React.createClass({
 
     getInitialState: function() {
 
-        var sort_functions = {
-            "l" : math_sort,
-            "t" : math_sort,
-            "percent" : math_sort
-        }
-
         var headers = [{
             "title":jQuery.i18n.map["user-loyalty.table.session-count"],
             "short" : "l",
@@ -20,6 +14,12 @@ var LoyaltyPage = React.createClass({
             "title":jQuery.i18n.map["common.percent"],
             "short" : "percent"
         }]
+
+        var sort_functions = {
+            "l" : math_sort,
+            "t" : math_sort,
+            "percent" : math_sort
+        }
 
         return({
             sort_functions : sort_functions,
@@ -44,16 +44,16 @@ var LoyaltyPage = React.createClass({
 
     render : function(){
 
+        if (!this.state.inited)
+        {
+            return (<Loader/>);
+        }
+
         var elements_width = get_viewport_width();
         var chart_height = 300;
 
         var page_style = {
             "width" : elements_width
-        }
-
-        if (!this.state.inited)
-        {
-            return (<Loader/>);
         }
 
         return (

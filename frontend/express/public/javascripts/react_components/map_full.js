@@ -115,17 +115,29 @@ var Map = React.createClass({
             data : countryData
         });
 
-        this.datamap.svg.selectAll('path').on('click', function(elem) {
+        if (this.props.onCountryClick)
+        {
+            this.datamap.svg.selectAll('path').on('click', function(elem) {
 
-            var countryIso = elem.id;
+                self.props.onCountryClick(elem);
 
-            self.draw_country({
-                height : 450,
-                metric : self.props.metric,
-                "countryIso3" : countryIso
             });
+        }
+        else
+        {
 
-        });
+            this.datamap.svg.selectAll('path').on('click', function(elem) {
+
+                var countryIso = elem.id;
+
+                self.draw_country({
+                    height : 450,
+                    metric : self.props.metric,
+                    "countryIso3" : countryIso
+                });
+
+            });
+        }
 
     },
 
@@ -179,14 +191,15 @@ var Map = React.createClass({
             dataUrl: dataUrl
         }
 
-        _periodObj = countlyCommon.periodObj;
+        //_periodObj = countlyCommon.periodObj;
 
         //$("#" + this.state.element_id).empty();
 
         if (options) {
-            if (options.chartElementId) {
-                _chartElementId = options.chartElementId;
-            }
+
+            /*if (options.chartElementId) {
+                element_id = options.chartElementId;
+            }*/
 
             if (options.height) {
                 chart_options.height = options.height;
@@ -262,9 +275,9 @@ var Map = React.createClass({
             return false;
         }
 
-        _chartElementId = this.state.element_id;
+        var element_id = this.state.element_id;
 
-        $("#" + _chartElementId).empty();
+        $("#" + element_id).empty();
 
         /*
           create map
@@ -301,7 +314,7 @@ var Map = React.createClass({
         }
 
         var country_map = new Datamap({
-                element    : document.getElementById(_chartElementId),
+                element    : document.getElementById(element_id),
                 height     : mapHeight,
                 width      : mapWidth,
                 setProjection: function(element) {
@@ -370,13 +383,10 @@ var Map = React.createClass({
 
         var chartData = {cols:[], rows:[]};
 
-        var _locationsDb = countlyUser.getDbObj();
-        var _countries = _locationsDb['meta']['countries'];// countlyCommon.union({}, _locationsDb['meta']['countries']);
+        var locations_db = countlyUser.getDbObj();
+        var countries = locations_db['meta']['countries'];// countlyCommon.union({}, locations_db['meta']['countries']);
 
-        console.log("========= _locationsDb ==========");
-        console.log(_locationsDb);
-
-        var tt = countlyCommon.extractTwoLevelData(_locationsDb, _countries, countlyLocation.clearLocationObject, [
+        var tt = countlyCommon.extractTwoLevelData(locations_db, countries, countlyLocation.clearLocationObject, [
             {
                 "name":"country",
                 "func":function (rangeArr, dataObj) {
@@ -401,9 +411,6 @@ var Map = React.createClass({
 
         var maxMetric = 0;
 
-        console.log("=========== tt =================");
-        console.log(tt);
-
         chartData.rows = _.map(tt.chartData, function (value, key, list) {
 
             if (value.country == "European Union" || value.country == "Unknown" || value.code == "Unknown") {
@@ -423,9 +430,6 @@ var Map = React.createClass({
                 metric  : value[data_metric]
             };
         });
-
-        console.log("===== chartData.rows =======");
-        console.log(chartData.rows);
 
         var linear = d3.scale.linear()
           .domain([0, maxMetric])
@@ -468,35 +472,35 @@ var Map = React.createClass({
 
     formatCountryData : function(ob, __callback){
 
-        _period = countlyCommon.getPeriodForAjax();
+        var period = countlyCommon.getPeriodForAjax();
 
-        _activeAppKey = countlyCommon.ACTIVE_APP_KEY;
-        _initialized = true;
+        //_activeAppKey = countlyCommon.ACTIVE_APP_KEY;
+        //_initialized = true;
 
         return $.ajax({
             type:"GET",
             url:countlyCommon.API_PARTS.data.r,
             data:{
-                "api_key":countlyGlobal.member.api_key,
-                "app_id":countlyCommon.ACTIVE_APP_ID,
-                "method":"cities",
-                "period":_period
+                "api_key" : countlyGlobal.member.api_key,
+                "app_id"  : countlyCommon.ACTIVE_APP_ID,
+                "method"  : "cities",
+                "period"  : period
             },
             dataType:"jsonp",
             success:function (json) {
-                _locationsDb = json;
+                var locations_db = json;
                 //setMeta();
 
-                if (_locationsDb['meta']) {
-                    _cities = (_locationsDb['meta']['cities']) ? _locationsDb['meta']['cities'] : [];
+                if (locations_db['meta']) {
+                   var cities = (locations_db['meta']['cities']) ? locations_db['meta']['cities'] : [];
                 } else {
-                    _cities = [];
+                   var cities = [];
                 }
 
                 ob = ob || {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
                 var chartData = {cols:[], rows:[]};
 
-                var tt = countlyCommon.extractTwoLevelData(_locationsDb, _cities, countlyCity.clearLocationObject, [
+                var tt = countlyCommon.extractTwoLevelData(locations_db,cities, countlyCity.clearLocationObject, [
                     {
                         "name":"city",
                         "func":function (rangeArr, dataObj) {
@@ -545,7 +549,7 @@ var Map = React.createClass({
                     }
 
                     var cityName   = cityChartData.city.toLowerCase();
-                    var coordsData = _locationsDb.citiesData[cityName];
+                    var coordsData = locations_db.citiesData[cityName];
 
                     if (!coordsData)
                     {

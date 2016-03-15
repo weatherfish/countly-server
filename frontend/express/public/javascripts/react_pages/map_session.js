@@ -1,4 +1,4 @@
-var SessionPage = React.createClass({
+var MapSessionPage = React.createClass({
 
     getInitialState : function() {
 
@@ -11,7 +11,8 @@ var SessionPage = React.createClass({
         return({
             granularity : "daily",//false, // todo - should be false
             sort_functions : sort_functions,
-            inited : false
+            inited : false,
+            iso2 : false
         });
     },
 
@@ -84,17 +85,7 @@ var SessionPage = React.createClass({
         });
     },
 
-    contextTypes: {
-        router: React.PropTypes.func
-    },
-
     componentWillReceiveProps : function(nextProps) {
-
-        console.log("{{{{{{{{{{{{{ this.context.router.getCurrentParams() }}}}}}}}}}}}}");
-        console.log(this.context.router/*.getCurrentParams()*/);
-
-        //console.log("==== receive props page =====");
-        //console.log(nextProps.router.getCurrentParams());
 
         var self = this;
 
@@ -106,7 +97,76 @@ var SessionPage = React.createClass({
 
     },
 
+    chart_data_function : function(){
 
+        console.log("======= chart data map =======");
+        console.log(countlySession.getSessionDP_map(this.state.iso2));
+
+        return countlySession.getSessionDP_map(this.state.iso2);
+
+    },
+
+    data_modificator : function(country_data){
+
+        console.log("== modoficator ==");
+        console.log(country_data);
+
+        var iso3 = country_data.id;
+        var selected_iso2 = false;
+
+        for (var iso2 in iso3_country_codes)
+        {
+
+            if (iso3_country_codes[iso2] == iso3)
+            {
+                selected_iso2 = iso2;
+                break;
+            }
+
+        }
+
+        var big_numbers_data = countlySession.getSessionDP_map(selected_iso2);
+
+        var data = big_numbers_data.chartDP;
+
+        var new_big_numbers = [];
+
+        for (var i = 0; i < data.length; i++)
+        {
+            var line = data[i];
+
+            var short = line.short;
+
+            var sum = 0;
+
+            for (var j = 0; j < line.data.length; j++)
+            {
+                sum += line.data[j][1];
+            }
+
+            for (var b = 0; b < this.state.big_numbers.length; b++)
+            {
+                if (this.state.big_numbers[b].short == short)
+                {
+
+                    var big_number = this.state.big_numbers[b];
+
+                    big_number.total = sum;
+
+                    new_big_numbers.push(big_number)
+
+                    break;
+                }
+            }
+
+        }
+
+        this.setState({
+            "iso2" : selected_iso2,
+            "big_numbers" : new_big_numbers
+        })
+
+    },
 
     render : function(){
 
@@ -120,6 +180,8 @@ var SessionPage = React.createClass({
         var elements_width = get_viewport_width();
         var chart_height = 300;
 
+        var map_width = elements_width - 360;
+
         var page_style = {
             "width" : elements_width
         }
@@ -132,40 +194,27 @@ var SessionPage = React.createClass({
         return(
             <div className="page" style={page_style}>
 
+                <Map
+                    width={map_width}
+                    metric={"t"}
+                    height={480}
+                    headline_sign="SELECT A COUNTRY"
+                    onCountryClick={this.data_modificator}
+                />
+
                 <LineChart
-                    trend_sign={"SESSIONS TREND"}
+                    trend_sign={this.state.iso2}
                     width={elements_width}
                     height={chart_height}
                     sides_padding={20}
                     period={countlyCommon.getPeriod()}
                     big_numbers={this.state.big_numbers}
-                    data_function={countlySession.getSessionDP}
+                    data_function={this.chart_data_function}
                     update_graph_function={countlyCommon.updateTimeGraph}
                     with_granularity={true}
                     mount_callback={this.on_graph_mount}
                     date={this.props.date}
                 />
-
-                {(() => {
-
-                    if (self.state.granularity)
-                    {
-                        return(<SortTable
-                            headers={self.state.headers}
-                            width={elements_width}
-                            row_height={50}
-                            data_sign={"DATA"}
-                            sort_functions={this.state.sort_functions}
-                            data_function={countlySession.getSessionDP}
-                            convert_data_function={true}
-                            initial_sort={"date"}
-                            granularity={this.state.granularity}
-                            rows_per_page={20}
-                            date={this.props.date}
-                        />)
-                    }
-
-                })()}
 
             </div>
         )

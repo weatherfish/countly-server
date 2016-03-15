@@ -2,6 +2,7 @@ var navigation = [
     {
         key         : 'User profiles',
         icon        : 'user',
+        path        : 'user',
         description : 'Metrics offer you a wide overwiew about your apps performance',
         items       : [
                         ["Frequency", "/analytics/frequency"],
@@ -19,6 +20,7 @@ var navigation = [
     {
         key         : 'Metrics',
         icon        : 'metrics',
+        path        : 'analytics',
         description : 'User profiles offer you a wide overwiew about your User profiles',
         items       : [
                         ["Users", "/analytics/users"],
@@ -37,6 +39,7 @@ var navigation = [
     {
         key: 'Engagement',
         icon        : 'engagement',
+        path        : 'engagement',
         description : 'Management offer you a wide overwiew about your apps Management',
         items       : [
                         ["Frequency",   "/analytics/frequency"],
@@ -47,6 +50,7 @@ var navigation = [
     {
         key: 'Messaging',
         icon        : 'messaging',
+        path        : 'messaging',
         description : 'Management offer you a wide overwiew about your apps Management',
         items       : [
                         ["Versions3",    "/analytics/versions"],
@@ -61,6 +65,7 @@ var navigation = [
     {
         key: 'Funnels',
         icon        : 'funnels',
+        path        : 'funnels',
         description : 'Funnels offer you a wide overwiew about Funnels',
         arrow       : -1, // todo: tmp
         items       : [
@@ -75,6 +80,7 @@ var navigation = [
     {
         key: 'Crashes',
         icon        : 'crashes',
+        path        : 'crashes',
         description : 'Crashes offer you a wide overwiew about your apps Crashes',
         items       : [
                         ["Loyalty5",     "/analytics/loyalty"],
@@ -91,6 +97,7 @@ var navigation = [
     {
         key: 'Drill',
         icon        : 'drill',
+        path        : 'drill',
         description : 'Crashes offer you a wide overwiew about your apps Crashes',
         arrow       : -1, // todo: tmp
         items       : [
@@ -108,6 +115,7 @@ var navigation = [
     {
         key: 'Management',
         icon        : 'manage',
+        path        : 'manage',
         description : '',
         arrow       : -1, // todo: tmp
         items       : [
@@ -119,19 +127,3 @@ var navigation = [
 
     }
 ];
-
-/*
-var applications = [
-    {
-        name : "Countly App",
-        icon : "appi1.png"
-    },
-    {
-        name : "Nuvi TV",
-        icon : "appi2.png"
-    },
-    {
-        name : "Bubble shooter saga",
-        icon : "appi3.png"
-    }
-]*/

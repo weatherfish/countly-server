@@ -7,6 +7,7 @@ var Chart = React.createClass({
     getInitialState: function() {
 
         var data = this.props.data_function();
+
         data = data.chartData;
 
         for (var i = 0; i < data.length; i++)
@@ -29,6 +30,9 @@ var Chart = React.createClass({
 
         /*if (nextProps.date != this.props.date) // todo !!!!!!!!!!!!!!!!!!!!!!
         {*/
+
+            console.log("{{{{{{{{{{{ receive props }}}}}}}}}}}");
+            console.log(nextProps);
 
             var data = this.props.data_function();
 
@@ -68,7 +72,7 @@ var Chart = React.createClass({
             });
         //}
     },
-
+/*
     componentWillMount: function() {
 
         $(event_emitter).on('data_changed', function(e, data){
@@ -76,8 +80,10 @@ var Chart = React.createClass({
         }.bind(this));
 
     },
-
+*/
     get_domain : function(data) {
+
+        var self = this;
 
         // Requires that at least one series contains some data
         var yMin = +Infinity;
@@ -90,7 +96,7 @@ var Chart = React.createClass({
                 return false;
             }
 
-            var y = d.t;
+            var y = d[self.props.headers[1]["short"]];
 
             if (y < yMin) yMin = y;
             if (y > yMax) yMax = y;
@@ -137,7 +143,7 @@ var Chart = React.createClass({
                           .attr("class", "tooltip")
                           .attr("transform", function(d, i) {
                               var xv = (-1 * ((/*this.props.*/tooltip_width - /*this.props.*/bar_width) / 2));
-                              var yv = self.y_scale_log(d.t) - /*this.props.*/tooltip_height - tooltip_margin_bottom;
+                              var yv = self.y_scale_log(d[self.props.headers[1]["short"]]) - /*this.props.*/tooltip_height - tooltip_margin_bottom;
                               return "translate(" + xv + "," + yv + ")";
                           })
 
@@ -169,7 +175,7 @@ var Chart = React.createClass({
         tooltip.append("text")
                 .attr("class", "count")
                 .text(function(d) {
-                    var value = d.t.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    var value = d[self.props.headers[1]["short"]].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     return value;
                 })
                 .attr("x", function(d) {
@@ -186,7 +192,7 @@ var Chart = React.createClass({
         tooltip.append("text")
                 .attr("class", "percent")
                 .text(function(d) {
-                    var percent = Math.round((d.t / total_count) * 100);
+                    var percent = Math.round((d[self.props.headers[1]["short"]] / total_count) * 100);
                     return percent + "%";
                 })
                 .attr("x", function(d) {
@@ -233,7 +239,8 @@ var Chart = React.createClass({
         this.y_scale_log = d3.scale.linear()
             .domain([0, d3.max(data, function(d) {
                 if (!d.active) return 0;
-                return d.t;
+                //return d.t;
+                return d[self.props.headers[1]["short"]];
             })]).nice()
             .range([height - bars_margin_bottom, 0])
             /*.base(10)*/
@@ -282,7 +289,7 @@ var Chart = React.createClass({
                 return height - 2;
             }
 
-            return self.y_scale_log(d.t);
+            return self.y_scale_log(d[self.props.headers[1]["short"]]);
         })
 
         var i = 0;
@@ -304,8 +311,8 @@ var Chart = React.createClass({
                 }
                 else
                 {
-                    var yv = self.y_scale_log(d.t);
-                    var h = height - self.y_scale_log(d.t) - bars_margin_bottom;
+                    var yv = self.y_scale_log(d[self.props.headers[1]["short"]]);
+                    var h = height - self.y_scale_log(d[self.props.headers[1]["short"]]) - bars_margin_bottom;
                     var r = 2;
                 }
 
@@ -378,8 +385,8 @@ var Chart = React.createClass({
             })
             .attr("d", function(d){
 
-                var yv = self.y_scale_log(d.t);
-                var h = height - self.y_scale_log(d.t) - bars_margin_bottom;
+                var yv = self.y_scale_log(d[self.props.headers[1]["short"]]);
+                var h = height - self.y_scale_log(d[self.props.headers[1]["short"]]) - bars_margin_bottom;
                 var rect = self.rounded_rect(0, yv, self.props.bar_width, h, 2, true, true, false, false);
 
                 return rect;

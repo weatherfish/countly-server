@@ -2,9 +2,6 @@ var EditableField = React.createClass({
 
     getInitialState: function() {
 
-        console.log("====== initisl ============", this.props.value);
-        console.log(this.props.options_values);
-
         if (this.props.options_values)
         {
             var value_key = this.props.value;
@@ -44,26 +41,24 @@ var EditableField = React.createClass({
 
     handleValueChange: function(new_value) {
 
-        console.log("============= new_value ==========");
-        console.log(new_value);
-        console.log("============ (this.props.options_values =============");
-        console.log(this.props.options_values);
-
-        if (this.props.options_values)
+        if (this.props.options_values) // todo: ??
         {
             var value_key = new_value;
             new_value = this.props.options_values[new_value];
         }
 
-        console.log("========== new_value =============");
-        console.log(new_value);
+        var new_state = {
+            "value" : new_value,
+            "value_key" : value_key,
+        };
 
-        this.setState({
-            value : new_value,
-            value_key : value_key,
-            prev_value : this.state.value,
-            prev_value_key : this.state.value_key,
-        });
+        if (!this.state.prev_value)
+        {
+            new_state.prev_value = this.state.value;
+            new_state.prev_value_key = this.state.value_key;
+        }
+
+        this.setState(new_state);
     },
 
     edit_click : function() {
@@ -76,9 +71,6 @@ var EditableField = React.createClass({
 
     save : function() {
 
-        console.log("--- save ----");
-        console.log(this);
-
         this.props.on_save(this.props, this.state);
 
         this.setState({
@@ -89,11 +81,17 @@ var EditableField = React.createClass({
 
     cancel : function() {
 
-        this.setState({
-            edit_open : false,
-            value : this.state.prev_value,
-            value_key : this.state.prev_value_key        
-        })
+        var new_state = {
+            edit_open : false
+        };
+
+        if (this.state.prev_value)
+        {
+            new_state.value = this.state.prev_value;
+            new_state.value_key = this.state.prev_value_key;
+        }
+
+        this.setState(new_state)
 
     },
 
@@ -139,14 +137,24 @@ var EditableField = React.createClass({
             //for (var i = 0; i < this.props.options_values.length; i++)
             for (var key in this.props.options_values)
             {
-                var value = this.props.options_values[key];
-                options.push(<option value={key}>{value}</option>);
+                options.push({
+                    "key" : key,
+                    "label" : this.props.options_values[key]
+                })
+                //options.push(<option value={key}>{value}</option>);
                 //options.push(<option value={this.props.options_values[i].key}>{this.props.options_values[i].value}</option>);
             }
 
             //input_value += (</select>);
 
-            var input_value = <select style={input_style} valueLink={valueLink}>{options}</select>;
+            //var input_value = <select style={input_style} valueLink={valueLink}>{options}</select>;
+
+            var input_value = <SimpleSelectBlock
+                                  selectors={options}
+                                  onChange={this.handleValueChange}
+                                  style={input_style}
+                                  active_selector_key={this.props.value}
+                              />
 
         }
         else
@@ -167,8 +175,8 @@ var EditableField = React.createClass({
                 <span className="key">{this.props.value_key}</span>
                 <span className="value" style={value_style}>{this.state.value}</span>
                 {input_value}
-                <span style={edit_button_style} className="edit" onClick={this.edit_click.bind(this)}>edit</span>
-                <span className="save_block" style={save_block_style}><span className="save" onClick={this.save}>Save</span><span className="cancel" onClick={this.cancel.bind(this)}>Cancel</span></span>
+                <span style={edit_button_style} className="edit" onClick={this.edit_click}>edit</span>
+                <span className="save_block" style={save_block_style}><span className="save" onClick={this.save}>Save</span><span className="cancel" onClick={this.cancel}>Cancel</span></span>
             </span>
         );
     }

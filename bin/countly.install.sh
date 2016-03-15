@@ -21,7 +21,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #update package index
 apt-get update
 
-apt-get -y install python-software-properties wget g++ build-essential libkrb5-dev
+apt-get -y install python-software-properties wget g++
 
 if !(command -v apt-add-repository >/dev/null) then
     apt-get -y install software-properties-common
@@ -29,15 +29,11 @@ fi
 
 #add node.js repo
 #echo | apt-add-repository ppa:chris-lea/node.js
-wget -qO- https://deb.nodesource.com/setup_4.x | bash -
+wget -qO- https://deb.nodesource.com/setup | bash -
 
 #add mongodb repo
-#echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" > /etc/apt/sources.list.d/mongodb-10gen-countly.list
-#apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
-
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
-
+echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" > /etc/apt/sources.list.d/mongodb-10gen-countly.list
+apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
 
 #update once more after adding new repos
 apt-get update
@@ -62,22 +58,6 @@ apt-get -y install imagemagick
 
 #install sendmail
 apt-get -y install sendmail
-
-apt-get install -y zip
-
-# download geo data for datamaps visualization from "themapping.org"
-if wget -q http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip;
-  then echo "done";
-  else wget http://static.count.ly/TM_WORLD_BORDERS-0.3.zip;
-fi
-
-mkdir ./scripts/geo_data
-mv TM_WORLD_BORDERS-0.3.zip ./scripts/geo_data
-unzip ./scripts/geo_data/TM_WORLD_BORDERS-0.3.zip -d ./scripts/geo_data
-# create mongodb table with geo data
-node ./scripts/create_country_table.js
-
-wget http://download.geonames.org/export/dump/cities1000.zip
 
 #install grunt & npm modules
 ( cd $DIR/.. ; npm install -g grunt-cli --unsafe-perm ; npm install )
@@ -109,6 +89,11 @@ fi
 bash $DIR/scripts/countly.install.plugins.sh
 
 #compile scripts for production
+cd $DIR/frontend/express/public/javascripts
+babel --presets es2015,react react_components/ --out-dir react_components_compiled/
+babel --presets es2015,react react_pages/ --out-dir react_pages_compiled/
+cd $DIR/frontend/express/public/stylesheets
+lessc ui.v2.less v2.css && lessc ui.calendar.less calendar.css && lessc tables.less tables.css && lessc map.less map.css
 cd $DIR && grunt dist-all
 
 #finally start countly api and dashboard
@@ -116,4 +101,3 @@ if [ "$INSIDE_DOCKER" != "1" ]
 then
 	countly start
 fi
-countly update sdk-web

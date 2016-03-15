@@ -8,7 +8,7 @@
 }
 
 .big-numbers-container > div {
-    width : 33%;
+    /*width : 33%;*/
     display : inline-block;
     margin-left  : auto;
     margin-right : auto;

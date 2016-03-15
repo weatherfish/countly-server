@@ -15,66 +15,66 @@ var UserPage = React.createClass({
         });
     },
 
+    make_big_numbers : function()
+    {
+        var sessionData = countlySession.getSessionData();
+
+        var big_numbers = [
+            {
+                "title":jQuery.i18n.map["common.table.total-users"],
+                "total":sessionData.usage["total-users"].total,
+                "trend":sessionData.usage["total-users"].trend,
+                "help":"users.total-users",
+                "short" : "t",
+                "color" : "#1B8AF3"
+            },
+            {
+                "title":jQuery.i18n.map["common.table.new-users"],
+                "total":sessionData.usage["new-users"].total,
+                "trend":sessionData.usage["new-users"].trend,
+                "help":"users.new-users",
+                "short" : "n",
+                "color" : "#F2B702",
+            },
+            {
+                "title":jQuery.i18n.map["common.table.returning-users"],
+                "total":sessionData.usage["returning-users"].total,
+                "trend":sessionData.usage["returning-users"].trend,
+                "help":"users.returning-users",
+                "short" : "r",
+                "color" : "#FF7D7D"
+            }
+        ]
+
+        for (var i = 0; i < big_numbers.length; i++)
+        {
+            big_numbers[i].active = true;
+        }
+
+        return big_numbers;
+    },
+
     componentDidMount : function() {
 
         var self = this;
 
         $.when(countlyUser.initialize()).then(function () {
 
-            var sessionData = countlySession.getSessionData();
-            //    sessionDP = countlySession.getSessionDP();
+            var headers = self.make_big_numbers();
 
-            var templateData = {
-                "page-title":jQuery.i18n.map["sessions.title"],
-                "logo-class":"sessions",
-                "big-numbers":{
-                    "count":3,
-                    "items":[
-                        {
-                            "title":jQuery.i18n.map["common.total-users"],
-                            "total":sessionData.usage["total-users"].total,
-                            "trend":sessionData.usage["total-users"].trend,
-                            "help":"users.total-users",
-                            "short" : "t",
-                            "color" : "#1B8AF3"
-                        },
-                        {
-                            "title":jQuery.i18n.map["common.new-users"],
-                            "total":sessionData.usage["new-users"].total,
-                            "trend":sessionData.usage["new-users"].trend,
-                            "help":"users.new-users",
-                            "short" : "n",
-                            "color" : "#F2B702",
-                        },
-                        {
-                            "title":jQuery.i18n.map["common.returning-users"],
-                            "total":sessionData.usage["returning-users"].total,
-                            "trend":sessionData.usage["returning-users"].trend,
-                            "help":"users.returning-users",
-                            "short" : "r",
-                            "color" : "#FF7D7D"
-                        }
-                    ]
-                }
-            };
-
-            for (var i = 0; i < templateData["big-numbers"].items.length; i++)
-            {
-                templateData["big-numbers"].items[i].active = true;
-            }
-
-            var headers = JSON.parse(JSON.stringify(templateData["big-numbers"].items));
+            var big_numbers = self.make_big_numbers();
 
             headers.unshift({
                 "title" : "Date",
                 //"help"  : "sessions.unique-sessions", // todo: add translation
                 "short" : "date",
+                "big_numbers" : big_numbers
             })
 
             self.setState({
                 inited : true,
-                templateData : templateData,
-                headers : headers
+                big_numbers : big_numbers,
+                headers : headers,
             })
         })
     },
@@ -84,6 +84,18 @@ var UserPage = React.createClass({
         this.setState({
             "granularity" : mount_data.granularity
         });
+
+    },
+
+    componentWillReceiveProps : function(nextProps) {
+
+        var self = this;
+
+        var big_numbers = self.make_big_numbers();
+
+        self.setState({
+            big_numbers : big_numbers
+        })
 
     },
 
@@ -112,7 +124,7 @@ var UserPage = React.createClass({
                     height={chart_height}
                     sides_padding={20}
                     period={countlyCommon.getPeriod()}
-                    big_numbers={this.state.templateData["big-numbers"].items}
+                    big_numbers={this.state.big_numbers}
                     data_function={countlySession.getUserDP}
                     update_graph_function={countlyCommon.updateTimeGraph}
                     with_granularity={true}

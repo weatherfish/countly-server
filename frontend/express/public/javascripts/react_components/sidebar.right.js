@@ -3,11 +3,20 @@ var RouterLink = React.createClass({
     mixins: [ ReactRouter.History ],
     _handleClick: function(path){
         this.history.pushState(null, path);
+        this.props.onClick(this.props.item, this.props.action_path)
     },
     render: function() {
+
+      var class_name = "router_link";
+/*
+      if (active)
+      {
+          class_name += " active";
+      }*/
+
       return (
-        <div className="router_link" onClick={this._handleClick.bind(self, this.props.action_path)}>
-            {this.props.label}
+        <div className={class_name} onClick={this._handleClick.bind(self, this.props.action_path)}>
+            {this.props.item[0]}
         </div>
       );
     },
@@ -61,7 +70,7 @@ var RightPart = React.createClass({
 
         if (active_elements.length > 0)
         {
-            transitionEvent = this.whichTransitionEvent(active_elements[0]);
+            var transitionEvent = this.whichTransitionEvent(active_elements[0]);
 
             /*
                 need to change menu items style for change opacity
@@ -81,36 +90,15 @@ var RightPart = React.createClass({
 
         //event.preventDefault();
 
+        console.log("{{{{{{{{ set state }}}}}}}}");
+        console.log(item);
+
+        var selected = item.split('/');
+        selected = selected[2];
+
         this.setState({
-            selected_item : item,
+            selected_item : selected,
         });
-
-        /*
-            trigger ui.topbar.js
-            todo: move to the root component
-        */
-
-        window.history.pushState({}, "Title", action_path);
-        //window.location.hash = action_path;
-
-        console.log("================== handle_right_changed ==================", item);
-
-        //$("#content-container").html("-- loading --");
-
-        var element_width = get_viewport_width();
-        var element_height = $(document).height();
-
-        /*$("#content-container").html("<div id='loader_wrapper'><div id='loader'></div></div>");*/
-/*
-        $("#content-container").css("width", element_width + "px");
-        $("#content-container").css("height", element_height + "px");
-*/
-        var nav_data = {
-            fstmenu : this.props.nav_key,
-            sndmenu : item,
-        }
-
-        //$(event_emitter).trigger('select', nav_data);
 
     },
 
@@ -150,12 +138,21 @@ var RightPart = React.createClass({
 
                 var action_path = nav_item[1];
 
+                var is_active = false;
+/*
+                if (self.state.selected_item && (self.state.selected_item.toLowerCase() == nav_item[0].toLowerCase()))
+                {
+                    is_active = true;
+                }*/
+
                 var node_class_name = items_class_name;
 
-                if ((self.state.selected_item && self.state.selected_item.toLowerCase()) == nav_item[0].toLowerCase())
+                if (self.state.selected_item && (self.state.selected_item.toLowerCase() == nav_item[0].toLowerCase()))
                 {
                     node_class_name += " active";
                 }
+
+
                 // href={action_path}
                 /*return (
                     <div key={nav_item[0]} className={node_class_name}>
@@ -172,9 +169,11 @@ var RightPart = React.createClass({
 
                 */
 
+                //  active={is_active}
+
                 return (
                     <div key={nav_item[0]} className={node_class_name}>
-                        <RouterLink label={nav_item[0]} action_path={action_path}/>
+                        <RouterLink item={nav_item} action_path={action_path} onClick={self.onItemClick}/>
                     </div>
                 );
 

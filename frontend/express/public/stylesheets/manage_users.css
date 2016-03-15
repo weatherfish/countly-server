@@ -7,7 +7,7 @@
 #manage_users_page .top_block {
     position : relative;
     height : 60px;
-    border : 1px solid #E9E9E9;
+    border-bottom : 1px solid #E9E9E9;
     background-color : white;
 
     font-family: Lato-Semibold;
@@ -136,7 +136,7 @@
     cursor : pointer;
     height : 40px;
     line-height : 40px;
-    text-decoration : underline;
+    text-decoration : none;
 }
 
 #manage_users_page .users_table .user_info:hover .edit_button {
@@ -156,12 +156,6 @@
 
 }
 
-#manage_users_page .users_table .user_info .edit_button {
-    color : #19CC63;
-    cursor : pointer;
-    text-decoration : underline;
-}
-
 #manage_users_page .users_table .user_info .save_block .save {
     color : #19CC63;
     cursor : pointer;
@@ -176,7 +170,7 @@
 }
 
 
-.admin_of div.app, .user_of div.app {
+#manage_users_page .admin_of div.app, .user_of div.app {
     border : 1px solid gray;
     cursor : pointer;
     /*margin : 6px;*/
@@ -185,14 +179,112 @@
     line-height : 20px;
 }
 
-.admin_of div.app:hover, .user_of div.app:hover {
+#manage_users_page .admin_of div.app:hover, .user_of div.app:hover {
     border : 1px solid gray;
     cursor : pointer;
     background-color : #FBFBFB;
 }
 
-.admin_of div.app.selected, .user_of div.app.selected {
+#manage_users_page .admin_of div.app.selected, .user_of div.app.selected {
     border : 1px solid gray;
     cursor : pointer;
     background-color : green;
+}
+
+#manage_users_page .new_user_block {
+
+    position : absolute;
+
+    /*top : 20px;
+    left : 20px;*/
+    top : -1px;
+    left : -1px;
+
+    width : 700px;
+    /*height : 300px;*/
+
+    border : 1px solid #E9E9E9;
+
+    border-radius : 2px;
+
+    background-color: white;
+
+    z-index : 5000;
+
+    padding-bottom : 100px;
+
+}
+
+#manage_users_page .new_user_block .label {
+
+    height : 60px;
+    line-height : 60px;
+
+    font-size: 24px;
+
+    font-family : Lato-Regular;
+
+    padding-left :  20px;
+
+}
+
+#manage_users_page .new_user_block .buttons_block {
+    margin-top : 20px;
+}
+
+#manage_users_page input {
+    width: 240px;
+    height: 30px;
+    padding-left: 10px;
+    border-radius: 2px;
+    border: 1px solid #E7E7E7;
+    box-sizing: border-box;
+}
+
+.setting_block {
+
+    height : 60px;
+    line-height: 60px;
+
+    border-bottom : 1px solid #eeeeee;
+
+    font-family : Lato-Regular;
+
+}
+
+.setting_block div {
+    display : inline-block;
+}
+
+.setting_block .setting_label {
+    width : 300px;
+    padding-left : 20px;
+    box-sizing: border-box;
+}
+
+#manage_users_page  .new_user_block .add_button, #manage_users_page  .new_user_block .cancel_button {
+
+    width : 100px;
+    height : 35px;
+    line-height : 35px;
+
+    cursor : pointer;
+    font-family: Lato-Regular;
+    font-size: 11px;
+    color: #FFFFFF;
+    text-align : center;
+    border-radius: 2px;
+
+    display : inline-block;
+
+    margin-right : 10px;
+
+}
+
+#manage_users_page  .new_user_block .add_button {
+    background-color : #19CC63;
+}
+
+#manage_users_page  .new_user_block .cancel_button {
+    background-color :red;
 }
