@@ -1,0 +1,279 @@
+.crash_details {
+
+    /*padding-left : 20px;
+    padding-right : 20px;*/
+    box-sizing : border-box;
+
+}
+
+.crash_details .info_block {
+
+    width : 100%;
+    height : 80px;
+
+}
+
+.crash_details .info_block .name {
+
+    font-family : Lato-Semibold;
+    font-size : 20px;
+
+    margin-top : 20px;
+    margin-left : 20px;
+
+}
+
+.crash_details .info_block .status {
+    margin-left : 20px;
+    margin-top : 20px;
+    font-family : Lato-Regular;
+}
+
+.crash_details .info_block .status.resolved {
+    color: red;
+}
+
+.crash_details .info_block .status.unresolved {
+    color: #19CC63;
+}
+
+.crash_details .info_block .mark_button {
+    width: 100px;
+    height: 35px;
+    line-height: 35px;
+    background-color: #19CC63;
+    cursor: pointer;
+    font-family: Lato-Regular;
+    font-size: 11px;
+    color: #FFFFFF;
+    text-align: center;
+    border-radius: 2px;
+    position: absolute;
+    right: 30px;
+    top: 12px;
+}
+
+.crash_details .info_block .mark_button.resolved {
+
+    background-color: green;
+
+}
+
+.crash_details .info_block .mark_button.unresolved {
+
+    background-color: red;
+
+}
+
+.crash_details .tabs {
+
+}
+
+.crash_details .tabs > span {
+
+    display : inline-block;
+    width : 50%;
+    height : 50px;
+    line-height : 50px;
+    text-align : center;
+    font-family : Lato-Regular;
+
+    box-sizing : border-box;
+
+    cursor : pointer;
+
+    border-top: 4px solid #F5F5F5;
+    background-color: #F5F5F5;
+    border-bottom : 2px solid #eeeeee;
+    color : gray;
+}
+
+.crash_details .tabs > span.active {
+
+    border-top : 4px solid #19CC63!important;
+    background-color: #ffffff;
+    border-bottom : 2px solid #ffffff;
+    color : #000000;
+}
+
+.crash_details .description, .crash_details .comments {
+
+    margin-top : 20px;
+    margin-left : 20px;
+    margin-right : 20px;
+    padding-top : 20px;
+    height : 200px;
+
+    background-color : #F5F5F5;
+    border : 2px solid #eeeeee;
+    border-radius : 2px;
+
+    margin-bottom : 40px;
+}
+
+.crash_details .description > div > span, .crash_details .comments > div > span {
+    margin-left : 20px;
+}
+
+.crash_details .data_block {
+    width : 100%;
+    border-top : 1px solid #eeeeee;
+    padding-top : 20px;
+    /*padding-left : 20px;
+    padding-right : 20px;*/
+    box-sizing : border-box;
+}
+
+.crash_details .data_block .block_sign {
+    font-family : Lato-Semibold;
+    font-size : 22px;
+    margin-bottom : 20px;
+    margin-left : 20px;
+}
+/*
+.crash_details .data_block > div {
+    display : inline-block;
+    width : 25%;
+}
+
+.crash_details .data_block > div > .value {
+    display : block;
+}*/
+
+.crash_details .data_block .simple_blocks {
+    width : 100%;
+    margin-right : 20px;
+    margin-left : 20px;
+    box-sizing : padding-box;
+}
+
+.crash_details .data_block .simple_blocks .sign {
+    display : block;
+}
+
+.crash_details .data_block .simple_blocks > div {
+
+    width : 25%;
+    height : 100px;
+
+
+    text-align : center;
+
+    border : 1px solid #EFEFF2;
+
+    border-radius : 2px;
+
+    display : inline-block;
+
+    box-sizing: border-box;
+
+    position : relative;
+
+}
+
+.crash_details .data_block .simple_blocks > div span {
+
+    /*line-height : 50px;*/
+
+}
+
+.crash_details .data_block .simple_blocks > div .value {
+
+    font-family : Lato-Semibold;
+    font-size : 24px;
+    position : absolute;
+    top : 10px;
+    width : 100%;
+    text-align : center;
+    left : 0px;
+}
+
+.crash_details .data_block .simple_blocks > div .sign {
+    font-size : 16px;
+    position : absolute;
+    bottom : 18px;
+    width : 100%;
+    text-align : center;
+    font-family : Lato-regular;
+}
+
+.crash_details .data_block .advanced_blocks {
+    width : 100%;
+    font-family : Lato-Regular;
+    margin-top : 30px;
+    margin-right : 20px;
+    margin-left : 20px;
+}
+
+.crash_details .data_block .advanced_blocks > div {
+
+    width : 25%;
+    height : 200px;
+    text-align : center;
+    border : 1px solid #EFEFF2;
+    border-radius : 2px;
+    display : inline-block;
+    box-sizing: border-box;
+    position : relative;
+}
+
+.crash_details .data_block .advanced_blocks > div .sign {
+
+    width : 100%;
+    display : block;
+    background-color : #F5F5F5;
+    height : 30px;
+    line-height : 30px;
+
+}
+
+.crash_details .data_block .advanced_blocks > div .value_block {
+    display : block;
+    height : 100px;
+    line-height : 100px;
+}
+
+.crash_details .data_block .advanced_blocks > div .value_block span {
+    display : block;
+    line-height: normal;
+}
+
+.crash_details .data_block .advanced_blocks > div .value_block .value {
+
+    font-size : 30px;
+
+    height: 70px;
+    line-height: 70px;
+    display : block;
+}
+
+.crash_details .data_block .advanced_blocks .min_max span {
+    margin-right : 20px;
+}
+
+.crash_details .data_block .pie_charts_blocks {
+    /*width : 100%;*/
+    margin-right : 20px;
+    margin-left : 20px;
+}
+
+.crash_details .data_block .pie_charts_blocks .pie_wrapper {
+    display : inline-block;
+    width : 25%;
+    height : 200px;
+    text-align : center;
+}
+
+.crash_details .data_block .pie_charts_blocks .pie_wrapper .sign {
+
+    /*width : 100%;*/
+    text-align : center;
+
+    font-family : Lato-Regular;
+
+}
+
+.crash_details .data_block .bar_chart_block {
+    margin-top : 20px;
+    border-top: 1px solid #E7E7E7;
+}

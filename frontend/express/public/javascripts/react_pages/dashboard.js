@@ -171,7 +171,7 @@ var Dashboard = React.createClass({
             }
         ]
 
-        var text_check_style = "normal 12pt Lato-Semibold"; // toto: non-english languages will have another font-family
+        var text_check_style = "normal 12px Lato-Semibold"; // letter-spacing: 0.98px;
 
         var long_text_flag = false;
 
@@ -264,8 +264,6 @@ var Dashboard = React.createClass({
 
                         return (
                             <div  onClick={self.top_tab_click.bind(self, id, tab)} className={class_name} style={style}>
-                                <div className={"green_line"}>
-                                </div>
                                 <div className={"total"}>
                                     {total}
                                 </div>
@@ -361,6 +359,7 @@ var Dashboard = React.createClass({
         var canvas = this.getTextWidth.canvas || (this.getTextWidth.canvas = document.createElement("canvas"));
         var context = canvas.getContext("2d");
         context.font = font;
+        context["letter-spacing"] = "0.98px";        
         var metrics = context.measureText(text);
         return metrics.width;
     },

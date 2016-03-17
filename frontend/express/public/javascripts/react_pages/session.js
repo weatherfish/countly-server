@@ -106,8 +106,6 @@ var SessionPage = React.createClass({
 
     },
 
-
-
     render : function(){
 
         var self = this;

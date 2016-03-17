@@ -4,7 +4,8 @@ var ManageUserBlock = React.createClass({
 
         return({
             edit_open : false,
-            user : this.props.user
+            user : this.props.user,
+            row_height : 40
         });
 
     },
@@ -96,9 +97,6 @@ var ManageUserBlock = React.createClass({
 
     save_user : function(){
 
-        console.log("====== save user ==========");
-        console.log(this.state.user);
-
         $.ajax({
             type: "GET",
                 url: countlyCommon.API_PARTS.users.w + '/update',
@@ -109,15 +107,35 @@ var ManageUserBlock = React.createClass({
                 dataType: "jsonp",
             success: function(result) {
 
-                console.log("============ save user result ===========");
-                console.log(result);
+                //console.log("============ save user result ===========");
+                //console.log(result);
 
             },
             error : function(error){
-                console.log("========= error save =========");
-                console.log(error);
+                //console.log("========= error save =========");
+                //console.log(error);
             }
         });
+    },
+
+    onHeightChange : function(label, new_height){
+
+        ///console.log("================== onHeightChange =========================");
+        //console.log(new_height);
+
+        if (new_height > this.state.row_height)
+        {
+            this.setState({
+                row_height : new_height
+            });
+        }
+        /*
+        if (new_height > this.max_height[label])
+        {
+            this.max_height[label]
+        }
+*/
+
     },
 
     render : function() {
@@ -127,24 +145,49 @@ var ManageUserBlock = React.createClass({
         var save_block_style = {};
         var edit_button_style = {};
 
+        var user_email_style = {
+            "height" : this.state.row_height + "px",
+            "line-height" : this.state.row_height + "px",
+        }
+
+        var user_info_style = { };
+
+        var user_of_style = { };
+
         if(this.state.edit_open) // show multi sellect
         {
 
-            var admin_of_block = <MultiSelectBlock
-                label="admin of apps"
-                selectors={this.props.apps}
-                active_selectors_keys={this.state.user.admin_of}
-                onChange={this.add_admin_app}
-                className={false}
-            />
+            user_info_style["background-color"] = "white";
 
-            var user_of_block = <MultiSelectBlock
-                label="user of apps"
-                selectors={this.props.apps}
-                active_selectors_keys={this.state.user.user_of}
-                onChange={this.add_user_app}
-                className={false}
-            />
+            var adminof_width = this.props.width / 100 * 30;
+            var userof_width = this.props.width / 100 * 40;
+
+            var admin_of_block =
+                <MultiSelectBlock
+                    label="admin of apps"
+                    selectors={this.props.apps}
+                    active_selectors_keys={this.state.user.admin_of}
+                    onChange={this.add_admin_app}
+                    className={false}
+                    blockWidth={adminof_width}
+                    onHeightChange={this.onHeightChange}
+                    parent_height={this.state.row_height}
+                />
+
+            var user_of_block =
+                <MultiSelectBlock
+                    label="user of apps"
+                    selectors={this.props.apps}
+                    active_selectors_keys={this.state.user.user_of}
+                    onChange={this.add_user_app}
+                    className={false}
+                    blockWidth={userof_width}
+                    onHeightChange={this.onHeightChange}
+                    parent_height={this.state.row_height}
+                />
+
+            user_email_style.float = "left";
+            user_of_style.float = "right";
 
           /*
             var admin_of_block = [];
@@ -234,15 +277,15 @@ var ManageUserBlock = React.createClass({
         }
 
         return(
-                <div className="user_info">
+                <div className="user_info" style={user_info_style}>
 
-                    <div className="email">{this.state.user.email}</div>
+                    <div className="email" style={user_email_style}>{this.state.user.email}</div>
 
                     <div className="admin_of">
                         {admin_of_block}
                     </div>
 
-                    <div className="user_of">
+                    <div className="user_of" style={user_of_style}>
                         {user_of_block}
                     </div>
 

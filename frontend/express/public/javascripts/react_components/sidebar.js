@@ -42,8 +42,40 @@ var FullSidebar = React.createClass({
             previous_left : -1,
             top_active    : false,
             active_app    : this.props.active_app,
-            right_selected_item : right_selected_item
+            right_selected_item : right_selected_item,
+            apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode()
         };
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+
+        console.log("======== sidebar receive props =========");
+        console.log(nextProps);
+
+        if (this.state.apps_list_hash == JSON.stringify(countlyGlobal['apps']).hashCode())
+        {
+            return false;
+        }
+
+        console.log("- +++ app changed  ------");
+        console.log(countlyGlobal['apps']);
+
+        var active_app = this.state.active_app;
+
+        for (var app_id in countlyGlobal['apps']){
+
+            if (app_id == this.state.active_app.id)
+            {
+                active_app.name = countlyGlobal['apps'][app_id].name;
+                break;
+            }
+
+        }
+
+        this.setState({
+          active_app : active_app,
+          apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode()
+        });
     },
 
     handle_top_click : function()
@@ -172,11 +204,11 @@ var FullSidebar = React.createClass({
             "active_app" : app,
             "top_active" : false
         });
-
+/*
         $(event_emitter).trigger("app_changed", {
             "app_id"  : app.id,
             "app_key" : app.key
-        });
+        });*/
     },
 
     render : function() {
@@ -227,7 +259,10 @@ var FullSidebar = React.createClass({
         return (
             <div className="wrapper">
 
-                <SidebarTop is_active={this.state.top_active} active_app={this.state.active_app} onClick={this.handle_top_click}/>
+                <SidebarTop
+                    is_active={this.state.top_active}
+                    active_app={this.state.active_app}
+                    onClick={this.handle_top_click}/>
 
                 <ApplicationsList
                     applications={this.props.applications}

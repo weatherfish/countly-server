@@ -498,9 +498,7 @@ var CrashesPage = React.createClass({
                         }
 
                         return (
-                            <div  onClick={self.top_tab_click.bind(self, id, tab)} className={class_name} style={style}>
-                                <div className={"green_line"}>
-                                </div>
+                            <div onClick={self.top_tab_click.bind(self, id, tab)} className={class_name} style={style}>
                                 <div className={"total"}>
                                     {total}
                                 </div>
@@ -551,6 +549,7 @@ var CrashesPage = React.createClass({
         var canvas = this.getTextWidth.canvas || (this.getTextWidth.canvas = document.createElement("canvas"));
         var context = canvas.getContext("2d");
         context.font = font;
+        context["letter-spacing"] = "0.98px";     
         var metrics = context.measureText(text);
         return metrics.width;
     },

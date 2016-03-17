@@ -2,11 +2,14 @@ var Chart = React.createClass({
 
     y_scale_log : false,
 
-    colors : ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"],
+    colors : ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575", "#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"],
 
     getInitialState: function() {
 
         var data = this.props.data_function();
+
+        console.log("<<<<<<<<<<<<<<<< CHART data >>>>>>>>>>>>>>>>>>>");
+        console.log(data);
 
         data = data.chartData;
 

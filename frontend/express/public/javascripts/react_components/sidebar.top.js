@@ -12,6 +12,8 @@ var SidebarTop = React.createClass({
     },
     render: function() {
 
+        console.log("===== rendr sidebar top ");
+
         var class_name = "";
 
         //if (this.state.pushed)
@@ -23,7 +25,7 @@ var SidebarTop = React.createClass({
             class_name += " closed";
         }
 
-        var logo_src = "/appimages/" + this.props.active_app.logo;
+        var logo_src = "/appimages/" + this.props.active_app.logo + "?v=" + this.props.active_app.icon_version;
 
         return (
             <div id="sidebar_top" className={class_name} onClick={this.handleClick}>

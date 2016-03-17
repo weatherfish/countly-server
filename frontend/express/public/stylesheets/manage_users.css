@@ -2,6 +2,7 @@
     background-color : #ffffff;
     position : relative;
     top : -70px;
+    padding-bottom : 300px;
 }
 
 #manage_users_page .top_block {
@@ -92,6 +93,9 @@
     border-left : 1px solid #E9E9E9;
     border-right : 1px solid #E9E9E9;
 
+    padding-top : 10px;
+    padding-bottom : 10px;
+
     position : relative;
 
     box-sizing: border-box;
@@ -106,14 +110,15 @@
 #manage_users_page .users_table .user_info > div {
     display : inline-block;
     /*padding-left : 10px;*/
-    height : 40px;
-    line-height : 40px;
+    /*height : 40px;
+    line-height : 40px;*/
     box-sizing: border-box;
     padding-left : 10px;
 }
 
 #manage_users_page .users_table .user_info .email, #manage_users_page .users_table .users_table_header .email {
     width : 30%;
+    /*float : left;*/
 }
 
 #manage_users_page .users_table .user_info .admin_of, #manage_users_page .users_table .users_table_header .admin_of {
@@ -122,6 +127,7 @@
 
 #manage_users_page .users_table .user_info .user_of, #manage_users_page .users_table .users_table_header .user_of {
     width : 40%;
+    /*float : right;*/
 }
 
 #manage_users_page .users_table .user_info .edit_button {
@@ -145,14 +151,21 @@
 
 #manage_users_page .users_table .user_info .save_block {
     display : none;
-    position : absolute;
+    /*position : absolute;
     right : 10px;
-    top : 0px;
+    top : 0px;*/
     font-family : Lato-Regular;
     font-size : 14px;
 
-    height : 40px;
-    line-height : 40px;
+    /*height : 40px;
+    line-height : 40px;*/
+
+    width: 100%;
+    /* display: block; */
+    text-align: right;
+    margin-right: 40px;
+    padding-right: 40px;
+    margin-top: 10px;
 
 }
 
@@ -167,6 +180,7 @@
     color : red;
     cursor : pointer;
     text-decoration : underline;
+    margin-right : 20px;
 }
 
 

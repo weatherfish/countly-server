@@ -1,13 +1,14 @@
 .multi_selectors_block {
     font-family : Lato-Regular;
+    transition: all 0.4s;
 }
 
 .multi_selectors_block .current {
 
     border: 1px solid #DEDEDE;
     border-radius: 3px;
-    width : 180px;
-    height : 30px;
+    /*width : 180px;
+    height : 30px;*/
     line-height : 30px;
     cursor : pointer;
     padding-left : 10px;
@@ -15,6 +16,11 @@
     box-sizing: border-box;
 
     font-size: 14px;
+
+    white-space: normal;
+
+    transition: all 0.4s;
+
 }
 
 .multi_selectors_block .current .arrow {
@@ -25,8 +31,9 @@
     width: 20px;
     height: 20px;
     position: absolute;
-    top: 6px;
-    right: 10px;
+    /*top: 6px;
+    right: 10px;*/
+    bottom : -3px;
 }
 
 .multi_selectors_block .current .sign {
@@ -34,7 +41,7 @@
     line-height : 30px;
     display: inline-block;
 
-    white-space: nowrap;
+    white-space: normal;
 
 }
 
@@ -48,7 +55,7 @@
 
 .multi_selectors_block .selectors_items {
     position : absolute;
-    top : 40px;
+    /*top : 40px;*/
     left : 0px;
 
     font-size: 14px;
@@ -56,7 +63,7 @@
     /*background-color: white;
     position: relative;*/
 
-    width: 180px;
+    /*width: 180px;*/
     background-color: #202531;
     border-top: 1px solid #2E3545;
     border-right: 1px solid #2E3545;

@@ -32,9 +32,6 @@ var NewUserWindow = React.createClass({
 
         var self = this;
 
-        console.log("------------ add ----------");
-        console.log(this.user_data);
-
         var data = {};
 
         data.full_name = this.user_data.fullname;
@@ -61,9 +58,6 @@ var NewUserWindow = React.createClass({
     				//data.user_of = currUserDetails.find(".user-apps .app-list").val().split(",");
   			}
 
-        console.log("<<<<<<<<<<<<< data >>>>>>>>>>>>>>>>");
-        console.log(data);
-
         this.setState({
             loading : true
         });
@@ -77,8 +71,6 @@ var NewUserWindow = React.createClass({
                   },
                   dataType: "jsonp",
       			success: function(result) {
-                console.log("---ajax result ---");
-                console.log(result);
 
                 self.props.onUserAdd(result);
                 self.props.onClose();
@@ -147,6 +139,7 @@ var NewUserWindow = React.createClass({
 
                 <MultiSelectBlock
                     label="admin of app"
+                    blockWidth={"180"}
                     selectors={this.state.apps}
                     onChange={this.on_row_change}
                     setting="adminof"
@@ -161,6 +154,7 @@ var NewUserWindow = React.createClass({
 
                 <MultiSelectBlock
                     label="admin of app"
+                    blockWidth={"180"}
                     selectors={this.state.apps}
                     onChange={this.on_row_change}
                     setting="userof"
@@ -291,6 +285,8 @@ var ManageUsersPage = React.createClass({
             width : elements_width
         }
 
+        var manage_block_width = elements_width - 20*2; // todo: tmp variable, look this.refs.svg.getDOMNode().offsetWidth
+
         return (
             <div id="manage_users_page" style={page_style}>
 
@@ -313,19 +309,20 @@ var ManageUsersPage = React.createClass({
                                       <div className="admin_of">Admin of</div>
                                       <div className="user_of">User of</div>
                                   </div>
-                            {
-                                _.map(self.state.users_data, function(user){
+                                  {
+                                      _.map(self.state.users_data, function(user){
 
-                                    return (<ManageUserBlock
-                                        user={user}
-                                        email={user.email}
-                                        admin_of={user.admin_of}
-                                        user_of={user.user_of}
-                                        apps={self.state.apps}
-                                        />)
+                                          return (<ManageUserBlock
+                                                      user={user}
+                                                      email={user.email}
+                                                      admin_of={user.admin_of}
+                                                      user_of={user.user_of}
+                                                      apps={self.state.apps}
+                                                      width={manage_block_width}
+                                                  />)
 
-                                })
-                            }
+                                      })
+                                  }
 
                         </div>)
                     }

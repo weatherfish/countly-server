@@ -47,7 +47,12 @@ var NewAppWindow = React.createClass({
             });
         };
 
-        return ({});
+        return ({
+            //"confirmation_waiting" : false
+            "confirmation_waiting" : true,
+            "confirmation_sign" : jQuery.i18n.map["management-applications.delete-confirm"],
+            "confirmation_function" : false
+        });
 
     },
 
@@ -68,14 +73,6 @@ var NewAppWindow = React.createClass({
         this.setState({
             loading : true
         })
-
-        console.log("--------- will add --------------");
-        console.log({
-            name : this.app_data.name,
-            category : this.app_data.category,
-            timezone : this.app_data.timezone,
-            country  : this.app_data.country
-        });
 
         this.props.onClose();
 
@@ -114,7 +111,7 @@ var NewAppWindow = React.createClass({
 
                 console.log("new_app_id:", new_app_id);
 
-                self.upload_image(new_app_id, function(error, result){
+                self.props.upload_icon(new_app_id, self.icon_file, function(error, result){
 
                     console.log("--- add finish ----");
                     console.log(result);
@@ -140,7 +137,7 @@ var NewAppWindow = React.createClass({
 
     },
 
-    handleFileChange: function(e){
+    handleIconAdd: function(e){
 
         var file = this.refs.file.getDOMNode().files[0];
 
@@ -150,37 +147,6 @@ var NewAppWindow = React.createClass({
         }
 
         this.icon_file = file;
-
-    },
-
-    upload_image : function(app_id, __callback){
-
-        var file = this.icon_file;
-
-        var fd = new FormData();
-        fd.append('file', file);
-
-        superagent
-            .post('/apps/icon')
-            .field('name', file.name)
-            .field("app_image_id", app_id)
-            .field('size', file.size)
-            .attach('image', file, file.name)
-            .set('Accept', 'application/json')
-            .set('x-csrf-token', countlyGlobal['csrf_token'])
-            .end(function(err, res){
-
-                if (err)
-                {
-                    console.log(err);
-                    return false;
-                }
-
-                var image_url = res.text;
-
-                __callback(false, image_url);
-
-            })
 
     },
 
@@ -230,7 +196,7 @@ var NewAppWindow = React.createClass({
                     <div className="upload_block">
 
                         <form ref="uploadForm" enctype="multipart/form-data" id="add-app-image-form">
-                            <input ref="file" type="file" id="app_image" name="app_image"  onChange={this.handleFileChange}/>
+                            <input ref="file" type="file" id="app_image" name="app_image"  onChange={this.handleIconAdd}/>
                         </form>
 
                     </div>
@@ -326,7 +292,7 @@ var ApplicationsPage = React.createClass({
 
         console.log("selectAppClick:", id);
 
-        var current_app = countlyGlobal['apps'][i];
+        var current_app = countlyGlobal['apps'][id];
 
         this.setState({
             current_app : current_app,
@@ -338,42 +304,46 @@ var ApplicationsPage = React.createClass({
 
     saveApp : function(props, state){
 
+        var self = this;
+
         var updated_app = this.state.current_app;
 
         if (state.value_key)
         {
             updated_app[props.save_key] = state.value_key;
         }
-        else {
+        else
+        {
             updated_app[props.save_key] = state.value;
         }
 
-        this.props.on_app_rename(updated_app);
+        $.ajax({
+            type:"GET",
+            url:countlyCommon.API_PARTS.apps.w + '/update',
+            data:{
+                args:JSON.stringify({
+                    app_id : updated_app._id,
+                    name : updated_app.name,
+                    category : updated_app.category,
+                    timezone : updated_app.timezone,
+                    country : "CN" // todo!!!!!!!!!!!!!!!!!!
+                }),
+                api_key:countlyGlobal['member'].api_key
+            },
+            dataType:"jsonp",
+            success:function (data) {
 
-            $.ajax({
-                type:"GET",
-                url:countlyCommon.API_PARTS.apps.w + '/update',
-                data:{
-                    args:JSON.stringify({
-                        app_id : updated_app._id,
-                        name : updated_app.name,
-                        category : updated_app.category,
-                        timezone : updated_app.timezone,
-                        country : "CN" // todo!!!!!!!!!!!!!!!!!!
-                    }),
-                    api_key:countlyGlobal['member'].api_key
-                },
-                dataType:"jsonp",
-                success:function (data) {
-
-                    console.log("========= saved ==============");
-                    console.log(data);
-
+                for (var modAttr in data) {
+                    countlyGlobal['apps'][updated_app._id][modAttr] = data[modAttr];
+                    countlyGlobal['admin_apps'][updated_app._id][modAttr] = data[modAttr];
                 }
-            });
 
-        /*});
-*/
+                console.log("========= saved ==============");
+                console.log(countlyGlobal['apps'][updated_app._id]);
+                console.log(data);
+
+            }
+        });
     },
 
     clearData : function(){
@@ -429,16 +399,13 @@ var ApplicationsPage = React.createClass({
 
         var self = this;
 
-        console.log("=============== delte current app =================");
+        console.log("=============== confirm delte current app =================");
         console.log(self.state.current_app);
 
         //var current_app = this.state.current_app;
 
-        CountlyHelpers.confirm(jQuery.i18n.map["management-applications.delete-confirm"], "red", function (result) {
-
-            if (!result) {
-                return true;
-            }
+        var _delete = function()
+        {
 
             var appId = self.state.current_app._id;
 
@@ -495,7 +462,14 @@ var ApplicationsPage = React.createClass({
                 error:function () {
                     CountlyHelpers.alert(jQuery.i18n.map["management-applications.delete-admin"], "red");
                 }
+
             });
+        }
+
+        this.setState({
+            "confirmation_waiting" : true,
+            "confirmation_sign" : jQuery.i18n.map["management-applications.delete-confirm"],
+            "confirmation_function" : _delete
         });
 
     },
@@ -512,6 +486,70 @@ var ApplicationsPage = React.createClass({
         this.setState({
             new_app_open : false
         })
+    },
+
+    handleIconChange: function(e){
+
+        var self = this;
+
+        console.log("this.refs.file:", this.refs);
+
+        var file = this.refs.app_image.getDOMNode().files[0];
+
+        if (!file)
+        {
+            return false;
+        }
+
+        this.upload_icon(this.state.current_app_id, file, function(error, result){
+
+            var app = self.state.current_app;
+            app.icon_version = (Math.random().toString(36)+'00000000000000000').slice(2, 8+2); // need to update the image in react render
+
+            countlyGlobal['apps'][self.state.current_app_id] = app;
+            countlyGlobal['admin_apps'][self.state.current_app_id] = app;
+
+            self.props.on_app_rename();
+
+            self.setState({
+                current_app : app
+            })
+        });
+
+    },
+
+    upload_icon : function(app_id, file, __callback){
+
+        //var file = this.icon_file;
+
+        var fd = new FormData();
+        fd.append('file', file);
+
+        superagent
+            .post('/apps/icon')
+            .field('name', file.name)
+            .field("app_image_id", app_id)
+            .field('size', file.size)
+            .attach('image', file, file.name)
+            .set('Accept', 'application/json')
+            .set('x-csrf-token', countlyGlobal['csrf_token'])
+            .end(function(err, res){
+
+                if (err)
+                {
+                    console.log("upload error:", err);
+                    __callback(err, false);
+                    return false;
+                }
+
+                console.log("uploaded:", res);
+
+                var image_url = res.text;
+
+                __callback(false, image_url);
+
+            })
+
     },
 
     render : function(){
@@ -546,10 +584,10 @@ var ApplicationsPage = React.createClass({
 
         var icon_style = {};
 
-        icon_style["background-image"] = "url('/appimages/" + this.state.current_app._id + ".png')";
+        icon_style["background-image"] = "url('/appimages/" + this.state.current_app._id + ".png?v=" + this.state.current_app.icon_version + "')";
 
         var selector_logo_style = {
-            "background-image" : "url('/appimages/" + this.state.current_app._id + ".png')"
+            "background-image" : "url('/appimages/" + this.state.current_app._id + ".png?v=" + this.state.current_app.icon_version + "')"
         }
 
         var app_selectors = [];
@@ -566,6 +604,13 @@ var ApplicationsPage = React.createClass({
 
         };
 
+        var confirm_block_style = {};
+
+        if (this.state.confirmation_waiting)
+        {
+            confirm_block_style.display = "block";
+        }
+
         return (
             <div id="applications_page" style={page_style}>
 
@@ -574,7 +619,12 @@ var ApplicationsPage = React.createClass({
                     <div className="new_app_button" onClick={this.new_app_click}>Add New App</div>
                 </div>
 
-                <NewAppWindow open={this.state.new_app_open} onClose={this.new_app_close} onCreate={self.selectAppClick}/>
+                <NewAppWindow
+                    open={this.state.new_app_open}
+                    onClose={this.new_app_close}
+                    onCreate={self.selectAppClick}
+                    upload_icon={this.upload_icon}
+                />
 
                 <div className="wrapper">
 
@@ -637,13 +687,18 @@ var ApplicationsPage = React.createClass({
 
                                 <span className="row">
                                     <span className="key">IAP Event Key</span>
-                                    <span className="value">101010test1010101</span>
+                                    <span className="value">---</span>
                                 </span>
                             </div>
 
                             <div className="icon_block">
-                                <span className="sign">Icon</span>
-                                <div className="icon" style={icon_style}></div>
+
+                                <form ref="uploadForm" enctype="multipart/form-data" id="add-app-image-form">
+
+                                    <input ref="app_image" type="file" id="app_image" name="app_image" className="inputfile" onChange={this.handleIconChange}/>
+                                    <label for="app_image"><span className="sign">Icon</span>
+                                    <div className="icon" style={icon_style}></div></label>
+                                </form>
                             </div>
 
                         </div>
@@ -656,6 +711,15 @@ var ApplicationsPage = React.createClass({
 
                     </div>
                 </div>
+
+                <div className="confirm_block" style={confirm_block_style}>
+                    <div className="sign">{this.state.confirmation_sign}</div>
+                    <div className="buttons">
+                        <span className="cancel">cancel</span>
+                        <span className="confirm">confirm</span>
+                    </div>
+                </div>
+
             </div>
         );
     }

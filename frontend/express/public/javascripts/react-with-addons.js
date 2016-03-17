@@ -21624,7 +21624,8 @@ if ("production" !== "development") {
 
     if (!condition) {
       var argIndex = 0;
-      var message = 'Warning: !!!!!!!!!! error!!!!!!!!'// + format.replace(/%s/g, function()  {return args[argIndex++];});
+      //var message = 'Warning: !!!!!!!!!! error!!!!!!!!'// + format.replace(/%s/g, function()  {return args[argIndex++];});
+      var message = format.replace(/%s/g, function()  {return args[argIndex++];});
       console.warn(message);
       try {
         // --- Welcome to debugging React ---

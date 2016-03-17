@@ -1,19 +1,18 @@
 var PieChart = React.createClass({
 
+    element_id : false,
+
     getInitialState: function() {
 
+        this.element_id = this.makeid();
+
         var data = this.props.data_function();
-
-        console.log("====== init data ========");
-        console.log(data);
-
-        data = data.chartDPTotal.dp;
 
         var formatted_data = [];
 
         for (var i = 0; i < data.length; i++)
         {
-            formatted_data.push({ label : data[i]['label'], value: data[i]["data"][0][1] })
+            formatted_data.push({ label : data[i]['name'], value: Math.round(data[i]["percent"]) })
         }
 
         return {
@@ -21,40 +20,19 @@ var PieChart = React.createClass({
         };
     },
 
-    componentWillMount: function() {
-
-        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
-/*
-            this.setState({
-                data : data
-            });
-*/
-            //this.draw_bars("#bar_chart");
-
-        }.bind(this));
-
-        $(event_emitter).on('data_changed', function(e, data){
-
-
-
-        }.bind(this));
-
-    },
-
     draw : function(container)
     {
 
-        console.log("========== this.state.data =========");
-        console.log(this.state.data);
+        //return false;
 
-        var pie = new d3pie("#pie_chart", {
-          size: {
-            canvasHeight: this.props.height,
-            canvasWidth: this.props.width
-          },
-          data: {
-            content :  this.state.data }
-          });
+        var pie = new d3pie("#" + this.element_id, {
+            size: {
+                canvasHeight : this.props.height,
+                canvasWidth  : this.props.width
+            },
+            data: {
+                content :  this.state.data
+            }});
 
     },
 
@@ -65,19 +43,30 @@ var PieChart = React.createClass({
             height : this.props.height
         }
         return (
-            <svg className="pie_chart" style={style} id="pie_chart">
+            <svg className="pie_chart" style={style} id={this.element_id}>
             </svg>
         );
     },
 
     componentDidMount : function()
     {
-        this.draw("#pie_chart");
+        this.draw("#" + this.element_id);
     },
 
     componentDidUpdate : function()
     {
-        this.draw("#pie_chart");
+        this.draw("#" + this.element_id);
+    },
+
+    makeid : function()
+    {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for( var i=0; i < 7; i++ )
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
     }
 
 });

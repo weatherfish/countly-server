@@ -84,6 +84,7 @@
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/selector_with_search.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/select.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/multi_select.css" />
+				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/crash_details.css" />
 
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
 		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.form.js"></script>
@@ -117,7 +118,7 @@
 				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/react-with-addons.js"></script>
 				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/ReactRouter.min.js"></script>
 
-				<!--script type="text/javascript" src="<%- cdn %>/javascripts/visualization/d3pie.js"></script-->
+				<script type="text/javascript" src="<%- cdn %>/javascripts/visualization/d3pie.js"></script>
 
 				<script type="text/javascript" src="<%- cdn %>/javascripts/JSXTransformer.js"></script>
 
@@ -164,6 +165,8 @@
 				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/sort_functions.js?<%= countlyVersion %>"></script>
 				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/utils/superagent.min.js?<%= countlyVersion %>"></script>
 
+				<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/react-dropzone.js?<%= countlyVersion %>"></script>
+
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/dashboard.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/frequency.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/loyalty.js"></script>
@@ -176,7 +179,11 @@
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/countries.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/events.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/crashes.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/crash_details.js"></script>
+
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/applications.js"></script>
+				<!--script type="text/javascript" src="http://192.168.187.129:3000/static/bundle.js"></script-->
+
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/manage_users.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/configurations.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/map_session.js"></script>
@@ -416,7 +423,7 @@
 
 					  render() {
 
-								if (this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1)
+								if (this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1 && this.props.location.pathname.indexOf("/crashes/") == -1)
 								{
 
 										var calendar = <div id="calendar_block">
@@ -487,14 +494,11 @@
 						},
 
 						on_app_rename : function(app){
-
+/*
 								var applications = this.state.applications;
 
 								for (var i = 0; i < applications.length; i++)
 								{
-										console.log(">>>> app >>>>");
-										console.log(applications[i]["id"], " > ", app["_id"]);
-										//console.log(app);
 
 										if (applications[i]["id"] == app["_id"])
 										{
@@ -504,12 +508,9 @@
 												break;
 										}
 								}
-
-								console.log("========= new applications =======");
-								console.log(applications);
-
+*/
 								this.setState({
-										applications : applications
+										applications : countlyGlobal['apps']
 								})
 
 						},
@@ -556,6 +557,7 @@
 														</Route>
 														<Route path="crashes" component={wrapComponent(CrashesPage, {date : this.state.date})}>
 														</Route>
+														<Route name="crashes_detail" path="/crashes/:crash_id" component={CrashDetailsPage}/>
 														<Route path="manage">
 																<Route path="apps" component={wrapComponent(ApplicationsPage, {on_app_rename : this.on_app_rename})} />
 																<Route path="users" component={ManageUsersPage}/>
@@ -566,7 +568,11 @@
 						}
 				})
 
-				React.render(React.createElement(CountlyRouter), document.getElementById("react_routing"))
+				setTimeout(function(){
+						React.render(React.createElement(CountlyRouter), document.getElementById("react_routing"));
+				}, 2000)
+
+
 
 		</script>
 
@@ -607,6 +613,17 @@
     <!---->
 
 		<script type="text/javascript">
+
+				String.prototype.hashCode = function() {
+						var hash = 0, i, chr, len;
+						if (this.length === 0) return hash;
+						for (i = 0, len = this.length; i < len; i++) {
+						chr   = this.charCodeAt(i);
+						hash  = ((hash << 5) - hash) + chr;
+						hash |= 0; // Convert to 32bit integer
+						}
+						return hash;
+				};
 
 				/*
 					todo: move icons load inside component

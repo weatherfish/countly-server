@@ -298,6 +298,8 @@ var SortTable = React.createClass({
         /*if (nextProps.date != this.props.date) // todo !!!!!!!!!!!!!!!!!!!!!!
         {*/
 
+            var data = nextProps.data_function();
+
             if (data.get_current_data)
             {
                 var rows = data.get_current_data('daily'); // todo: only daily

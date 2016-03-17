@@ -27,8 +27,12 @@ var SimpleSelectBlock = React.createClass({
 
     componentWillReceiveProps : function(nextProps){
 
-        if (nextProps.active_selector_key)
+
+        if (nextProps.active_selector_key && nextProps.active_selector_key != this.state.active_selector.key)
         {
+
+            var active_selector = false;
+
             for (var i = 0; i < nextProps.selectors.length; i++)
             {
 
@@ -57,6 +61,8 @@ var SimpleSelectBlock = React.createClass({
 
     select : function(selector) {
 
+        console.log("select 1:", selector);
+
         if (this.props.setting)
         {
             this.props.onChange(this.props.setting, selector.key);
@@ -65,6 +71,8 @@ var SimpleSelectBlock = React.createClass({
         {
             this.props.onChange(selector.key);
         }
+
+        console.log("select 2:", selector);
 
         this.setState({
             "active_selector" : selector,
