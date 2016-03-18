@@ -63,7 +63,7 @@ var defaultSettings = {
 	size: {
 		canvasHeight: 500,
 		canvasWidth: 500,
-		pieInnerRadius: "0%",
+		pieInnerRadius: "70%",
 		pieOuterRadius: null
 	},
 	data: {
@@ -685,7 +685,7 @@ var math = {
 		return data;
 	},
 
-	
+
 
 	// var pieCenter = math.getPieCenter();
 	getPieTranslateCenter: function(pieCenter) {

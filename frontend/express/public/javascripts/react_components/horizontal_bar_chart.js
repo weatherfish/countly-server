@@ -736,8 +736,6 @@ var HorizontalBarChart = React.createClass({
                 .style("opacity", 0)
                 .remove();
 
-
-
         }
 
     },

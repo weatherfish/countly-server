@@ -594,8 +594,9 @@
 #applications_page .confirm_block {
 
     position : absolute;
-    top : 20px;
-    left : 30px;
+    top : 100px;
+
+    /*left : 30px;*/
 
     font-family : Lato-Regular;
 
@@ -606,7 +607,7 @@
 
     padding : 20px;
 
-    border : 1px solid #eeeeee;
+    border : 2px solid #eeeeee;
     border-radius : 2px;
     background-color: white;
     z-index : 5000;

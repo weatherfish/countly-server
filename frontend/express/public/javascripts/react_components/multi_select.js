@@ -49,13 +49,17 @@ var MultiSelectBlock = React.createClass({
 
         var rows = Math.ceil(text_width / (element_width - 50)); // todo: var
 
+        var row_height = 30;
+
+        if (this.props.onHeightChange) this.props.onHeightChange(this.props.label, row_height * rows + 10);
+
         return({
             selectors : this.props.selectors,
             active_selectors : active_selectors,
             open : false,
             blockWidth : this.props.blockWidth,
             element_width : element_width,
-            row_height : 30,
+            row_height : row_height,
             rows : rows,
             active_selectors_sign : active_selectors_sign,
             parent_height : this.props.parent_height
@@ -212,7 +216,6 @@ var MultiSelectBlock = React.createClass({
         }
 */
 
-        console.log("this.props.parent_height:", this.props.parent_height);
 
         var own_height = (this.state.row_height * this.state.rows) + 10;
 

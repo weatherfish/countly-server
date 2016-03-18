@@ -85,6 +85,7 @@
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/select.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/multi_select.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/crash_details.css" />
+				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/bool_pie_chart.css" />
 
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
 		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.form.js"></script>
@@ -226,6 +227,12 @@
 
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/select.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/multi_select.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/simple_input.js"></script>
+
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/bool_pie_chart.js"></script>
+
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react-height.min.js"></script>
+
 
 				<!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/countly/countly.template.js?<%= countlyVersion %>"></script-->
 
@@ -423,7 +430,7 @@
 
 					  render() {
 
-								if (this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1 && this.props.location.pathname.indexOf("/crashes/") == -1)
+								if (this.props.location.pathname.indexOf("/manage/users") == -1 && this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1 && this.props.location.pathname.indexOf("/crashes/") == -1)
 								{
 
 										var calendar = <div id="calendar_block">
@@ -568,11 +575,7 @@
 						}
 				})
 
-				setTimeout(function(){
-						React.render(React.createElement(CountlyRouter), document.getElementById("react_routing"));
-				}, 2000)
-
-
+				React.render(React.createElement(CountlyRouter), document.getElementById("react_routing"));
 
 		</script>
 

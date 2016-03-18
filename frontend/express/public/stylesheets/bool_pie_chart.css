@@ -1,0 +1,13 @@
+.bool_pie_chart {
+    position : relative;
+}
+
+.bool_pie_chart .label {
+    position : absolute;
+    top : 0px;
+    left : 0px;
+    width : 100%;
+    text-align : center;
+    font-family : Lato-Regular;
+    font-size: 28px;
+}

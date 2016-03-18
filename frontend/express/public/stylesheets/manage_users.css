@@ -1,8 +1,9 @@
 #manage_users_page {
     background-color : #ffffff;
     position : relative;
-    top : -70px;
-    padding-bottom : 300px;
+    /*top : -70px;*/
+    background-color : #F5F5F5;
+    border : 0px solid white;
 }
 
 #manage_users_page .top_block {
@@ -24,7 +25,6 @@
     font-size: 18px;
     margin-left: 30px;
     /* margin-top: 20px; */
-    margin-bottom: 20px;
 }
 
 #manage_users_page .top_block .new_user_button {
@@ -48,12 +48,16 @@
     background-color : #13B757;
 }
 
-#manage_users_page > .sign {
+#manage_users_page .wrapper {
+    background-color: white;
+    margin-top : 20px;
+    padding-bottom : 300px;
+}
+
+#manage_users_page .wrapper > .sign {
     margin-left : 30px;
-    margin-top : 30px;
     margin-right : 30px;
     line-height : 60px;
-
     font-family : Lato-Regular;
 }
 
@@ -99,6 +103,14 @@
     position : relative;
 
     box-sizing: border-box;
+
+    /**cursor : pointer;/
+}
+
+#manage_users_page .users_table .user_info.edit {
+
+    /*cursor : default;*/
+
 }
 
 #manage_users_page .users_table .user_info:hover {
@@ -117,17 +129,21 @@
 }
 
 #manage_users_page .users_table .user_info .email, #manage_users_page .users_table .users_table_header .email {
-    width : 30%;
-    /*float : left;*/
+    /*width : 30%;*/
+    float : left;
 }
 
 #manage_users_page .users_table .user_info .admin_of, #manage_users_page .users_table .users_table_header .admin_of {
-    width : 30%;
+    /*width : 30%;*/
 }
 
 #manage_users_page .users_table .user_info .user_of, #manage_users_page .users_table .users_table_header .user_of {
-    width : 40%;
+    /*width : 40%;*/
     /*float : right;*/
+}
+
+#manage_users_page .users_table .user_info .email div {
+    display : inline-block;
 }
 
 #manage_users_page .users_table .user_info .edit_button {
@@ -255,27 +271,6 @@
     box-sizing: border-box;
 }
 
-.setting_block {
-
-    height : 60px;
-    line-height: 60px;
-
-    border-bottom : 1px solid #eeeeee;
-
-    font-family : Lato-Regular;
-
-}
-
-.setting_block div {
-    display : inline-block;
-}
-
-.setting_block .setting_label {
-    width : 300px;
-    padding-left : 20px;
-    box-sizing: border-box;
-}
-
 #manage_users_page  .new_user_block .add_button, #manage_users_page  .new_user_block .cancel_button {
 
     width : 100px;
@@ -301,4 +296,44 @@
 
 #manage_users_page  .new_user_block .cancel_button {
     background-color :red;
+}
+
+#manage_users_page  .global_admin_block {
+    float : left;
+    position : relative;
+    top : -6px;
+    left : 10px;
+}
+
+#manage_users_page  .global_admin_block input {
+    width : 20px;
+    height : 20px;
+    cursor : pointer;
+}
+
+#manage_users_page .global_admin_block span {
+    position : relative;
+    top : -6px;
+    margin-left : 10px;
+}
+
+#manage_users_page .user_of_empty {
+    display : block;
+    height : 35px;
+}
+
+#manage_users_page .setting_block {
+    border-bottom: 0px solid #eeeeee;
+}
+
+
+
+.setting_block div {
+    display : inline-block;
+}
+
+.setting_block .setting_label {
+    width : 300px;
+    padding-left : 20px;
+    box-sizing: border-box;
 }

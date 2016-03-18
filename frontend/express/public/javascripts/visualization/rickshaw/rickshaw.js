@@ -2613,6 +2613,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
     if (!this.current_point || (max_point && max_point.value.x != this.last_point.value.x)) /*this.last_point &&*/
     {
+
+        console.log("call points changed:", points);
         this.point_changed(max_point, points);
         this.last_point = max_point;
     }
@@ -2760,6 +2762,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
     if (!this.current_points)
     {
+        console.log("!this.current_points --------------------------");
         this.guide_line.style.display = "none";
         return false;
     }
@@ -2767,6 +2770,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     {
         this.guide_line.style.display = "block";
     }
+
+    console.log(">> continue >>>");
 
     var current_points_length = this.current_points.length;
 
@@ -2818,6 +2823,9 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     {
         var is_bottom_block = false;
     }
+
+    console.log("{{{{{ point }}}}}");
+    console.log(point);
 
 		if (point.value.y === null) return;
 

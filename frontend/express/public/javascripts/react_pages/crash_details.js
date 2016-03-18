@@ -2,6 +2,8 @@ var CrashDetailsPage = React.createClass({
 
     metrics : [],
 
+    pie_charts_colors : ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"],
+
     getInitialState: function() {
 
         // "00bf85dafddf7e8d0a31edb903dd1535e15b724a"
@@ -64,22 +66,13 @@ var CrashDetailsPage = React.createClass({
 
             var metrics = countlyCrashes.getMetrics();
 
-            console.log("-- metrics 11111 --------");
-            console.log(metrics);
-
             for (var key in metrics)
             {
-
-                console.log("key ->", key);
-
                 self.metrics.push({
                     "key" : key,
                     "label" : metrics[key]
                 });
             }
-
-            console.log("========== this.metrics =========");
-            console.log(this.metrics);
 
             self.setState({
                 "crash_data" : crashData,
@@ -134,9 +127,6 @@ var CrashDetailsPage = React.createClass({
     {
         var full_data = this.state.crash_data.data;
 
-        console.log("======= table full_data ==========");
-        console.log(full_data);
-
         return {
             chartData : full_data
         };
@@ -159,9 +149,6 @@ var CrashDetailsPage = React.createClass({
     },
 
     metric_switch : function(metric){
-
-        console.log("------- switch ------");
-        console.log(metric);
 
         this.setState({
             "current_metric" : !this.state.is_resolved
@@ -223,7 +210,7 @@ var CrashDetailsPage = React.createClass({
             var status_classname = "status resolved";
         }
 
-        var metrics_switch = <SimpleSelectBlock
+        var metrics_selector = <SimpleSelectBlock
                                   selectors={this.metrics}
                                   active_selector_key={false}
                                   onChange={this.metric_switch}
@@ -363,37 +350,41 @@ var CrashDetailsPage = React.createClass({
                     <div className="pie_charts_blocks" style={blocks_style}>
 
                         <div className="pie_wrapper">
-                            <PieChart
+                            <BoolPieChart
                                 width={200}
                                 height={200}
                                 data_function={this.pie_function.bind(this, "root")}
+                                color={this.pie_charts_colors[9]}
                             />
                             <div className="sign">{jQuery.i18n.map["crashes.root"]}</div>
                         </div>
 
                         <div className="pie_wrapper">
-                            <PieChart
+                            <BoolPieChart
                                 width={200}
                                 height={200}
                                 data_function={this.pie_function.bind(this, "online")}
+                                color={this.pie_charts_colors[7]}
                             />
                             <div className="sign">{jQuery.i18n.map["crashes.online"]}</div>
                         </div>
 
                         <div className="pie_wrapper">
-                            <PieChart
+                            <BoolPieChart
                                 width={200}
                                 height={200}
                                 data_function={this.pie_function.bind(this, "muted")}
+                                color={this.pie_charts_colors[2]}
                             />
                             <div className="sign">{jQuery.i18n.map["crashes.muted"]}</div>
                         </div>
 
                         <div className="pie_wrapper">
-                            <PieChart
+                            <BoolPieChart
                                 width={200}
                                 height={200}
                                 data_function={this.pie_function.bind(this, "background")}
+                                color={this.pie_charts_colors[1]}
                             />
                             <div className="sign">{jQuery.i18n.map["crashes.background"]}</div>
                         </div>
@@ -401,8 +392,6 @@ var CrashDetailsPage = React.createClass({
                     </div>
 
                     <div className="bar_chart_block">
-
-                        {metrics_switch}
 
                         <Chart headline_sign={"CRASH DISTRIBUTION BY"}
                             headers={this.state.bar_chart_keys}
@@ -415,6 +404,8 @@ var CrashDetailsPage = React.createClass({
                             tooltip_height={44}
                             bar_width={40}
                             date={this.props.date}
+                            additional_selector={metrics_selector}
+
                         />
 
                     </div>

@@ -20,6 +20,7 @@ var SimpleSelectBlock = React.createClass({
 
         return({
             selectors : this.props.selectors,
+            selectors_hash : JSON.stringify(this.props.selectors).hashCode(),
             active_selector : active_selector,
             open : false
         });
@@ -27,6 +28,7 @@ var SimpleSelectBlock = React.createClass({
 
     componentWillReceiveProps : function(nextProps){
 
+        var new_state = {};
 
         if (nextProps.active_selector_key && nextProps.active_selector_key != this.state.active_selector.key)
         {
@@ -44,10 +46,17 @@ var SimpleSelectBlock = React.createClass({
 
             }
 
-            this.setState({
-                active_selector : active_selector
-            });
+            new_state.active_selector = active_selector;
+
         }
+
+        if (this.state.selectors_hash != JSON.stringify(nextProps.selectors).hashCode())
+        {
+            new_state.selectors = nextProps.selectors;
+            new_state.selectors_hash = JSON.stringify(nextProps.selectors).hashCode();
+        }
+
+        this.setState(new_state);
 
     },
 

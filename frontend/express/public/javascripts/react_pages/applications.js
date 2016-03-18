@@ -240,7 +240,6 @@ var ApplicationsPage = React.createClass({
             }
 
             this.timezones_options[timezone_key] = timezone_value;
-
         }
 
         this.app_categories_options = [];
@@ -399,11 +398,6 @@ var ApplicationsPage = React.createClass({
 
         var self = this;
 
-        console.log("=============== confirm delte current app =================");
-        console.log(self.state.current_app);
-
-        //var current_app = this.state.current_app;
-
         var _delete = function()
         {
 
@@ -421,11 +415,14 @@ var ApplicationsPage = React.createClass({
                 dataType:"jsonp",
                 success:function () {
 
-                    console.log("============ countlyGlobal['apps'] ===============");
+                    console.log("============ countlyGlobal['apps'] 1 ===============");
                     console.log(countlyGlobal['apps']);
 
                     delete countlyGlobal['apps'][appId];
                     delete countlyGlobal['admin_apps'][appId];
+
+                    console.log("============ countlyGlobal['apps'] 2 ===============");
+                    console.log(countlyGlobal['apps']);
 
                     var current_app = false/*countlyGlobal['apps'][0]*/;
 
@@ -441,7 +438,10 @@ var ApplicationsPage = React.createClass({
                     self.setState({
                         current_app : current_app,
                         current_app_id : current_app._id,
-                        actions_list_is_open : false
+                        actions_list_is_open : false,
+                        confirmation_waiting : false,
+                        confirmation_sign : false,
+                        confirmation_function : false
                     });
 
                     /*
@@ -472,6 +472,15 @@ var ApplicationsPage = React.createClass({
             "confirmation_function" : _delete
         });
 
+    },
+
+    cancel_confirmation : function()
+    {
+        this.setState({
+            "confirmation_waiting" : false,
+            "confirmation_sign" : false,
+            "confirmation_function" : false
+        });
     },
 
     new_app_click : function(){
@@ -609,6 +618,7 @@ var ApplicationsPage = React.createClass({
         if (this.state.confirmation_waiting)
         {
             confirm_block_style.display = "block";
+            confirm_block_style.left = (elements_width / 2) - (300 / 2);
         }
 
         return (
@@ -694,7 +704,6 @@ var ApplicationsPage = React.createClass({
                             <div className="icon_block">
 
                                 <form ref="uploadForm" enctype="multipart/form-data" id="add-app-image-form">
-
                                     <input ref="app_image" type="file" id="app_image" name="app_image" className="inputfile" onChange={this.handleIconChange}/>
                                     <label for="app_image"><span className="sign">Icon</span>
                                     <div className="icon" style={icon_style}></div></label>
@@ -715,8 +724,8 @@ var ApplicationsPage = React.createClass({
                 <div className="confirm_block" style={confirm_block_style}>
                     <div className="sign">{this.state.confirmation_sign}</div>
                     <div className="buttons">
-                        <span className="cancel">cancel</span>
-                        <span className="confirm">confirm</span>
+                        <span className="cancel" onClick={this.cancel_confirmation}>cancel</span>
+                        <span className="confirm" onClick={this.state.confirmation_function}>confirm</span>
                     </div>
                 </div>
 

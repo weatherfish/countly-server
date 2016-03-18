@@ -172,11 +172,11 @@ var NewUserWindow = React.createClass({
     }
 });
 
-/*
-
-*/
-
 var ManageUsersPage = React.createClass({
+
+    emails_blocks_width : [],
+
+    blocks_height : [],
 
     getInitialState: function() {
 
@@ -192,7 +192,9 @@ var ManageUsersPage = React.createClass({
 
         return({
             new_user_open : false,
-            apps : apps
+            apps : apps,
+            email_max_width : false,
+            max_block_height : false
         });
 
     },
@@ -275,6 +277,70 @@ var ManageUsersPage = React.createClass({
 
     },
 
+    email_width_changed : function(email, new_width){
+
+        this.emails_blocks_width[email] = new_width;
+
+        var max_width = 0;
+
+        for (var key in  this.emails_blocks_width)
+        {
+            if (this.emails_blocks_width[key] > max_width)
+            {
+                max_width = this.emails_blocks_width[key];
+            }
+        }
+
+        if (max_width != this.state.email_max_width)
+        {
+
+            this.setState({
+                email_max_width : max_width
+            });
+        }
+
+    },
+
+    block_height_changed : function(type, key, height){
+
+        console.log("--- height changed ---");
+        console.log(type, key, height);
+
+        if (!this.blocks_height[type]) this.blocks_height[type] = [];
+
+        this.blocks_height[type][key] = height;
+
+        var max_height = 0;
+
+        for (var type in this.blocks_height)
+        {
+            var column = this.blocks_height[type];
+
+            var max_in_type = 0;
+
+            for (var key in column)
+            {
+                if (column[key] > max_in_type)
+                {
+                    max_in_type = column[key];
+                }
+            }
+
+            if (max_in_type > max_height)
+            {
+                max_height = max_in_type;
+            }
+
+        }
+
+        console.log("max_height:", max_height);
+
+        this.setState({
+            max_block_height : max_height
+        })
+
+    },
+
     render : function(){
 
         var self = this;
@@ -285,7 +351,23 @@ var ManageUsersPage = React.createClass({
             width : elements_width
         }
 
-        var manage_block_width = elements_width - 20*2; // todo: tmp variable, look this.refs.svg.getDOMNode().offsetWidth
+        var manage_block_width = elements_width - 20 * 2; // todo: tmp variable, look this.refs.svg.getDOMNode().offsetWidth
+
+        var email_header_style = {};
+        var adminof_header_style = {};
+        var userof_header_style = {};
+
+        if (this.state.email_max_width)
+        {
+
+            var email_header_width = this.state.email_max_width + 40;
+
+            email_header_style.width = email_header_width + "px";
+
+            adminof_header_style.width = (manage_block_width - email_header_width) / 2 - 10 + "px";
+            userof_header_style.width = (manage_block_width - email_header_width) / 2 - 10 + "px";
+
+        }
 
         return (
             <div id="manage_users_page" style={page_style}>
@@ -297,37 +379,46 @@ var ManageUsersPage = React.createClass({
 
                 <NewUserWindow open={this.state.new_user_open} onClose={this.new_user_close} onUserAdd={this.on_new_user_add}/>
 
-                <div className="sign">ADDED USERS</div>
+                <div className="wrapper">
 
-                {(() => {
+                    <div className="sign">ADDED USERS</div>
 
-                    if (self.state.users_data){
+                    {(() => {
 
-                        return (<div className="users_table">
-                                  <div className="users_table_header">
-                                      <div className="email">User E-mail</div>
-                                      <div className="admin_of">Admin of</div>
-                                      <div className="user_of">User of</div>
-                                  </div>
-                                  {
-                                      _.map(self.state.users_data, function(user){
+                        if (self.state.users_data){
 
-                                          return (<ManageUserBlock
-                                                      user={user}
-                                                      email={user.email}
-                                                      admin_of={user.admin_of}
-                                                      user_of={user.user_of}
-                                                      apps={self.state.apps}
-                                                      width={manage_block_width}
-                                                  />)
+                            return (<div className="users_table">
+                                      <div className="users_table_header">
+                                          <div className="email" style={email_header_style}>User E-mail</div>
+                                          <div className="admin_of" style={adminof_header_style}>Admin of</div>
+                                          <div className="user_of" style={userof_header_style}>User of</div>
+                                      </div>
+                                      {
+                                          _.map(self.state.users_data, function(user){
 
-                                      })
-                                  }
+                                              return (<ManageUserBlock
+                                                          user={user}
+                                                          email={user.email}
+                                                          admin_of={user.admin_of}
+                                                          user_of={user.user_of}
+                                                          global_admin={user.global_admin}
+                                                          apps={self.state.apps}
+                                                          width={manage_block_width}
+                                                          email_max_width={self.state.email_max_width}
+                                                          email_width_changed={self.email_width_changed}
+                                                          max_block_height={self.state.max_block_height}
+                                                          block_height_changed={self.block_height_changed}
+                                                      />)
 
-                        </div>)
-                    }
+                                          })
+                                      }
 
-                })()}
+                            </div>)
+                        }
+
+                    })()}
+
+                </div>
 
             </div>
         );

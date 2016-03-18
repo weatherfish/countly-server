@@ -94,3 +94,14 @@
     padding-left : 20px;
     margin-left : 0px;
 }
+
+.configurations_page .setting_block {
+
+    height : 60px;
+    line-height: 60px;
+
+    border-bottom : 1px solid #eeeeee;
+
+    font-family : Lato-Regular;
+
+}

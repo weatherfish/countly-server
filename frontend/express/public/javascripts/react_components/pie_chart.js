@@ -61,7 +61,7 @@ var PieChart = React.createClass({
     makeid : function()
     {
         var text = "";
-        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
         for( var i=0; i < 7; i++ )
             text += possible.charAt(Math.floor(Math.random() * possible.length));
