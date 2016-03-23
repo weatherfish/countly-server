@@ -8,9 +8,6 @@ var Chart = React.createClass({
 
         var data = this.props.data_function();
 
-        console.log("<<<<<<<<<<<<<<<< CHART data >>>>>>>>>>>>>>>>>>>");
-        console.log(data);
-
         data = data.chartData;
 
         for (var i = 0; i < data.length; i++)
@@ -33,9 +30,6 @@ var Chart = React.createClass({
 
         /*if (nextProps.date != this.props.date) // todo !!!!!!!!!!!!!!!!!!!!!!
         {*/
-
-            console.log("{{{{{{{{{{{ receive props }}}}}}}}}}}");
-            console.log(nextProps);
 
             var data = this.props.data_function();
 
@@ -275,7 +269,8 @@ var Chart = React.createClass({
 
         var bar_block = this.chart.selectAll("g.bar_block")
                         .data(data, function(d){
-                            return d.color;
+                            //return d.color;
+                            return d[self.props.headers[0]["short"]];
                         })
 
 
@@ -445,7 +440,16 @@ var Chart = React.createClass({
             .style("opacity", 0)
             .remove();
 
-        bar_rect.on("mouseover", function(d, e)
+        bar_rect.on("mouseover", false);
+        bar_rect.on("mouseout", false);
+
+        /*
+            TODO
+        */
+
+        setTimeout(function(){
+
+            bar_rect.on("mouseover", function(d, e)
             {
                 self.draw_tooltip(this.parentNode, d, e, total_count, self);
 
@@ -461,8 +465,9 @@ var Chart = React.createClass({
                 self.setState({
                     tooltip_is_active : false
                 });
-
             });
+
+        }, 750);
 
     },
 
@@ -542,17 +547,6 @@ var Chart = React.createClass({
 
         var tick_values = [];
 
-/*
-        var ticks_count = 5;
-
-        var tick_size = (y_domain) / ticks_count;
-
-        for (var i = 0; i <= ticks_count; i++)
-        {
-            tick_values.push(Math.round(i * tick_size));
-        }
-*/
-
         for(var i = 0; i < ticks.length; i+=1)
         {
             tick_values.push(ticks[i]);
@@ -590,11 +584,6 @@ var Chart = React.createClass({
                 this.axis_right_inited = true;
             }
 
-                //.call(axis/*.scale(y_inverted)*/.ticks(5)/*.tickValues(tick_values)*/.tickFormat(function(d) {
-                //    //console.log("-- draw tick ---");
-                //    //console.log(d);
-                //    return formatValue(d).replace('0.0', '0').replace('.0', '');/* return d*/
-                //}))
         }
 
         return axis;
@@ -624,9 +613,6 @@ var Chart = React.createClass({
 
         y_domain = parseInt(y_domain_string);
 
-        //console.log("new domain:", y_domain);
-
-        //var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, height - bars_margin_bottom]);
         var y_inverted = this.y_scale_log;
 
         var tick_values = [];
@@ -700,9 +686,13 @@ var Chart = React.createClass({
 
                 {(() => {
 
+                    var head_line = [];
+
                     if (this.props.headline_sign){
-                        return(<div className="headline_sign">{this.props.headline_sign}</div>)
+                        head_line.push(<div className="headline_sign">{this.props.headline_sign}{this.props.additional_selector}</div>);
                     }
+
+                    return head_line;
 
                 })()}
 

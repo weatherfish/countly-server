@@ -70,7 +70,8 @@ var Map = React.createClass({
         var metric = this.props.metric;
 
         var countryFills = {
-            defaultFill : "#ffffff"
+            defaultFill : "#ffffff",
+            reset : "#ffffff"
         }
 
         var countryData = this.formatData(metric);
@@ -95,7 +96,7 @@ var Map = React.createClass({
 
         var chart_options = {
             borderWidth: 1,
-            borderColor: '#E6E6E6',
+            borderColor: '#d3d3d3',//'#E6E6E6',
             popupOnHover: true,
             highlightOnHover: true,
             highlightFillColor: "#024873",
@@ -154,7 +155,7 @@ var Map = React.createClass({
             if (!countryData[iso3])
             {
                 countryData[iso3] = {
-                    "fillKey"        : "0.0",
+                    "fillKey"        : "reset",//"0.0",
                     "numberOfThings" : 0
                 };
             }
@@ -283,7 +284,7 @@ var Map = React.createClass({
           create map
         */
 
-        containerHeigth = this.props.height;
+        var containerHeigth = this.props.height;
 
         var mapHeight = containerHeigth - 50;
         var mapWidth  = mapHeight * 1.48;

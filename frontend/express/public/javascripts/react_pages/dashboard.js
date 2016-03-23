@@ -34,7 +34,8 @@ var Dashboard = React.createClass({
         return {
             "date_period" : false,
             "top_items_bars" : top_items_bars,
-            "inited" : false
+            "inited" : false,
+            "long_text_flag" : false
         }
 
     },
@@ -129,6 +130,17 @@ var Dashboard = React.createClass({
 
     },
 
+    is_long_text : function(height, id)
+    {
+
+        if (height > 14) // todo: var
+        {
+            this.setState({
+                long_text_flag : true
+            })
+        }
+    },
+
     render : function(){
 
         var self = this;
@@ -171,26 +183,7 @@ var Dashboard = React.createClass({
             }
         ]
 
-        var text_check_style = "normal 12px Lato-Semibold"; // letter-spacing: 0.98px;
-
-        var long_text_flag = false;
-
-        this.state.graph_tabs.every(function(element){
-
-            var text_width = self.getTextWidth(element.title, text_check_style); // toto: non-english languages will have another font-family
-
-            if (text_width > tab_item_style.width)
-            {
-                long_text_flag = true;
-                return false;
-            }
-
-            return true;
-        });
-
-        console.log("long_text_flag:", long_text_flag);
-
-        if (long_text_flag)
+        if (this.state.long_text_flag)
         {
             top_tab_style.height = (this.topbar_height + 20) + "px"
         }
@@ -198,9 +191,6 @@ var Dashboard = React.createClass({
         {
             top_tab_style.height = this.topbar_height + "px"
         }
-
-        console.log("-------------------------- this.state.graph tabs ----");
-        console.log(this.state.graph_tabs);
 
         return (
             <div id="dashboard" style={dashboard_style}>
@@ -240,7 +230,7 @@ var Dashboard = React.createClass({
 
                         var title = tab.title.toUpperCase();
 
-                        var text_width = self.getTextWidth(title, text_check_style); // toto: non-english languages will have another font-family
+                        //var text_width = self.getTextWidth(title, text_check_style); // toto: non-english languages will have another font-family
 
                         if (id == self.state.graph_tabs.length - 1)
                         {
@@ -253,7 +243,7 @@ var Dashboard = React.createClass({
                             var style = tab_item_style;
                         }
 
-                        if (long_text_flag)
+                        if (self.state.long_text_flag)
                         {
                             style.height = "130px";
                         }
@@ -263,7 +253,7 @@ var Dashboard = React.createClass({
                         }
 
                         return (
-                            <div  onClick={self.top_tab_click.bind(self, id, tab)} className={class_name} style={style}>
+                            <div onClick={self.top_tab_click.bind(self, id, tab)} className={class_name} style={style}>
                                 <div className={"total"}>
                                     {total}
                                 </div>
@@ -271,7 +261,11 @@ var Dashboard = React.createClass({
                                     {percent_change}
                                 </div>
                                 <div className={"title"}>
-                                    {title}
+                                    <MultiLangLabel
+                                        label={title}
+                                        onHeightChange={self.is_long_text}
+                                        id={id}
+                                    />
                                 </div>
                             </div>)
                     })
@@ -285,10 +279,11 @@ var Dashboard = React.createClass({
                     graph_width={elements_width}
                     period={countlyCommon.getPeriod()}
                     big_numbers={false}
-                    with_granularity={false}
+                    with_granularity={true}
                     data_function={this.state.graph_data_function}
                     update_graph_function={countlyCommon.updateTimeGraph}
                     lines_descriptions={lines_descriptions}
+                    reverse_dp={true}
                 />
 
                 <DateSign
@@ -352,16 +347,6 @@ var Dashboard = React.createClass({
 
         </div>
         */
-    },
-
-    getTextWidth : function(text, font) {
-        // re-use canvas object for better performance
-        var canvas = this.getTextWidth.canvas || (this.getTextWidth.canvas = document.createElement("canvas"));
-        var context = canvas.getContext("2d");
-        context.font = font;
-        context["letter-spacing"] = "0.98px";        
-        var metrics = context.measureText(text);
-        return metrics.width;
     },
 
 });

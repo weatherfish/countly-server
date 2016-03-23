@@ -24,7 +24,16 @@ var MultiSelectBlock = React.createClass({
             }
         }
 
-        var element_width = this.props.blockWidth - 20;
+        if (this.props.padding)
+        {
+            var padding = this.props.padding;
+        }
+        else
+        {
+            var padding = 0;
+        }
+
+        var element_width = this.props.blockWidth - (padding * 2);
 
         var active_selectors_sign = '';
 
@@ -68,6 +77,9 @@ var MultiSelectBlock = React.createClass({
 
     componentWillReceiveProps : function(nextProps){
 
+        console.log("=== receive props =============");
+        console.log(nextProps);
+
         if (nextProps.active_selector_key)
         {
             for (var i = 0; i < nextProps.selectors.length; i++)
@@ -86,6 +98,7 @@ var MultiSelectBlock = React.createClass({
             });
         }
 
+/*
         var active_selectors_sign = '';
 
         for (var i = 0; i < this.state.active_selectors.length; i++)
@@ -108,11 +121,11 @@ var MultiSelectBlock = React.createClass({
         var text_width = Math.round(this.getTextWidth(active_selectors_sign, "normal 14px Lato-Semibold"));
 
         var rows = Math.ceil(text_width / (this.state.element_width - 50)); // todo: var
-
+*/
         this.setState({
             //element_width : element_width,
-            rows : rows,
-            active_selectors_sign : active_selectors_sign,
+            /*rows : rows,
+            active_selectors_sign : active_selectors_sign,*/
             parent_height : nextProps.parent_height
         })
 
@@ -140,6 +153,9 @@ var MultiSelectBlock = React.createClass({
     },
 
     select : function(selector) {
+
+        console.log("--- select ---");
+        console.log(selector);
 
         var active_selectors = this.state.active_selectors;
 
@@ -177,8 +193,36 @@ var MultiSelectBlock = React.createClass({
             this.props.onChange(active_selectors_keys);
         }
 
+        console.log(":::::::::: active_selectors ::::::::::");
+        console.log(active_selectors);
+
+        var active_selectors_sign = '';
+
+        for (var i = 0; i < active_selectors.length; i++)
+        {
+            active_selectors_sign += active_selectors[i].label;
+
+            if (i == active_selectors.length - 1)
+            {
+                active_selectors_sign += "";
+            }
+            else
+            {
+                active_selectors_sign += ", ";
+            }
+
+        }
+
+        //var element_width = this.state.blockWidth - 20 * 2;
+
+        var text_width = Math.round(this.getTextWidth(active_selectors_sign, "normal 14px Lato-Semibold"));
+
+        var rows = Math.ceil(text_width / (this.state.element_width - 50)); // todo: var
+
         this.setState({
-            "active_selectors" : active_selectors
+            "active_selectors" : active_selectors,
+            "active_selectors_sign" : active_selectors_sign,
+            "rows" : rows,
         });
 
     },
@@ -216,8 +260,16 @@ var MultiSelectBlock = React.createClass({
         }
 */
 
+        if (this.state.rows)
+        {
+            var rows_count = this.state.rows;
+        }
+        else
+        {
+            var rows_count = 1; // make min height
+        }
 
-        var own_height = (this.state.row_height * this.state.rows) + 10;
+        var own_height = (this.state.row_height * rows_count) + 10;
 
         if (this.props.parent_height > own_height)
         {
@@ -236,6 +288,9 @@ var MultiSelectBlock = React.createClass({
         var arrow_style = {
             "left" : this.state.element_width / 2 - arrow_width / 2
         }
+
+        console.log("--------------- self.state.active_selectors --------------------");
+        console.log(self.state.active_selectors);
 
         return(
             <div className={class_name}>

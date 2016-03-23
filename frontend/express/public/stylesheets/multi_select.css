@@ -136,3 +136,21 @@
     top: -7px;
     left: 152px;
 }
+
+.multi_selectors_block ::-webkit-scrollbar {
+    width: 6px;
+    /*position : relative;
+    top : -6px;*/
+}
+
+.multi_selectors_block ::-webkit-scrollbar-track {
+    /*-webkit-box-shadow: inset 0 0 6px #fff;*/
+    border-radius: 0px;
+    background-color: #2E3545;
+}
+
+.multi_selectors_block ::-webkit-scrollbar-thumb {
+    border-radius: 0px;
+    /*-webkit-box-shadow: inset 0 0 10px #19CC63;*/
+    background-color: #19CC63; /*#202531; */
+}

@@ -8,13 +8,13 @@ var LeftPart = React.createClass({
         };
     },
 
-    handleClick: function(i) {
+    handleClick: function(i, href) {
 
         this.setState({
             selected : i,
         });
 
-        this.props.handleClick(i);
+        this.props.handleClick(i, href);
     },
 
     componentDidUpdate: function() {
@@ -45,6 +45,17 @@ var LeftPart = React.createClass({
 
         var navNodes = this.props.navigation.map(function (nav_item, i) {
 
+            if (Object.prototype.toString.call(nav_item.items[0]) === '[object Array]')
+            {
+                var sub_menu = true;
+                var href = false;
+            }
+            else
+            {
+                var sub_menu = false;
+                var href = nav_item.items[1];
+            }
+
             var class_name      = "item_wrap hoverable";
             var icon_class_name = "icon";
             var sign_class_name = "menu_sign";
@@ -70,7 +81,7 @@ var LeftPart = React.createClass({
                 var sign = false;
             }
 
-            if (is_active && nav_item.arrow !== -1)
+            if (is_active && sub_menu)
             {
                 var arrow = <div className="arrow"></div>;
             }
@@ -80,7 +91,7 @@ var LeftPart = React.createClass({
             }
 
             return (
-                <div className={class_name} onClick={self.handleClick.bind(self, i)}>
+                <div className={class_name} onClick={self.handleClick.bind(self, i, href)}>
                     {icon}{sign}{arrow}
                 </div>
             );

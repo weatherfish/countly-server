@@ -33,6 +33,7 @@
     padding-left : 15px;
     cursor : pointer;
     border-right : 1px solid #E7E7E7;
+    text-transform: capitalize;
  }
 
 .table_header .header_sort_button {

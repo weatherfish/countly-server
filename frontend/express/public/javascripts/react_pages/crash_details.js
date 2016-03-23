@@ -1,3 +1,5 @@
+var Link = ReactRouter.Link;
+
 var CrashDetailsPage = React.createClass({
 
     metrics : [],
@@ -18,6 +20,11 @@ var CrashDetailsPage = React.createClass({
         var table_headers = [{
             "title":jQuery.i18n.map["crashes.crashed"],
             "short" : "ts",
+            formatting_function : function(timestamp){
+                var date = new Date(timestamp * 1000);
+                var date_string = d3.time.format("%d %b %Y")(date);
+                return date_string;
+            }
         },
         {
             "title":jQuery.i18n.map["crashes.os_version"],
@@ -55,7 +62,9 @@ var CrashDetailsPage = React.createClass({
 
         var self = this;
 
-        $.when(countlyCrashes.initialize("00bf85dafddf7e8d0a31edb903dd1535e15b724a")).then(function () {
+        var crash_id = this.props.params.crash_id;
+
+        $.when(countlyCrashes.initialize(crash_id)).then(function () {
 
             //var crashData = countlyCrashes.getData();
             //var chartData = countlyCrashes.getChartData(self.initial_metric, self.metrics[self.initial_metric]);
@@ -150,8 +159,10 @@ var CrashDetailsPage = React.createClass({
 
     metric_switch : function(metric){
 
+        console.log("metric_switch:", metric);
+
         this.setState({
-            "current_metric" : !this.state.is_resolved
+            "current_metric" : metric
         })
 
         //$.when(countlyCrashes.refresh()).then(function () {
@@ -217,217 +228,269 @@ var CrashDetailsPage = React.createClass({
                                   className="metric_selector"
                               />
 
+        // todo !!!: REMOVE !!!!!!!
+        crash_data.run.max = (crash_data.run.max / 20).toFixed(2);
+        crash_data.run.total = (crash_data.run.total / 10).toFixed(2);
+        // todo !!!: REMOVE !!!!!!!
+
+        // todo: change ID
+
         return (
             <div className="crash_details page" id="dashboard" style={page_style}>
 
-                <div className="info_block">
-                    <div className="name">{this.state.crash_data.name.substr(0, 80)}</div>
-                    <div className={status_classname}>{is_resolved}</div>
-                    <div className={mark_classname} onClick={this.mark}>{button_sign}</div>
+                <div className="return_to_crashes">
+                    <Link to="/crashes"><span className="arrow" />Back To Crashes Overall</Link>
                 </div>
 
-                <div className="tabs">
-                    <span onClick={this.change_tab.bind(this, "description")} className={description_tab_class}>DESCRIPTION</span>
-                    <span onClick={this.change_tab.bind(this, "comments")} className={comments_tab_class}>COMMENTS</span>
+                <div className="border_wrapper">
+
+                    <div className="info_block">
+                        <div className="name">{this.state.crash_data.name.substr(0, 80)}</div>
+                        <div className={status_classname}>{is_resolved}</div>
+                        <div className={mark_classname} onClick={this.mark}>{button_sign}</div>
+                    </div>
+
+                    <div className="tabs">
+                        <span onClick={this.change_tab.bind(this, "description")} className={description_tab_class}>DESCRIPTION</span>
+                        <span onClick={this.change_tab.bind(this, "comments")} className={comments_tab_class}>COMMENTS</span>
+                    </div>
+
+                    <div className="description" style={description_block_style}>
+                    {
+                        _.map(this.state.error_trace, function(line, i) {
+
+                            return (<div><span>{i}</span><span>{line}</span></div>);
+
+                        })
+
+                    }
+                    </div>
+                    <div className="comments" style={comments_block_style}></div>
+
+                    <div className="data_block">
+
+                        <div className="block_sign">CRASH DATA</div>
+
+                        <div className="simple_blocks" style={blocks_style}>
+
+                            <div>
+                                <span className="value">{crash_data.os}</span>
+                                <span className="sign">{jQuery.i18n.map["crashes.platform"].toUpperCase()}</span>
+                            </div>
+
+                            <div>
+                                <span className="value">{crash_data.reports}</span>
+                                <span className="sign">{jQuery.i18n.map["crashes.reports"].toUpperCase()}</span>
+                            </div>
+
+                            <div>
+                                <span className="value">{crash_data.users + " ("+((crash_data.users/crash_data.total)*100).toFixed(2)+"%)"}</span>
+                                <span className="sign">{jQuery.i18n.map["crashes.affected-users"].toUpperCase()}</span>
+                            </div>
+
+                            <div>
+                                <span className="value">{crash_data.latest_version.replace(/:/g, '.')}</span>
+                                <span className="sign">{jQuery.i18n.map["crashes.highest-version"].toUpperCase()}</span>
+                            </div>
+
+                        </div>
+
+                        <div className="advanced_blocks" style={blocks_style}>
+
+                            <div>
+
+                                <span className="sign">{jQuery.i18n.map["crashes.ram"].toUpperCase()}</span>
+
+                                <span className="value_block">
+                                    <span className="value">{(crash_data.ram.total/crash_data.ram.count).toFixed(2)+" %"}</span>
+                                    <span className="average_sign">AVERAGE</span>
+                                </span>
+
+                                <div className="min_max">
+                                    <span className="min">{crash_data.ram.min+" %"}</span>
+                                    <span className="max">{crash_data.ram.max+" %"}</span>
+                                </div>
+
+                                <div className="min_max_signs">
+                                    <span className="min">MIN</span>
+                                    <span className="max">MAX</span>
+                                </div>
+
+                                <AverageBar
+                                    min={crash_data.ram.min}
+                                    max={crash_data.ram.max}
+                                    average={(crash_data.ram.total/crash_data.ram.count).toFixed(2)}
+                                />
+
+                            </div>
+
+                            <div>
+
+                                <span className="sign">{jQuery.i18n.map["crashes.disk"].toUpperCase()}</span>
+
+                                <span className="value_block">
+                                    <span className="value">{(crash_data.disk.total/crash_data.disk.count).toFixed(2)+" %"}</span>
+                                    <span className="average_sign">AVERAGE</span>
+                                </span>
+
+                                <div className="min_max">
+                                    <span className="min">{crash_data.disk.min+" %"}</span>
+                                    <span className="max">{crash_data.disk.max+" %"}</span>
+                                </div>
+
+                                <div className="min_max_signs">
+                                    <span className="min">MIN</span>
+                                    <span className="max">MAX</span>
+                                </div>
+
+                                <AverageBar
+                                    min={crash_data.disk.min}
+                                    max={crash_data.disk.max}
+                                    average={(crash_data.disk.total/crash_data.disk.count).toFixed(2)}
+                                />
+
+                            </div>
+
+                            <div>
+
+                                <span className="sign">{jQuery.i18n.map["crashes.battery"].toUpperCase()}</span>
+
+                                <span className="value_block">
+                                    <span className="value">{(crash_data.bat.total/crash_data.bat.count).toFixed(2)+" %"}</span>
+                                    <span className="average_sign">AVERAGE</span>
+                                </span>
+
+                                <div className="min_max">
+                                    <span className="min">{crash_data.bat.min+" %"}</span>
+                                    <span className="max">{crash_data.bat.max+" %"}</span>
+                                </div>
+
+                                <div className="min_max_signs">
+                                    <span className="min">MIN</span>
+                                    <span className="max">MAX</span>
+                                </div>
+
+                                <AverageBar
+                                    min={crash_data.bat.min}
+                                    max={crash_data.bat.max}
+                                    average={(crash_data.bat.total/crash_data.bat.count).toFixed(2)}
+                                />
+
+                            </div>
+
+                            <div>
+
+                                <span className="sign">{jQuery.i18n.map["crashes.run"].toUpperCase()}</span>
+
+                                <span className="value_block">
+                                    <span className="value">{(crash_data.run.total/crash_data.run.count).toFixed(2)+" %"}</span>
+                                    <span className="average_sign">AVERAGE</span>
+                                </span>
+
+                                <div className="min_max">
+                                    <span className="min">{crash_data.run.min+" %"}</span>
+                                    <span className="max">{crash_data.run.max+" %"}</span>
+                                </div>
+
+                                <div className="min_max_signs">
+                                    <span className="min">MIN</span>
+                                    <span className="max">MAX</span>
+                                </div>
+
+                                <AverageBar
+                                    min={crash_data.run.min}
+                                    max={crash_data.run.max}
+                                    average={(crash_data.run.total/crash_data.run.count).toFixed(2)}
+                                />
+
+                            </div>
+
+                        </div>
+
+                        <div className="pie_charts_blocks" style={blocks_style}>
+
+                            <div className="pie_wrapper">
+                                <BoolPieChart
+                                    width={200}
+                                    height={200}
+                                    data_function={this.pie_function.bind(this, "root")}
+                                    color={this.pie_charts_colors[9]}
+                                />
+                                <div className="sign">{jQuery.i18n.map["crashes.root"].toUpperCase()}</div>
+                            </div>
+
+                            <div className="pie_wrapper">
+                                <BoolPieChart
+                                    width={200}
+                                    height={200}
+                                    data_function={this.pie_function.bind(this, "online")}
+                                    color={this.pie_charts_colors[7]}
+                                />
+                                <div className="sign">{jQuery.i18n.map["crashes.online"].toUpperCase()}</div>
+                            </div>
+
+                            <div className="pie_wrapper">
+                                <BoolPieChart
+                                    width={200}
+                                    height={200}
+                                    data_function={this.pie_function.bind(this, "muted")}
+                                    color={this.pie_charts_colors[2]}
+                                />
+                                <div className="sign">{jQuery.i18n.map["crashes.muted"].toUpperCase()}</div>
+                            </div>
+
+                            <div className="pie_wrapper">
+                                <BoolPieChart
+                                    width={200}
+                                    height={200}
+                                    data_function={this.pie_function.bind(this, "background")}
+                                    color={this.pie_charts_colors[1]}
+                                />
+                                <div className="sign">{jQuery.i18n.map["crashes.background"].toUpperCase()}</div>
+                            </div>
+
+                        </div>
+
+                        <div className="bar_chart_block">
+
+                            <Chart headline_sign={"CRASH DISTRIBUTION BY"}
+                                headers={this.state.bar_chart_keys}
+                                width={elements_width}
+                                height={300}
+                                side_margin={30}
+                                bar_width={40}
+                                data_function={this.bars_data_function}
+                                tooltip_width={60}
+                                tooltip_height={44}
+                                bar_width={40}
+                                date={this.props.date}
+                                additional_selector={metrics_selector}
+
+                            />
+
+                        </div>
+
+                        <div className="table_block">
+
+                            <SortTable
+                                headers={this.state.table_headers}
+                                width={elements_width}
+                                row_height={50}
+                                data_sign={"CRASH OCCURENCIES LIST"}
+                                sort_functions={this.state.sort_functions}
+                                data_function={this.table_data_function}
+                                convert_data_function={false}
+                                initial_sort={"frequency"}
+                                rows_per_page={20}
+                                date={this.props.date}
+                            />
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div className="description" style={description_block_style}>
-                {
-                    _.map(this.state.error_trace, function(line, i) {
-
-                        return (<div><span>{i}</span><span>{line}</span></div>);
-
-                    })
-
-                }
-                </div>
-                <div className="comments" style={comments_block_style}></div>
-
-                <div className="data_block">
-
-                    <div className="block_sign">CRASH DATA</div>
-
-                    <div className="simple_blocks" style={blocks_style}>
-
-                        <div>
-                            <span className="value">{crash_data.os}</span>
-                            <span className="sign">{jQuery.i18n.map["crashes.platform"].toUpperCase()}</span>
-                        </div>
-
-                        <div>
-                            <span className="value">{crash_data.reports}</span>
-                            <span className="sign">{jQuery.i18n.map["crashes.reports"].toUpperCase()}</span>
-                        </div>
-
-                        <div>
-                            <span className="value">{crash_data.users + " ("+((crash_data.users/crash_data.total)*100).toFixed(2)+"%)"}</span>
-                            <span className="sign">{jQuery.i18n.map["crashes.affected-users"].toUpperCase()}</span>
-                        </div>
-
-                        <div>
-                            <span className="value">{crash_data.latest_version.replace(/:/g, '.')}</span>
-                            <span className="sign">{jQuery.i18n.map["crashes.highest-version"].toUpperCase()}</span>
-                        </div>
-
-                    </div>
-
-                    <div className="advanced_blocks" style={blocks_style}>
-
-                        <div>
-
-                            <span className="sign">{jQuery.i18n.map["crashes.ram"].toUpperCase()}</span>
-
-                            <span className="value_block">
-                                <span className="value">{(crash_data.ram.total/crash_data.ram.count).toFixed(2)+" %"}</span>
-                                <span>AVERAGE</span>
-                            </span>
-
-                            <div className="min_max">
-                                <span className="min">{crash_data.ram.min+" %"}</span>
-                                <span className="max">{crash_data.ram.max+" %"}</span>
-                            </div>
-
-                            <div className="bar"></div>
-
-                        </div>
-
-                        <div>
-
-                            <span className="sign">{jQuery.i18n.map["crashes.disk"].toUpperCase()}</span>
-
-                            <span className="value_block">
-                                <span className="value">{(crash_data.disk.total/crash_data.disk.count).toFixed(2)+" %"}</span>
-                                <span>AVERAGE</span>
-                            </span>
-
-                            <div className="min_max">
-                                <span className="min">{crash_data.disk.min+" %"}</span>
-                                <span className="max">{crash_data.disk.max+" %"}</span>
-                            </div>
-
-                            <div className="bar"></div>
-
-                        </div>
-
-                        <div>
-
-                            <span className="sign">{jQuery.i18n.map["crashes.battery"].toUpperCase()}</span>
-
-                            <span className="value_block">
-                                <span className="value">{(crash_data.bat.total/crash_data.bat.count).toFixed(2)+" %"}</span>
-                                <span>AVERAGE</span>
-                            </span>
-
-                            <div className="min_max">
-                                <span className="min">{crash_data.bat.min+" %"}</span>
-                                <span className="max">{crash_data.bat.max+" %"}</span>
-                            </div>
-
-                            <div className="bar"></div>
-
-                        </div>
-
-                        <div>
-
-                            <span className="sign">{jQuery.i18n.map["crashes.run"].toUpperCase()}</span>
-
-                            <span className="value_block">
-                                <span className="value">{(crash_data.run.total/crash_data.run.count).toFixed(2)+" %"}</span>
-                                <span>AVERAGE</span>
-                            </span>
-
-                            <div className="min_max">
-                                <span className="min">{crash_data.run.min+" %"}</span>
-                                <span className="max">{crash_data.run.max+" %"}</span>
-                            </div>
-
-                            <div className="bar"></div>
-
-                        </div>
-
-                    </div>
-
-                    <div className="pie_charts_blocks" style={blocks_style}>
-
-                        <div className="pie_wrapper">
-                            <BoolPieChart
-                                width={200}
-                                height={200}
-                                data_function={this.pie_function.bind(this, "root")}
-                                color={this.pie_charts_colors[9]}
-                            />
-                            <div className="sign">{jQuery.i18n.map["crashes.root"]}</div>
-                        </div>
-
-                        <div className="pie_wrapper">
-                            <BoolPieChart
-                                width={200}
-                                height={200}
-                                data_function={this.pie_function.bind(this, "online")}
-                                color={this.pie_charts_colors[7]}
-                            />
-                            <div className="sign">{jQuery.i18n.map["crashes.online"]}</div>
-                        </div>
-
-                        <div className="pie_wrapper">
-                            <BoolPieChart
-                                width={200}
-                                height={200}
-                                data_function={this.pie_function.bind(this, "muted")}
-                                color={this.pie_charts_colors[2]}
-                            />
-                            <div className="sign">{jQuery.i18n.map["crashes.muted"]}</div>
-                        </div>
-
-                        <div className="pie_wrapper">
-                            <BoolPieChart
-                                width={200}
-                                height={200}
-                                data_function={this.pie_function.bind(this, "background")}
-                                color={this.pie_charts_colors[1]}
-                            />
-                            <div className="sign">{jQuery.i18n.map["crashes.background"]}</div>
-                        </div>
-
-                    </div>
-
-                    <div className="bar_chart_block">
-
-                        <Chart headline_sign={"CRASH DISTRIBUTION BY"}
-                            headers={this.state.bar_chart_keys}
-                            width={elements_width}
-                            height={300}
-                            side_margin={30}
-                            bar_width={40}
-                            data_function={this.bars_data_function}
-                            tooltip_width={60}
-                            tooltip_height={44}
-                            bar_width={40}
-                            date={this.props.date}
-                            additional_selector={metrics_selector}
-
-                        />
-
-                    </div>
-
-                    <div className="table_block">
-
-                        <SortTable
-                            headers={this.state.table_headers}
-                            width={elements_width}
-                            row_height={50}
-                            data_sign={"CRASH OCCURENCIES LIST"}
-                            sort_functions={this.state.sort_functions}
-                            data_function={this.table_data_function}
-                            convert_data_function={false}
-                            initial_sort={"frequency"}
-                            rows_per_page={20}
-                            date={this.props.date}
-                        />
-
-                    </div>
-
-                </div>
             </div>
         )
 

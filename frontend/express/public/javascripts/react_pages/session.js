@@ -84,10 +84,6 @@ var SessionPage = React.createClass({
         });
     },
 
-    contextTypes: {
-        router: React.PropTypes.func
-    },
-
     componentWillReceiveProps : function(nextProps) {
 
         console.log("{{{{{{{{{{{{{ this.context.router.getCurrentParams() }}}}}}}}}}}}}");
@@ -138,7 +134,6 @@ var SessionPage = React.createClass({
                     period={countlyCommon.getPeriod()}
                     big_numbers={this.state.big_numbers}
                     data_function={countlySession.getSessionDP}
-                    update_graph_function={countlyCommon.updateTimeGraph}
                     with_granularity={true}
                     mount_callback={this.on_graph_mount}
                     date={this.props.date}

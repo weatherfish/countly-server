@@ -70,6 +70,7 @@ module.exports = function(grunt) {
           'frontend/express/public/javascripts/utils/globalize.min.js',
   				'frontend/express/public/javascripts/countly/countly.common.js',
           'frontend/express/public/javascripts/sort_functions.js',
+          'frontend/express/public/javascripts/utils/superagent.min.js'
   			],
   			dest: 'frontend/express/public/javascripts/min/countly.utils.concat.js'
         //dest: 'frontend/express/public/javascripts/min/countly.utils.js'
@@ -182,8 +183,10 @@ module.exports = function(grunt) {
             "frontend/express/public/stylesheets/crashes_page.css",
             "frontend/express/public/stylesheets/selector_with_search.css",
             "frontend/express/public/stylesheets/select.css",
-            "frontend/express/public/stylesheets/multi_select.css"
-
+            "frontend/express/public/stylesheets/multi_select.css",
+            "frontend/express/public/stylesheets/crash_details.css",
+            "frontend/express/public/stylesheets/bool_pie_chart.css",
+            "frontend/express/public/stylesheets/average_bar.css"
 	    		],
     		}
     	}
@@ -301,7 +304,7 @@ module.exports = function(grunt) {
 
 	// grunt.task.loadTasks(['copy:plugins', 'concat:plugins', 'uglify:plugins']);
 	// grunt.task.run(['concat', 'uglify']);
-	grunt.task.run(['concat:plugins'/*, 'uglify:plugins'*/, 'copy:plugins', 'cssmin:plugins']);
+	grunt.task.run(['concat:plugins'/*, 'uglify:plugins'*/, 'copy:plugins'/*, 'cssmin:plugins'*/]);
 
   	console.log('Done preparing production files');
   });

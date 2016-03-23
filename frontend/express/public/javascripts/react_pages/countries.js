@@ -9,14 +9,14 @@ var CountriesPage = React.createClass({
             "country_flag" : natural_sort
         }
 
-        return {
+        return ({
             sort_functions : sort_functions,
             metric : "t",
             radio_button : 0,
             inited : false,
             /*maps : maps,
             cur_map : cur_map*/
-        }
+        })
 
         /*
                 var maps = {
@@ -38,48 +38,90 @@ var CountriesPage = React.createClass({
 
             var sessionData = countlySession.getSessionData();
 
+            var metrics = [
+                {
+                    "title":jQuery.i18n.map["common.total-sessions"],
+                    "total":sessionData.usage["total-sessions"].total,
+                    "trend":sessionData.usage["total-sessions"].trend,
+                    "help":"countries.total-sessions",
+                    "short" : "t",
+                    "color" : "#1B8AF3"
+                },
+                {
+                    "title":jQuery.i18n.map["common.total-users"],
+                    "total":sessionData.usage["total-users"].total,
+                    "trend":sessionData.usage["total-users"].trend,
+                    "help":"countries.total-users",
+                    "short" : "u",
+                    "color" : "#F2B702"
+                },
+                {
+                    "title":jQuery.i18n.map["common.new-users"],
+                    "total":sessionData.usage["new-users"].total,
+                    "trend":sessionData.usage["new-users"].trend,
+                    "help":"countries.new-users",
+                    "short" : "n",
+                    "color" : "#FF7D7D"
+                }
+            ]
+
+/*
             var templateData = {
                 "page-title":jQuery.i18n.map["countries.title"],
                 "logo-class":"countries",
                 "big-numbers":{
                     "count":3,
-                    "items":[
-                        {
-                            "title":jQuery.i18n.map["common.total-sessions"],
-                            "total":sessionData.usage["total-sessions"].total,
-                            "trend":sessionData.usage["total-sessions"].trend,
-                            "help":"countries.total-sessions",
-                            "short" : "t",
-                            "color" : "#1B8AF3"
-                        },
-                        {
-                            "title":jQuery.i18n.map["common.total-users"],
-                            "total":sessionData.usage["total-users"].total,
-                            "trend":sessionData.usage["total-users"].trend,
-                            "help":"countries.total-users",
-                            "short" : "u",
-                            "color" : "#F2B702"
-                        },
-                        {
-                            "title":jQuery.i18n.map["common.new-users"],
-                            "total":sessionData.usage["new-users"].total,
-                            "trend":sessionData.usage["new-users"].trend,
-                            "help":"countries.new-users",
-                            "short" : "n",
-                            "color" : "#FF7D7D"
-                        }
-                    ]
+                    "items":
                 },
                 "chart-helper":"countries.chart",
                 "table-helper":"countries.table"
             };
+*/
 
             self.setState({
                 inited : true,
-                template_data : templateData,
+                //template_data : templateData,
+                metrics : metrics
             })
 
         });
+    },
+
+    componentWillReceiveProps : function(nextProps) {
+
+        var sessionData = countlySession.getSessionData();
+
+        var metrics = [
+            {
+                "title":jQuery.i18n.map["common.total-sessions"],
+                "total":sessionData.usage["total-sessions"].total,
+                "trend":sessionData.usage["total-sessions"].trend,
+                "help":"countries.total-sessions",
+                "short" : "t",
+                "color" : "#1B8AF3"
+            },
+            {
+                "title":jQuery.i18n.map["common.total-users"],
+                "total":sessionData.usage["total-users"].total,
+                "trend":sessionData.usage["total-users"].trend,
+                "help":"countries.total-users",
+                "short" : "u",
+                "color" : "#F2B702"
+            },
+            {
+                "title":jQuery.i18n.map["common.new-users"],
+                "total":sessionData.usage["new-users"].total,
+                "trend":sessionData.usage["new-users"].trend,
+                "help":"countries.new-users",
+                "short" : "n",
+                "color" : "#FF7D7D"
+            }
+        ]
+
+        this.setState({
+            metrics : metrics
+        })
+
     },
 
     radio_button_click : function(id)
@@ -89,7 +131,7 @@ var CountriesPage = React.createClass({
             return true;
         }
 
-        var metric = this.state.template_data["big-numbers"]["items"][id]["short"];
+        var metric = this.state.metrics[id]["short"];
 
         console.log("new map metric:", metric);
 
@@ -118,7 +160,7 @@ var CountriesPage = React.createClass({
             "width" : elements_width
         }
 
-        var table_headers = JSON.parse(JSON.stringify(this.state.template_data["big-numbers"].items));
+        var table_headers = JSON.parse(JSON.stringify(this.state.metrics));
 
         table_headers.unshift({
             "title" : "Country",
@@ -138,7 +180,7 @@ var CountriesPage = React.createClass({
 
                 <div className="radio_buttons_container">
                 {
-                    _.map(self.state.template_data["big-numbers"].items, function(radio_button, i) {
+                    _.map(self.state.metrics, function(radio_button, i) {
 
                         return <RadioButton
                                   id={i}
@@ -162,6 +204,7 @@ var CountriesPage = React.createClass({
                     date_sign={"Date"}
                     rows_per_page={20}
                     filter_field={"country"}
+                    date={this.props.date}
                 />
 
             </div>

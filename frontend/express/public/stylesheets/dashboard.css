@@ -65,22 +65,17 @@
 
 #dashboard .top_tabs > div.tab.active {
 
-    /*border-top : 6px solid green;*/
-    /*box-shadow: 0 -4px 0 #34fa45;*/
-    /*border-top : 4px solid #19CC63;*/
-    /*height : 104px;*/
-
-
     border-top : 4px solid #19CC63;
-
     background-color : #ffffff;
-
     border-bottom : 2px solid #ffffff;
-
     border-left : 0px solid white;
-
     padding-top : 0px;
+    padding-left : 2px;
+}
 
+#dashboard .top_tabs > div.tab.active + div {
+
+    border-left : 2px solid #F8F8F8;
 }
 
 #dashboard .top_tabs > div.tab > div {

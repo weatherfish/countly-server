@@ -7,15 +7,8 @@ var RouterLink = React.createClass({
     },
     render: function() {
 
-      var class_name = "router_link";
-/*
-      if (active)
-      {
-          class_name += " active";
-      }*/
-
       return (
-        <div className={class_name} onClick={this._handleClick.bind(self, this.props.action_path)}>
+        <div className="router_link" onClick={this._handleClick.bind(self, this.props.action_path)}>
             {this.props.item[0]}
         </div>
       );
@@ -35,6 +28,10 @@ var RightPart = React.createClass({
             }
 
             //$(event_emitter).trigger('select', nav_data);
+
+            console.log("first:", nav_data.fstmenu, " >>",  nav_data.sndmenu);
+
+            this.props.onChange(nav_data.fstmenu, nav_data.sndmenu);
 
         }
 
@@ -93,11 +90,24 @@ var RightPart = React.createClass({
         console.log("{{{{{{{{ set state }}}}}}}}");
         console.log(item);
 
-        var selected = item.split('/');
-        selected = selected[2];
+        var selected = item[1].split('/');
+
+        console.log("???????????? selected ?????????");
+        console.log(selected);
+
+        var nav_data = {
+            fstmenu : selected[1],
+            sndmenu : selected[2].charAt(0).toUpperCase() + selected[2].slice(1),
+        }
+
+        //$(event_emitter).trigger('select', nav_data);
+
+        console.log("first:", nav_data.fstmenu, " >>",  nav_data.sndmenu);
+
+        this.props.onChange(nav_data.fstmenu, nav_data.sndmenu);
 
         this.setState({
-            selected_item : selected,
+            selected_item : selected[2],
         });
 
     },

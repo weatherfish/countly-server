@@ -1132,9 +1132,6 @@
 
                 var set_data = granularity_rows[i];
 
-                console.log("--- set data ----");
-                console.log(set_data);
-
                 if (set_data.color)
                 {
                     var color = set_data.color;
@@ -1278,9 +1275,6 @@
                   };
             });
         }
-
-        console.log("---------------- single_graph_data ---------------------");
-        console.log(single_graph_data);
 
         _state_single_graph_data = single_graph_data; // todo: remove
 

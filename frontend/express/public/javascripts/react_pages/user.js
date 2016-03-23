@@ -129,6 +129,7 @@ var UserPage = React.createClass({
                     update_graph_function={countlyCommon.updateTimeGraph}
                     with_granularity={true}
                     mount_callback={this.on_graph_mount}
+                    date={this.props.date}
                 />
 
                 {(() => {
@@ -146,6 +147,7 @@ var UserPage = React.createClass({
                             initial_sort={"date"}
                             granularity={this.state.granularity}
                             rows_per_page={20}
+                            date={this.props.date}
                         />)
                     }
 

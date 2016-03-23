@@ -77,6 +77,16 @@ var SelectBlock = React.createClass({
 
         if (!this.state.open) selectors_style.display = "none";
 
+        var style = {};
+        var top_arrow_style = {};
+
+        if (this.props.width) {
+
+            style.width = this.props.width;
+            top_arrow_style.left = this.props.width - 28;
+
+        }
+
         return(
             <div className="setting_block">
 
@@ -84,35 +94,41 @@ var SelectBlock = React.createClass({
 
                 <div className="selectors_block">
 
-                    <div className="current" onClick={this.show_selectors}>
+                    <div className="current" onClick={this.show_selectors} style={style}>
                         <span className="sign">{self.state.active_selector.label}</span>
                         <span className="arrow"/>
                     </div>
 
-                    <div className="selectors" style={selectors_style}>
-                        <div className="top_arrow"/>
+                    <div className="selectors_wrapper" style={selectors_style}>
 
-                        <span className="search_block"><input onKeyUp={this.change_search_input}/></span>
-                        {
-                            _.map(self.state.current_selectors, function(selector, id) {
+                        <div className="top_arrow" style={top_arrow_style} />
 
-                                if (selector.key == self.state.active_selector.key)
-                                {
-                                    var class_name = "active";
-                                }
-                                else
-                                {
-                                    var class_name = "";
-                                }
+                        <div className="search_block">
+                            <div className="search_icon"/> 
+                            <input onKeyUp={this.change_search_input}/>
+                        </div>
 
-                                return (<span className={class_name} onClick={self.select.bind(self, selector)} key={id}>{selector.label}</span>)
+                        <div className="selectors">
 
-                            })
-                        }
+                            {
+                                _.map(self.state.current_selectors, function(selector, id) {
+
+                                    if (selector.key == self.state.active_selector.key)
+                                    {
+                                        var class_name = "active";
+                                    }
+                                    else
+                                    {
+                                        var class_name = "";
+                                    }
+
+                                    return (<span className={class_name} onClick={self.select.bind(self, selector)} key={id}>{selector.label}</span>)
+
+                                })
+                            }
+                        </div>
                     </div>
-
                 </div>
-
             </div>
         )
     }

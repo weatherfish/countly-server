@@ -1,0 +1,32 @@
+.average_bar {
+    width : 90%;
+    background-color : #F5F5F5;
+    margin-left : 5%;
+    margin-right : 5%;
+    box-sizing: border-box;
+    border-radius : 2px;
+    position : relative;
+}
+
+.average_bar .inner_bar {
+
+    background-color : #1A8AF3;
+    height : 12px;
+    box-sizing: border-box;
+    border-radius : 2px;
+
+}
+
+.average_bar .average_point {
+    position : absolute;
+    top : 3px;
+
+    background-color: white;
+
+    width : 6px;
+    height : 6px;
+
+    -moz-border-radius: 3px;
+  	-webkit-border-radius: 3px;
+  	border-radius: 3px;
+}

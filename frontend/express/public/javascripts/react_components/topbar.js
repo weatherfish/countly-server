@@ -8,9 +8,21 @@ var TopBar = React.createClass({
         };
     },
 
+    componentWillReceiveProps : function(nextProps) {
+
+        this.setState({
+            fstmenu : nextProps.first,
+            sndmenu : nextProps.second
+        })
+
+    },
+/*
     componentDidMount: function(){
 
         $(event_emitter).on('select', function(e, data){
+
+            console.log("======= topbar event ==========");
+            console.log(data);
 
             this.setState({
                 fstmenu : data.fstmenu,
@@ -24,7 +36,7 @@ var TopBar = React.createClass({
     componentWillUnmount: function () {
         $(event_emitter).off('select');
     },
-
+*/
     handleOpenUserMenu : function(){
 
         if (this.state.user_menu_open == false)

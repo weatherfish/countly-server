@@ -93,8 +93,10 @@ var FullSidebar = React.createClass({
         this.history.pushState(null, path);
     },
 
-    handle_left_click : function(i)
+    handle_left_click : function(i, href)
     {
+
+        console.log("click:", i, " --> ", href);
 
         if (this.state.selected_left == i) // already selected element
         {
@@ -118,26 +120,47 @@ var FullSidebar = React.createClass({
 
                 //$(event_emitter).trigger('select', nav_data);
 
+                this.props.onChange(nav_data.fstmenu, nav_data.sndmenu);
+
             }
 
             return this.handle_right_close(-1);
-        }
 
-        if (this.state.selected_left == -1 || this.state.selected_left == -2)
+        }
+        else if (href == false)
         {
-            this.setState({
-                selected_left : i,
-                previous_left : false,
-                in_transition : true,
-                right_closed  : false
-            });
+            if (this.state.selected_left == -1 || this.state.selected_left == -2 || this.state.left_full)
+            {
+                this.setState({
+                    selected_left : i,
+                    previous_left : false,
+                    in_transition : true,
+                    right_closed  : false,
+                    left_full : false,
+                });
+            }
+            else
+            {
+                this.setState({
+                    right_change   : true,
+                    right_change_i : i,
+                    left_full : false,
+                });
+            }
         }
         else
         {
+            this._handleClick(href);
+
+            this.props.onChange(false, href.replace("/", ""));
+
             this.setState({
-                right_change   : true,
-                right_change_i : i
+                selected_left : i,
+                left_full : true,
+                previous_left : false,
+                right_closed  : true
             });
+
         }
     },
 
@@ -256,6 +279,11 @@ var FullSidebar = React.createClass({
             var description      = full_navigation[i].description;
         }
 
+        if (this.state.left_full)
+        {
+            is_left_active = true;
+        }
+
         return (
             <div className="wrapper">
 
@@ -285,12 +313,13 @@ var FullSidebar = React.createClass({
                         closed={this.state.right_closed}
                         handleClose={this.handle_right_close.bind(this, -2)}
                         selected_item={this.state.right_selected_item}
+                        onChange={this.props.onChange}
                     />
                 </div>
 
                 <div id="countly_logo_side"></div>
             		<div id="countly_logo"></div>
-                <div id="countly_version">Enterprise Edition 1.0.0.14</div>
+                <div id="countly_version">{this.props.countly_version}</div>
 
             		<div id="right_part_back"></div>
 

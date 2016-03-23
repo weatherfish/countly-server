@@ -40,18 +40,21 @@ var NewUserWindow = React.createClass({
     		data.password = this.user_data.password;
         data.global_admin = this.user_data.global_admin;
 
+        data.admin_of = [];
+        data.user_of = [];
+
+        console.log("> will save >>>>>");
+        console.log(this.user_data);
+
   			if (!this.user_data.global_admin)
         {
 
-            data.admin_of = [];
-            data.user_of = [];
-
             this.user_data.adminof.forEach(function(app){
-                data.admin_of.push(app.key);
+                data.admin_of.push(app/*.key*/);
             });
 
             this.user_data.userof.forEach(function(app){
-                data.user_of.push(app.key);
+                data.user_of.push(app/*.key*/);
             });
 
     				//data.admin_of = currUserDetails.find(".admin-apps .app-list").val().split(",");
@@ -72,6 +75,9 @@ var NewUserWindow = React.createClass({
                   dataType: "jsonp",
       			success: function(result) {
 
+                console.log("========= add result ============");
+                console.log(result);
+
                 self.props.onUserAdd(result);
                 self.props.onClose();
 
@@ -88,6 +94,14 @@ var NewUserWindow = React.createClass({
 
     },
 
+    handleGlobalAdminChange : function(e){
+
+        var state = e.target.checked;
+
+        console.log("<<<<<<<<<< global_admin changed >>>>>>>>>>", state);
+        this.on_row_change("global_admin", state)
+    },
+
     render : function(){
 
         if (this.state.loading)
@@ -96,14 +110,17 @@ var NewUserWindow = React.createClass({
         }
 
         var new_user_block_style = {
-            width : get_viewport_width()
+            width : 440//get_viewport_width() - 30
         };
 
         if (!this.props.open) new_user_block_style.display = "none";
 
         return(<div className="new_user_block" style={new_user_block_style}>
-
-            <div className="label">Create a new user</div>
+            
+            <div className="label">
+                <div className="cancel_button" onClick={this.cancel}></div>
+                <span>Create a new user</span>
+            </div>
 
             <InputBlock
                 label="user fullname"
@@ -139,7 +156,7 @@ var NewUserWindow = React.createClass({
 
                 <MultiSelectBlock
                     label="admin of app"
-                    blockWidth={"180"}
+                    blockWidth={240}
                     selectors={this.state.apps}
                     onChange={this.on_row_change}
                     setting="adminof"
@@ -154,7 +171,7 @@ var NewUserWindow = React.createClass({
 
                 <MultiSelectBlock
                     label="admin of app"
-                    blockWidth={"180"}
+                    blockWidth={240}
                     selectors={this.state.apps}
                     onChange={this.on_row_change}
                     setting="userof"
@@ -163,8 +180,13 @@ var NewUserWindow = React.createClass({
 
             </div>
 
+            <div className="setting_block">
+                <div className="setting_label">global admin</div>
+                <input key="global_admin" type="checkbox" id="global_admin_checkbox" onChange={this.handleGlobalAdminChange}/>
+            </div>
+
             <div className="buttons_block">
-                <div className="cancel_button" onClick={this.cancel}>cancel</div>
+
                 <div className="add_button" onClick={this.add}>add</div>
             </div>
 
@@ -191,10 +213,11 @@ var ManageUsersPage = React.createClass({
         }
 
         return({
-            new_user_open : false,
+            new_user_open : true,
             apps : apps,
             email_max_width : false,
-            max_block_height : false
+            max_block_height : false,
+            selected_user : false
         });
 
     },
@@ -230,9 +253,6 @@ var ManageUsersPage = React.createClass({
                         users_data[i].user_of[0] = false
                     }
                 }
-
-                console.log("{{{{{{{{{{ loaded user data }}}}}}}}}}");
-                console.log(users_data);
 
                 self.setState({
                     "users_data" : users_data
@@ -271,6 +291,9 @@ var ManageUsersPage = React.createClass({
 
         users_data.push(new_user);
 
+        console.log("::::::::::::::: updated users data :::::::::::::");
+        console.log(users_data);
+
         this.setState({
             "users_data" : users_data
         });
@@ -303,9 +326,6 @@ var ManageUsersPage = React.createClass({
 
     block_height_changed : function(type, key, height){
 
-        console.log("--- height changed ---");
-        console.log(type, key, height);
-
         if (!this.blocks_height[type]) this.blocks_height[type] = [];
 
         this.blocks_height[type][key] = height;
@@ -333,10 +353,24 @@ var ManageUsersPage = React.createClass({
 
         }
 
-        console.log("max_height:", max_height);
-
         this.setState({
             max_block_height : max_height
+        })
+
+    },
+
+    open_edit : function(id){
+
+        this.setState({
+            selected_user : id
+        })
+
+    },
+
+    close_edit : function(id){
+
+        this.setState({
+            selected_user : false
         })
 
     },
@@ -364,8 +398,8 @@ var ManageUsersPage = React.createClass({
 
             email_header_style.width = email_header_width + "px";
 
-            adminof_header_style.width = (manage_block_width - email_header_width) / 2 - 10 + "px";
-            userof_header_style.width = (manage_block_width - email_header_width) / 2 - 10 + "px";
+            adminof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 10 + "px";
+            userof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 10 + "px";
 
         }
 
@@ -383,39 +417,53 @@ var ManageUsersPage = React.createClass({
 
                     <div className="sign">ADDED USERS</div>
 
-                    {(() => {
+                    <div className="users_table">
+                              <div className="users_table_header">
+                                  <div className="email" style={email_header_style}>User E-mail</div>
+                                  <div className="admin_of" style={adminof_header_style}>Admin of</div>
+                                  <div className="user_of" style={userof_header_style}>User of</div>
+                              </div>
+                              {
+                                  _.map(self.state.users_data, function(user, i){
 
-                        if (self.state.users_data){
-
-                            return (<div className="users_table">
-                                      <div className="users_table_header">
-                                          <div className="email" style={email_header_style}>User E-mail</div>
-                                          <div className="admin_of" style={adminof_header_style}>Admin of</div>
-                                          <div className="user_of" style={userof_header_style}>User of</div>
-                                      </div>
+                                      if (self.state.selected_user && self.state.selected_user == i)
                                       {
-                                          _.map(self.state.users_data, function(user){
-
-                                              return (<ManageUserBlock
-                                                          user={user}
-                                                          email={user.email}
-                                                          admin_of={user.admin_of}
-                                                          user_of={user.user_of}
-                                                          global_admin={user.global_admin}
-                                                          apps={self.state.apps}
-                                                          width={manage_block_width}
-                                                          email_max_width={self.state.email_max_width}
-                                                          email_width_changed={self.email_width_changed}
-                                                          max_block_height={self.state.max_block_height}
-                                                          block_height_changed={self.block_height_changed}
-                                                      />)
-
-                                          })
+                                          var edit_active = true;
+                                      }
+                                      else
+                                      {
+                                          var edit_active = false;
                                       }
 
-                            </div>)
-                        }
+                                      return (<ManageUserBlock
+                                                  user={user}
+                                                  email={user.email}
+                                                  admin_of={user.admin_of}
+                                                  user_of={user.user_of}
+                                                  global_admin={user.global_admin}
+                                                  apps={self.state.apps}
+                                                  width={manage_block_width}
+                                                  email_max_width={self.state.email_max_width}
+                                                  email_width_changed={self.email_width_changed}
+                                                  max_block_height={self.state.max_block_height}
+                                                  block_height_changed={self.block_height_changed}
+                                                  edit_click={self.open_edit.bind(self, i)}
+                                                  cancel_click={self.close_edit.bind(self, i)}
+                                                  edit_active={edit_active}
+                                              />)
 
+                                  })
+                              }
+
+                    </div>
+
+                    {(() => { // todo: add <Loader/>
+/*
+                        if (self.state.users_data){
+
+                            return ()
+                        }
+*/
                     })()}
 
                 </div>

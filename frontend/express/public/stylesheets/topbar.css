@@ -23,6 +23,7 @@
     font-size   : 14px;
     color       : #969696;
     position    : relative;
+    text-transform: capitalize;
 }
 
 #top_bar .navigation .arrow_icon {
@@ -43,6 +44,7 @@
     font-family : Lato-Regular;
     font-size   : 14px;
     color       : #3D3D3D;
+    text-transform: capitalize;
 }
 
 #top_bar .navigation .sndmenu.dashboard {

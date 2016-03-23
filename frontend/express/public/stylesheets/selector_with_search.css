@@ -1,3 +1,7 @@
+.selectors_block {
+    position : relative;
+}
+
 .selectors_block .current {
 
     border: 1px solid #DEDEDE;
@@ -39,9 +43,59 @@
     position : relative;
 }
 
+.selectors_block .selectors_wrapper {
+    position : absolute;
+    top : 10px;
+    left : 0px;
+    z-index : 2000;
+}
+
+.selectors_block /*.selectors*/ .top_arrow {
+    /*display : none;*/
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 7px 7px 7px;
+    border-color: transparent transparent #202531 transparent;
+    position: absolute;;
+    top: 24px;
+    left: 152px;
+}
+
+.selectors_block /*.selectors */.search_block {
+    /*display : none;*/
+    position: absolute;;
+    top: 10px;
+    left: 0px;
+    height : 40px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.selectors_block .search_block .search_icon {
+    position: absolute;
+    top: 32px;
+    left: 20px;
+    height: 14px;
+    width: 14px;
+    background: url('../images/sidebar/search_app_selection.png');
+    background-image: url("../images/sidebar/search_app_selection.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.selectors_block .search_block input {
+    height : 40px !important;
+    line-height : 40px !important;
+    background-color:  #0F131C;
+    color : white;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
 .selectors_block .selectors {
     position : absolute;
-    top : 60px;
+    top : 70px;
     left : 0px;
 
     font-size: 14px;
@@ -55,12 +109,12 @@
 
     background-color: #202531;
     border-top: 1px solid #2E3545;
-    border-right: 1px solid #2E3545;
+    /*border-right: 1px solid #2E3545;*/
     /*opacity: 0;*/
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    /*border-top-left-radius: 4px;
+    border-top-right-radius: 10px;*/
     border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 10px;
 
     z-index : 6000;
 
@@ -113,13 +167,20 @@
     color : white;
 }
 
-.selectors_block .selectors .top_arrow {
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 0 7px 7px 7px;
-    border-color: transparent transparent #202531 transparent;
-    position: absolute;;
-    top: -7px;
-    left: 152px;
+.selectors_block ::-webkit-scrollbar {
+    width: 6px;
+    /*position : relative;
+    top : -6px;*/
+}
+
+.selectors_block ::-webkit-scrollbar-track {
+    /*-webkit-box-shadow: inset 0 0 6px #fff;*/
+    border-radius: 0px;
+    background-color: #2E3545;
+}
+
+.selectors_block ::-webkit-scrollbar-thumb {
+    border-radius: 0px;
+    /*-webkit-box-shadow: inset 0 0 10px #19CC63;*/
+    background-color: #B8B8B8; /*#202531; */
 }

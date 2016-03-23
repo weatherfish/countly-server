@@ -1,4 +1,8 @@
+var Link = ReactRouter.Link;
+
 var CrashesPage = React.createClass({
+
+    mixins: [ ReactRouter.History ],
 
     topbar_height : 110,
 
@@ -141,7 +145,8 @@ var CrashesPage = React.createClass({
             //"crash_type_filter" : ((store.get("countly_crashfilter")) ? store.get("countly_crashfilter") : "crash-all"),
             "crashes_types" : crashes_types,
             "active_crash_filter" : crashes_types[0], // todo: ((store.get("countly_crashfilter")) ? store.get("countly_crashfilter") : "crash-all"),
-            "loading" : false
+            "loading" : false,
+            "long_text_flag" : false
         }
 
     },
@@ -208,6 +213,10 @@ var CrashesPage = React.createClass({
 
             var graph_tabs = self.make_graph_tabs();
 
+            var elements_width = get_viewport_width();
+
+            var tab_width = Math.round(elements_width / graph_tabs.length)
+
             self.setState({
                 "graph_tabs" : graph_tabs,
                 "chart_color" : graph_tabs[0].color,
@@ -215,7 +224,9 @@ var CrashesPage = React.createClass({
                 "active_metric" : self.initial_metric,
                 "tabs_data_function" : countlyCrashes.getDashboardData, // data function for tabs data
                 "graph_data_function" : countlyCrashes.getChartData, // data function for line chart
-                "inited" : true
+                "inited" : true,
+                "elements_width" : elements_width,
+                "top_tab_width" : tab_width
             })
         });
     },
@@ -260,9 +271,6 @@ var CrashesPage = React.createClass({
     },
 
     graph_data_function : function(){
-
-        console.log("{{{{{{{{{{{{ graph_data_function }}}}}}}}}}}}", this.state.active_metric);
-        console.log(this.metrics);
 
         return this.state.graph_data_function(this.state.active_metric, this.metrics[this.state.active_metric], this.state.chart_color);
 
@@ -323,6 +331,25 @@ var CrashesPage = React.createClass({
         })
     },
 
+    row_click : function(row_data)
+    {
+
+        var error_id = row_data._id;
+
+        this.history.pushState(null, "/crashes/" + error_id);
+    },
+
+    is_long_text : function(height, id)
+    {
+
+        if (height > 14) // todo: var
+        {
+            this.setState({
+                long_text_flag : true
+            })
+        }
+    },
+
     render : function(){
 
         if (!this.state.inited || this.state.loading)
@@ -332,7 +359,9 @@ var CrashesPage = React.createClass({
 
         var self = this;
 
-        var elements_width = get_viewport_width();
+        //var elements_width = get_viewport_width();
+
+        var elements_width = this.state.elements_width;
 
         var graph_width = elements_width - 40; // todo
         var map_width = elements_width - 500; // todo
@@ -346,7 +375,7 @@ var CrashesPage = React.createClass({
         }
 
         var tab_item_style = {
-            "width" : Math.round(top_tab_style.width / this.state.graph_tabs.length)
+            "width" : this.state.top_tab_width// Math.round(top_tab_style.width / this.state.graph_tabs.length)
         }
 
         var last_tab_width_difference = top_tab_style.width - (tab_item_style.width * this.state.graph_tabs.length);
@@ -364,14 +393,16 @@ var CrashesPage = React.createClass({
                 "label" : "Current Time Range"
             }
         ]
-
-        var text_check_style = "normal 12pt Lato-Semibold"; // toto: non-english languages will have another font-family
+/*
+        var text_check_style = "normal 12px Lato-Semibold"; // toto: non-english languages will have another font-family
 
         var long_text_flag = false;
 
         this.state.graph_tabs.every(function(element){
 
             var text_width = self.getTextWidth(element.title, text_check_style); // toto: non-english languages will have another font-family
+
+            console.log(">>>> text_width:", text_width);
 
             if (text_width > tab_item_style.width)
             {
@@ -381,12 +412,12 @@ var CrashesPage = React.createClass({
 
             return true;
         });
+*/
+        //long_text_flag = true; // todo: !remove
 
-        long_text_flag = true; // todo: !remove
+        console.log("long_text_flag:", this.state.long_text_flag);
 
-        console.log("long_text_flag:", long_text_flag);
-
-        if (long_text_flag)
+        if (this.state.long_text_flag)
         {
             top_tab_style.height = (this.topbar_height + 20) + "px"
         }
@@ -437,9 +468,6 @@ var CrashesPage = React.createClass({
 
         // todo: change id and classname
 
-        console.log("------------- crashes tabs ----------------");
-        console.log(this.state.graph_tabs);
-
         return (
             <div className="crashes_page" id="dashboard" style={dashboard_style}>
 
@@ -475,7 +503,7 @@ var CrashesPage = React.createClass({
 
                         var title = tab.title.toUpperCase();
 
-                        var text_width = self.getTextWidth(title, text_check_style); // toto: non-english languages will have another font-family
+                        //var text_width = self.getTextWidth(title, text_check_style);
 
                         if (id == self.state.graph_tabs.length - 1)
                         {
@@ -488,7 +516,7 @@ var CrashesPage = React.createClass({
                             var style = tab_item_style;
                         }
 
-                        if (long_text_flag)
+                        if (self.state.long_text_flag)
                         {
                             style.height = "130px";
                         }
@@ -506,7 +534,11 @@ var CrashesPage = React.createClass({
                                     {percent_change}
                                 </div>
                                 <div className={"title"}>
-                                    {title}
+                                    <MultiLangLabel
+                                        label={title}
+                                        onHeightChange={self.is_long_text}
+                                        id={id}
+                                    />
                                 </div>
                             </div>)
                     })
@@ -520,10 +552,11 @@ var CrashesPage = React.createClass({
                     graph_width={elements_width}
                     period={countlyCommon.getPeriod()}
                     big_numbers={false}
-                    with_granularity={false}
+                    with_granularity={true}
                     data_function={self.graph_data_function}
                     update_graph_function={countlyCommon.updateTimeGraph}
                     lines_descriptions={lines_descriptions}
+                    reverse_dp={true}
                 />
 
                 <SortTable
@@ -538,19 +571,11 @@ var CrashesPage = React.createClass({
                     rows_per_page={20}
                     date={this.props.date}
                     additional_filter={additional_filter}
+                    on_row_click={this.row_click}
                 />
 
             </div>
         )
     },
 
-    getTextWidth : function(text, font) {
-        // re-use canvas object for better performance
-        var canvas = this.getTextWidth.canvas || (this.getTextWidth.canvas = document.createElement("canvas"));
-        var context = canvas.getContext("2d");
-        context.font = font;
-        context["letter-spacing"] = "0.98px";     
-        var metrics = context.measureText(text);
-        return metrics.width;
-    },
 })

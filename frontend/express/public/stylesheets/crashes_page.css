@@ -125,3 +125,7 @@
     top: -7px;
     left: 152px;
 }
+
+.crashes_page .table_content {
+    cursor : pointer;
+}

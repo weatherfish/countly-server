@@ -46,10 +46,17 @@ var InputBlock = React.createClass({
             var label = false;
         }
 
+        var style = {};
+
+        if (this.props.width)
+        {
+            style.width = this.props.width;
+        }
+
         return(
             <div className="setting_block">
                 {label}
-                <input value={this.state.value} onChange={this.change_input}/>
+                <input value={this.state.value} onChange={this.change_input} style={style}/>
             </div>
         )
     },

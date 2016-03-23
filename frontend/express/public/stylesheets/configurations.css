@@ -1,7 +1,7 @@
 .configurations_page {
 
     padding-bottom : 400px;
-
+    border: 1px solid #EEEEEE;
 }
 
 .configurations_page .category {
@@ -16,24 +16,36 @@
 }
 
 .configurations_page .category > div.block_label {
-
+/*
     width : 20%;
     height : 100%;
     line-height: 100%;
 
-    float : left;
-
-    font-size : 24px;
-
+    /*float : left;*/
+/*
     position : relative;
-    top : 20px;
-    left : 20px;
+    top : 30px;
+    left : 30px;
+*/
+
+    margin-left : 30px;
+    margin-top : 30px;
+    margin-bottom : 30px;
+
+    font-family: Lato-Semibold;
+    font-size: 17px;
+    color: #132737;
+    letter-spacing: 1.39px;
+
+    text-transform: uppercase;
 
 }
 
 .configurations_page .category > div.block_elements {
 
-    width : 80%;
+    /*width : 80%;*/
+    display : block;
+    padding-left : 30px;
 
 }
 
@@ -100,8 +112,21 @@
     height : 60px;
     line-height: 60px;
 
-    border-bottom : 1px solid #eeeeee;
+    /*border-bottom : 1px solid #eeeeee;*/
 
     font-family : Lato-Regular;
 
+}
+
+.configurations_page .setting_block div {
+    display : inline-block;
+}
+
+.configurations_page .setting_block .setting_label {
+    width : 300px;
+    /*padding-left : 20px;*/
+    box-sizing: border-box;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-family: Lato-Medium;
 }

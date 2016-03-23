@@ -50,9 +50,10 @@ var TableHeader = (function (_React$Component) {
                 var sort_icons = <div className="header_sort_button"><div className="up_icon"></div><div className="down_icon"></div></div>;
             }
 
-            var label = this.props.label.toLowerCase().replace(/\w\S*/g, function(txt){
-              return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            });
+            var label = this.props.label.toLowerCase(); //.toLowerCase().replace(/\w\S*/g, function(txt){
+            /*    console.log("convert label:", txt);
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });*/
 
             return (
                     <div className="table_header" onClick={this.props.sort_function.bind(null, this.props.data_key)}>
@@ -579,6 +580,24 @@ var SortTable = React.createClass({
         this.setState({ rows : rows })
     },
 
+    onRowMouseDown : function(event, row_id){
+
+        if (!this.props.on_row_click)
+        {
+            return false;
+        }
+
+        console.log("------- mouse click -------------");
+        console.log(event, row_id);
+
+        var row_id = (this.state.active_page * this.props.rows_per_page) + row_id;
+
+        console.log("row_id:", row_id);
+
+        this.props.on_row_click(this.state.full_rows[row_id]);
+
+    },
+
     make_pagination : function(full_rows, old_data)
     {
 
@@ -827,6 +846,7 @@ var SortTable = React.createClass({
                     headerHeight = {row_height}
                     onCellMouseEnter={this.onCellMouseEnter}
                     onCellMouseLeave={this.onCellMouseLeave}
+                    onRowMouseDown={this.onRowMouseDown}
                 >
                 {this.columns_render(headers)}
                 </Table>
@@ -882,11 +902,6 @@ var SortTable = React.createClass({
                 {this.columns_render(headers, sortDirArrow)}
             </Table>
         );*/
-    },
-
-    componentDidMount : function()
-    {
-
     },
 
 });

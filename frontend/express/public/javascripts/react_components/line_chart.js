@@ -4,12 +4,11 @@ var LineChart = React.createClass({
 
     getInitialState() {
 
-        console.log(":::::::::: initial ::::::::::::");
-        console.log(this.props.data_function());
-
         var data_points = this.props.data_function();
 
         var line_chart_width = this.props.width - (this.props.sides_padding * 2);
+
+        console.log("init graph:", data_points.daily_granularity[0].data.length * (this.circle_radius * 2) * 2,  line_chart_width);
 
         if (this.props.with_granularity)
         {
@@ -46,9 +45,19 @@ var LineChart = React.createClass({
             else
             {
                 var granularity_rows = data_points.daily_granularity;
+/*
+                if ((granularity_rows[0].data.length * this.circle_radius * 2 * 2) > line_chart_width)
+                {
+                    var without_circles = true;
+                }
+                else
+                {
+                    var without_circles = false;
+                }
+*/
             }
 
-            var zero_points = true;
+            var zero_points = true; // all points value = 0
 
             /*
                 Check if all points have 0 values
@@ -91,6 +100,11 @@ var LineChart = React.createClass({
             {
                 granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0];
             }
+        }
+
+        if (this.props.reverse_dp)
+        {
+            granularity_rows.reverse();
         }
 
         countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", this.props.big_numbers/*tmp_colors*/, line_chart_width - 40 - 40, this.props.height, false, granularity, false, zero_points); // !remove
@@ -161,31 +175,6 @@ var LineChart = React.createClass({
         $(event_emitter).on('granularity', function(e, granularity_type){
 
             this.update(-1, granularity_type);
-
-        }.bind(this));
-/*
-        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
-
-            if (period.period == "hour")
-            {
-                var updated_data = this.update(-1, "hourly");
-            }
-            else
-            {
-                var updated_data = this.update(-1, false);
-            }
-
-/*
-            var rows = updated_data.rows;
-            var granularity = updated_data.new_granularity;
-*/
-/*        }.bind(this));*/
-
-
-
-        $(event_emitter).on('data_changed', function(e, data){
-
-            this.update(-1, this.state.granularity_type);
 
         }.bind(this));
 
@@ -439,10 +428,14 @@ var LineChart = React.createClass({
                 granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0];
             }
         }
-
         //_granularity = new_granularity; // todo: remove global variable
 
-        this.props.update_graph_function(granularity_rows, "#dashboard-graph", big_numbers, false, new_granularity, without_circles, zero_points, function(error, result){
+        if (this.props.reverse_dp)
+        {
+            granularity_rows.reverse();
+        }
+
+        countlyCommon.updateTimeGraph(granularity_rows, "#dashboard-graph", big_numbers, false, new_granularity, without_circles, zero_points, function(error, result){
             $(event_emitter).trigger('granularity_data', {
                 "session_dp" : sessionDP,
                 "new_granularity" : new_granularity,
@@ -496,7 +489,7 @@ var LineChart = React.createClass({
         if (this.state.lines_descriptions)
         {
             var description_blocks = JSON.parse(JSON.stringify(this.state.lines_descriptions));
-            description_blocks.reverse();
+            //description_blocks.reverse();
         }
 
         // graph_width={this.props.width}

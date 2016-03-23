@@ -8,19 +8,8 @@ var BoolPieChart = React.createClass({
 
         var data = this.props.data_function();
 
-        console.log("----- this.props --------");
-        console.log(this.props);
-
         data = data[0];
 
-/*
-        var formatted_data = [];
-
-        for (var i = 0; i < data.length; i++)
-        {
-            formatted_data.push({ label : data[i]['name'], value: Math.round(data[i]["percent"]) })
-        }
-*/
         return({
             label : data.name,
             value : data.percent
@@ -78,6 +67,8 @@ var BoolPieChart = React.createClass({
               .attr("height", height)
 
 
+        svg.selectAll('*').remove();
+
         // -------------------------
 
         var empty_data = [
@@ -98,8 +89,6 @@ var BoolPieChart = React.createClass({
         _gray_circle.append("path")
                 .attr("d", arc2)
                 .style("fill", function(d, i) {
-                    console.log("====== empty =======", i);
-                    console.log(d);
                     return "#eeeeee";
                 });
 
@@ -122,9 +111,6 @@ var BoolPieChart = React.createClass({
         _segment.append("path")
             .attr("d", arc)
             .style("fill", function(d, i) {
-
-                console.log("--- d ----");
-                console.log(self.props);
 
                 if (i == 0)
                 {

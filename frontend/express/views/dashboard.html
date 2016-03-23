@@ -20,7 +20,7 @@
     <% if (production) { %>
 
 				<link rel="stylesheet" href="<%- cdn %>/stylesheets/main.min.css?<%= countlyVersion %>" />
-				<link rel="stylesheet" href="<%- cdn %>/stylesheets/plugins.min.css?<%= countlyVersion %>" />
+				<!--link rel="stylesheet" href="<%- cdn %>/stylesheets/plugins.min.css?<%= countlyVersion %>" /-->
 
 	    	<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/min/countly.dom.js?<%= countlyVersion %>"></script>
 	    	<script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/min/countly.utils.js?<%= countlyVersion %>"></script>
@@ -86,6 +86,7 @@
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/multi_select.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/crash_details.css" />
 				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/bool_pie_chart.css" />
+				<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/average_bar.css" />
 
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
 		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.form.js"></script>
@@ -211,8 +212,8 @@
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/table_filter.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/line_chart.js"></script>
-				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/graph.time_extension.js"></script>
-				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/graph.granularity.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/line_chart.time_extension.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/line_chart.granularity.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/bar_chart.js"></script>
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/pie_chart.js"></script>
@@ -230,20 +231,13 @@
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/simple_input.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/bool_pie_chart.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/average_bar.js"></script>
+				<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/multi_lang_label.js"></script>
 
 				<script type="text/jsx" src="<%- cdn %>/javascripts/react-height.min.js"></script>
 
 
 				<!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/countly/countly.template.js?<%= countlyVersion %>"></script-->
-
-				<style>
-						#countly_logo {
-								display : none !important;
-						}
-						#countly_version {
-								display : none !important;
-						}
-				</style>
 
     <% } %>
 
@@ -349,6 +343,9 @@
 				}.bind(self));
 				*/
 
+				var countly_version = "<%= countlyTypeName %>";
+
+
     </script>
 
 </head>
@@ -372,7 +369,7 @@
 				</div>
 		</div>
 
-		<script language="javascript" type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<!--script language="javascript" type="text/javascript" src="https://www.google.com/jsapi"></script-->
 
     <% if (production) { %>
 				<!--  -->
@@ -428,6 +425,22 @@
 
 				const App = React.createClass({
 
+						getInitialState : function()
+						{
+								return ({
+										top_bar_first : false,
+										top_bar_second : false
+								})
+						},
+
+						path_changed : function(first, second)
+						{
+								this.setState({
+										top_bar_first : first,
+										top_bar_second : second
+								})
+						},
+
 					  render() {
 
 								if (this.props.location.pathname.indexOf("/manage/users") == -1 && this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1 && this.props.location.pathname.indexOf("/crashes/") == -1)
@@ -461,6 +474,8 @@
 															active_app={active_app_data}
 															current_location={this.props.location.pathname}
 															applications={this.props.route.applications}
+															onChange={this.path_changed}
+															countly_version={countly_version}
 													/>
 											</div>
 
@@ -468,6 +483,8 @@
 													<TopBar
 															user_name={"John Black"}
 															width={window.innerWidth - sidebar_width}
+															first={this.state.top_bar_first}
+															second={this.state.top_bar_second}
 													/>
 											</div>
 
@@ -548,17 +565,19 @@
 										<Router history={ReactRouter.browserHistory}>
 												<Route path="/" component={App} applications={this.state.applications} onDateChange={this.date_change.bind(this)}> // this.props.route.onDateChange
 														<Route path="dashboard" component={wrapComponent(Dashboard, {date : this.state.date})}/>
-														<Route path="analytics">
+														<Route path="metrics">
 																<Route path="sessions" 		component={wrapComponent(SessionPage, 		{date : this.state.date})} date={this.state.date}/>
 																<Route path="users" 			component={wrapComponent(UserPage, 				{date : this.state.date})}/>
-																<Route path="frequency" 	component={wrapComponent(FrequencyPage, 	{date : this.state.date})}/>
-																<Route path="loyalty" 		component={wrapComponent(LoyaltyPage, 		{date : this.state.date})}/>
-																<Route path="durations" 	component={wrapComponent(DurationPage, 		{date : this.state.date})}/>
 																<Route path="resolutions" component={wrapComponent(ResolutionsPage, {date : this.state.date})}/>
 																<Route path="devices" 		component={wrapComponent(DevicesPage, 		{date : this.state.date})}/>
 																<Route path="countries"   component={wrapComponent(CountriesPage, 	{date : this.state.date})}/>
 																<Route path="carriers"    component={wrapComponent(CarrierPage, 	  {date : this.state.date})}/>
 																<Route path="map_sessions" component={wrapComponent(MapSessionPage, {date : this.state.date})}/>
+														</Route>
+														<Route path="engagement">
+																<Route path="frequency" 	component={wrapComponent(FrequencyPage, 	{date : this.state.date})}/>
+																<Route path="loyalty" 		component={wrapComponent(LoyaltyPage, 		{date : this.state.date})}/>
+																<Route path="durations" 	component={wrapComponent(DurationPage, 		{date : this.state.date})}/>
 														</Route>
 														<Route path="events" component={wrapComponent(EventsPage, {date : this.state.date})}>
 														</Route>
@@ -570,6 +589,7 @@
 																<Route path="users" component={ManageUsersPage}/>
 																<Route path="configurations" component={ConfigurationsPage}/>
 														</Route>
+														<Route path="*" component={wrapComponent(Dashboard, {date : this.state.date})}/>
 												</Route>
 										</Router>)
 						}
@@ -580,7 +600,7 @@
 		</script>
 
     <% if(intercom && member['global_admin'] || config.autonomous) { %>
-    <script id="IntercomSettingsScriptTag">
+    <!--script id="IntercomSettingsScriptTag">
         var intercomSettings = {
             app_id: 'pt60eheo',
             widget: {
@@ -611,7 +631,7 @@
                 window.addEventListener('load', async_load, false);
             }
         })();
-    </script>
+    </script-->
     <% } %>
     <!---->
 

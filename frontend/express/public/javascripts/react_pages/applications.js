@@ -158,7 +158,7 @@ var NewAppWindow = React.createClass({
         }
 
         var new_app_block_style = {
-            width : get_viewport_width()
+            width : 440/*get_viewport_width()*/
         };
 
         if (!this.props.open) new_app_block_style.display = "none";
@@ -166,7 +166,10 @@ var NewAppWindow = React.createClass({
         return(
             <div className="new_app_block" style={new_app_block_style}>
 
-                <div className="label"></div>
+                <div className="label">
+                    <div className="cancel_button" onClick={this.cancel}></div>
+                    <span>CREATE A NEW APPLICATION</span>
+                </div>
 
                 <InputBlock
                     label="app name"
@@ -181,6 +184,7 @@ var NewAppWindow = React.createClass({
                     active_selector_key={this.countries[0]}
                     onChange={this.on_setting_change}
                     setting={["country"]}
+                    width={240}
                 />
 
                 <SelectBlock
@@ -189,6 +193,7 @@ var NewAppWindow = React.createClass({
                     active_selector_key={this.categories[0]}
                     onChange={this.on_setting_change}
                     setting={["category"]}
+                    width={240}
                 />
 
                 <div className="setting_block upload_icon_block">
@@ -202,8 +207,7 @@ var NewAppWindow = React.createClass({
                     </div>
                 </div>
 
-                <div className="buttons_block">
-                    <div className="cancel_button" onClick={this.cancel}>cancel</div>
+                <div className="buttons_block">                  
                     <div className="add_button" onClick={this.add}>add</div>
                 </div>
           </div>);
@@ -257,7 +261,7 @@ var ApplicationsPage = React.createClass({
             current_app_id : app_id,
             app_list_is_open : false,
             actions_list_is_open : false,
-            new_app_open : false
+            new_app_open : true
         });
 
         /*

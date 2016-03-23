@@ -9,7 +9,7 @@
 #manage_users_page .top_block {
     position : relative;
     height : 60px;
-    border-bottom : 1px solid #E9E9E9;
+    border : 1px solid #eeeeee;
     background-color : white;
 
     font-family: Lato-Semibold;
@@ -22,9 +22,16 @@
 #manage_users_page .top_block .sign {
     line-height : 60px;
     font-family: Lato-Regular;
-    font-size: 18px;
+
     margin-left: 30px;
     /* margin-top: 20px; */
+
+    font-family: Lato-Semibold;
+    font-size: 17px;
+    color: #132737;
+    letter-spacing: 1.39px;
+
+    text-transform: uppercase;
 }
 
 #manage_users_page .top_block .new_user_button {
@@ -52,19 +59,26 @@
     background-color: white;
     margin-top : 20px;
     padding-bottom : 300px;
+    border: 1px solid #eeeeee;
 }
 
 #manage_users_page .wrapper > .sign {
     margin-left : 30px;
     margin-right : 30px;
     line-height : 60px;
-    font-family : Lato-Regular;
+    font-family: Lato-Semibold;
+    font-size: 17px;
+    color: #132737;
+    letter-spacing: 1.39px;
+
+    text-transform: uppercase;
 }
 
 #manage_users_page .users_table {
     font-family: Lato-Regular;
     margin-left : 20px;
     margin-right : 20px;
+    box-sizing : border-box;
 }
 
 #manage_users_page .users_table_header {
@@ -79,6 +93,12 @@
     border-left : 1px solid #E9E9E9;
 
     box-sizing: border-box;
+
+    font-family: Lato-Medium;
+    font-size: 14px;
+
+    text-transform: capitalize;
+    font-weight: bold;
 }
 
 #manage_users_page .users_table .users_table_header > div {
@@ -131,15 +151,41 @@
 #manage_users_page .users_table .user_info .email, #manage_users_page .users_table .users_table_header .email {
     /*width : 30%;*/
     float : left;
+
+    font-family: Lato-Regular;
+    font-size: 13px;
+    color: #3D3D3D;
+
+    border-right : 1px solid red;
+
+    box-sizing: border-box;
 }
 
 #manage_users_page .users_table .user_info .admin_of, #manage_users_page .users_table .users_table_header .admin_of {
     /*width : 30%;*/
+    font-family: Lato-Regular;
+    font-size: 13px;
+    color: #3D3D3D;
+
+    border-right : 1px solid red;
+    box-sizing: border-box;
+
+    padding-left : 20px;
+
 }
 
 #manage_users_page .users_table .user_info .user_of, #manage_users_page .users_table .users_table_header .user_of {
     /*width : 40%;*/
     /*float : right;*/
+    font-family: Lato-Regular;
+    font-size: 13px;
+    color: #3D3D3D;
+
+    border-right : 1px solid red;
+    box-sizing: border-box;
+
+    padding-right: 20px;
+
 }
 
 #manage_users_page .users_table .user_info .email div {
@@ -224,38 +270,57 @@
 #manage_users_page .new_user_block {
 
     position : absolute;
-
     /*top : 20px;
     left : 20px;*/
-    top : -1px;
-    left : -1px;
-
+    top : -22px;
+    right : -20px;
     width : 700px;
     /*height : 300px;*/
 
     border : 1px solid #E9E9E9;
-
     border-radius : 2px;
-
     background-color: white;
-
     z-index : 5000;
+    padding-bottom : 600px; /* todo */
 
-    padding-bottom : 100px;
+    padding-left : 30px;
+
+    font-family : Lato-Regular;
+
+    -webkit-box-shadow: -2px 0px 6px 0px rgba(90,90,90,0.5);
+    -moz-box-shadow: -2px 0px 6px 0px rgba(90,90,90,0.5);
+    box-shadow: -2px 0px 6px 0px rgba(90,90,90,0.5);
 
 }
 
 #manage_users_page .new_user_block .label {
-
+/*
     height : 60px;
     line-height : 60px;
-
-    font-size: 24px;
-
+*/
+    /*font-size: 24px;
+*/
     font-family : Lato-Regular;
 
-    padding-left :  20px;
+    /*margin-left : 30px;*/
+    margin-top : 30px;
+    margin-bottom : 30px;
 
+    font-family: Lato-Semibold;
+    font-size: 17px;
+    color: #132737;
+    letter-spacing: 1.39px;
+
+    text-transform: uppercase;
+
+}
+
+#manage_users_page .new_user_block .label span {
+    height : 24px;
+    line-height : 24px;
+    position : relative;
+    top : -5px;
+    left : 10px;
 }
 
 #manage_users_page .new_user_block .buttons_block {
@@ -271,7 +336,7 @@
     box-sizing: border-box;
 }
 
-#manage_users_page  .new_user_block .add_button, #manage_users_page  .new_user_block .cancel_button {
+#manage_users_page  .new_user_block .add_button/*, #manage_users_page  .new_user_block .cancel_button*/ {
 
     width : 100px;
     height : 35px;
@@ -290,12 +355,24 @@
 
 }
 
+
+#manage_users_page .new_user_block input[type=checkbox] {
+    width : 20px;
+    height : 20px;
+}
+
 #manage_users_page  .new_user_block .add_button {
     background-color : #19CC63;
 }
 
 #manage_users_page  .new_user_block .cancel_button {
-    background-color :red;
+    background-image: url("../images/close.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    width : 24px;
+    height : 24px;
+    display : inline-block;
+    cursor : pointer;
 }
 
 #manage_users_page  .global_admin_block {
@@ -324,16 +401,18 @@
 
 #manage_users_page .setting_block {
     border-bottom: 0px solid #eeeeee;
+    margin-top : 20px;
 }
 
-
-
-.setting_block div {
+#manage_users_page .setting_block div {
     display : inline-block;
 }
 
-.setting_block .setting_label {
-    width : 300px;
-    padding-left : 20px;
+#manage_users_page .setting_block .setting_label {
+    width : 150px;
+    /*padding-left : 20px;*/
     box-sizing: border-box;
+
+    text-transform: uppercase;
+    font-size: 12px;
 }

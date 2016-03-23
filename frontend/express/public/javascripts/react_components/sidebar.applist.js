@@ -104,11 +104,15 @@ var ApplicationsList = React.createClass({
         // todo: one time:
         var screen_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
-        var list_height = (screen_height - 60 - 50) + "px"; // todo: change values to variables
+        var one_app_link_height = 45;
 
-        document.getElementById('app_info').style.height = list_height;
+        var list_height = (this.props.applications.length * one_app_link_height) + 50; // todo: change values to variables
 
-        var initial_top = 'translate3d(0,-' + ((screen_height - 60 - 50 - 60)) + 'px,0)';
+        document.getElementById('app_info').style.height = list_height + "px";
+
+        var list_top = (this.props.applications.length * one_app_link_height) + 50;
+
+        var initial_top = 'translate3d(0,-' + list_top + 'px,0)';
 
         document.getElementById('app_info').style.webkitTransform = initial_top;
         document.getElementById('app_info').style.MozTransform    = initial_top;
