@@ -1,5 +1,7 @@
 var CountriesPage = React.createClass({
 
+    mixins: [UpdatePageMixin],
+
     getInitialState: function() {
 
         var sort_functions = {
@@ -30,7 +32,7 @@ var CountriesPage = React.createClass({
 
     },
 
-    componentDidMount : function() {
+    init_data : function(timestamp) {
 
         var self = this;
 

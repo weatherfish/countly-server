@@ -207,6 +207,7 @@
     color: #9D9D9E;
     cursor : pointer;
     position : relative;
+    height : 40px;
 }
 
 .granularity.hidden > div > span, .granularity > div.hidden >  span {
@@ -237,6 +238,10 @@
 
 .granularity > div > span .incomplete_star.active {
     background-color: #FF5800;
+}
+
+.granularity > div > span > span {
+    padding-top:10px; /* the increase of active zone for granularity selectors click */
 }
 
 .period_extend_block {

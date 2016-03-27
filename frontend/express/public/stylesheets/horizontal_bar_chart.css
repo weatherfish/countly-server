@@ -41,6 +41,8 @@
     height : 40px;*/
     font-size : 15px;
     font-family : Lato-Regular;
+    top : 10px;
+    text-transform: capitalize;
 }
 
 .horizontal_chart .percent {

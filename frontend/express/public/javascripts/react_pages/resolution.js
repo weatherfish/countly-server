@@ -1,5 +1,7 @@
 var ResolutionsPage = React.createClass({
 
+    mixins: [UpdatePageMixin],
+
     getInitialState: function() {
 
         var labels_mapping = {
@@ -50,7 +52,7 @@ var ResolutionsPage = React.createClass({
 
     },
 
-    componentDidMount : function() {
+    init_data : function(timestamp) {
 
         var self = this;
 

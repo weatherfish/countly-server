@@ -54,6 +54,16 @@ var SimpleSelectBlock = React.createClass({
         {
             new_state.selectors = nextProps.selectors;
             new_state.selectors_hash = JSON.stringify(nextProps.selectors).hashCode();
+
+            for (var i = 0; i < new_state.selectors.length; i++)
+            {
+                if (new_state.selectors[i].key == this.state.active_selector.key){
+
+                    new_state.active_selector = new_state.selectors[i];
+                    break;
+                }
+            }
+
         }
 
         this.setState(new_state);

@@ -12,6 +12,7 @@ var navigation = [
                         ["Resolutions", "/metrics/resolutions"],
                         /*["App Versions", "/analytics/durations"],*/
                         ["Carriers", "/metrics/carriers"],
+                        ["Density", "/metrics/density"],                        
                         ["Sessions by Countries", "/metrics/map_sessions"],
                         /*["Platforms", "/analytics/platforms"],
                         ["Densities", "/analytics/densities"],

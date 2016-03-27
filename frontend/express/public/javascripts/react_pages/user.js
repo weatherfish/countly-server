@@ -1,5 +1,7 @@
 var UserPage = React.createClass({
 
+    mixins: [UpdatePageMixin],
+
     getInitialState : function() {
 
         var sort_functions = {
@@ -13,6 +15,31 @@ var UserPage = React.createClass({
             sort_functions : sort_functions,
             inited : false
         });
+    },
+
+    init_data : function(timestamp)
+    {
+        var self = this;
+
+        $.when(countlyUser.initialize()).then(function () {
+
+            var headers = self.make_big_numbers();
+
+            var big_numbers = self.make_big_numbers();
+
+            headers.unshift({
+                "title" : "Date",
+                //"help"  : "sessions.unique-sessions", // todo: add translation
+                "short" : "date",
+                "big_numbers" : big_numbers
+            })
+
+            self.setState({
+                inited : true,
+                big_numbers : big_numbers,
+                headers : headers,
+            })
+        })
     },
 
     make_big_numbers : function()
@@ -52,31 +79,6 @@ var UserPage = React.createClass({
         }
 
         return big_numbers;
-    },
-
-    componentDidMount : function() {
-
-        var self = this;
-
-        $.when(countlyUser.initialize()).then(function () {
-
-            var headers = self.make_big_numbers();
-
-            var big_numbers = self.make_big_numbers();
-
-            headers.unshift({
-                "title" : "Date",
-                //"help"  : "sessions.unique-sessions", // todo: add translation
-                "short" : "date",
-                "big_numbers" : big_numbers
-            })
-
-            self.setState({
-                inited : true,
-                big_numbers : big_numbers,
-                headers : headers,
-            })
-        })
     },
 
     on_graph_mount : function(mount_data) {

@@ -1,5 +1,7 @@
 var DurationPage = React.createClass({
 
+    mixins: [UpdatePageMixin],
+
     getInitialState: function() {
 
         var headers = [{
@@ -17,7 +19,7 @@ var DurationPage = React.createClass({
 
         var sort_functions = {
             "ds" : math_sort,
-            "f" : math_sort,
+            "t" : math_sort,
             "percent" : math_sort
         }
 
@@ -29,7 +31,7 @@ var DurationPage = React.createClass({
 
     },
 
-    componentDidMount : function() {
+    init_data : function(timestamp) {
 
         var self = this;
 

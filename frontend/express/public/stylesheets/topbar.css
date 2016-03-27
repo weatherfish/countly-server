@@ -82,6 +82,9 @@
     font-size   : 14px;
 
   /*  text-align : right;*/
+
+    text-transform: capitalize;
+
 }
 
 #top_bar .navigation .user_name_block .arrow {

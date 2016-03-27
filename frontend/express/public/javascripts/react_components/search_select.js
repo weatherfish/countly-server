@@ -92,7 +92,7 @@ var SelectBlock = React.createClass({
 
                 <div className="setting_label">{this.props.label}</div>
 
-                <div className="selectors_block">
+                <div className="search_selectors_block">
 
                     <div className="current" onClick={this.show_selectors} style={style}>
                         <span className="sign">{self.state.active_selector.label}</span>
@@ -104,7 +104,7 @@ var SelectBlock = React.createClass({
                         <div className="top_arrow" style={top_arrow_style} />
 
                         <div className="search_block">
-                            <div className="search_icon"/> 
+                            <div className="search_icon"/>
                             <input onKeyUp={this.change_search_input}/>
                         </div>
 

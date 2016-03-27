@@ -207,7 +207,7 @@ var NewAppWindow = React.createClass({
                     </div>
                 </div>
 
-                <div className="buttons_block">                  
+                <div className="buttons_block">
                     <div className="add_button" onClick={this.add}>add</div>
                 </div>
           </div>);
@@ -345,6 +345,8 @@ var ApplicationsPage = React.createClass({
                 console.log(countlyGlobal['apps'][updated_app._id]);
                 console.log(data);
 
+                self.props.on_app_rename();
+
             }
         });
     },
@@ -419,14 +421,8 @@ var ApplicationsPage = React.createClass({
                 dataType:"jsonp",
                 success:function () {
 
-                    console.log("============ countlyGlobal['apps'] 1 ===============");
-                    console.log(countlyGlobal['apps']);
-
                     delete countlyGlobal['apps'][appId];
                     delete countlyGlobal['admin_apps'][appId];
-
-                    console.log("============ countlyGlobal['apps'] 2 ===============");
-                    console.log(countlyGlobal['apps']);
 
                     var current_app = false/*countlyGlobal['apps'][0]*/;
 
@@ -435,9 +431,6 @@ var ApplicationsPage = React.createClass({
                         current_app = countlyGlobal['apps'][app_id];
                         break;
                     }
-
-                    console.log("{{{{{{{{{{{ current app }}}}}}}}}}}");
-                    console.log(current_app);
 
                     self.setState({
                         current_app : current_app,

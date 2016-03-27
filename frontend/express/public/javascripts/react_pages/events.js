@@ -2,6 +2,8 @@ var EventsPage = React.createClass({
 
     //colors : ["#1B8AF3", "#F2B702"],
 
+    mixins: [UpdatePageMixin],
+
     getInitialState: function() {
 
         var sort_functions = {
@@ -18,7 +20,7 @@ var EventsPage = React.createClass({
 
     },
 
-    componentDidMount : function() {
+    init_data : function(timestamp) {
 
         var self = this;
 

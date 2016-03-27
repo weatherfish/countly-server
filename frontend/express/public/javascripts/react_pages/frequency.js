@@ -1,5 +1,7 @@
 var FrequencyPage = React.createClass({
 
+    mixins: [UpdatePageMixin],
+
     getInitialState: function() {
 
         var headers = [{
@@ -29,7 +31,7 @@ var FrequencyPage = React.createClass({
 
     },
 
-    componentDidMount : function() {
+    init_data : function(timestamp) {
 
         var self = this;
 

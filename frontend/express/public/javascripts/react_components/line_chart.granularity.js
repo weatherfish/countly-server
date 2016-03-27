@@ -10,22 +10,52 @@ var Granularity = React.createClass({
 
         var weekly = { name : "Weekly", active : this.props.type == "weekly" ? true : false };
 
-        if (this.props.data.weekly_granularity[0].data[0][2] < 7)
+/*
+        if (this.props.data.chartDP[0].mode == "ghost") // if previous time range in 0 position
+        {
+            var data_index = 1;
+        }
+        else
+        {
+            var data_index = 0;
+        }
+*/
+
+        if (this.props.data.weekly_granularity[0].mode == "ghost") // if previous time range in 0 position
+        {
+            var data_index = 1;
+        }
+        else
+        {
+            var data_index = 0;
+        }
+
+
+        if (this.props.data.weekly_granularity[data_index].data[0][2] < 7)
         {
             weekly.incomplete_left = true;
-            weekly.incomplete_left_days = 7 - this.props.data.weekly_granularity[0].data[0][2];
+            weekly.incomplete_left_days = 7 - this.props.data.weekly_granularity[data_index].data[0][2];
         }
 
         list.push(weekly);
 
         var monthly = { name : "Monthly", active : this.props.type == "monthly" ? true : false };
 
-        var days_in_month = new Date(self.props.data.monthly_granularity[0].data[0][0]).monthDays();
+        if (this.props.data.monthly_granularity[0].mode == "ghost") // if previous time range in 0 position
+        {
+            var data_index = 1;
+        }
+        else
+        {
+            var data_index = 0;
+        }
 
-        if (this.props.data.monthly_granularity[0].data[0][2] < days_in_month) // todo : 31
+        var days_in_month = new Date(self.props.data.monthly_granularity[data_index].data[0][0]).monthDays();
+
+        if (this.props.data.monthly_granularity[data_index].data[0][2] < days_in_month) // todo : 31
         {
             monthly.incomplete_left = true;
-            monthly.incomplete_left_days = days_in_month - this.props.data.monthly_granularity[0].data[0][2];
+            monthly.incomplete_left_days = days_in_month - this.props.data.monthly_granularity[data_index].data[0][2];
         }
 
         list.push(monthly);
@@ -65,32 +95,50 @@ var Granularity = React.createClass({
             var new_granularity = data.new_granularity;
             var period          = data.period;
 
-            console.log("{}[[[}{{{}}}]]] new granularity ------->>>>>>>");
-            console.log(new_granularity);
-
             var list = [ { name : "Daily", active : (new_granularity == "daily" ? true : false) /*self.state.list[0].active*/ } ];
 
             var weekly = { name : "Weekly", active : (new_granularity == "weekly" ? true : false) /*self.state.list[1].active*/ };
 
-            if (session_dp.weekly_granularity[0].data[0][2] < 7)
+            if (session_dp.weekly_granularity[0].mode == "ghost") // if previous time range in 0 position
+            {
+                var data_index = 1;
+            }
+            else
+            {
+                var data_index = 0;
+            }
+
+            if (session_dp.weekly_granularity[data_index].data[0][2] < 7)
             {
                 weekly.incomplete_left = true;
-                weekly.incomplete_left_days = 7 - session_dp.weekly_granularity[0].data[0][2];
+                weekly.incomplete_left_days = 7 - session_dp.weekly_granularity[data_index].data[0][2];
             }
 
             list.push(weekly);
 
             var monthly = { name : "Monthly", active : (new_granularity == "monthly" ? true : false) /* self.state.list[2].active*/ };
 
-            var days_in_month = new Date(session_dp.monthly_granularity[0].data[0][0]).monthDays();
+            if (session_dp.monthly_granularity[0].mode == "ghost") // if previous time range in 0 position
+            {
+                var data_index = 1;
+            }
+            else
+            {
+                var data_index = 0;
+            }
 
-            if (session_dp.monthly_granularity[0].data[0][2] < days_in_month) // todo : 31
+            var days_in_month = new Date(session_dp.monthly_granularity[data_index].data[0][0]).monthDays();
+
+            if (session_dp.monthly_granularity[data_index].data[0][2] < days_in_month) // todo : 31
             {
                 monthly.incomplete_left = true;
-                monthly.incomplete_left_days = days_in_month - session_dp.monthly_granularity[0].data[0][2];
+                monthly.incomplete_left_days = days_in_month - session_dp.monthly_granularity[data_index].data[0][2];
             }
 
             list.push(monthly);
+
+            console.log("==== granularity list ====");
+            console.log(list);
 
             self.setState({
                 list : list,
@@ -214,6 +262,10 @@ var Granularity = React.createClass({
 
     extend_click : function(element)
     {
+
+        console.log("---------- element --------------");
+        console.log(element);
+
         this.setState({
             info_open : false
         });
@@ -363,8 +415,8 @@ var Granularity = React.createClass({
                                 star_class_name += " active";
                             }
 
-                            return <span id={element_id} className={class_name} onMouseEnter={self.onhover} onMouseLeave={self.onhoverend}>
-                                      <span onClick={self.handleClick.bind(self, element.name.toLowerCase())}>{element.name}</span>
+                            return <span id={element_id} className={class_name} onClick={self.handleClick.bind(self, element.name.toLowerCase())} onMouseEnter={self.onhover} onMouseLeave={self.onhoverend}>
+                                      <span>{element.name}</span>
                                       <div className={star_class_name}></div>
                                     </span>
                         }
@@ -378,8 +430,8 @@ var Granularity = React.createClass({
                                 star_class_name += " active";
                             }
 
-                            return <span id={element_id} className={class_name} onMouseEnter={self.onhover} onMouseLeave={self.onhoverend}>
-                                      <span onClick={self.handleClick.bind(self, element.name.toLowerCase())}>{element.name}</span>
+                            return <span id={element_id} className={class_name} onClick={self.handleClick.bind(self, element.name.toLowerCase())} onMouseEnter={self.onhover} onMouseLeave={self.onhoverend}>
+                                      <span>{element.name}</span>
                                       <div className={star_class_name}></div>
                                     </span>
                         }

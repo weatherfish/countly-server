@@ -191,6 +191,9 @@ var SortTable = React.createClass({
             with_granularity : with_granularity
         }
 
+        console.log("========= full_rows ===========");
+        console.log(full_rows);
+
         var pagination = this.make_pagination(full_rows);
 
         for (var attrname in pagination) { init_object[attrname] = pagination[attrname]; }
@@ -587,12 +590,7 @@ var SortTable = React.createClass({
             return false;
         }
 
-        console.log("------- mouse click -------------");
-        console.log(event, row_id);
-
         var row_id = (this.state.active_page * this.props.rows_per_page) + row_id;
-
-        console.log("row_id:", row_id);
 
         this.props.on_row_click(this.state.full_rows[row_id]);
 
@@ -721,7 +719,7 @@ var SortTable = React.createClass({
             }
             else
             {
-                var width = self.table_width / headers.length;
+                var width = Math.floor(self.table_width / headers.length);
             }
 
             return React.createElement(Column, {
@@ -734,8 +732,11 @@ var SortTable = React.createClass({
                     sort_dir : self.state.sortDir,
                     sort_function : self.sort_rows_by
                 }),
-                cell: React.createElement(TableCell, { data: self.state.rows, field : header.short, formatting_function : header.formatting_function })
-
+                cell: React.createElement(TableCell, {
+                    data: self.state.rows,
+                    field : header.short,
+                    formatting_function : header.formatting_function
+                })
             });
         });
     },
@@ -746,7 +747,7 @@ var SortTable = React.createClass({
 
         var row_height = this.props.row_height;
 
-        this.table_width = this.props.width - 60;
+        this.table_width = this.props.width - 60; // todo
 
         /*if (this.state.sortDir !== null)
         {

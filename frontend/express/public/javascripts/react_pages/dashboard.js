@@ -2,6 +2,8 @@ var Dashboard = React.createClass({
 
     topbar_height : 110,
 
+    mixins: [UpdatePageMixin],
+
     getInitialState: function() {
 
         /*
@@ -40,7 +42,7 @@ var Dashboard = React.createClass({
 
     },
 
-    componentDidMount : function() {
+    init_data : function(timestamp) {
 
         var self = this;
 

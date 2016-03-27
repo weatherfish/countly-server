@@ -2876,9 +2876,9 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     if (graph.x(point.value.x) > this.graph.width / 2) // right side
     {
 
-        if ((tooltip_left + (block_width / 2)) > this.graph.width)
+        if ((tooltip_left + (block_width / 4)) > this.graph.width)
         {
-            var shift_left = this.graph.width - (tooltip_left + (block_width / 2));
+            var shift_left = this.graph.width - (tooltip_left + (block_width / 4));
         }
         else
         {

@@ -1,3 +1,80 @@
+var SettingsBlock = React.createClass({
+
+    getInitialState : function() {
+
+        return ({
+            //"confirmation_waiting" : false
+            "confirmation_waiting" : true,
+            "confirmation_sign" : jQuery.i18n.map["management-applications.delete-confirm"],
+            "confirmation_function" : false
+        });
+
+    },
+
+    render : function() {
+
+        if (this.state.loading)
+        {
+            return (<Loader/>);
+        }
+
+        var new_app_block_style = {
+            width : 440/*get_viewport_width()*/
+        };
+
+        if (!this.props.open) new_app_block_style.display = "none";
+
+        return(
+            <div className="new_app_block" style={new_app_block_style}>
+
+                <div className="label">
+                    <div className="cancel_button" onClick={this.cancel}></div>
+                    <span>CREATE A NEW APPLICATION</span>
+                </div>
+
+                <InputBlock
+                    label="app name"
+                    value={""}
+                    onChange={this.on_setting_change}
+                    setting={["name"]}
+                />
+
+                <SelectBlock
+                    label="Country"
+                    selectors={this.countries}
+                    active_selector_key={this.countries[0]}
+                    onChange={this.on_setting_change}
+                    setting={["country"]}
+                    width={240}
+                />
+
+                <SelectBlock
+                    label="Category"
+                    selectors={this.categories}
+                    active_selector_key={this.categories[0]}
+                    onChange={this.on_setting_change}
+                    setting={["category"]}
+                    width={240}
+                />
+
+                <div className="setting_block upload_icon_block">
+                    <div className="setting_label">Icon</div>
+                    <div className="upload_block">
+
+                        <form ref="uploadForm" enctype="multipart/form-data" id="add-app-image-form">
+                            <input ref="file" type="file" id="app_image" name="app_image"  onChange={this.handleIconAdd}/>
+                        </form>
+
+                    </div>
+                </div>
+
+                <div className="buttons_block">
+                    <div className="add_button" onClick={this.add}>add</div>
+                </div>
+          </div>);
+    }
+});
+
 var TopBar = React.createClass({
 
     getInitialState: function() {

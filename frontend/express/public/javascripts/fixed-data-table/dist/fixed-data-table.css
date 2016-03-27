@@ -34,7 +34,17 @@
     cursor : pointer;
     border-right : 1px solid #E7E7E7;
     text-transform: capitalize;
+    box-sizing : border-box;
  }
+/*
+.table_header:last-of-type {
+    border-right : 0px solid #ffffff;
+}*/
+
+.fixedDataTableCellLayout_main.public_fixedDataTableCell_main:last-of-type > .table_header {
+
+    border-right : 0px solid #ffffff;
+}
 
 .table_header .header_sort_button {
     /*width  : 100%;
@@ -119,6 +129,7 @@
     color: #3D3D3D;
     line-height : 50px;
     width : 100%;
+    box-sizing : border-box;
  }
 /*
 .public_fixedDataTableRow_main {
@@ -170,6 +181,8 @@
 
 .fixedDataTableCellLayout_lastChild {
   border-width: 0 1px 1px 0;
+
+  border-color:red;
 }
 
 .fixedDataTableCellLayout_alignRight {
@@ -357,6 +370,12 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
 .fixedDataTableRowLayout_rowWrapper:hover .table_content {
     box-sizing: border-box;
     border-right : 1px solid #E7E7E7;
+}
+
+.fixedDataTableRowLayout_rowWrapper:hover .fixedDataTableCellLayout_main.public_fixedDataTableCell_main:last-of-type .table_content {
+
+    border-right : 0px solid #ffffff;
+
 }
 
 /*

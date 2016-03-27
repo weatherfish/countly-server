@@ -56,7 +56,7 @@ var InputBlock = React.createClass({
         return(
             <div className="setting_block">
                 {label}
-                <input value={this.state.value} onChange={this.change_input} style={style}/>
+                <input type="text" value={this.state.value} onChange={this.change_input} style={style}/>
             </div>
         )
     },

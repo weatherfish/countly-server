@@ -1,8 +1,8 @@
-.selectors_block {
+.search_selectors_block {
     position : relative;
 }
 
-.selectors_block .current {
+.search_selectors_block .current {
 
     border: 1px solid #DEDEDE;
     border-radius: 3px;
@@ -17,7 +17,7 @@
     font-size: 14px;
 }
 
-.selectors_block .current .arrow {
+.search_selectors_block .current .arrow {
     background-image: url("../images/time_range_arrow.svg");
     background-repeat: no-repeat;
     background-position: center;
@@ -29,28 +29,28 @@
     right: 10px;
 }
 
-.selectors_block .current .sign {
+.search_selectors_block .current .sign {
     height : 30px;
     line-height : 30px;
     display: inline-block;
 }
 
-.selectors_block .current:hover {
+.search_selectors_block .current:hover {
     border: 1px solid #D6D6D6;
 }
 
-.selectors_block {
+.search_selectors_block {
     position : relative;
 }
 
-.selectors_block .selectors_wrapper {
+.search_selectors_block .selectors_wrapper {
     position : absolute;
-    top : 10px;
+    top : 14px;
     left : 0px;
     z-index : 2000;
 }
 
-.selectors_block /*.selectors*/ .top_arrow {
+.search_selectors_block .top_arrow {
     /*display : none;*/
     width: 0;
     height: 0;
@@ -59,41 +59,64 @@
     border-color: transparent transparent #202531 transparent;
     position: absolute;;
     top: 24px;
-    left: 152px;
+    left: 153px;
 }
 
-.selectors_block /*.selectors */.search_block {
+.search_selectors_block .search_block {
     /*display : none;*/
-    position: absolute;;
+
+    /*position: absolute;;
     top: 10px;
     left: 0px;
-    height : 40px;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    height : 40px;*/
+
+    position : absolute;
+    top : 31px;
+
+    /*border-top-left-radius: 4px;
+    border-top-right-radius: 4px;*/
 }
 
-.selectors_block .search_block .search_icon {
+.search_selectors_block .search_block .search_icon {
     position: absolute;
-    top: 32px;
+    top: 13px;
     left: 20px;
     height: 14px;
     width: 14px;
-    background: url('../images/sidebar/search_app_selection.png');
-    background-image: url("../images/sidebar/search_app_selection.svg");
+    background: url('../images/search_icon.svg');
+    background-image: url("../images/search_icon.svg");
     background-repeat: no-repeat;
     background-position: center;
 }
 
-.selectors_block .search_block input {
+.search_selectors_block .search_block input {
     height : 40px !important;
     line-height : 40px !important;
     background-color:  #0F131C;
     color : white;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    /*border-top-left-radius: 14px;
+    border-top-right-radius: 14px;*/
+    border : 1px solid #0F131C !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    border-top-left-radius: 4px !important;
+    border-top-right-radius: 4px !important;
+    padding-left : 10px;
+
+    width: 240px;
+    /*height: 40px;*/
+
+    /*padding-left: 10px;*/
+    /*border-radius: 2px;
+    border: 1px solid #E7E7E7;*/
+    box-sizing: border-box;
 }
 
-.selectors_block .selectors {
+.search_selectors_block .search_block input:focus{
+    outline: none;
+}
+
+.search_selectors_block .selectors {
     position : absolute;
     top : 70px;
     left : 0px;
@@ -125,7 +148,7 @@
 
 }
 
-.selectors_block .selectors span {
+.search_selectors_block .selectors span {
     display : block;
     /*border : 1px solid black;
     width : 120px;
@@ -154,32 +177,32 @@
 
 }
 
-.selectors_block .selectors span:last-child {
+.search_selectors_block .selectors span:last-child {
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 }
 
-.selectors_block .selectors span:hover {
+.search_selectors_block .selectors span:hover {
     color : white;
 }
 
-.selectors_block .selectors span.active {
+.search_selectors_block .selectors span.active {
     color : white;
 }
 
-.selectors_block ::-webkit-scrollbar {
+.search_selectors_block ::-webkit-scrollbar {
     width: 6px;
     /*position : relative;
     top : -6px;*/
 }
 
-.selectors_block ::-webkit-scrollbar-track {
+.search_selectors_block ::-webkit-scrollbar-track {
     /*-webkit-box-shadow: inset 0 0 6px #fff;*/
     border-radius: 0px;
     background-color: #2E3545;
 }
 
-.selectors_block ::-webkit-scrollbar-thumb {
+.search_selectors_block ::-webkit-scrollbar-thumb {
     border-radius: 0px;
     /*-webkit-box-shadow: inset 0 0 10px #19CC63;*/
     background-color: #B8B8B8; /*#202531; */

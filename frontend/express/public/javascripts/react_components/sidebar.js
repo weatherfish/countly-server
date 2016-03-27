@@ -49,9 +49,6 @@ var FullSidebar = React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
 
-        console.log("======== sidebar receive props =========");
-        console.log(nextProps);
-
         if (this.state.apps_list_hash == JSON.stringify(countlyGlobal['apps']).hashCode())
         {
             return false;

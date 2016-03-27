@@ -2,7 +2,7 @@ var Link = ReactRouter.Link;
 
 var CrashesPage = React.createClass({
 
-    mixins: [ ReactRouter.History ],
+    mixins: [ UpdatePageMixin, ReactRouter.History ],
 
     topbar_height : 110,
 
@@ -202,7 +202,7 @@ var CrashesPage = React.createClass({
 
     },
 
-    componentDidMount : function() {
+    init_data : function(timestamp) {
 
         var self = this;
 

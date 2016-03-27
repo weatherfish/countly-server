@@ -1,5 +1,7 @@
 var CarrierPage = React.createClass({
 
+    mixins: [UpdatePageMixin],
+
     getInitialState: function() {
 
         var labels_mapping = {
@@ -16,20 +18,17 @@ var CarrierPage = React.createClass({
 
         var headers = [
             {
-                "title":jQuery.i18n.map["common.total-users"], // todo : not common.total-sessions
-                "help":"dashboard.top-platforms",
+                "title":jQuery.i18n.map["common.total-users"],
                 "short" : "t",
                 "color" : "#1B8AF3"
             },
             {
                 "title":jQuery.i18n.map["common.new-users"],
-                "help":"devices.platform-versions2",
                 "short" : "n",
                 "color" : "#1B8AF3"
             },
             {
                 "title":jQuery.i18n.map["common.total-sessions"], // todo:
-                "help":"dashboard.top-resolutions",
                 "short" : "u",
                 "color" : "#1B8AF3"
             }
@@ -50,7 +49,7 @@ var CarrierPage = React.createClass({
 
     },
 
-    componentDidMount : function() {
+    init_data : function(timestamp) {
 
         var self = this;
 
@@ -64,7 +63,7 @@ var CarrierPage = React.createClass({
     },
 
     render : function(){
-      
+
         if (!this.state.inited)
         {
             return (<Loader/>);

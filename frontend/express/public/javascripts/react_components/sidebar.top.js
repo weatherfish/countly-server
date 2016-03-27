@@ -12,8 +12,6 @@ var SidebarTop = React.createClass({
     },
     render: function() {
 
-        console.log("===== rendr sidebar top ");
-
         var class_name = "";
 
         //if (this.state.pushed)

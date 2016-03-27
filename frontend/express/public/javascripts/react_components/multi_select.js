@@ -77,9 +77,6 @@ var MultiSelectBlock = React.createClass({
 
     componentWillReceiveProps : function(nextProps){
 
-        console.log("=== receive props =============");
-        console.log(nextProps);
-
         if (nextProps.active_selector_key)
         {
             for (var i = 0; i < nextProps.selectors.length; i++)
@@ -288,9 +285,6 @@ var MultiSelectBlock = React.createClass({
         var arrow_style = {
             "left" : this.state.element_width / 2 - arrow_width / 2
         }
-
-        console.log("--------------- self.state.active_selectors --------------------");
-        console.log(self.state.active_selectors);
 
         return(
             <div className={class_name}>

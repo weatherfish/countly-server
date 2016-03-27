@@ -73,6 +73,11 @@
     padding-left : 2px;
 }
 
+#dashboard .top_tabs > div.tab.active + div.tab:hover {
+
+    border-left : 2px solid #F2F2F2;
+}
+
 #dashboard .top_tabs > div.tab.active + div {
 
     border-left : 2px solid #F8F8F8;

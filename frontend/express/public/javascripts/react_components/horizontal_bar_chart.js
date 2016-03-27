@@ -172,13 +172,14 @@ var HorizontalBarChart = React.createClass({
             //for (var di = 0; di < data.length; di++)
             for (var k = 0; k < keys.length; k++)
             {
+
                 this.labels = this.chart.append("div")
                     .attr("class", "block_label")
                     .style("position",  "absolute")
                     .style("left",  (k * (bar_width + self.props.margins.right)) + "px")
                     .style("width",  bar_width + "px")
                     .html(function(d, i){
-                        return self.props.labels_mapping[keys[k]];
+                        return self.props.labels_mapping[keys[k]].toLowerCase();
                     })
             }
 
@@ -200,7 +201,7 @@ var HorizontalBarChart = React.createClass({
                 .attr("height", height)
         }
 
-        this.chart.selectAll('*').remove();
+        this.chart.selectAll('.bar_block').remove();
 
         if (!data)
         {

@@ -8,7 +8,14 @@ var LineChart = React.createClass({
 
         var line_chart_width = this.props.width - (this.props.sides_padding * 2);
 
-        console.log("init graph:", data_points.daily_granularity[0].data.length * (this.circle_radius * 2) * 2,  line_chart_width);
+        if (data_points.daily_granularity[0].mode == "ghost") // if previous time range in 0 index
+        {
+            var daily_data = data_points.daily_granularity[0].data;
+        }
+        else
+        {
+            var daily_data = data_points.daily_granularity[1].data;
+        }
 
         if (this.props.with_granularity)
         {
@@ -17,11 +24,11 @@ var LineChart = React.createClass({
             {
                 var granularity = "hourly";
             }
-            else if ((data_points.daily_granularity[0].data.length / 30) > 6) // more than 6 months
+            else if ((daily_data.length / 30) > 6) // more than 6 months
             {
                 var granularity = "monthly";
             }
-            else if (data_points.daily_granularity[0].data.length * (this.circle_radius * 2) * 2 > line_chart_width) // todo: combine with block from update
+            else if (daily_data.length * (this.circle_radius * 2) * 2 > line_chart_width) // todo: combine with block from update
             {
                 var granularity = "weekly";
             }
@@ -96,12 +103,15 @@ var LineChart = React.createClass({
 
         if (granularity_rows[0] && granularity_rows[0].mode == "ghost") // todo: fix for previous time ranges
         {
-            for (var i = 0; i < granularity_rows[1].data.length; i++)
+            for (var i = 0; i < granularity_rows[0].data.length; i++)
             {
-                granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0];
+                if (granularity_rows[1].data[i])
+                {
+                    granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0]; // projection of previous time range on current time range
+                }
             }
         }
-
+      
         if (this.props.reverse_dp)
         {
             granularity_rows.reverse();
@@ -292,6 +302,14 @@ var LineChart = React.createClass({
                 new_granularity = this.state.granularity_type;
             }
 
+            if (sessionDP.daily_granularity[0].mode == "ghost") // if previous time range in 0 index
+            {
+                var daily_data = sessionDP.daily_granularity[0].data;
+            }
+            else
+            {
+                var daily_data = sessionDP.daily_granularity[1].data;
+            }
 
             if ((!new_granularity/* && id == -1*/ && (time_range_difference < 0.5 || time_range_difference > 2)) || this.state.granularity_type == "hourly") // if previous period is hourly
             {
@@ -300,11 +318,11 @@ var LineChart = React.createClass({
                     auto granularity is active, event from date selection
                 */
 
-                if ((sessionDP.daily_granularity[0].data.length / 30) > 6) // more then 6 months
+                if ((daily_data.length / 30) > 6) // more then 6 months
                 {
                     var new_granularity = "monthly";
                 }
-                else if ((sessionDP.daily_granularity[0].data.length * this.circle_radius * 2 * 2) > this.state.line_chart_width)
+                else if ((daily_data.length * this.circle_radius * 2 * 2) > this.state.line_chart_width)
                 {
                     var new_granularity = "weekly";
                 }
@@ -343,9 +361,6 @@ var LineChart = React.createClass({
         {
             var granularity_rows = this.props.data_function().get_current_data();
         }
-
-        console.log("{{{{{{{{{{{{{{{{ granularity_rows }}}}}}}}}}}}}}}}");
-        console.log(granularity_rows);
 
         granularity_rows.every(function(datapath){
 

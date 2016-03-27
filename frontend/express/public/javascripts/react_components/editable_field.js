@@ -63,6 +63,8 @@ var EditableField = React.createClass({
 
     edit_click : function() {
 
+        if (this.state.edit_open) return false;
+
         this.setState({
             "edit_open" : true
         })
@@ -101,6 +103,7 @@ var EditableField = React.createClass({
         var input_style = {};
         var save_block_style = {};
         var edit_button_style = {};
+        var row_style = {};
 
         if (this.state.edit_open)
         {
@@ -115,6 +118,7 @@ var EditableField = React.createClass({
             input_style.display = "none";
             save_block_style.display = "none";
             //edit_button_style.display = "inline-block";
+            row_style.cursor = "pointer";
         }
 
         if (Array.isArray(this.props.options_values))
@@ -171,12 +175,12 @@ var EditableField = React.createClass({
         // value={this.props.value}
 
         return (
-            <span className="row">
+            <span className="row" onClick={this.edit_click} style={row_style}>
                 <span className="key">{this.props.value_key}</span>
                 <span className="value" style={value_style}>{this.state.value}</span>
                 {input_value}
-                <span style={edit_button_style} className="edit" onClick={this.edit_click}>edit</span>
-                <span className="save_block" style={save_block_style}><span className="save" onClick={this.save}>Save</span><span className="cancel" onClick={this.cancel}>Cancel</span></span>
+                <span style={edit_button_style} className="edit">edit</span>
+                <span className="save_block" style={save_block_style}><span className="save" onClick={this.save}>Save</span><span className="cancel" onClick={this.cancel}></span></span>
             </span>
         );
     }

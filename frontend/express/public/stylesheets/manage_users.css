@@ -156,7 +156,7 @@
     font-size: 13px;
     color: #3D3D3D;
 
-    border-right : 1px solid red;
+    /*border-right : 1px solid red;*/
 
     box-sizing: border-box;
 }
@@ -167,7 +167,7 @@
     font-size: 13px;
     color: #3D3D3D;
 
-    border-right : 1px solid red;
+    /*border-right : 1px solid red;*/
     box-sizing: border-box;
 
     padding-left : 20px;
@@ -181,7 +181,7 @@
     font-size: 13px;
     color: #3D3D3D;
 
-    border-right : 1px solid red;
+    /*border-right : 1px solid red;*/
     box-sizing: border-box;
 
     padding-right: 20px;
@@ -192,6 +192,10 @@
     display : inline-block;
 }
 
+#manage_users_page .users_table .user_info .email input {
+    height : 30px;
+}
+
 #manage_users_page .users_table .user_info .edit_button {
     display : none;
     position : absolute;
@@ -199,7 +203,7 @@
     top : 0px;
     color : #19CC63;
     font-family : Lato-Regular;
-    font-size : 14px;
+    font-size : 13px;
 
     cursor : pointer;
     height : 40px;
@@ -211,40 +215,132 @@
     display : block;
 }
 
-#manage_users_page .users_table .user_info .save_block {
+#manage_users_page .left_block {
+    float : left;
+}
+
+#manage_users_page .left_block > span {
+    display : block;
+}
+
+#manage_users_page .users_table .user_info .cancel {
+    /*color : red;
+    cursor : pointer;
+    text-decoration : underline;
+    margin-right : 20px;*/
+    background-image: url("../images/close.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    width : 24px;
+    height : 24px;
+    display : inline-block;
+    cursor : pointer;
+    display : inline-block;
+    margin-top : 10px;
+}
+
+#manage_users_page .users_table .user_info .save {
+
+    margin-right : 20px;
+    display : inline-block;
+    width: 60px;
+    height: 24px;
+    line-height: 24px;
+    background-color: #19CC63;
+    cursor: pointer;
+    font-family: Lato-Regular;
+    font-size: 11px;
+    color: #FFFFFF;
+    text-align: center;
+    border-radius : 2px;
+    position : relative;
+    top : -8px;
+    left : 6px;
+}
+
+#manage_users_page .users_table .additional_selector {
+    cursor : pointer;
+    border-left : 1px solid #E9E9E9;
+    padding-left : 10px;
+    height : 30px;
+    line-height : 30px;
+    display : inline-block;
+    position : relative;
+    top : -6px;
+    font-size: 11px;
+    text-transform: capitalize;
+
+    border-right: 1px solid #eeeeee;
+    padding-right: 2px;
+}
+
+#manage_users_page .users_table .additional_selector.active {
+    background-color : #eeeeee;
+    border-top-left-radius : 2px;
+    border-bottom-left-radius : 2px;
+}
+
+#manage_users_page .users_table .additional_selector .label {
+    height : 30px;
+    line-height : 30px;
+    display : inline-block;
+    color : #969696;
+}
+
+#manage_users_page .users_table .additional_selector .label:hover {
+    color : #000000;
+}
+
+#manage_users_page .users_table .additional_selector.active .label {
+    color : #000000;
+}
+
+#manage_users_page .users_table .additional_selector .arrow {
+    background-image: url("../images/red_down_arrow.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    /*position: absolute;
+    bottom: -3px;*/
+    -ms-transform: rotate(-90deg); /* IE 9 */
+    -webkit-transform: rotate(-90deg); /* Safari */
+    transform: rotate(-90deg);
+    position: relative;
+    top : 7px;
+
+}
+
+#manage_users_page .additional_block {
     display : none;
-    /*position : absolute;
-    right : 10px;
-    top : 0px;*/
-    font-family : Lato-Regular;
-    font-size : 14px;
-
-    /*height : 40px;
-    line-height : 40px;*/
-
-    width: 100%;
-    /* display: block; */
-    text-align: right;
-    margin-right: 40px;
-    padding-right: 40px;
-    margin-top: 10px;
-
+    background-color : #eeeeee;
+    width : 200px;
+    position : relative;
+    left : -2px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-left-radius: 2px;
 }
 
-#manage_users_page .users_table .user_info .save_block .save {
-    color : #19CC63;
-    cursor : pointer;
-    text-decoration : underline;
+#manage_users_page .additional_block .delete {
+
     margin-right : 20px;
+    display : inline-block;
+    width: 60px;
+    height: 24px;
+    line-height: 24px;
+    background-color: #F85D02;
+    cursor: pointer;
+    font-family: Lato-Regular;
+    font-size: 11px;
+    color: #FFFFFF;
+    text-align: center;
+    border-radius : 2px;
+    /*position : relative;
+    top : -8px;
+    left : 6px;*/
 }
-
-#manage_users_page .users_table .user_info .save_block .cancel {
-    color : red;
-    cursor : pointer;
-    text-decoration : underline;
-    margin-right : 20px;
-}
-
 
 #manage_users_page .admin_of div.app, .user_of div.app {
     border : 1px solid gray;
@@ -290,6 +386,13 @@
     -webkit-box-shadow: -2px 0px 6px 0px rgba(90,90,90,0.5);
     -moz-box-shadow: -2px 0px 6px 0px rgba(90,90,90,0.5);
     box-shadow: -2px 0px 6px 0px rgba(90,90,90,0.5);
+
+}
+
+
+#manage_users_page .new_user_block .setting_block {
+
+    margin-top : 20px;
 
 }
 
@@ -376,22 +479,48 @@
 }
 
 #manage_users_page  .global_admin_block {
-    float : left;
+    /*float : left;
     position : relative;
     top : -6px;
-    left : 10px;
+    left : 10px;*/
+    position : relative;
+    top : -4px;
+}
+/*
+#manage_users_page  .global_admin_block input {
+
+}
+*/
+#manage_users_page  .global_admin_block input[type="checkbox"] {
+    width : 14px;
+    height : 14px;
+    cursor : pointer;
+    position: relative;
+    top : 3px;
 }
 
-#manage_users_page  .global_admin_block input {
-    width : 20px;
-    height : 20px;
-    cursor : pointer;
+#manage_users_page  .global_admin_block input[type="checkbox"] + label span {
+    display:inline-block;
+    width:14px;
+    height:14px;
+    margin:-1px 4px 0 0;
+    vertical-align:middle;
+    /*background:url(check_radio_sheet.png) left top no-repeat;*/
+    background-color: white;
+    cursor:pointer;
+}
+
+#manage_users_page  .global_admin_block input[type="checkbox"]:checked + label span {
+    /*background:url(check_radio_sheet.png) -19px top no-repeat;*/
+    background-color: red;
 }
 
 #manage_users_page .global_admin_block span {
-    position : relative;
-    top : -6px;
-    margin-left : 10px;
+    /*text-transform: uppercase;*/
+    font-family: Lato-Medium;
+    color : #9D9D9E;
+    text-transform : capitalize;
+    font-size : 11px;
 }
 
 #manage_users_page .user_of_empty {
@@ -399,9 +528,10 @@
     height : 35px;
 }
 
+/* todo: remove .setting_block class and wrapper */
 #manage_users_page .setting_block {
-    border-bottom: 0px solid #eeeeee;
-    margin-top : 20px;
+    /*border-bottom: 0px solid #eeeeee;*/
+    /*margin-top : 20px;*/
 }
 
 #manage_users_page .setting_block div {

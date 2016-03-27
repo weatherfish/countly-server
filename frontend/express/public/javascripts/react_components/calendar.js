@@ -237,6 +237,7 @@ var CalendarWrapper = React.createClass({
                     state_obj.calendars_open     = false;
                     state_obj.transition_c_close = false;
                     state_obj.in_close           = false;
+                    state_obj.choise_open        = false;
                 }
                 else
                 {
@@ -251,6 +252,8 @@ var CalendarWrapper = React.createClass({
         }
 
         var state_obj = { };
+
+        console.log("handle click:", countlyCommon.getPeriod());
 
         if (this.state.choise_open)
         {
@@ -269,7 +272,17 @@ var CalendarWrapper = React.createClass({
         }
         else
         {
-            state_obj.transition_open = true; // start open fast time range choise
+
+            if (Array.isArray(countlyCommon.getPeriod()))
+            {
+                state_obj.transition_c_open = true; // start open fast time range choise
+                state_obj.transition_open = true;
+            }
+            else
+            {
+                state_obj.transition_open = true; // start open fast time range choise
+            }
+
         }
 
         this.setState(state_obj);

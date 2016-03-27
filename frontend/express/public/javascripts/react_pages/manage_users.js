@@ -43,9 +43,6 @@ var NewUserWindow = React.createClass({
         data.admin_of = [];
         data.user_of = [];
 
-        console.log("> will save >>>>>");
-        console.log(this.user_data);
-
   			if (!this.user_data.global_admin)
         {
 
@@ -116,7 +113,7 @@ var NewUserWindow = React.createClass({
         if (!this.props.open) new_user_block_style.display = "none";
 
         return(<div className="new_user_block" style={new_user_block_style}>
-            
+
             <div className="label">
                 <div className="cancel_button" onClick={this.cancel}></div>
                 <span>Create a new user</span>
@@ -271,8 +268,6 @@ var ManageUsersPage = React.createClass({
 
     new_user_click : function(){
 
-        console.log("this.state.new_user_open:", this.state.new_user_open);
-
         this.setState({
             new_user_open : !this.state.new_user_open
         })
@@ -285,19 +280,41 @@ var ManageUsersPage = React.createClass({
         })
     },
 
-    on_new_user_add : function(new_user)
+    on_user_add : function(new_user)
     {
         var users_data = this.state.users_data;
 
         users_data.push(new_user);
 
-        console.log("::::::::::::::: updated users data :::::::::::::");
-        console.log(users_data);
-
         this.setState({
             "users_data" : users_data
         });
 
+    },
+
+    on_user_delete : function(user_id)
+    {
+
+        console.log("will delete user:", user_id);
+
+        var users_data = this.state.users_data;
+
+        var array_id = false;
+
+        for (var i = 0; i < users_data.length; i++)
+        {
+            if (users_data[i]["_id"] == user_id)
+            {
+                array_id = i;
+                break;
+            }
+        }
+
+        users_data.splice(array_id, 1);
+
+        this.setState({
+            "users_data" : users_data
+        });
     },
 
     email_width_changed : function(email, new_width){
@@ -325,6 +342,8 @@ var ManageUsersPage = React.createClass({
     },
 
     block_height_changed : function(type, key, height){
+
+        console.log("block_height_changed:", type, key, height);
 
         if (!this.blocks_height[type]) this.blocks_height[type] = [];
 
@@ -361,6 +380,8 @@ var ManageUsersPage = React.createClass({
 
     open_edit : function(id){
 
+        console.log(">> open >>>");
+
         this.setState({
             selected_user : id
         })
@@ -370,7 +391,7 @@ var ManageUsersPage = React.createClass({
     close_edit : function(id){
 
         this.setState({
-            selected_user : false
+            "selected_user" : false
         })
 
     },
@@ -398,8 +419,8 @@ var ManageUsersPage = React.createClass({
 
             email_header_style.width = email_header_width + "px";
 
-            adminof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 10 + "px";
-            userof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 10 + "px";
+            adminof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 1 + "px";
+            userof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 1 + "px";
 
         }
 
@@ -411,7 +432,7 @@ var ManageUsersPage = React.createClass({
                     <div className="new_user_button" onClick={this.new_user_click}>Add New User</div>
                 </div>
 
-                <NewUserWindow open={this.state.new_user_open} onClose={this.new_user_close} onUserAdd={this.on_new_user_add}/>
+                <NewUserWindow open={this.state.new_user_open} onClose={this.new_user_close} onUserAdd={this.on_user_add}/>
 
                 <div className="wrapper">
 
@@ -426,7 +447,7 @@ var ManageUsersPage = React.createClass({
                               {
                                   _.map(self.state.users_data, function(user, i){
 
-                                      if (self.state.selected_user && self.state.selected_user == i)
+                                      if (self.state.selected_user && self.state.selected_user === i)
                                       {
                                           var edit_active = true;
                                       }
@@ -448,23 +469,15 @@ var ManageUsersPage = React.createClass({
                                                   max_block_height={self.state.max_block_height}
                                                   block_height_changed={self.block_height_changed}
                                                   edit_click={self.open_edit.bind(self, i)}
-                                                  cancel_click={self.close_edit.bind(self, i)}
+                                                  close_click={self.close_edit.bind(self)}
                                                   edit_active={edit_active}
+                                                  on_delete={self.on_user_delete}
                                               />)
 
                                   })
                               }
 
                     </div>
-
-                    {(() => { // todo: add <Loader/>
-/*
-                        if (self.state.users_data){
-
-                            return ()
-                        }
-*/
-                    })()}
 
                 </div>
 

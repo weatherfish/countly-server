@@ -7,7 +7,7 @@ var SwitchBlock = React.createClass({
         });
 
     },
-
+/*
     switch_value : function(state) {
 
         if (state && this.state.enabled) return false;
@@ -17,6 +17,20 @@ var SwitchBlock = React.createClass({
 
         this.setState({
             enabled : !this.state.enabled
+        });
+
+    },
+*/
+    switch_value : function(e) {
+
+        var state = e.target.checked;
+
+        console.log(">> state:", state);
+
+        this.props.onChange(this.props.setting, state);
+
+        this.setState({
+            "enabled" : state
         });
 
     },
@@ -36,6 +50,31 @@ var SwitchBlock = React.createClass({
             var disable_button_class = "button disable active";
         }
 
+        /*
+        <div  onClick={this.switch_value.bind(this, true)} className={enable_button_class}>{jQuery.i18n.map["plugins.enable"]}</div>
+        <div  onClick={this.switch_value.bind(this, false)} className={disable_button_class}>{jQuery.i18n.map["plugins.disable"]}</div>
+
+
+
+        */
+
+        if (this.state.enabled)
+        {
+            var checkbox = <input type="checkbox" checked onChange={this.switch_value}/>;
+        }
+        else
+        {
+            var checkbox = <input type="checkbox" onChange={this.switch_value}/>;
+        }
+
+        return(
+            <div className="setting_block">
+                <div className="setting_label">{this.props.label}</div>
+                {checkbox}
+            </div>
+        )
+
+/*
         return(
             <div className="setting_block">
                 <div className="setting_label">{this.props.label}</div>
@@ -43,7 +82,7 @@ var SwitchBlock = React.createClass({
                 <div  onClick={this.switch_value.bind(this, false)} className={disable_button_class}>{jQuery.i18n.map["plugins.disable"]}</div>
             </div>
         )
-
+*/
     }
 
 });

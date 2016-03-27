@@ -83,8 +83,7 @@
     background-color: red;
 }
 
-.configurations_page input {
-    margin-left : 20px;
+.configurations_page input[type="text"] {
     width : 240px;
     height: 30px;
     padding-left: 10px;
@@ -109,10 +108,12 @@
 
 .configurations_page .setting_block {
 
-    height : 60px;
-    line-height: 60px;
+    /*height : 60px;
+    line-height: 60px;*/
 
     /*border-bottom : 1px solid #eeeeee;*/
+
+    margin-bottom : 20px;
 
     font-family : Lato-Regular;
 
@@ -129,4 +130,16 @@
     text-transform: uppercase;
     font-size: 12px;
     font-family: Lato-Medium;
+    text-align : right;
+    margin-right : 14px;
+}
+
+.configurations_page .setting_block input[type="checkbox"] {
+    width : 20px;
+    height : 20px;
+    position : relative;
+    top : 6px;
+    /*left : 15px;*/
+    margin : 0px;
+    background-color : #ffffff
 }

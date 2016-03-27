@@ -1,5 +1,7 @@
 var SessionPage = React.createClass({
 
+    mixins: [UpdatePageMixin],
+
     getInitialState : function() {
 
         var sort_functions = {
@@ -11,8 +13,33 @@ var SessionPage = React.createClass({
         return({
             granularity : "daily",//false, // todo - should be false
             sort_functions : sort_functions,
-            inited : false
+            inited : false,
+            data_timestamp : false
         });
+    },
+
+    init_data : function(timestamp)
+    {
+        var self = this;
+
+        $.when(countlyUser.initialize()).then(function () {
+
+            var headers = self.make_big_numbers();
+
+            var big_numbers = self.make_big_numbers();
+
+            headers.unshift({
+                "title" : "Date",
+                "short" : "date",
+            })
+
+            self.setState({
+                inited : true,
+                big_numbers : big_numbers,
+                headers : headers,
+                data_timestamp : timestamp
+            })
+        })
     },
 
     make_big_numbers : function()
@@ -54,30 +81,6 @@ var SessionPage = React.createClass({
         return big_numbers;
     },
 
-    componentDidMount : function() {
-
-        var self = this;
-
-        $.when(countlyUser.initialize()).then(function () {
-
-            var headers = self.make_big_numbers();
-
-            var big_numbers = self.make_big_numbers();
-
-            headers.unshift({
-                "title" : "Date",
-                //"help"  : "sessions.unique-sessions", // todo: add translation
-                "short" : "date",
-            })
-
-            self.setState({
-                inited : true,
-                big_numbers : big_numbers,
-                headers : headers
-            })
-        })
-    },
-
     on_graph_mount : function(mount_data) {
         this.setState({
             "granularity" : mount_data.granularity
@@ -86,19 +89,11 @@ var SessionPage = React.createClass({
 
     componentWillReceiveProps : function(nextProps) {
 
-        console.log("{{{{{{{{{{{{{ this.context.router.getCurrentParams() }}}}}}}}}}}}}");
-        console.log(this.context.router/*.getCurrentParams()*/);
-
-        //console.log("==== receive props page =====");
-        //console.log(nextProps.router.getCurrentParams());
-
-        var self = this;
-
         var big_numbers = self.make_big_numbers();
 
-        self.setState({
+        this.setState({
             big_numbers : big_numbers
-        })
+        });
 
     },
 
