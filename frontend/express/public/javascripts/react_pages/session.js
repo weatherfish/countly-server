@@ -89,7 +89,7 @@ var SessionPage = React.createClass({
 
     componentWillReceiveProps : function(nextProps) {
 
-        var big_numbers = self.make_big_numbers();
+        var big_numbers = this.make_big_numbers();
 
         this.setState({
             big_numbers : big_numbers

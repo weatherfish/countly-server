@@ -87,6 +87,8 @@
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/crash_details.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/bool_pie_chart.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/average_bar.css" />
+						<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/horizontal_bar_interactive.css" />
+						<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/platforms.css" />
 
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
 		    <!--script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery.form.js"></script>
@@ -187,6 +189,8 @@
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/crashes.js"></script>
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/crash_details.js"></script>
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/densities.js"></script>
+						<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/language.js"></script>
+						<script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/platforms.js"></script>
 
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/applications.js"></script>
             <!--script type="text/javascript" src="http://192.168.187.129:3000/static/bundle.js"></script-->
@@ -194,6 +198,8 @@
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/manage_users.js"></script>
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/configurations.js"></script>
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/map_session.js"></script>
+
+
 
             <!--script type="text/jsx" src="<%- cdn %>/javascripts/react_pages_compiled/router.js"></script-->
 
@@ -239,6 +245,8 @@
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/average_bar.js"></script>
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/multi_lang_label.js"></script>
 
+						<script type="text/jsx" src="<%- cdn %>/javascripts/react_components/horizontal_bar_interactive.js"></script>
+
             <!--script type="text/jsx" src="<%- cdn %>/javascripts/react-height.min.js"></script-->
 
             <% if (plugins) { %>
@@ -248,7 +256,12 @@
             	<% } %>
             <% } %>
 
-
+						<style>
+								/* todo: add window resize events */
+								#countly_logo_side, #countly_logo, #countly_version {
+										display : none;
+								}
+						</style>
 
         <% } %>
 
@@ -584,6 +597,8 @@
                                 <Route path="carriers"     component={wrapComponent(CarrierPage,     {date : this.state.date})}/>
                                 <Route path="map_sessions" component={wrapComponent(MapSessionPage,  {date : this.state.date})}/>
                                 <Route path="density"    component={wrapComponent(DensitiesPage,   {date : this.state.date})}/>
+																<Route path="language"    component={wrapComponent(LanguagePage,   {date : this.state.date})}/>
+																<Route path="platforms"	component={wrapComponent(PlatformsPage,   {date : this.state.date})}/>
                             </Route>
                             <Route path="engagement">
                                 <Route path="frequency" component={wrapComponent(FrequencyPage, {date : this.state.date})}/>

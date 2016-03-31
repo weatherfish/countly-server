@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="19px" height="18px"  viewBox="-1 -1 18 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+
+    <defs>
+        <style>
+          rect, line { shape-rendering: crispEdges; }
+          svg .svg_icon { display: none }
+          svg .svg_icon:target { display: inline }
+        </style>
+    </defs>
+
+    <g id="metrics" class="svg_icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Ikony-Copy" sketch:type="MSArtboardGroup" transform="translate(-314.000000, -85.000000)">
+            <g id="Path-187-+-Star-2-Copy-2" sketch:type="MSLayerGroup" transform="translate(314.000000, 84.000000)">
+                <path d="M0.5,13.4705882 L2.7745098,9.49019608 L4.48039216,11.7647059 L7.32352941,6.93137255 L9.59803922,10.627451 L14.5,2.50000002" id="Path-187" stroke="#B8BFC4" stroke-linecap="round" sketch:type="MSShapeGroup"></path>
+                <polygon id="Star-2-Copy" fill="#B8BFC4" sketch:type="MSShapeGroup" transform="translate(14.400000, 2.833295) scale(1, -1) rotate(146.000000) translate(-14.400000, -2.833295) " points="11.6349365 4.38580806 14.4 1.10119267 17.1650635 4.38580806 "></polygon>
+            </g>
+        </g>
+    </g>
+
+    <g id="engagement" class="svg_icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Artboard-2" sketch:type="MSArtboardGroup" transform="translate(-384.000000, -293.000000)" stroke="#B8BFC4" stroke-width="1.20000005" fill="#B8BFC4" fill-opacity="0">
+            <path d="M391.722623,307.852366 C385.645836,302.182699 384,301.075783 384,297.833886 C384,295.168482 385.892971,293 388.219728,293 C390.164206,293 391.26332,294.265038 392,295.216659 C392.73668,294.265038 393.835794,293 395.780272,293 C398.107029,293 400,295.168482 400,297.833886 C400,301.075783 398.354164,302.182699 392.277377,307.852366 L392,308.111111 L391.722623,307.852366 Z" id="Fill-18" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+
+    <g id="crashes" class="svg_icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Ikony-Copy" sketch:type="MSArtboardGroup" transform="translate(-313.000000, -200.000000)">
+            <g id="Oval-155-+-Rectangle-308-+-Star-15-Copy" sketch:type="MSLayerGroup" transform="translate(313.000000, 200.000000)">
+                <g id="Oval-155-+-Rectangle-308" transform="translate(8.000000, 5.199997)" fill="#D8D8D8" sketch:type="MSShapeGroup">
+                    <circle id="Oval-155" cx="1" cy="7" r="1"></circle>
+                    <rect id="Rectangle-308" x="0.5" y="0" width="1.10000002" height="5" rx="40"></rect>
+                </g>
+                <polygon id="Star-15" stroke="#B8BFC4" sketch:type="MSShapeGroup" points="9 15 0.339745962 15 4.66987298 7.5 9 0 13.330127 7.5 17.660254 15 "></polygon>
+            </g>
+        </g>
+    </g>
+
+    <g id="dashboard" class="svg_icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Artboard-2" sketch:type="MSArtboardGroup" transform="translate(-417.000000, -554.000000)">
+            <g id="Dashboard-Copy-4" sketch:type="MSLayerGroup" transform="translate(417.000000, 554.000000)">
+                <g id="Group-Copy" transform="translate(0.000000, 0.350000)" sketch:type="MSShapeGroup">
+                    <path d="M16.9241681,12.9269316 C17.4595838,11.7586273 17.7587403,10.4545679 17.7587403,9.07906536 C17.7587403,4.06483602 13.7833109,0 8.87937014,0 C3.97542942,0 0,4.06483602 0,9.07906536 C0,10.4862326 0.31308848,11.8186295 0.871923544,13.0073997 L0.871923544,13.0073997" id="Oval-224" stroke="#B8BFC4" stroke-width="1.14113208" stroke-linecap="round" stroke-linejoin="round" fill-opacity="0" fill="#D8D8D8"></path>
+                    <g id="Oval-224-+-Rectangle-485-Copy" transform="translate(10.036335, 7.671209) rotate(31.000000) translate(-10.036335, -7.671209) translate(8.360982, 3.064826)" fill="#B8BFC4">
+                        <g id="Oval-224-+-Rectangle-485" transform="translate(0.287212, 0.165476)">
+                            <ellipse id="Oval-224" cx="1.49839371" cy="7.07750774" rx="1.49839371" ry="1.66529594"></ellipse>
+                            <path d="M1.49839371,1.94955163e-13 L2.96849147,6.70635555 L0.0457129248,6.6734977 L1.49839371,1.94955163e-13 Z" id="Rectangle-485"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+
+    <g id="manage" class="svg_icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Ikony-Copy" sketch:type="MSArtboardGroup" transform="translate(-316.000000, -519.000000)">
+            <g id="Group" sketch:type="MSLayerGroup" transform="translate(303.000000, 49.000000)">
+                <g id="Management" transform="translate(10.000000, 467.000000)" sketch:type="MSShapeGroup">
+                    <path d="M12,15.5 C10.0701008,15.5 8.5,13.9298992 8.5,12 C8.5,10.0701008 10.0701008,8.5 12,8.5 C13.9298992,8.5 15.5,10.0701008 15.5,12 C15.5,13.9298992 13.9298992,15.5 12,15.5 L12,15.5 Z" id="Fill-45" stroke="#B8BFC4" stroke-width="1.20000005"></path>
+                    <path d="M13.2315789,20.9336842 L10.7021053,20.9336842 L9.97215789,18.7452632 C9.48947368,18.6036316 9.02431579,18.4108421 8.58331579,18.1702105 L6.52089474,19.2014211 L4.73178947,17.4127895 L5.76347368,15.3498947 C5.52284211,14.9098421 5.33052632,14.4446842 5.18842105,13.9610526 L3,13.2315789 L3,10.7021053 L5.18842105,9.97263158 C5.33052632,9.489 5.52284211,9.02384211 5.76347368,8.58378947 L4.73178947,6.52089474 L6.52089474,4.73178947 L8.58331579,5.76347368 C9.02431579,5.52284211 9.48947368,5.33005263 9.97215789,5.18842105 L10.7021053,3 L13.2315789,3 L13.9615263,5.18842105 C14.4437368,5.33005263 14.9093684,5.52284211 15.3503684,5.76347368 L17.4127895,4.73178947 L19.2018947,6.52089474 L18.1702105,8.58378947 C18.4108421,9.02384211 18.6031579,9.489 18.7452632,9.97263158 L20.9336842,10.7021053 L20.9336842,13.2315789 L18.7452632,13.9610526 C18.6031579,14.4446842 18.4108421,14.9098421 18.1702105,15.3498947 L19.2018947,17.4127895 L17.4127895,19.2014211 L15.3503684,18.1702105 C14.9093684,18.4108421 14.4437368,18.6036316 13.9615263,18.7452632 L13.2315789,20.9336842 L13.2315789,20.9336842 Z M11.3368421,20.0526316 L12.5968421,20.0526316 L13.2761053,18.0157895 L13.5082105,17.9561053 C14.0723684,17.8111579 14.6123684,17.5880526 15.1125789,17.292 L15.3191053,17.1697895 L17.2389474,18.1299474 L18.1299474,17.2389474 L17.1693158,15.3191053 L17.292,15.1121053 C17.5871053,14.6133158 17.8106842,14.0737895 17.9565789,13.5077368 L18.0157895,13.2756316 L20.0526316,12.5968421 L20.0526316,11.3368421 L18.0157895,10.6580526 L17.9565789,10.4259474 C17.8106842,9.85989474 17.5871053,9.32036842 17.292,8.82157895 L17.1693158,8.61457895 L18.1299474,6.69473684 L17.2389474,5.80373684 L15.3191053,6.76389474 L15.1125789,6.64168421 C14.6123684,6.34563158 14.0723684,6.12252632 13.5082105,5.97757895 L13.2761053,5.91789474 L12.5968421,3.88105263 L11.3368421,3.88105263 L10.6575789,5.91789474 L10.4254737,5.97757895 C9.86131579,6.12252632 9.32131579,6.34563158 8.82110526,6.64168421 L8.61457895,6.76389474 L6.69473684,5.80373684 L5.80373684,6.69473684 L6.76436842,8.61457895 L6.64168421,8.82157895 C6.34657895,9.32036842 6.123,9.85989474 5.97710526,10.4259474 L5.91742105,10.6580526 L3.88105263,11.3368421 L3.88105263,12.5968421 L5.91742105,13.2756316 L5.97710526,13.5077368 C6.123,14.0737895 6.34657895,14.6133158 6.64168421,15.1121053 L6.76436842,15.3191053 L5.80373684,17.2389474 L6.69473684,18.1299474 L8.61457895,17.1697895 L8.82110526,17.292 C9.32131579,17.5880526 9.86131579,17.8111579 10.4254737,17.9561053 L10.6575789,18.0157895 L11.3368421,20.0526316 L11.3368421,20.0526316 Z" id="Fill-46" fill="#B8BFC4" transform="translate(11.966842, 11.966842) rotate(-22.500000) translate(-11.966842, -11.966842) "></path>
+                </g>
+            </g>
+        </g>
+    </g>
+
+    <g id="funnels" class="svg_icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Ikony-Copy" sketch:type="MSArtboardGroup" transform="translate(-314.000000, -120.000000)" stroke="#B8BFC4">
+            <g id="Group" sketch:type="MSLayerGroup" transform="translate(303.000000, 49.000000)">
+                <g id="Engagement-+-Oval-74-+-Oval-74-Copy-2" transform="translate(11.000000, 71.000000)" sketch:type="MSShapeGroup">
+                    <g id="Engagement" transform="translate(0.000000, 4.000000)" stroke-width="1.20000005" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M0.609022556,0.615384615 C0.609022556,0.615384615 0.762202164,0.790684436 0.838791969,0.878334347 C2.99528487,3.34623999 7.30827068,8.28205128 7.30827068,8.28205128 L7.30827068,13 L10.3533835,13" id="Path-7"></path>
+                        <path d="M10.3533835,0.615384615 L17.0526316,8.28205128 L17.0526316,13" id="Path-7-Copy" transform="translate(13.703008, 6.807692) scale(-1, 1) translate(-13.703008, -6.807692) "></path>
+                        <path d="M0.609022556,0.600000024 L17.0526316,0.600000024" id="Path-8"></path>
+                    </g>
+                    <g id="Oval-74-+-Oval-74-Copy-2" transform="translate(3.000000, 0.000000)">
+                        <path d="M0.506471413,4.66858983 C0.756680552,5.04176075 1.74165279,4.93778658 2.7780165,4.95791937 C3.97148408,4.98110411 5.23310511,5.07102604 5.51923592,4.62959724 C5.82338308,4.1603737 6,3.6008124 6,3 C6,1.34314575 4.65685425,0 3,0 C1.34314575,0 0,1.34314575 0,3 C0,3.61754512 0.186591528,4.19150946 0.506471413,4.66858983 Z" id="Oval-74"></path>
+                        <path d="M8,4.69999997 L10,4.4 L8,2.4 L6,4.4 L8,4.69999997 Z" id="Oval-74-Copy"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+
+</svg>

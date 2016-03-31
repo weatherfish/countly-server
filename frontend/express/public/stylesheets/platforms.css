@@ -1,0 +1,96 @@
+.platforms_page .horizontal_chart {
+    margin-top : 30px;
+}
+
+.platforms_page .horizontal_chart .bar_block.active_bars {
+    cursor : pointer;
+}
+
+.platforms_page .bar_block.active_bars:hover .bar-outer {
+    background-color : #eeeeee !important;
+}
+
+.platforms_page .bar_block.active_bars:hover .bar-outer:not(.active) {
+    background-color : #ffffff !important;
+}
+
+.platforms_page .bar_block .bar-outer.active_bar span {
+
+    /*font-weight : bold;*/
+    font-family : Lato-Semibold;
+}
+
+.platforms_page .bar_block.active_block span, .platforms_page .bar_block.active_block .percent {
+    font-family : Lato-Semibold;
+}
+
+.blocks_box {
+
+    /*position : relative;
+    left : -40px;*/
+    border-top: 2px solid #eeeeee;
+    padding-top : 2px;
+
+
+    /*border-right : 4px solid red;*/
+    box-sizing: border-box;
+
+}
+/*
+.blocks_box:first-of-type {
+    border-right:1px solid red;
+}
+*/
+/*
+.blocks_box:hover {
+    background-color : #eeeeee;
+}
+*/
+
+.blocks_box.active {
+    border-top : 4px solid #19CC63;
+    padding-top : 0px;
+    /*cursor : pointer;*/
+    border-bottom : 1px solid #f4f4f4;
+}
+
+.blocks_box:not(.active){
+    background-color : #F2F2F2;
+    border-bottom: 2px solid #eeeeee;
+}
+
+.blocks_box:not(.active):hover {
+    background-color : #eeeeee;
+    cursor : pointer;
+}
+
+.platforms_page .load_more {
+
+    position: absolute;
+    bottom: 20px;
+    right : 22%;
+    width : 50% !important;
+    width: auto !important;
+    text-align: center;
+
+}
+
+.platforms_page .table_wrapper {
+    border-top : 0px solid #ffffff;
+}
+
+.platforms_page .horizontal_chart_wrapper {
+    box-sizing: border-box;
+}
+
+.platforms_page .horizontal_chart {
+    box-sizing: border-box;
+}
+
+.platforms_page .block_label {
+    white-space: nowrap;
+}
+
+.platforms_page .block_label.active {
+    font-family: Lato-Semibold;    
+}

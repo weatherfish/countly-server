@@ -43,10 +43,37 @@ var FullSidebar = React.createClass({
             top_active    : false,
             active_app    : this.props.active_app,
             right_selected_item : right_selected_item,
-            apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode()
+            apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode(),
+            icons_ready : false
         };
     },
 
+    componentWillMount : function()
+    {
+
+        var self = this;
+
+        var icons = ['sidebar_hover.svg',
+                     'sidebar_active.svg']
+
+        var loaded = 0;
+
+        icons.forEach(function(img){
+              var icon_src = "../../images/" + img;
+
+              $(new Image()).attr('src', icon_src).load(function() {
+
+                  loaded++;
+
+                  if (loaded == icons.length)
+                  {
+                      self.setState({
+                          "icons_ready" : true
+                      });
+                  }
+              });
+          });
+    },
     componentWillReceiveProps: function(nextProps) {
 
         if (this.state.apps_list_hash == JSON.stringify(countlyGlobal['apps']).hashCode())
@@ -232,6 +259,11 @@ var FullSidebar = React.createClass({
     },
 
     render : function() {
+
+        if (!this.state.icons_ready)
+        {
+            return false;
+        }
 
         var full_navigation = this.props.navigation;
 

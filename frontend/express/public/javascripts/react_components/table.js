@@ -149,6 +149,8 @@ var SortTable = React.createClass({
 
     getInitialState() {
 
+        console.log(":::::::::::::::: init ::::::::::::::::");
+
         //var headers = JSON.parse(JSON.stringify(this.props.headers));
 
         var headers = this.props.headers;
@@ -166,7 +168,17 @@ var SortTable = React.createClass({
 
         //var full_rows = this.props.data_function().get_current_data(granularity);
 
-        var data = this.props.data_function();
+        if (this.props.data)
+        {
+            var data = this.props.data;
+        }
+        else
+        {
+            var data = this.props.data_function();
+        }
+
+        console.log("==================== table data =================");
+        console.log(data);
 
         if (data.get_current_data)
         {
@@ -301,8 +313,15 @@ var SortTable = React.createClass({
 
         /*if (nextProps.date != this.props.date) // todo !!!!!!!!!!!!!!!!!!!!!!
         {*/
-
-            var data = nextProps.data_function();
+            
+            if (nextProps.data)
+            {
+                var data = nextProps.data;
+            }
+            else
+            {
+                var data = nextProps.data_function();
+            }
 
             if (data.get_current_data)
             {

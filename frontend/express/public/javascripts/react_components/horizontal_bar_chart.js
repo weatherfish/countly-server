@@ -6,18 +6,21 @@ var HorizontalBarChart = React.createClass({
 
         var data = this.props.data_function();
 
+        console.log("---- HorizontalBarChart data -----------");
+        console.log(data);
+
         data = data.chartData;
 
         //var test_data = [];
 
-        if (!data[0] || !data[0]["t"]) // todo: t change to key
+        if (!data[0] || !data[0]["t"]) // todo: t change to a key
         {
             data = false;
         }
         else
         {
 
-            var rand = getRandomInt(1, (data[0]["t"] / (data.length + 2)));
+            var rand = this.getRandomInt(1, (data[0]["t"] / (data.length + 2)));
 
             var last_value = false;
 
@@ -36,7 +39,7 @@ var HorizontalBarChart = React.createClass({
                     }
                     else
                     {
-                        last_value = Math.round(last_value - (last_value / 100 * getRandomInt(4, 10)));
+                        last_value = Math.round(last_value - (last_value / 100 * this.getRandomInt(4, 10)));
                     }
 
                     data[i][key] = last_value;
@@ -45,10 +48,8 @@ var HorizontalBarChart = React.createClass({
             }
         }
 
-        function getRandomInt(min, max)
-        {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+        console.log("============== HorizontalBarChart 2 data ==============");
+        console.log(data);
 
         return {
             data : data,
@@ -72,7 +73,7 @@ var HorizontalBarChart = React.createClass({
             else
             {
 
-                var rand = getRandomInt(1, (data[0]["t"] / (data.length + 2)));
+                var rand = this.getRandomInt(1, (data[0]["t"] / (data.length + 2)));
 
                 var last_value = false;
 
@@ -89,7 +90,7 @@ var HorizontalBarChart = React.createClass({
                         }
                         else
                         {
-                            last_value = Math.round(last_value - (last_value / 100 * getRandomInt(2, 6)));
+                            last_value = Math.round(last_value - (last_value / 100 * this.getRandomInt(2, 6)));
                         }
 
                         //console.log("last_value:", last_value, ", minus:", (last_value / 100 * getRandomInt(10, 40)));
@@ -104,31 +105,10 @@ var HorizontalBarChart = React.createClass({
                 data : data
             });
 
-            function getRandomInt(min, max)
-            {
-                return Math.floor(Math.random() * (max - min + 1)) + min;
-            }
-
         //}
 
     },
-/*
-    componentWillMount: function() {
 
-        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
-
-
-
-        }.bind(this));
-
-        $(event_emitter).on('data_changed', function(e, data){
-
-
-
-        }.bind(this));
-
-    },
-*/
     draw : function(container)
     {
 
@@ -219,29 +199,6 @@ var HorizontalBarChart = React.createClass({
 
         var current_data = data.slice(0, bars_count);
         var other_data   = data.slice(bars_count, data.length);
-
-        /*
-        if (!this.labels)
-        {
-
-            for (var k = 0; k < keys.length; k++)
-            {
-
-                var key = keys[k];
-
-                this.labels = this.chart.append("text")
-                    .attr("class", "label")
-                    .text(function(d) {
-                        return self.props.labels_mapping[key];
-                    })
-                    .style("fill", "black")
-                    .attr("transform", function(d, i) {
-                        return "translate(" + (k * (width + self.props.margins.right)) + ", 0)";
-                    })
-
-            }
-        }
-*/
 
         for (var k = 0; k < keys.length; k++)
         {
@@ -818,7 +775,7 @@ var HorizontalBarChart = React.createClass({
 
         return (
             <div className="horizontal_chart_wrapper" style={wrapper_style}>
-                <div className="chart_label">{this.props.graph_label}</div>
+                <div className="chart_label">{this.props.graph_label.toUpperCase()}</div>
                 <div className="horizontal_chart" style={chart_style} id="horizontal_chart">
                 </div>
                 <div onClick={this.load_more} style={load_more_style} className="load_more">
@@ -841,6 +798,11 @@ var HorizontalBarChart = React.createClass({
     componentDidUpdate : function()
     {
         this.draw("#horizontal_chart");
+    },
+
+    getRandomInt : function(min, max)
+    {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
 });

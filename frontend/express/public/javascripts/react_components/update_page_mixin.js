@@ -2,7 +2,7 @@ var UpdatePageMixin = {
 
     componentDidMount : function() {
 
-        countlyCommon.DASHBOARD_REFRESH_MS = 100000; // todo
+        countlyCommon.DASHBOARD_REFRESH_MS = 1000000; // todo
 
         var self = this;
 

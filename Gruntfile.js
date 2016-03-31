@@ -186,7 +186,8 @@ module.exports = function(grunt) {
             "frontend/express/public/stylesheets/multi_select.css",
             "frontend/express/public/stylesheets/crash_details.css",
             "frontend/express/public/stylesheets/bool_pie_chart.css",
-            "frontend/express/public/stylesheets/average_bar.css"
+            "frontend/express/public/stylesheets/average_bar.css",
+            "frontend/express/public/stylesheets/platforms.css"
 	    		],
     		}
     	}
