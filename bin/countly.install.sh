@@ -89,12 +89,12 @@ fi
 bash $DIR/scripts/countly.install.plugins.sh
 
 #compile scripts for production
-cd $DIR/frontend/express/public/javascripts
+cd $DIR/../frontend/express/public/javascripts
 babel --presets es2015,react react_components/ --out-dir react_components_compiled/
 babel --presets es2015,react react_pages/ --out-dir react_pages_compiled/
-cd $DIR/frontend/express/public/stylesheets
+cd $DIR/../frontend/express/public/stylesheets
 lessc ui.v2.less v2.css && lessc ui.calendar.less calendar.css && lessc tables.less tables.css && lessc map.less map.css
-cd $DIR && grunt dist-all
+cd $DIR/../ && grunt dist-all
 
 #finally start countly api and dashboard
 if [ "$INSIDE_DOCKER" != "1" ]
