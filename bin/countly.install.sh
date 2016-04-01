@@ -59,6 +59,12 @@ apt-get -y install imagemagick
 #install sendmail
 apt-get -y install sendmail
 
+#install babel
+npm install -g babel-cli
+
+#install less
+npm install -g less
+
 #install grunt & npm modules
 ( cd $DIR/.. ; npm install -g grunt-cli --unsafe-perm ; npm install )
 
