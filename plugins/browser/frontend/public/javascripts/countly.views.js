@@ -12,13 +12,14 @@ window.BrowserView = countlyView.extend({
             "pie-titles":{
                 "left":jQuery.i18n.map["common.total-users"],
                 "right":jQuery.i18n.map["common.new-users"]
-            }
+            },
+            "chart-helper":"browser.chart"
         };
 
         if (!isRefresh) {
             $(this.el).html(this.template(this.templateData));
             if(typeof addDrill != "undefined"){
-                addDrill("up.brw");
+                $(".widget-header .left .title").after(addDrill("up.brw"));
             }
 
             this.dtable = $('.d-table').dataTable($.extend({}, $.fn.dataTable.defaults, {

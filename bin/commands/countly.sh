@@ -23,10 +23,22 @@ countly_stop (){
 
 countly_restart (){
     echo "restart stub";
+}
+
+countly_status (){
+    echo "status stub";
 } 
+
+countly_root (){
+    if [[ $EUID -ne 0 ]]; then
+        echo "This command must be run as root" 
+        exit 1
+    fi
+}
 
 #real commands, can also be overwritten
 countly_upgrade (){ 
+    countly_root ;
     (cd $DIR/../.. ;
     echo "Installing dependencies...";
     npm install ;
@@ -46,6 +58,7 @@ countly_dir (){
 }
 
 countly_test (){
+    countly_root ;
     bash $DIR/scripts/countly.run.tests.sh ;
 }
 

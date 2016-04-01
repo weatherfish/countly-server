@@ -86,6 +86,26 @@ var common = {},
     common.isNumber = function (n) {
         return !isNaN(parseFloat(n)) && isFinite(n);
     };
+    
+    common.convertToType = function(value){
+        //if value can be a number
+        if (common.isNumber(value)) {
+            //check if it is string but is less than 16 length
+            if(value.length && value.length <= 16)
+                //convert to number
+                return parseFloat(value);
+            //check if it is number, but longer than 16 digits (max limit)
+            else if((value+"").length > 16)
+                //convert to string
+                return value+"";
+            else
+                //return number as is
+                return value;
+        } else{
+            //return as string
+            return value+"";
+        }
+    }
 
     common.safeDivision = function(dividend, divisor) {
         var tmpAvgVal;
@@ -352,8 +372,16 @@ var common = {},
         }
     };
 
+    common.blockResponses = function(params) {
+        params.blockResponses = true;
+    };
+
+    common.unblockResponses = function(params) {
+        params.blockResponses = false;
+    };
+
     common.returnMessage = function (params, returnCode, message) {
-        if (params && params.res) {
+        if (params && params.res && !params.blockResponses) {
             params.res.writeHead(returnCode, {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin':'*'});
             if (params.qstring.callback) {
                 params.res.write(params.qstring.callback + '(' + JSON.stringify({result: message}) + ')');
@@ -366,7 +394,7 @@ var common = {},
     };
 
     common.returnOutput = function (params, output) {
-        if (params && params.res) {
+        if (params && params.res && !params.blockResponses) {
             params.res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin':'*'});
             if (params.qstring.callback) {
                 params.res.write(params.qstring.callback + '(' + JSON.stringify(output) + ')');

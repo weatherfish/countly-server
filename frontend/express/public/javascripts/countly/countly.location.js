@@ -62,11 +62,20 @@
             }
         }
 
-        draw(options.metric);
+        if (google.visualization) {
+            draw(options.metric);
+        } else {
+            google.load('visualization', '1', {'packages':['geochart'], callback:function(){draw(options.metric);}});
+        }
     };
 
     countlyLocation.refreshGeoChart = function (metric) {
-        reDraw(metric);
+        if (google.visualization) {
+            reDraw(metric);
+        } else {
+            google.load('visualization', '1', {'packages':['geochart'], callback:function(){draw(metric);}});
+        }
+
     };
 
     countlyLocation.getLocationData = function (options) {
@@ -124,9 +133,10 @@
     countlyLocation.getCountryName = function (cc) {
 
         var countryName = _countryMap[cc.toUpperCase()];
-
         if (countryName) {
             return countryName;
+        } else if(cc.toUpperCase() == "EU") {
+            return jQuery.i18n.map["common.eu"] || "European Union";
         } else {
             return "Unknown";
         }

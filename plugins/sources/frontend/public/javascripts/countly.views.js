@@ -12,14 +12,15 @@ window.SourcesView = countlyView.extend({
             "pie-titles":{
                 "left":jQuery.i18n.map["common.total-users"],
                 "right":jQuery.i18n.map["common.new-users"]
-            }
+            },
+            "chart-helper":"sources.chart"
         };
 
         if (!isRefresh) {
             var data = countlySources.getData();
             $(this.el).html(this.template(this.templateData));
             if(typeof addDrill != "undefined"){
-                addDrill("up.src");
+                $(".widget-header .left .title").after(addDrill("up.src"));
             }
             this.dtable = $('.d-table').dataTable($.extend({}, $.fn.dataTable.defaults, {
                 "aaData": data.chartData,

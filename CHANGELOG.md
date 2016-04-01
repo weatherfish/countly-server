@@ -1,3 +1,71 @@
+## Version 16.02.1
+
+  * Fixed Checking GCM credentials
+  
+  * Fixed Showing feedback link, if intercom is not enabled
+  
+  * Fixed DB settings for replica sets
+  
+  * Fixed problem with data on Sharded servers (documents coming in different order)
+  
+  * Fixed MongoDB configuration on Ubuntu Willy
+  
+  * Fixed GCM sent count for tokens replaced by GCM 
+  
+  * Use NodeJS 5.5 for compatibility with push functionality
+  
+  * Fixed inconsistencies with MongoDB 3 findAndModify
+  
+  * Fixed help localization for app version
+  
+  * Fixed sorting columns for attribution
+  
+  * Added remote installer script to install Countly 
+
+        wget -qO- https://raw.githubusercontent.com/Countly/countly-server/master/bin/installer.sh | bash
+  
+## Version 16.02
+
+  * Different App Types (which can have different views and dashboards)
+  
+  * Web Analytics, one of the major app types countly now supports
+  
+  * HTTP/2 transport for Apple Push Notifications service, single certificate for both: development & production evnvironments
+  
+  * Sources plugin showing sources of your Web visitors or Android app installations (replacing stores plugin)
+
+  * Support themeing, and switching between different themes
+  
+  * Views plugin to track time which user spent of specific application view/screen
+  
+  * Upgrading to MongoDB 3 and NodeJS 5
+  
+  * Internal job queue and scheduling
+  
+  * Support for duration property for events to measure timed events
+  
+  * Lots of new command line commands (managing plugins, changing configurations, more backup options, etc)
+  
+  * Allow disabling Google services (for users who live in regiones where Google is blocked)
+  
+  * Server side and email localization (https://github.com/Countly/countly-server/issues/214)
+  
+  * Support for Apple TV and Watch OS 2 
+  
+  * DB Viewer plugin provides decrypted collection names
+  
+  * More complete localization, making all strings translatable
+  
+  * User Profiles - allow segmenting users, and view user list from drill, crashes and attribution plugins (Enterprise Edition)
+  
+  * User Profiles -  store custom properties as arrays, for multiple values, as well as provide atomic on server operations, like increase, max, min, etc (Enterprise Edition)
+  
+  * More drillable properties and Drill property categorization (Enterprise Edition)
+  
+  * Allow tracking custom segments with Attribution Analytics (Enterprise Edition)
+  
+  * Added new supported features to Populator plugin for data generation
+
 ## Version 15.08
 
   * Introduction of crash analytics ([Issue #152](https://github.com/Countly/countly-server/issues/152))

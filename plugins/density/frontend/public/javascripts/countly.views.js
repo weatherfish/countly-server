@@ -12,13 +12,14 @@ window.DensityView = countlyView.extend({
             "pie-titles":{
                 "left":jQuery.i18n.map["common.total-users"],
                 "right":jQuery.i18n.map["common.new-users"]
-            }
+            },
+            "chart-helper":"density.chart"
         };
 
         if (!isRefresh) {
             $(this.el).html(this.template(this.templateData));
             if(typeof addDrill != "undefined"){
-                addDrill("up.dnst");
+                $(".widget-header .left .title").after(addDrill("up.dnst"));
             }
 
             this.dtable = $('.d-table').dataTable($.extend({}, $.fn.dataTable.defaults, {

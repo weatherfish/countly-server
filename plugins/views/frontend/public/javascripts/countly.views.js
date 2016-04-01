@@ -59,8 +59,10 @@ window.ViewsView = countlyView.extend({
             ];
             
             if(typeof addDrill != "undefined"){
-                addDrill("up.lv");
-                columns.push({ "mData": function(row, type){return '<a href="#/analytics/action-map/'+row.views+'" class="icon-button green btn-header btn-view-map" data-localize="views.action-map" style="margin:0px; padding:2px;">Action Map</a>';}, sType:"string", "sTitle": jQuery.i18n.map["views.action-map"]  });
+                $(".widget-header .left .title").after(addDrill("up.lv"));
+                if(countlyGlobal["apps"][countlyCommon.ACTIVE_APP_ID].type == "web"){
+                    columns.push({ "mData": function(row, type){return '<a href="#/analytics/views/action-map/'+row.views+'" class="icon-button green btn-header btn-view-map" data-localize="views.table.view" style="margin:0px; padding:2px;">View</a>';}, sType:"string", "sTitle": jQuery.i18n.map["views.action-map"], "sClass":"shrink center"  });
+                }
             }
 
             this.dtable = $('.d-table').dataTable($.extend({}, $.fn.dataTable.defaults, {
@@ -282,10 +284,10 @@ window.ActionMapView = countlyView.extend({
     loadIframe: function(){
         var self = this;
         var segments = countlyViews.getActionsData().domains;
-        var url = "http://"+segments[self.curSegment]+self.view;
+        var url = location.protocol+"//"+segments[self.curSegment]+self.view;
         countlyViews.testUrl(url, function(result){
             if(result)
-                $("#view-map iframe").attr("src", url);
+                $("#view-map iframe").attr("src", "/o/urlredir?url="+encodeURIComponent(url));
             else{
                 self.curSegment++;
                 if(segments[self.curSegment]){
@@ -318,7 +320,8 @@ window.ActionMapView = countlyView.extend({
             this.loadIframe();
             this.map = simpleheat("view-canvas-map");
             this.map.data(this.getData(data.data));
-            this.map.radius(50, 100);
+            var r = Math.max((48500-35*data.data.length)/900, 5);
+            this.map.radius(r, r*1.6);
             this.map.draw();
             
             $("#date-selector").after('<a class="icon-button light btn-header btn-back-view" data-localize="views.back"><i class="fa fa-chevron-left"></i> Back</a>');
@@ -369,9 +372,13 @@ window.ActionMapView = countlyView.extend({
             }
             self.renderCommon(true);
             var data = countlyViews.getActionsData();
-            self.map.clear();
-            self.map.data(self.getData(data.data));
-            self.map.draw();
+            if(self.map){
+                self.map.clear();
+                self.map.data(self.getData(data.data));
+                var r = Math.max((48500-35*data.data.length)/900, 5);
+                self.map.radius(r, r*1.6);
+                self.map.draw();
+            }
         });
     }
 });
@@ -388,7 +395,7 @@ app.route("/analytics/view-frequency", 'views', function () {
 	this.renderWhenReady(this.viewFrequencyView);
 });
 
-app.route("/analytics/action-map/*view", 'views', function (view) {
+app.route("/analytics/views/action-map/*view", 'views', function (view) {
     this.actionMapView.view = view;
 	this.renderWhenReady(this.actionMapView);
 });

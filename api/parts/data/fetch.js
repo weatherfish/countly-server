@@ -681,7 +681,12 @@ var fetch = {},
 
                         if (mergedDataObj[year]) {
                             for (var prop in dataObjects[i]['d']) {
-                                mergedDataObj[year][prop] = dataObjects[i]['d'][prop];
+                                if(mergedDataObj[year][prop]){
+                                    _.extend(mergedDataObj[year][prop], dataObjects[i]['d'][prop]) 
+                                }
+                                else{
+                                    mergedDataObj[year][prop] = dataObjects[i]['d'][prop];
+                                }
                             }
                         } else {
                             mergedDataObj[year] = dataObjects[i]['d'] || {};

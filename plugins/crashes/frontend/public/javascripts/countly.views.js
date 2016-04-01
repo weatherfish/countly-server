@@ -147,14 +147,14 @@ window.CrashesView = countlyView.extend({
                         $(nRow).addClass("renewedcrash");
 				},
                 "aoColumns": [
-					{ "mData": function(row, type){return (row.is_new) ? true : false;}, "bVisible": false} ,
+					{ "mData":function(row, type){return (row.is_new) ? true : false;}, "bVisible": false} ,
 					{ "mData": function(row, type){return (row.is_renewed) ? true : false;}, "bVisible": false} ,
 					{ "mData": function(row, type){return (row.is_hidden) ? true : false;}, "bVisible": false} ,
 					{ "mData": function(row, type){if(type == "display"){if(row.nonfatal) return jQuery.i18n.map["crashes.nonfatal"]; else return jQuery.i18n.map["crashes.fatal"];}else return (row.nonfatal) ? true : false;}, "sType":"string", "sTitle": jQuery.i18n.map["crashes.fatal"], "sWidth":"80px"} ,
 					{ "mData": function(row, type){if(type == "display"){if(row.session){return ((Math.round(row.session.total/row.session.count)*100)/100)+" "+jQuery.i18n.map["crashes.sessions"];} else {return jQuery.i18n.map["crashes.first-crash"];}}else{if(row.session)return row.session.total/row.session.count; else return 0;}}, "sType":"string", "sTitle": jQuery.i18n.map["crashes.frequency"], "sWidth":"80px" },
 					{ "mData": "reports", "sType":"numeric", "sTitle": jQuery.i18n.map["crashes.reports"], "sWidth":"80px" },
 					{ "mData": function(row, type){if(type == "display") return row.users+" ("+((row.users/crashData.users.total)*100).toFixed(2)+"%)"; else return row.users}, "sType":"string", "sTitle": jQuery.i18n.map["crashes.users"], "sWidth":"60px" },
-                    { "mData": "os", "sType":"string", "sTitle": jQuery.i18n.map["crashes.platform"], "sWidth":"70px" },
+                    { "mData": function(row, type){return (row.not_os_specific) ? jQuery.i18n.map["crashes.varies"] : row.os;}, "sType":"string", "sTitle": jQuery.i18n.map["crashes.platform"], "sWidth":"70px" },
                     { "mData": function(row, type){return "<div class='truncated'>"+row.name+"</div>";}, "sType":"string", "sTitle": jQuery.i18n.map["crashes.error"] },
                     { "mData": function(row, type){if(type == "display") return countlyCommon.formatTimeAgo(row.lastTs); else return row.lastTs;}, "sType":"string", "sTitle": jQuery.i18n.map["crashes.last_time"], "sWidth":"100px" },
                     { "mData": function(row, type){return row.latest_version.replace(/:/g, '.');}, "sType":"string", "sTitle": jQuery.i18n.map["crashes.latest_app"], "sWidth":"100px" },
@@ -275,6 +275,7 @@ window.CrashgroupView = countlyView.extend({
         this.loaded = true;
     },
     beforeRender: function() {
+        countlyCrashes.reset();
 		if(this.template)
 			return $.when(countlyCrashes.initialize(this.id)).then(function () {});
 		else{
@@ -311,8 +312,11 @@ window.CrashgroupView = countlyView.extend({
 		
 		if (!isRefresh) {
 			this.metrics = countlyCrashes.getMetrics();
-			this.curMetric = "app_version";
-			this.curTitle = jQuery.i18n.map["crashes.app_version"];
+            for(var i in this.metrics){
+                this.curMetric = i;
+                this.curTitle = this.metrics[i];
+                break;
+            }
 		}
         var ranges = ["ram", "disk", "bat", "run"];
         for(var i = 0; i < ranges.length; i++){
@@ -335,7 +339,7 @@ window.CrashgroupView = countlyView.extend({
                 "items":[
 					{
                         "title":jQuery.i18n.map["crashes.platform"],
-                        "total":crashData.os,
+                        "total":(crashData.not_os_specific) ? jQuery.i18n.map["crashes.varies"] : crashData.os,
                         "help":"crashes.help-platform"
                     },
                     {
@@ -441,10 +445,7 @@ window.CrashgroupView = countlyView.extend({
         if (!isRefresh) {
             $(this.el).html(this.template(this.templateData));
              if(typeof addDrill != "undefined"){
-                var str = '<div title="Drill down this data with Countly Drill" id="drill-down-for-view" data-drill-id="sg.crash" data-drill-val="'+this.id+'" data-drill-section="crashes" class="icon-button light" style="font-size: 14px; padding: 5px 5px 4px 5px; margin: 6px 0 0 13px; border-radius: 15px;">'+
-                    '<span class="fa fa-sort-amount-desc" style="color:#86BB64;"></span>'+
-                '</div>';
-                $("#content .widget:first-child .widget-header>.right").append(str);
+                $("#content .widget:first-child .widget-header>.right").append(addDrill("sg.crash", this.id, "[CLY]_crash"));
             }
             if(crashData.comments){
                 var count = 0;
@@ -891,7 +892,7 @@ $( document ).ready(function() {
         CountlyHelpers.loadJS("crashes/javascripts/marked.min.js");
     }
 	var menu = '<a href="#/crashes" class="item" id="crash-menu">'+
-        '<div class="logo fa fa-exclamation-triangle" style="background-image:none; font-size:24px; text-align:center; width:35px; margin-left:14px; line-height:42px;"></div>'+
+        '<div class="logo ion-alert-circled"></div>'+
         '<div class="text" data-localize="crashes.title"></div>'+
     '</a>';
 	if($('.sidebar-menu #management-menu').length)

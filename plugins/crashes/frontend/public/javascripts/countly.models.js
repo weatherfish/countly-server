@@ -8,6 +8,7 @@
         _list = {},
         _activeAppKey = 0,
         _initialized = false,
+        _period = {},
 		_periodObj = {},
 		_metrics = {},
         _lastId = null,
@@ -40,7 +41,11 @@
     countlyCrashes.initialize = function (id) {
 		_activeAppKey = countlyCommon.ACTIVE_APP_KEY;
 		_initialized = true;
-		_metrics = {"app_version":jQuery.i18n.map["crashes.app_version"], 
+		_metrics = {
+            "os_name":jQuery.i18n.map["crashes.os"], 
+            "browser":jQuery.i18n.map["crashes.browser"], 
+            "view":jQuery.i18n.map["crashes.view"], 
+            "app_version":jQuery.i18n.map["crashes.app_version"], 
             "os_version":jQuery.i18n.map["crashes.os_version"],
 			"manufacture":jQuery.i18n.map["crashes.manufacture"], 
 			"device":jQuery.i18n.map["crashes.device"], 
@@ -48,8 +53,10 @@
 			"orientation":jQuery.i18n.map["crashes.orientation"],
 			"cpu":jQuery.i18n.map["crashes.cpu"],
 			"opengl":jQuery.i18n.map["crashes.opengl"]};
+            
         
-		
+        
+		_period = countlyCommon.getPeriodForAjax();
 		if(id){
             _lastId = id;
 			return $.ajax({
@@ -59,6 +66,7 @@
 					"api_key":countlyGlobal.member.api_key,
 					"app_id":countlyCommon.ACTIVE_APP_ID,
 					"method":"crashes",
+                    "period":_period,
 					"group":id
 				},
 				dataType:"jsonp",
@@ -78,7 +86,11 @@
                             _usable_metrics[i] = i.charAt(0).toUpperCase() + i.slice(1);
                         }
                     }
-				}
+				}, 
+                error:function(){
+                    CountlyHelpers.alert(jQuery.i18n.map["crashes.not-found"], "red");
+                    app.navigate("/crashes", true);
+                }
 			});
 		}
 		else
@@ -88,6 +100,7 @@
 				data:{
 					"api_key":countlyGlobal.member.api_key,
 					"app_id":countlyCommon.ACTIVE_APP_ID,
+                    "period":_period,
 					"method":"crashes"
 				},
 				dataType:"jsonp",
@@ -280,6 +293,7 @@
     };
 
     countlyCrashes.refresh = function (id) {		
+        _period = countlyCommon.getPeriodForAjax();
 		if(id){
 			return $.ajax({
 				type:"GET",
@@ -288,6 +302,7 @@
 					"api_key":countlyGlobal.member.api_key,
 					"app_id":countlyCommon.ACTIVE_APP_ID,
 					"method":"crashes",
+                    "period":_period,
 					"group":id
 				},
 				dataType:"jsonp",
@@ -317,6 +332,7 @@
 				data:{
 					"api_key":countlyGlobal.member.api_key,
 					"app_id":countlyCommon.ACTIVE_APP_ID,
+                    "period":_period,
 					"method":"crashes"
 				},
 				dataType:"jsonp",
@@ -344,6 +360,8 @@
 		_groupData = {};
 		_reportData = {};
         _crashTimeline = {};
+        _metrics = {};
+        _usable_metrics = {};
     };
 	
 	countlyCrashes.processMetric = function (data, metric, label) {
@@ -396,7 +414,11 @@
     };
     
     countlyCrashes.setGroupData = function (data) {
-        _metrics = {"os_version":jQuery.i18n.map["crashes.os_version"], 
+        _metrics = {
+            "os_name":jQuery.i18n.map["crashes.os"], 
+            "browser":jQuery.i18n.map["crashes.browser"], 
+            "view":jQuery.i18n.map["crashes.view"], 
+            "os_version":jQuery.i18n.map["crashes.os_version"], 
 			"app_version":jQuery.i18n.map["crashes.app_version"], 
 			"manufacture":jQuery.i18n.map["crashes.manufacture"], 
 			"device":jQuery.i18n.map["crashes.device"], 

@@ -29,11 +29,14 @@ fi
 
 #add node.js repo
 #echo | apt-add-repository ppa:chris-lea/node.js
-wget -qO- https://deb.nodesource.com/setup | bash -
+# wget -qO- https://deb.nodesource.com/setup_5.x | bash -
 
 #add mongodb repo
-echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" > /etc/apt/sources.list.d/mongodb-10gen-countly.list
-apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
+#echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" > /etc/apt/sources.list.d/mongodb-10gen-countly.list
+#apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
+
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.0.list
 
 #update once more after adding new repos
 apt-get update
@@ -42,7 +45,8 @@ apt-get update
 apt-get -y install nginx || (echo "Failed to install nginx." ; exit)
 
 #install node.js
-apt-get -y --force-yes install nodejs || (echo "Failed to install nodejs." ; exit)
+bash $DIR/scripts/install.nodejs.deb.sh || (echo "Failed to install nodejs." ; exit)
+# apt-get -y --force-yes install nodejs || (echo "Failed to install nodejs." ; exit)
 
 #install mongodb
 apt-get -y --force-yes install mongodb-org || (echo "Failed to install mongodb." ; exit)
@@ -93,6 +97,9 @@ fi
 
 #install plugins
 bash $DIR/scripts/countly.install.plugins.sh
+
+#get web sdk
+countly update sdk-web
 
 #compile scripts for production
 cd $DIR/../frontend/express/public/javascripts

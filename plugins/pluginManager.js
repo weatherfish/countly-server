@@ -122,18 +122,18 @@ var pluginManager = function pluginManager(){
         });
     };
     
-    this.extendModule = function(name, object){
-        //global extend
-        try{
-            require("../extend/"+name)(object);
-        } catch (ex) {}
-        
+    this.extendModule = function(name, object){     
         //plugin specific extend
         for(var i = 0, l = plugins.length; i < l; i++){
             try{
                 require("./"+plugins[i]+"/extend/"+name)(object);
             } catch (ex) {}
         }
+        
+        //global extend
+        try{
+            require("../extend/"+name)(object);
+        } catch (ex) {}
     }
     
     this.register = function(event, callback){
@@ -172,8 +172,11 @@ var pluginManager = function pluginManager(){
                     timeout = setTimeout(pluginCallback, 1000);
                 }
                 async.map(events[event], runEvent, function(){
-                    callback(used);
+                    callback();
                 });
+            }
+            else{
+                callback();
             }
         }
         else{
@@ -439,7 +442,6 @@ var pluginManager = function pluginManager(){
             replSet:{poolSize: config.mongodb.max_pool_size, reconnectInterval: 100, socketOptions: { autoReconnect:true, noDelay:true, keepAlive: 1, connectTimeoutMS: 0, socketTimeoutMS: 0 }},
             mongos:{poolSize: config.mongodb.max_pool_size, reconnectInterval: 100, socketOptions: { autoReconnect:true, noDelay:true, keepAlive: 1, connectTimeoutMS: 0, socketTimeoutMS: 0 }}
         };
-        var dbOptions = {};
         if (typeof config.mongodb === 'string') {
             dbName = db ? config.mongodb.replace(new RegExp('countly$'), db) : config.mongodb;
         } else{

@@ -31,13 +31,27 @@ var plugin = {},
         var params = ob.params;
         if(params.qstring.url){
             request(params.qstring.url, function (error, response, body) {
-                if (!error && response.statusCode == 200) {
+                if (!error && response.statusCode >= 200 && response.statusCode < 400) {
                     common.returnOutput(params,{result:true});
                 }
                 else{
                     common.returnOutput(params,{result:false});
                 }
             });
+        }
+        else{
+            common.returnOutput(params,{result:false});
+        }
+        return true;
+    });
+    
+    plugins.register("/o/urlredir", function(ob){
+        var params = ob.params;
+        if(params.qstring.url){
+            params.res.writeHead(302, {
+                'Location': params.qstring.url,
+            });
+            params.res.end();
         }
         else{
             common.returnOutput(params,{result:false});
@@ -162,7 +176,7 @@ var plugin = {},
         var dbAppUser = ob.dbAppUser;
         if(dbAppUser && dbAppUser.vc){
             common.db.collection('app_users' + params.app_id).findAndModify({'_id': params.app_user_id },{}, {$set:{vc:0}},{upsert:true, new:false}, function (err, user){
-                user = user.value;
+                user = user && user.ok ? user.value : null;
                 if(user && user.vc){
                     var ranges = [
                         [0,2],
@@ -237,11 +251,11 @@ var plugin = {},
                 var lastView = {};
                 lastView[escapedMetricVal] = params.time.timestamp;           
                 common.db.collection('app_views' + params.app_id).findAndModify({'_id': params.app_user_id },{}, {$max:lastView},{upsert:true, new:false}, function (err, view){
-                    recordMetrics(params, currEvent, user, view);
+                    recordMetrics(params, currEvent, user && user.ok ? user.value : null, view && view.ok ? view.value : null);
                 });
             }
             else{
-                recordMetrics(params, currEvent, user);
+                recordMetrics(params, currEvent, user && user.ok ? user.value : null);
             }
         });
 	}
@@ -315,8 +329,13 @@ var plugin = {},
         common.fillTimeObjectZero(params, tmpTimeObjZero, zeroObjUpdate);
         common.fillTimeObjectMonth(params, tmpTimeObjMonth, monthObjUpdate, 1, true);
         
-        if(currEvent.dur){
-            common.fillTimeObjectMonth(params, tmpTimeObjMonth, escapedMetricVal + '.' + common.dbMap['duration'], currEvent.dur, true);
+        if(currEvent.dur || currEvent.segmentation.dur){
+            var dur = 0;
+            if(currEvent.dur)
+                dur = parseInt(currEvent.dur);
+            else if(currEvent.segmentation.dur)
+                dur = parseInt(currEvent.segmentation.dur);
+            common.fillTimeObjectMonth(params, tmpTimeObjMonth, escapedMetricVal + '.' + common.dbMap['duration'], dur, true);
         }
         
         if(typeof currEvent.segmentation.segment != "undefined"){
@@ -348,6 +367,51 @@ var plugin = {},
         }
         
     }
+    
+    plugins.register("/i/apps/create", function(ob){
+		var params = ob.params;
+		var appId = ob.appId;
+        common.db.collection("app_viewdata" + appId).insert({_id:"meta"},function(){});
+	});
+	
+	plugins.register("/i/apps/delete", function(ob){
+		var appId = ob.appId;
+		common.db.collection('app_viewdata' + appId).drop(function() {});
+		common.db.collection('app_views' + appId).drop(function() {});
+        if(common.drillDb){
+            common.drillDb.collection("drill_events" + crypto.createHash('sha1').update("[CLY]_action" + appId).digest('hex')).drop(function() {});
+            common.drillDb.collection("drill_events" + crypto.createHash('sha1').update("[CLY]_view" + appId).digest('hex')).drop(function() {});
+        }
+	});
+    
+    plugins.register("/i/apps/clear", function(ob){
+		var appId = ob.appId;
+        var ids = ob.ids;
+        common.db.collection('app_viewdata' + appId).findOne({_id:"meta"}, function(err, doc){
+            if(!err && doc && doc.segments){
+                doc.segments.push("no-segment");
+                for(var i = 0; i < doc.segments.length; i++){
+                    common.db.collection('app_viewdata' + appId).remove({$and:[{'_id': {$regex: doc.segments[i] + ".*"}}, {'_id': {$nin:ids}}]},function(){}); 
+                }
+            }
+        });
+        if(common.drillDb){
+            common.drillDb.collection("drill_events" + crypto.createHash('sha1').update("[CLY]_action" + appId).digest('hex')).remove({ts:{$lt:ob.moment.valueOf()}}, function() {});
+            common.drillDb.collection("drill_events" + crypto.createHash('sha1').update("[CLY]_view" + appId).digest('hex')).remove({ts:{$lt:ob.moment.valueOf()}}, function() {});
+        }
+	});
+	
+	plugins.register("/i/apps/reset", function(ob){
+		var appId = ob.appId;
+        common.db.collection('app_viewdata' + appId).drop(function() {
+            common.db.collection("app_viewdata" + appId).insert({_id:"meta"},function(){});
+        });
+		common.db.collection('app_views' + appId).drop(function() {});
+        if(common.drillDb){
+            common.drillDb.collection("drill_events" + crypto.createHash('sha1').update("[CLY]_action" + appId).digest('hex')).drop(function() {});
+            common.drillDb.collection("drill_events" + crypto.createHash('sha1').update("[CLY]_view" + appId).digest('hex')).drop(function() {});
+        }
+	});
 	
 }(plugin));
 

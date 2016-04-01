@@ -1,6 +1,6 @@
 {
   "name": "countly-server",
-  "version": "15.8.0",
+  "version": "16.2.1",
   "description": "innovative, real-time, open source mobile analytics application",
   "keywords": [
     "analytics",
@@ -63,6 +63,13 @@
     "request": "2.51.0",
     "string": "3.0.0",
     "time": "*",
-    "underscore": "1.7.0"
+    "underscore": "1.7.0",
+    "formidable": "1.0.17",
+    "kerberos": "~0.0",
+    "properties-parser":"0.2.3"
+  },
+  "jshintConfig": {
+    "esversion": 6,
+    "node": true
   }
 }

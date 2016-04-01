@@ -11,7 +11,7 @@ plugins.setConfigs("crashes", {
 
 (function (plugin) {
     var ranges = ["ram", "bat", "disk", "run", "session"];
-	var segments = ["os_version", "manufacture", "device", "resolution", "app_version", "cpu", "opengl", "orientation"];
+	var segments = ["os_version", "os_name", "manufacture", "device", "resolution", "app_version", "cpu", "opengl", "orientation", "view", "browser"];
 	var bools = {"root":true, "online":true, "muted":true, "signal":true, "background":true};
     var ios_cpus = {
         "iPhone1,1":"RISC ARM 11",
@@ -148,6 +148,9 @@ plugins.setConfigs("crashes", {
                 var rPlus = /\s\+\s([0-9]*)$/gim;
                 error = error.replace(rHex, "0x%%%%%% ").replace(rPlus, " + ");
             }
+            //there can be multiple stacks separated by blank line
+            //use the first one
+            error = error.split("\n\n")[0];
             //remove same lines for recursive overflows (on different devices may have different amount of internal calls)
             //removing duplicates will result in same stack on different devices
             var lines = error.split("\n");
@@ -169,6 +172,8 @@ plugins.setConfigs("crashes", {
                 "app_version",
                 "cpu", //type of cpu used on device (for ios will be based on device)
                 "opengl", //version of open gl supported
+                "view", //screen, view or page where error happened
+                "browser", //browser in which error happened, if applicable
                 
                 //state of device
                 "ram_current", //in megabytes
@@ -217,12 +222,20 @@ plugins.setConfigs("crashes", {
                                     report[props[i]][safeKey] = params.qstring.crash["_"+props[i]][key];
                             }
                         }
-						else
+						else{
 							report[props[i]] = params.qstring.crash["_"+props[i]];
+                            if(props[i] == "os" && params.qstring.crash._not_os_specific){
+                                report[props[i]+"_name"] = params.qstring.crash["_"+props[i]]+"";
+                            }
+                        }
 				}
                 report.cd = new Date();
                 report.nonfatal = (report.nonfatal && report.nonfatal !== "false") ? true : false;
-                var hash = common.crypto.createHash('sha1').update(report.os + error + params.app_id + report.nonfatal + "").digest('hex');
+                report.not_os_specific = (params.qstring.crash._not_os_specific) ? true : false;
+                var seed = error + params.app_id + report.nonfatal + "";
+                if(!params.qstring.crash._not_os_specific)
+                    seed = report.os + seed;
+                var hash = common.crypto.createHash('sha1').update(seed).digest('hex');
 				function checkUser(err, dbAppUser, tries){
                     if(!dbAppUser || !dbAppUser.uid){
                         setTimeout(function(){
@@ -242,7 +255,7 @@ plugins.setConfigs("crashes", {
                         if(dbAppUser && dbAppUser.sc)
                             set.sessions = dbAppUser.sc;
                         common.db.collection('app_crashusers' + params.app_id).findAndModify({group:hash, 'uid':report.uid},{}, {$set:set, $inc:{reports:1}},{upsert:true, new:false}, function (err, user){
-                            user = user.value;
+                            user = user && user.ok ? user.value : null;
                             if(user && user.sessions && dbAppUser && dbAppUser.sc && dbAppUser.sc > user.sessions)
                                 report.session = dbAppUser.sc - user.sessions;
                             common.db.collection('app_crashes' + params.app_id).insert(report, function (err, res){});
@@ -255,6 +268,9 @@ plugins.setConfigs("crashes", {
                                     { name:"manufacture", type: "l" },
                                     { name:"cpu", type: "l" },
                                     { name:"opengl", type: "l" },
+                                    { name:"view", type: "l" },
+                                    { name:"browser", type: "l" },
+                                    { name:"os", type: "l" },
                                     { name:"orientation", type: "l" },
                                     { name:"nonfatal", type: "l" },
                                     { name:"root", type: "l" },
@@ -311,6 +327,8 @@ plugins.setConfigs("crashes", {
                                 groupSet.name = report.name || report.error.split('\n')[0];
                                 groupSet.error = report.error;
                                 groupSet.nonfatal = (report.nonfatal) ? true : false;
+                                if(report.not_os_specific)
+                                    groupSet.not_os_specific = true;
                                 
                                 groupInc.reports = 1;
                                 
@@ -396,7 +414,7 @@ plugins.setConfigs("crashes", {
                                     update["$max"] = groupMax;
                                 
                                 common.db.collection('app_crashgroups' + params.app_id).findAndModify({'_id': hash },{},update,{upsert:true, new:true}, function(err,crashGroup){
-                                    crashGroup = crashGroup.value;
+                                    crashGroup = crashGroup && crashGroup.ok ? crashGroup.value : null;
                                     var isNew = (crashGroup && crashGroup.reports == 1) ? true : false;
                                     
                                     var metrics = ["cr"];
@@ -462,7 +480,7 @@ plugins.setConfigs("crashes", {
                                     inc.fatal = 1;
                         
                                 common.db.collection('app_crashusers' + params.app_id).findAndModify({group:0, 'uid':report.uid},{}, {$set:{group:0, 'uid':report.uid}, $inc:inc},{upsert:true, new:true}, function (err, userAll){
-                                    userAll = userAll.value;
+                                    userAll = userAll && userAll.ok ? userAll.value : null;
                                     processCrash(userAll);
                                 });
                             }
@@ -474,7 +492,7 @@ plugins.setConfigs("crashes", {
                     }
 				}
                 common.db.collection('app_users' + params.app_id).findAndModify({'_id': params.app_user_id },{},{ $addToSet: { crashes: hash } },{upsert:true, new:false}, function(err, dbAppUser){
-                    dbAppUser = dbAppUser.value;
+                    dbAppUser = dbAppUser && dbAppUser.ok ? dbAppUser.value : null;
                     checkUser(err, dbAppUser, 0);
                 });
 			}
@@ -578,7 +596,7 @@ plugins.setConfigs("crashes", {
 								}
                             }
                             
-                            common.db.collection('app_crashgroups' + params.app_id).find({_id:{$ne:"meta"}},{uid:1, is_new:1, is_renewed:1, is_hidden:1, os:1, name:1, error:1, users:1, lastTs:1, reports:1, latest_version:1, is_resolved:1, resolved_version:1, nonfatal:1, session:1}).toArray(function(err, res){
+                            common.db.collection('app_crashgroups' + params.app_id).find({_id:{$ne:"meta"}},{uid:1, is_new:1, is_renewed:1, is_hidden:1, os:1, not_os_specific:1, name:1, error:1, users:1, lastTs:1, reports:1, latest_version:1, is_resolved:1, resolved_version:1, nonfatal:1, session:1}).toArray(function(err, res){
                                 result.groups = res || [];
                                 fetch.getTimeObj("crashdata", params, function(data){
                                     result.data = data;

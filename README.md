@@ -1,15 +1,17 @@
-#Countly [![Build Status](https://api.travis-ci.org/Countly/countly-server.png?branch=master)](https://travis-ci.org/Countly/countly-server) 
+#Countly [![Build Status](https://api.travis-ci.org/Countly/countly-server.png?branch=master)](https://travis-ci.org/Countly/countly-server) [![Install Countly on DigitalOcean](http://do.count.ly/button.svg?v2)](http://do.count.ly)
 
-**HEY! We're hiring:** Countly is looking for full stack node.js developers to work on its core platform. [Click this link for job description](https://count.ly/full-stack-node-js-developer/)
+**We're hiring:** Countly is looking for full stack node.js developers to work on its core platform. [Click this link for job description](https://count.ly/full-stack-node-js-developer/)
+
+**Are you a plugin developer?** [Contact us](http://count.ly/contact-us) if you like to work / working on a specific [plugin](http://count.ly/plugins) and we can discuss details on how we can work together in a lively environment!
 
 ##What's Countly?
 [Countly](http://count.ly) is an innovative, real-time, open source mobile & [web analytics](http://count.ly/web-analytics), [push notifications](http://count.ly/push-notifications) and [crash reporting](http://count.ly/crash-reports) platform powering nearly 3000 mobile applications. It collects data from mobile phones, tablets, Apple Watch and other internet-connected devices, and visualizes this information to analyze mobile application usage and end-user behavior. 
 
-With the help of [Javascript API](http://github.com/countly/countly-sdk-web), Countly is a web analytics platform with features on par with mobile SDKs. For more information about web analytics capabilities, [see this link](http://count.ly/web-analytics).
+With the help of [Javascript SDK](http://github.com/countly/countly-sdk-web), Countly is a web analytics platform with features on par with mobile SDKs. For more information about web analytics capabilities, [see this link](http://count.ly/web-analytics).
 
 There are two parts of Countly: the server that collects and analyzes data, and an SDK (mobile, web or desktop) that sends this data. This repository includes Countly Community Edition (server side). For more information other versions (e.g Enterprise Edition), see [comparison of different Countly editions](https://count.ly/compare)
 
-![Countly dashboard screenshot](http://a.fsdn.com/con/app/proj/countly/screenshots/dashboard_without_realtime.png)
+![Countly dashboard screenshot](https://count.ly/wp-content/uploads/2016/02/countly_dashboard_community_16.02.png)
 
 ##Supported devices
 
@@ -17,15 +19,23 @@ There are two parts of Countly: the server that collects and analyzes data, and 
 
 ##Installing & upgrading Countly server
 
-All public Community Edition versions are [available from Github](https://github.com/Countly/countly-server/releases). We provide a beautiful installation sript (`bin/countly.install.sh`) with countly-server package that installs and configures everything required to run Countly Server.
+There are several ways to install Countly: 
+
+1. The following command will download and install Countly on your **Ubuntu** or **CentOS** server. 
+
+    wget -qO- http://c.ly/install | bash
+
+2. If you have a Digital Ocean account, [click here and install on Digital Ocean](http://do.count.ly) with a single click.
+
+3. For bash lovers, we provide a beautiful installation sript (`bin/countly.install.sh`) in countly-server package which installs everything required to run Countly Server. For this, you need a stable release of this repository [available here](https://github.com/Countly/countly-server/releases). 
+
+4. Countly also has Docker support - [see our official Docker repository](https://registry.hub.docker.com/u/countly/countly-server/) and [installation instructions for Docker](http://resources.count.ly/docs/installing-countly-server)
 
 If you want to upgrade Countly from a previous version, please take a look at [upgrading documentation](resources.count.ly/v1.0/docs/upgrading-countly-server).
 
-Countly also has Docker support - [see our official Docker repository](https://registry.hub.docker.com/u/countly/countly-server/) and [installation instructions for Docker](http://resources.count.ly/docs/installing-countly-server)
-
 ##Dependencies
 
-We develop and test Countly on Ubuntu with MongoDB, Node.js and Nginx. Installation script only needs a clean, decent Ubuntu Linux without any services listening to port 80 and takes care of every library and software (e.g MongoDB, Nginx, Node.js, Expressjs etc) required to be installed on Ubuntu Linux. 
+We develop and test Countly on Ubuntu with MongoDB, Node.js and Nginx. Installation script only needs a clean, decent Ubuntu Linux without any services listening to port 80 and takes care of every library and software required to be installed on Ubuntu Linux. 
 
 ##API & Frontend
 
@@ -57,5 +67,6 @@ And, if you liked Countly, [why not use one of our badges](https://count.ly/bran
 * [Countly web page](http://count.ly)
 * [Countly support](http://support.count.ly)
 * [Documentation & API reference guide](http://resources.count.ly)
-* [Countly Enterprise & Cloud Edition](https://count.ly/compare)
+* [Comparison of Countly editions](https://count.ly/compare)
+* [White labeling & rebranding options](https://count.ly/whitelabel-analytics/)
 * [Extended features of Countly Enterprise Edition](https://count.ly/enterprise-edition-features), including crash reports, referral analytics, user profiles, geolocations with push, detailed segmentation, funnels, real-time dashboard and more.

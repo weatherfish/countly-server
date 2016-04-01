@@ -44,6 +44,17 @@ countlyDeviceList = {
 	"iPad4,7":"iPad Mini 3G (WiFi)",
 	"iPad4,8":"iPad Mini 3G (Global)",
 	"iPad4,9":"iPad Mini 3G (Global)",
-	"i386":"Simulator",
-	"x86_64":"Simulator"
+	"iPad5,1":"iPad mini 4",
+	"iPad5,2":"iPad mini 4",
+    //apple watch
+    "Watch1,1":"Apple Watch",
+    "Watch1,2":"Apple Watch 42mm",
+    //apple tv
+    "AppleTV2,1":"Apple TV 2G",
+    "AppleTV3,1":"Apple TV 3G",
+    "AppleTV3,2":"Apple TV 3G",
+    "AppleTV5,3":"Apple TV 4G",
+    //simulators
+		"i386":"Simulator",
+		"x86_64":"Simulator"
 }
