@@ -28,6 +28,7 @@
     "grunt-contrib-jshint": "*",
     "grunt-contrib-uglify": "^0.8.0",
     "grunt-mocha-test": "*",
+    "later": "^1.2.0",
     "less": "^2.6.1",
     "load-grunt-tasks": "^3.4.1",
     "should": "*",
@@ -64,9 +65,8 @@
     "string": "3.0.0",
     "time": "*",
     "underscore": "1.7.0",
-    "formidable": "1.0.17",
     "kerberos": "~0.0",
-    "properties-parser":"0.2.3"
+    "properties-parser": "0.2.3"
   },
   "jshintConfig": {
     "esversion": 6,
