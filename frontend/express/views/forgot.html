@@ -11,6 +11,11 @@
 <head>
 	<link href='stylesheets/pre-login/main.css' rel='stylesheet' type='text/css'>
 	<link rel="icon" type="image/png" href="images/favicon.png">
+    <% if (themeFiles && themeFiles.css) { %>
+        <% for(var i=0, l=themeFiles.css.length; i<l; i++) {%>
+    <link href='<%= themeFiles.css[i]%>' rel='stylesheet' type='text/css'>
+        <% } %>
+    <% } %>
 	<title><%- countlyTitle %></title>
 	<script>window.countlyGlobal = window.countlyGlobal || {}; countlyGlobal["cdn"] = "<%- cdn %>";</script>
 </head>
@@ -50,14 +55,15 @@
 		<div id="forgot-left">
 			<div id="forgot-logo"></div>
 		</div>
-		<div style="font-size: 18px; color: #eee; margin-bottom: 39px; text-align: center; text-shadow: 0 -1px #000;" data-localize="forgot.explanation"></div>
+		<div style="height: 45px; font-size: 14px; color: #A7A7A7; text-align: center; width: 400px; margin: 0 auto 30px; line-height: 21px;" data-localize="forgot.explanation"></div>
 		<div id="create-account">
 			<form method="POST">
 				<div>
-					<input style="width:300px;" autocapitalize="off" type="text" name="email" placeholder="Email" data-localize="placeholder.email"/>
+					<input style="width:300px; margin-left:5px;" autocapitalize="off" type="text" name="email" placeholder="Email" data-localize="placeholder.email"/>
 				</div>
 				<div>
 					<input type="hidden" value="<%= csrf %>" name="_csrf" />
+                    <input type="hidden" value="en" name="lang" id="form-lang" />
 					<input id="login-button" value="Send" type="submit" data-localize="forgot.button"/>
 				</div>
 			</form>
@@ -85,5 +91,10 @@
 	<% if (typeof javascript != 'undefined') { %>
 	<script><%- javascript %></script>
 	<% } %>
+    <% if (themeFiles && themeFiles.js) { %>
+        <% for(var i=0, l=themeFiles.js.length; i<l; i++) {%>
+    <script language="javascript" type="text/javascript" src="<%=themeFiles.js[i]%>"></script>
+        <% } %>
+    <% } %>
 </body>
 </html>
