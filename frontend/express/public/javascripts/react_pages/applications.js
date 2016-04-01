@@ -220,8 +220,6 @@ var ApplicationsPage = React.createClass({
 
     getInitialState: function() {
 
-        var app_id = countlyCommon.ACTIVE_APP_ID;
-
         this.app_categories = countlyCommon.getAppCategories();
         var timezones = countlyCommon.getTimeZones();
 
@@ -254,14 +252,27 @@ var ApplicationsPage = React.createClass({
             this.app_categories_options[key] = value;
         }
 
-        var current_app = countlyGlobal['apps'][app_id];
+        console.log("init app id:", countlyCommon.ACTIVE_APP_ID);
+
+        if (countlyCommon.ACTIVE_APP_ID)
+        {
+            var app_id = countlyCommon.ACTIVE_APP_ID;
+            var current_app = countlyGlobal['apps'][app_id];
+            var new_app_open = false;
+        }
+        else
+        {
+            var app_id = false;
+            var current_app = false;
+            var new_app_open = true;
+        }
 
         return({
             current_app : current_app,
             current_app_id : app_id,
             app_list_is_open : false,
             actions_list_is_open : false,
-            new_app_open : true
+            new_app_open : new_app_open
         });
 
         /*
@@ -633,90 +644,116 @@ var ApplicationsPage = React.createClass({
                     upload_icon={this.upload_icon}
                 />
 
-                <div className="wrapper">
+                {(() => {
 
-                    <SimpleSelectBlock
-                        selectors={app_selectors}
-                        active_selector_key={self.state.current_app_id}
-                        onChange={self.selectAppClick}
-                        className="application_selector"
-                    />
+                    if (this.state.current_app)
+                    {
+                        return (
 
-                    <div className="action_selector">
-                        <div className="open_button" onClick={this.actionsListClick}>
-                            <div className="sign">Action</div>
-                            <div className="arrow"></div>
-                        </div>
-                        <div className="actions_list" style={actions_list_style}>
-                            <div onClick={this.deleteApp}>Delete App</div>
-                            <div onClick={this.clearData}>Clear Data</div>
-                        </div>
-                    </div>
+                          <div className="wrapper">
 
-                    <div className="application_block">
+                              <SimpleSelectBlock
+                                  selectors={app_selectors}
+                                  active_selector_key={self.state.current_app_id}
+                                  onChange={self.selectAppClick}
+                                  className="application_selector"
+                              />
 
-                        <span className="sign">APPLICATION DATA</span>
+                              <div className="action_selector">
+                                  <div className="open_button" onClick={this.actionsListClick}>
+                                      <div className="sign">Action</div>
+                                      <div className="arrow"></div>
+                                  </div>
+                                  <div className="actions_list" style={actions_list_style}>
+                                      <div onClick={this.deleteApp}>Delete App</div>
+                                      <div onClick={this.clearData}>Clear Data</div>
+                                  </div>
+                              </div>
 
-                        <div className="info_block">
-                            <div className="table">
-                                <span className="row">
-                                    <span className="key">App ID</span>
-                                    <span className="value">{this.state.current_app._id}</span>
-                                </span>
+                              <div className="application_block">
 
-                                <EditableField
-                                    value_key={"App Name"}
-                                    value={this.state.current_app.name}
-                                    on_save={this.saveApp}
-                                    save_key="name"
-                                />
+                                  <span className="sign">APPLICATION DATA</span>
 
-                                <span className="row">
-                                    <span className="key">App Key</span>
-                                    <span className="value">{this.state.current_app.key}</span>
-                                </span>
+                                  <div className="info_block">
+                                      <div className="table">
+                                          <span className="row">
+                                              <span className="key">App ID</span>
+                                              <span className="value">{this.state.current_app._id}</span>
+                                          </span>
 
-                                <EditableField
-                                    value_key={"Category"}
-                                    value={this.state.current_app.category}
-                                    options_values={this.app_categories_options}
-                                    on_save={this.saveApp}
-                                    save_key="category"
-                                />
+                                          <EditableField
+                                              value_key={"App Name"}
+                                              value={this.state.current_app.name}
+                                              on_save={this.saveApp}
+                                              save_key="name"
+                                          />
 
-                                <EditableField
-                                    value_key={"Time Zone"}
-                                    value={this.state.current_app.timezone}
-                                    options_values={this.timezones_options}
-                                    on_save={this.saveApp}
-                                    save_key="timezone"
-                                />
+                                          <span className="row">
+                                              <span className="key">App Key</span>
+                                              <span className="value">{this.state.current_app.key}</span>
+                                          </span>
 
-                                <span className="row">
-                                    <span className="key">IAP Event Key</span>
-                                    <span className="value">---</span>
-                                </span>
+                                          <EditableField
+                                              value_key={"Category"}
+                                              value={this.state.current_app.category}
+                                              options_values={this.app_categories_options}
+                                              on_save={this.saveApp}
+                                              save_key="category"
+                                          />
+
+                                          <EditableField
+                                              value_key={"Time Zone"}
+                                              value={this.state.current_app.timezone}
+                                              options_values={this.timezones_options}
+                                              on_save={this.saveApp}
+                                              save_key="timezone"
+                                          />
+
+                                          <span className="row">
+                                              <span className="key">IAP Event Key</span>
+                                              <span className="value">---</span>
+                                          </span>
+                                      </div>
+
+                                      <div className="icon_block">
+
+                                          <form ref="uploadForm" enctype="multipart/form-data" id="add-app-image-form">
+                                              <input ref="app_image" type="file" id="app_image" name="app_image" className="inputfile" onChange={this.handleIconChange}/>
+                                              <label for="app_image"><span className="sign">Icon</span>
+                                              <div className="icon" style={icon_style}></div></label>
+                                          </form>
+                                      </div>
+
+                                  </div>
+
+                                  <div className="sdk_block">
+                                      <span className="sign">Run Countly SDKs</span>
+                                      <span className="description">Countly has several SDKs to choose from. Some of them are supported by Countly, and others are contributed by Countly community.</span>
+                                      <a href="https://github.com/countly" className="button">Explore at Github</a>
+                                  </div>
+
+                              </div>
+
+                          </div>
+
+                        );
+                    }
+                    else
+                    {
+                        return (
+                            <div className="wrapper">
+                                <div className="sdk_block">
+                                    <span className="sign">Run Countly SDKs</span>
+                                    <span className="description">Countly has several SDKs to choose from. Some of them are supported by Countly, and others are contributed by Countly community.</span>
+                                    <a href="https://github.com/countly" className="button">Explore at Github</a>
+                                </div>
                             </div>
+                        );
+                    }
 
-                            <div className="icon_block">
+                })()}
 
-                                <form ref="uploadForm" enctype="multipart/form-data" id="add-app-image-form">
-                                    <input ref="app_image" type="file" id="app_image" name="app_image" className="inputfile" onChange={this.handleIconChange}/>
-                                    <label for="app_image"><span className="sign">Icon</span>
-                                    <div className="icon" style={icon_style}></div></label>
-                                </form>
-                            </div>
 
-                        </div>
-
-                        <div className="sdk_block">
-                            <span className="sign">Run Countly SDKs</span>
-                            <span className="description">Countly has several SDKs to choose from. Some of them are supported by Countly, and others are contributed by Countly community.</span>
-                            <a href="https://github.com/countly" className="button">Explore at Github</a>
-                        </div>
-
-                    </div>
-                </div>
 
                 <div className="confirm_block" style={confirm_block_style}>
                     <div className="sign">{this.state.confirmation_sign}</div>

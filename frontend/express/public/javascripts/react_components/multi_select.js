@@ -60,7 +60,7 @@ var MultiSelectBlock = React.createClass({
 
         var row_height = 30;
 
-        if (this.props.onHeightChange) this.props.onHeightChange(this.props.label, row_height * rows + 10);
+        if (this.props.onHeightChange) this.props.onHeightChange(this.props.label, row_height * rows + 20);
 
         return({
             selectors : this.props.selectors,
@@ -135,7 +135,7 @@ var MultiSelectBlock = React.createClass({
             return false;
         }
 
-        if (this.props.onHeightChange) this.props.onHeightChange(this.props.label, nextState.row_height * nextState.rows + 10);
+        if (this.props.onHeightChange) this.props.onHeightChange(this.props.label, nextState.row_height * nextState.rows + 20);
 
         return true;
 
@@ -266,17 +266,21 @@ var MultiSelectBlock = React.createClass({
             var rows_count = 1; // make min height
         }
 
-        var own_height = (this.state.row_height * rows_count) + 10;
+        var own_height = (this.state.row_height * rows_count) + 20;
 
         if (this.props.parent_height > own_height)
         {
             current_block_style.height = this.props.parent_height + "px";
-            selectors_style.top = this.props.parent_height + 10 + "px";
+            selectors_style.top = this.props.parent_height + 20 + "px";
+
+            var selectors_style_top = this.props.parent_height + 20;
         }
         else
         {
             current_block_style.height = own_height + "px";
-            selectors_style.top = own_height + 10 + "px";
+            selectors_style.top = own_height + 20 + "px";
+
+            var selectors_style_top = own_height + 20;
         }
 
 
@@ -286,6 +290,14 @@ var MultiSelectBlock = React.createClass({
             "left" : this.state.element_width / 2 - arrow_width / 2
         }
 
+        var top_arrow_style = {
+            top : (selectors_style_top - 7) + "px",
+            left : ((this.state.element_width / 2) - (14 / 2)) + 1 + "px", // todo: +1 here
+            display : !this.state.open ? "none" : false
+        }
+
+        //if (!this.state.open) selectors_style.display = "none";
+
         return(
             <div className={class_name}>
 
@@ -294,8 +306,9 @@ var MultiSelectBlock = React.createClass({
                     <span className="arrow" style={arrow_style}/>
                 </div>
 
+                <div className="top_arrow" style={top_arrow_style}/>
+
                 <div className="selectors_items" style={selectors_style}>
-                    <div className="top_arrow"/>
                     {
                         _.map(self.state.selectors, function(selector, id) {
 

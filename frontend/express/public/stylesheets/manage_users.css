@@ -57,7 +57,7 @@
 
 #manage_users_page .wrapper {
     background-color: white;
-    margin-top : 20px;
+    margin-top : 10px;
     padding-bottom : 300px;
     border: 1px solid #eeeeee;
 }
@@ -99,6 +99,8 @@
 
     text-transform: capitalize;
     font-weight: bold;
+
+
 }
 
 #manage_users_page .users_table .users_table_header > div {
@@ -107,6 +109,8 @@
     border-right : 1px solid #E9E9E9;
     box-sizing: border-box;
     padding-left : 10px;
+
+    transition: width 0.4s;
 }
 
 #manage_users_page .users_table .user_info {
@@ -118,11 +122,13 @@
     border-right : 1px solid #E9E9E9;
 
     padding-top : 10px;
-    padding-bottom : 10px;
+    /*padding-bottom : 10px;*/
 
     position : relative;
 
     box-sizing: border-box;
+
+    transition: width 0.4s;
 
     /**cursor : pointer;/
 }
@@ -145,7 +151,10 @@
     /*height : 40px;
     line-height : 40px;*/
     box-sizing: border-box;
+
     padding-left : 10px;
+
+    transition: width 0.4s;
 }
 
 #manage_users_page .users_table .user_info .email, #manage_users_page .users_table .users_table_header .email {
@@ -170,7 +179,7 @@
     /*border-right : 1px solid red;*/
     box-sizing: border-box;
 
-    padding-left : 20px;
+    /*padding-left : 20px;*/
 
 }
 
@@ -184,7 +193,7 @@
     /*border-right : 1px solid red;*/
     box-sizing: border-box;
 
-    padding-right: 20px;
+    /*padding-right: 20px;*/
 
 }
 
@@ -217,6 +226,7 @@
 
 #manage_users_page .left_block {
     float : left;
+    position : relative;
 }
 
 #manage_users_page .left_block > span {
@@ -237,6 +247,10 @@
     cursor : pointer;
     display : inline-block;
     margin-top : 10px;
+
+    position : absolute;
+    bottom : 10px;
+    left : 10px;
 }
 
 #manage_users_page .users_table .user_info .save {
@@ -253,9 +267,12 @@
     color: #FFFFFF;
     text-align: center;
     border-radius : 2px;
-    position : relative;
+    /*position : relative;
     top : -8px;
-    left : 6px;
+    left : 6px;*/
+    position : absolute;
+    bottom : 10px;
+    left : 42px;
 }
 
 #manage_users_page .users_table .additional_selector {
@@ -265,8 +282,15 @@
     height : 30px;
     line-height : 30px;
     display : inline-block;
-    position : relative;
-    top : -6px;
+    /*position : relative;*/
+
+    position : absolute;
+    bottom : 7px;
+    /**left : 113px;*/
+
+    right : 20px;
+
+    /*top : -6px;*/
     font-size: 11px;
     text-transform: capitalize;
 
@@ -278,6 +302,8 @@
     background-color : #eeeeee;
     border-top-left-radius : 2px;
     border-bottom-left-radius : 2px;
+
+    /*width : 100px;*/
 }
 
 #manage_users_page .users_table .additional_selector .label {
@@ -287,7 +313,7 @@
     color : #969696;
 }
 
-#manage_users_page .users_table .additional_selector .label:hover {
+#manage_users_page .users_table .additional_selector:hover .label {
     color : #000000;
 }
 
@@ -310,6 +336,15 @@
     position: relative;
     top : 7px;
 
+    opacity : 0.7;
+}
+
+#manage_users_page .users_table .additional_selector.active .arrow {
+    opacity : 1;
+}
+
+#manage_users_page .users_table .additional_selector:hover .arrow {
+    opacity : 1;
 }
 
 #manage_users_page .additional_block {
@@ -317,17 +352,44 @@
     background-color : #eeeeee;
     width : 200px;
     position : relative;
-    left : -2px;
+    left : -10px;
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
     border-bottom-left-radius: 2px;
 }
 
+#manage_users_page .additional_block .password_change_block {
+    margin-top : 20px;
+    margin-left : 10px;
+}
+
+#manage_users_page .additional_block .password_change_block .label {
+    display : inline-block;
+    margin-right : 10px;
+    /*width : 150px;*/
+    /*padding-left : 20px;*/
+    box-sizing: border-box;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+/*
+#manage_users_page .additional_block .password_change_block .change_passord_button {
+    display : inline-block;
+}
+*/
+
 #manage_users_page .additional_block .delete {
+    /*margin-left : 10px;*/
+    position : absolute;
+    left : 20px;
+    bottom : 10px;
+}
+
+#manage_users_page .additional_block .delete, #manage_users_page .additional_block .password_change_block .change_passord_button {
 
     margin-right : 20px;
     display : inline-block;
-    width: 60px;
+    /*width: 60px;*/
     height: 24px;
     line-height: 24px;
     background-color: #F85D02;
@@ -337,9 +399,15 @@
     color: #FFFFFF;
     text-align: center;
     border-radius : 2px;
+    padding-left : 10px;
+    padding-right : 10px;
     /*position : relative;
     top : -8px;
     left : 6px;*/
+}
+
+#manage_users_page .additional_block .password_change_block input {
+    margin-right : 10px;
 }
 
 #manage_users_page .admin_of div.app, .user_of div.app {

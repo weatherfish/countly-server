@@ -52,15 +52,27 @@ var AppUserList = React.createClass({
         var height = React.findDOMNode(this).offsetHeight;
     },
 */
+
+    getInitialState: function() {
+        return ({
+
+        });
+    },
+
     componentDidMount : function(){
 
         var height = React.findDOMNode(this).offsetHeight;
 
-        console.log("mount height:", height);
-
         this.height = height;
 
         this.props.onHeightChange(height);
+
+        if (height < this.props.max_block_height)
+        {
+            this.setState({
+                offset_top : ((this.props.max_block_height - height) / 2)
+            })
+        }
 
     },
 
@@ -68,13 +80,22 @@ var AppUserList = React.createClass({
 
         var height = React.findDOMNode(this).offsetHeight;
 
-        console.log("componentDidUpdate height:", height);
-
         if (height != this.height)
         {
             this.height = height;
             this.props.onHeightChange(height);
         }
+
+    },
+
+    componentWillReceiveProps : function(nextProps){
+/*
+        if (this.height < nextProps.max_block_height)
+        {
+            this.setState({
+                offset_top : ((nextProps.max_block_height - this.height) / 2)
+            })
+        }*/
 
     },
 
@@ -98,7 +119,7 @@ var AppUserList = React.createClass({
                 return false
             }
 
-            if (i == self.props.apps_array - 2)
+            if (i == self.props.apps_array.length - 1)
             {
                 var comma = "";
             }
@@ -113,13 +134,58 @@ var AppUserList = React.createClass({
 
         })
 
+        var block_style = {
+      /*      "position" : "relative",
+            "top" : this.state.offset_top ? this.state.offset_top + "px" : false*/
+        }
+
         return(
-            <div>
+            <div style={block_style}>
                 {block}
             </div>
         )
     }
 })
+
+var ChangePasswordBlock = React.createClass({
+
+    getInitialState : function() {
+
+        return({
+            "value" : ""
+        });
+    },
+
+    change_input : function(event)
+    {
+
+        var value = event.target.value;
+
+        if (event.target.value.toString().length > 0) this.props.onChange(this.props.setting, event.target.value);
+
+        this.setState({ value: event.target.value });
+    },
+
+    render : function(){
+
+        var style = {};
+
+        if (this.props.width)
+        {
+            style.width = this.props.width;
+        }
+
+        return(
+            <div className="password_change_block">
+                <span className="label">Change Password</span>
+                <input type="text" value={this.state.value} onChange={this.change_input} style={style}/>
+
+                <div className="change_passord_button">Change</div>
+            </div>
+        )
+    },
+
+});
 
 var ManageUserBlock = React.createClass({
 
@@ -138,6 +204,28 @@ var ManageUserBlock = React.createClass({
 
     },
 
+    componentDidMount : function(){
+
+        var height = React.findDOMNode(this).offsetHeight;
+
+        this.setState({
+            height : height
+        })
+
+    },
+
+    componentDidUpdate : function(){
+
+        var height = React.findDOMNode(this).offsetHeight;
+
+        if (height != this.state.height)
+        {
+            this.setState({
+                height : height
+            })
+        }
+    },
+/*
     edit_click : function() {
 
         if (this.props.edit_active) return false;
@@ -147,7 +235,7 @@ var ManageUserBlock = React.createClass({
         })
 
     },
-
+*/
     save : function() {
 
         this.props.close_click();
@@ -242,14 +330,11 @@ var ManageUserBlock = React.createClass({
 
         var user = this.state.user;
 
-        user.admin_of = apps;
+        user.user_of = apps;
 
         this.setState({
-            //edit_open : false,
             user : user
         });
-
-        //this.save_user();
 
     },
 
@@ -292,10 +377,12 @@ var ManageUserBlock = React.createClass({
 
         this.setState({
             user : user,//state,
-            row_height : 40
+            //row_height : 40
         });
 
-        return e.preventDefault();
+        return true;
+
+        //return e.preventDefault();
 
     },
 
@@ -328,14 +415,9 @@ var ManageUserBlock = React.createClass({
 
     additional_click : function()
     {
-
-        console.log("------- additional click -----------");
-        console.log(this.state.additional_open);
-
         this.setState({
             additional_open : !this.state.additional_open
         })
-
     },
 
     render : function() {
@@ -347,6 +429,8 @@ var ManageUserBlock = React.createClass({
 
         var user_email_style = { }
         var user_info_style = { };
+
+        console.log("render this.props.max_block_height:", this.props.max_block_height);
 
         if (this.props.max_block_height)
         {
@@ -384,9 +468,17 @@ var ManageUserBlock = React.createClass({
             user_email_style.float = "left";
             user_of_block_style.float = "right";
 
-            user_email_style.width = this.props.email_max_width + 40 + 60;
+            user_email_style.width = this.props.email_max_width + 30;
 
-            var input_right_margin = 20;
+            if (user_email_style.width < 200)
+            {
+                user_email_style.width = 200; // todo: var
+            }
+
+            var adminof_width = Math.floor((this.props.width - user_email_style.width) / 2) - 4 - 30; // todo: var
+            var userof_width = Math.floor((this.props.width - user_email_style.width) / 2) - 4 - 30; // todo: var
+
+            var input_right_margin = 20; // todo ??
 
             edit_button_style.display = "none";
             save_block_style.display = "block";
@@ -397,21 +489,26 @@ var ManageUserBlock = React.createClass({
 
             if (this.state.user.global_admin)
             {
-                var checkbox = <input key="global_admin" type="checkbox" id="global_admin_checkbox" onChange={this.handleGlobalAdminChange}/>;
+                //var checkbox = <input key="global_admin" type="checkbox" id="global_admin_checkbox" onChange={this.handleGlobalAdminChange}/>;
+                var checkbox = <input type="checkbox" checked onChange={this.handleGlobalAdminChange}/>;
             }
             else
             {
-                var checkbox = <input key="global_admin" type="checkbox" checked id="global_admin_checkbox" onChange={this.handleGlobalAdminChange}/>;
+                //var checkbox = <input key="global_admin" type="checkbox" checked id="global_admin_checkbox" onChange={this.handleGlobalAdminChange}/>;
+                var checkbox = <input type="checkbox" onChange={this.handleGlobalAdminChange}/>;
             }
 
-            var additional_style = {};
+            var additional_style = {
+                width : adminof_width + userof_width + "px"
+            };
+
             var additional_selector_style = {};
             var additional_selector_class = "additional_selector";
 
             if (this.state.additional_open)
             {
                 additional_style.display = "inline-block";
-                additional_style.height = (block_height * 2) + "px";
+                additional_style.height = (this.state.height - 18) + "px";
                 user_of_block_style.display = "none";
                 admin_of_block_style.display = "none";
                 additional_selector_class += " active"
@@ -421,7 +518,11 @@ var ManageUserBlock = React.createClass({
                 additional_style.display = "none";
             }
 
-            var email_block = <div className="left_block">
+            var left_block_style = {
+                height : (this.state.height - 12) + "px"
+            }
+
+            var left_block = <div className="left_block" style={left_block_style}>
 
                                   <span className="global_admin_block" style={global_admin_style}>
                                       {checkbox}
@@ -451,7 +552,11 @@ var ManageUserBlock = React.createClass({
                               </div>
 
             var additional_block = <div className="additional_block" style={additional_style}>
-                                        <span className="delete" onClick={this.delete}>Delete</span>
+
+                                        <ChangePasswordBlock />
+
+                                        <span className="delete" onClick={this.delete}>Delete User</span>
+
                                     </div>
 
             if (this.state.user.global_admin)
@@ -461,9 +566,6 @@ var ManageUserBlock = React.createClass({
             }
             else
             {
-
-                var adminof_width = Math.floor((this.props.width - user_email_style.width) / 2);
-                var userof_width = Math.floor((this.props.width - user_email_style.width) / 2);
 
                 //admin_of_block_style.width = Math.floor((this.props.width - user_email_style.width) / 2) - 10 + "px";
                 //user_of_block_style.width =  Math.floor((this.props.width - user_email_style.width) / 2) - 10 + "px";
@@ -478,7 +580,7 @@ var ManageUserBlock = React.createClass({
                         blockWidth={adminof_width}
                         onHeightChange={this.onHeightChange}
                         parent_height={this.state.row_height}
-                        padding={20}
+                        padding={0}
                     />
 
                 var user_of_block =
@@ -491,7 +593,7 @@ var ManageUserBlock = React.createClass({
                         blockWidth={userof_width}
                         onHeightChange={this.onHeightChange}
                         parent_height={this.state.row_height}
-                        padding={20}
+                        padding={0}
                     />
             }
 
@@ -515,7 +617,7 @@ var ManageUserBlock = React.createClass({
                 user_email_style.width = this.props.email_max_width + 40;
             }
 
-            var email_block = <div className="email" style={user_email_style} key={this.state.email_key}>
+            var left_block = <div className="email" style={user_email_style} key={this.state.email_key}>
                                   <EmailLabel
                                       onWidthChange={this.__email_width_changed}
                                       email={this.state.user.email}
@@ -539,6 +641,7 @@ var ManageUserBlock = React.createClass({
                                               apps_array={this.state.user.admin_of}
                                               width={admin_of_block_style.width}
                                               onHeightChange={this.__admin_block_height_changed}
+                                              max_block_height={this.props.max_block_height}
                                           />
                 }
                 else
@@ -553,6 +656,7 @@ var ManageUserBlock = React.createClass({
                                               apps_array={this.state.user.user_of}
                                               width={user_of_block_style.width}
                                               onHeightChange={this.__user_block_height_changed}
+                                              max_block_height={this.props.max_block_height}
                                         />
 
                 }
@@ -567,8 +671,7 @@ var ManageUserBlock = React.createClass({
         return(
                 <div className={block_class_name} style={user_info_style} onClick={function(){ if (!self.props.edit_active) self.props.edit_click.call() }}>
 
-
-                    {email_block}
+                    {left_block}
 
                     {additional_block}
 

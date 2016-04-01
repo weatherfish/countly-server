@@ -210,7 +210,7 @@ var ManageUsersPage = React.createClass({
         }
 
         return({
-            new_user_open : true,
+            new_user_open : false,
             apps : apps,
             email_max_width : false,
             max_block_height : false,
@@ -319,6 +319,8 @@ var ManageUsersPage = React.createClass({
 
     email_width_changed : function(email, new_width){
 
+        console.log("changed >> ", email, " :: ", new_width);
+
         this.emails_blocks_width[email] = new_width;
 
         var max_width = 0;
@@ -331,6 +333,8 @@ var ManageUsersPage = React.createClass({
             }
         }
 
+        console.log("max_width:", max_width);
+
         if (max_width != this.state.email_max_width)
         {
 
@@ -342,8 +346,6 @@ var ManageUsersPage = React.createClass({
     },
 
     block_height_changed : function(type, key, height){
-
-        console.log("block_height_changed:", type, key, height);
 
         if (!this.blocks_height[type]) this.blocks_height[type] = [];
 
@@ -412,15 +414,27 @@ var ManageUsersPage = React.createClass({
         var adminof_header_style = {};
         var userof_header_style = {};
 
-        if (this.state.email_max_width)
+        if (this.state.selected_user !== false)
+        {
+            var email_header_width = this.state.email_max_width + 100;
+
+            email_header_style.width = email_header_width + "px";
+            adminof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 1 + "px";
+            userof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 1 + "px";
+
+            var cells_email_width = this.state.email_max_width + 60;
+
+        }
+        else if (this.state.email_max_width)
         {
 
             var email_header_width = this.state.email_max_width + 40;
 
             email_header_style.width = email_header_width + "px";
-
             adminof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 1 + "px";
             userof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 1 + "px";
+
+            var cells_email_width = this.state.email_max_width;
 
         }
 
@@ -447,7 +461,7 @@ var ManageUsersPage = React.createClass({
                               {
                                   _.map(self.state.users_data, function(user, i){
 
-                                      if (self.state.selected_user && self.state.selected_user === i)
+                                      if (self.state.selected_user !== false && self.state.selected_user === i)
                                       {
                                           var edit_active = true;
                                       }
@@ -464,7 +478,7 @@ var ManageUsersPage = React.createClass({
                                                   global_admin={user.global_admin}
                                                   apps={self.state.apps}
                                                   width={manage_block_width}
-                                                  email_max_width={self.state.email_max_width}
+                                                  email_max_width={cells_email_width}
                                                   email_width_changed={self.email_width_changed}
                                                   max_block_height={self.state.max_block_height}
                                                   block_height_changed={self.block_height_changed}

@@ -87,7 +87,7 @@
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/crash_details.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/bool_pie_chart.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/average_bar.css" />
-						<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/horizontal_bar_interactive.css" />
+						<!--link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/horizontal_bar_interactive.css" /-->
 						<link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/platforms.css" />
 
 		    <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/dom/jquery/jquery-1.8.3.min.js"></script>
@@ -199,8 +199,6 @@
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/configurations.js"></script>
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_pages/map_session.js"></script>
 
-
-
             <!--script type="text/jsx" src="<%- cdn %>/javascripts/react_pages_compiled/router.js"></script-->
 
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/dashboard.bar_chart.js"></script>
@@ -252,7 +250,7 @@
             <% if (plugins) { %>
             	<% for(var i=0, l=plugins.length; i<l; i++) {%>
             		<script language="javascript" type="text/javascript" src="<%- cdn %>/<%= plugins[i] %>/javascripts/countly.models.js?<%= countlyVersion %>"></script>
-            		<script language="javascript" type="text/javascript" src="<%- cdn %>/<%= plugins[i] %>/javascripts/countly.views.js?<%= countlyVersion %>"></script>
+            		<!--script language="javascript" type="text/javascript" src="<%- cdn %>/<%= plugins[i] %>/javascripts/countly.views.js?<%= countlyVersion %>"></script-->
             	<% } %>
             <% } %>
 
@@ -266,40 +264,38 @@
         <% } %>
 
 		<script type="text/javascript">
-		    var event_emitter = {};
-            var global_controller = {};
 
-            Date.prototype.monthDays= function(){ // todo: move from here
-                var d= new Date(this.getFullYear(), this.getMonth()+1, 0);
-                return d.getDate();
-            }
+				var event_emitter = {};
+        var global_controller = {}; // todo: remove
 
-            var cached_viewport_width = false;
+        var cached_viewport_width = false;
 
-            var get_viewport_width = function() // first time it gives width without vertical scroll block
-            {
+        var get_viewport_width = function() // first time it gives width without vertical scroll block
+        {
 
-                if (cached_viewport_width)
-          		{
-                    return cached_viewport_width;
-          		}
+        		if (cached_viewport_width)
+          	{
+            		return cached_viewport_width;
+          	}
 
-          		var width = document.body.clientWidth - 240 - 20 - 20 - 16; // todo : variables
+          	var width = document.body.clientWidth - 240 - 20 - 20 - 16; // todo : variables
 
-          		cached_viewport_width = width;
+          	cached_viewport_width = width;
 
-          		return width;
-            }
+          	return width;
+        }
 
-        </script>
+    </script>
 
-        <script type="text/javascript">
+    <script type="text/javascript">
+
+				var sidebar_width = 240;
 
 		    window.production = <%= production ? true : false %>;
 
-            var applications = [];
+        var applications = [];
 
-            <% for (var i = 0; i < userOfApps.length; i++) { %>
+        <% for (var i = 0; i < userOfApps.length; i++) { %>
 
           		var app_id   = "<%= userOfApps[i]._id %>";
           		var app_name = "<%= userOfApps[i].name %>";
@@ -313,63 +309,68 @@
                     key  : app_key
                 });
 
-            <% } %>
+        <% } %>
 
-            var sidebar_width = 240;
-
-            /*
-            applications.forEach(function(app){
+        /*
+        applications.forEach(function(app){
                 var icon_src = "./images/" + app.icon;
                 $(new Image()).attr('src', icon_src).load(function() { });
-            });
-            */
+        });
+        */
 
-            try {
-          		moment.lang(countlyCommon.BROWSER_LANG_SHORT);
-            } catch(e) {
-          		moment.lang("en");
+        try {
+          	moment.lang(countlyCommon.BROWSER_LANG_SHORT);
+        } catch(e) {
+          	moment.lang("en");
+        }
+
+				console.log("================ init apps ==============");
+				console.log(applications);
+
+				console.log("--------- init global apps ----------");
+				console.log(countlyGlobal['apps']);
+
+        if (!countlyCommon.ACTIVE_APP_ID) {
+
+            for (var appId in countlyGlobal['apps']) {
+
+                //console.log(countlyCommon);
+
+                countlyCommon.setActiveApp(appId);
+                /*
+                countlyCommon.ACTIVE_APP_KEY = countlyGlobal['apps'][appId].key;
+                countlyCommon.ACTIVE_APP_ID = appId;
+                store.set("countly_active_app", appId);
+                */
+
+                store.set("countly_active_app", appId);
+
+                //self.activeAppName = countlyGlobal['apps'][appId].name;
+                break;
             }
 
-            if (!countlyCommon.ACTIVE_APP_ID) {
-                for (var appId in countlyGlobal['apps']) {
+        } else {
+          	//self.activeAppName = countlyGlobal['apps'][countlyCommon.ACTIVE_APP_ID].name;
+        }
 
-                    //console.log(countlyCommon);
+				/*
+        $(event_emitter).on('app_changed', function(e, data){ // todo: remove
 
-                    countlyCommon.setActiveApp(appId);
-                    /*
-                    countlyCommon.ACTIVE_APP_KEY = countlyGlobal['apps'][appId].key;
-                    countlyCommon.ACTIVE_APP_ID = appId;
-                    store.set("countly_active_app", appId);
-                    */
+  		    self.activeAppName = "hello";
+          self.activeAppKey  = data.app_key;
 
-                    store.set("countly_active_app", appId);
+          countlyCommon.setActiveApp(data.app_id);
 
-                    //self.activeAppName = countlyGlobal['apps'][appId].name;
-                    break;
-                }
-            } else {
-          		//self.activeAppName = countlyGlobal['apps'][countlyCommon.ACTIVE_APP_ID].name;
-            }
-            /*
-            $(event_emitter).on('app_changed', function(e, data){ // todo: remove
+          self.activeView.appChanged();
 
-  		        self.activeAppName = "hello";
-          		self.activeAppKey  = data.app_key;
+        }.bind(self));
+        */
 
-          		countlyCommon.setActiveApp(data.app_id);
+        var countly_version = "<%= countlyTypeName %>";
+				var api_key =	"<%= member['api_key'] %>";
+				var user_full_name = "<%= member['full_name'] %>";
 
-          		self.activeView.appChanged();
-
-            }.bind(self));
-            */
-
-            var countly_version = "<%= countlyTypeName %>";
-
-						var api_key =	"<%= member['api_key'] %>";
-						console.log("api key:", api_key);
-
-						var user_full_name = "<%= member['full_name'] %>";
-						console.log("full_name:", user_full_name);
+				console.log("api key:", api_key);
 
     </script>
 
@@ -407,6 +408,27 @@
 
     <script type="text/jsx">
 
+				jQuery.i18n.properties({
+						name:'locale',
+						cache:true,
+						language:countlyCommon.BROWSER_LANG_SHORT,
+						path:[countlyGlobal["cdn"]+'/localization/min/'],
+						mode:'map'
+				});
+
+				var active_app_id = countlyCommon.ACTIVE_APP_ID;
+
+        var active_app_data = false;
+
+        for (var i = 0; i < applications.length; i++)
+        {
+	      		if (applications[i].id == active_app_id)
+	      		{
+	                active_app_data = applications[i];
+	                break;
+	      		}
+        }
+
         var wrapComponent = function(Component, props) {
 
             return React.createClass({
@@ -417,31 +439,19 @@
                 },
 
                 render: function() {
-                	return React.createElement(Component, props);
+
+										if (applications.length == 0)
+										{
+												return React.createElement(ApplicationsPage, props);
+										}
+										else
+										{
+												return React.createElement(Component, props);
+										}
+
                 }
             });
-        };
-
-        jQuery.i18n.properties({
-            name:'locale',
-            cache:true,
-            language:countlyCommon.BROWSER_LANG_SHORT,
-            path:[countlyGlobal["cdn"]+'/localization/min/'],
-            mode:'map'
-        });
-
-        var active_app_id = countlyCommon.ACTIVE_APP_ID;
-
-        var active_app_data = false;
-
-        for (var i = 0; i < applications.length; i++)
-        {
-      		if (applications[i].id == active_app_id)
-      		{
-                active_app_data = applications[i];
-                break;
-      		}
-        }
+				};
 
         var Router = ReactRouter.Router;
         var Route = ReactRouter.Route;
@@ -466,12 +476,12 @@
 
             render() {
 
-                if (this.props.location.pathname.indexOf("/manage/users") == -1 && this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1 && this.props.location.pathname.indexOf("/crashes/") == -1)
+                if ((applications.length != 0) && this.props.location.pathname.indexOf("/manage/users") == -1 && this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1 && this.props.location.pathname.indexOf("/crashes/") == -1)
                 {
 
                     var calendar = <div id="calendar_block">
                                         <CalendarWrapper onDateChange={this.props.route.onDateChange}/>
-                	               </div>
+                	  							 </div>
 
                     var container_style = {
                         "border-width" : "1px"
@@ -524,6 +534,8 @@
 
         var CountlyRouter = React.createClass({
 
+						/*mixins: [ ReactRouter.browserHistory ],*/
+
             getInitialState: function() {
 
                 return({
@@ -534,22 +546,12 @@
 
             },
 /*
-						componentDidMount : function() {
-
-								var self = this;
-
-								var refresh = setInterval(function () {
-
-										var data_timestamp = Math.floor(Date.now());
-
-										console.log("update timestamp:", data_timestamp);
-
-										self.setState({
-												"data_timestamp" : data_timestamp
-										});
-
-								}, 3000);
-
+						componentWillMount : function()
+						{
+								if (applications.length == 0)
+								{
+										this.history.pushState(null, "/manage/apps");
+								}
 						},
 */
             date_change : function(new_date)
@@ -560,21 +562,6 @@
             },
 
             on_app_rename : function(app){
-                /*
-                var applications = this.state.applications;
-
-                for (var i = 0; i < applications.length; i++)
-                {
-
-              		if (applications[i]["id"] == app["_id"])
-              		{
-                        app["id"] = app["_id"];
-                        delete app["_id"];
-                        applications[i] = app;
-                        break;
-                    }
-                }
-                */
 
                 this.setState({
                     applications : countlyGlobal['apps']
@@ -622,43 +609,12 @@
 
     </script>
 
-    <% if(intercom && member['global_admin'] || config.autonomous) { %>
-    <!--script id="IntercomSettingsScriptTag">
-        var intercomSettings = {
-            app_id: 'pt60eheo',
-            widget: {
-                activator: '#Intercom'
-            },
-            email: "<%= member.email %>",
-            created_at: parseInt("<%= member.created_at %>") || 1349863810,
-            name: "<%= member.full_name %>",
-            user_id: "<%= member.in_user_id %>",
-            user_hash: "<%= member.in_user_hash %>",
-            trial_user: <%= countlyTrial %>
-        };
-    </script>
-    <script>
-        (function() {
-            var i=function(){i.c(arguments)};i.q=[];
-            i.c=function(args){i.q.push(args)};window.Intercom=i;
-            function async_load() {
-                var s = document.createElement('script');
-                s.type = 'text/javascript'; s.async = true;
-                s.src = 'https://api.intercom.io/api/js/library.js';
-                var x = document.getElementsByTagName('script')[0];
-                x.parentNode.insertBefore(s, x);
-            }
-            if (window.attachEvent) {
-                window.attachEvent('onload', async_load);
-            } else {
-                window.addEventListener('load', async_load, false);
-            }
-        })();
-    </script-->
-    <% } %>
-    <!---->
-
     <script type="text/javascript">
+
+				Date.prototype.monthDays= function(){ // todo: move from here
+						var d= new Date(this.getFullYear(), this.getMonth()+1, 0);
+						return d.getDate();
+				}
 
         String.prototype.hashCode = function() {
             var hash = 0, i, chr, len;
@@ -670,40 +626,6 @@
             }
             return hash;
         };
-
-        /*
-        	todo: move icons load inside component
-        */
-
-
-        var loaded = 0;
-
-        var icons = ['user.svg',
-        'user_hover.svg',
-        'user_active.svg',
-        'metrics_hover.svg',
-        'metrics_active.svg',
-        'messaging.svg',
-        'messaging_hover.svg',
-        'messaging_active.svg',
-        'funnels_hover.svg',
-        'funnels_active.svg',
-        'funnels.svg',
-        'drill.svg',
-        'drill_hover.svg',
-        //'drill_active.svg',
-        'crashes_hover.svg',
-        'crashes_active.svg',
-        'crashes.svg',
-        'cross_2ndlevel_hover.svg',
-        'cross_2ndlevel_inactive.svg',
-        ]
-
-        icons.forEach(function(img){
-            var icon_src = "./images/sidebar/" + img;
-            $(new Image()).attr('src', icon_src).load(function() {
-            });
-        });
 
     </script>
 

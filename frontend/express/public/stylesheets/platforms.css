@@ -7,7 +7,7 @@
 }
 
 .platforms_page .bar_block.active_bars:hover .bar-outer {
-    background-color : #eeeeee !important;
+    background-color : #d9d9d9 !important;
 }
 
 .platforms_page .bar_block.active_bars:hover .bar-outer:not(.active) {
@@ -81,6 +81,7 @@
 
 .platforms_page .horizontal_chart_wrapper {
     box-sizing: border-box;
+    /*margin-top : 25px !important;*/
 }
 
 .platforms_page .horizontal_chart {
@@ -92,5 +93,9 @@
 }
 
 .platforms_page .block_label.active {
-    font-family: Lato-Semibold;    
+    font-family: Lato-Semibold;
 }
+/*
+.platforms_page .chart_label {
+    padding-top : 25px !important;
+}*/

@@ -392,7 +392,7 @@ var HorizontalBarInteractive = React.createClass({
                     {
                         if (column.active)
                         {
-                            return "#e7e7e7";
+                            return "#d9d9d9";
                         }
                         else {
                             return "#ffffff";
