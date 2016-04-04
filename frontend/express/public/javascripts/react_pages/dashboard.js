@@ -309,6 +309,7 @@ var Dashboard = React.createClass({
                 <DashboardMap
                     width={map_width}
                     height={420}
+                    data={this.state.top_items_bars}
                 />
 
             </div>

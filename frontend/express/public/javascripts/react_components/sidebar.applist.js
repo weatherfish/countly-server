@@ -23,11 +23,31 @@ var AppListSearch = React.createClass({
 
 var AppList = React.createClass({
 
+    getInitialState : function(){
+        return({
+            overflow : "hidden"
+        })
+    },
+
     render: function() {
 
         var self = this;
 
         //var app_list = this.props.applications.map(function (app, i) {
+
+        var app_list_style = {};
+
+        //if (this.props.is_active){
+            app_list_style['overflow-y'] = this.state.overflow;
+        /*}
+        else
+        {
+            app_list_style['overflow-y'] = this.state.overflow;
+        }*/
+
+        var screen_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+        app_list_style.height = (screen_height - 60 - 50 - 50) + "px"; // todo: change values to variables
 
         var app_list = [];
 
@@ -75,11 +95,37 @@ var AppList = React.createClass({
         }
 
         return (
-            <div className="app_list">
+            <div className="app_list" style={app_list_style}>
                 {app_list}
             </div>
         );
+    },
+
+    componentWillReceiveProps : function(nextProps){
+
+        var self = this;
+
+        if (nextProps.is_active)
+        {
+            var overflow = "auto";
+        }
+        else {
+            var overflow = "hidden";
+        }
+
+        setTimeout(function(){
+
+            self.setState({
+                "overflow" : overflow
+            });
+
+        }, 500);
+
+        this.setState({
+            is_active : nextProps.is_active
+        })
     }
+
 });
 
 var ApplicationsList = React.createClass({
@@ -106,6 +152,7 @@ var ApplicationsList = React.createClass({
 
         var one_app_link_height = 45;
 
+/*
         var list_height = (this.props.applications.length * one_app_link_height) + 50; // todo: change values to variables
 
         document.getElementById('app_info').style.height = list_height + "px";
@@ -113,6 +160,14 @@ var ApplicationsList = React.createClass({
         var list_top = (this.props.applications.length * one_app_link_height) + 50;
 
         var initial_top = 'translate3d(0,-' + list_top + 'px,0)';
+*/
+
+        var list_height = (screen_height - 60 - 50) + "px"; // todo: change values to variables
+
+        document.getElementById('app_info').style.height = list_height; // todo:  first steps in React. change this.
+
+        var initial_top = 'translate3d(0,-' + ((screen_height - 60 - 50 - 60)) + 'px,0)';
+
 
         document.getElementById('app_info').style.webkitTransform = initial_top;
         document.getElementById('app_info').style.MozTransform    = initial_top;
@@ -152,7 +207,7 @@ var ApplicationsList = React.createClass({
         return (
             <div id="app_info" className={class_name}>
                 <AppListSearch app_filter={this.app_filter}/>
-                <AppList applications={this.props.applications} active_app={this.props.active_app} onAppChange={this.props.onAppChange} app_filter_text={this.state.app_filter_text}/>
+                <AppList is_active={this.props.active} applications={this.props.applications} active_app={this.props.active_app} onAppChange={this.props.onAppChange} app_filter_text={this.state.app_filter_text}/>
             </div>
         );
     }

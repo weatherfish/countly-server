@@ -1,5 +1,7 @@
 var SimpleSelectBlock = React.createClass({
 
+    mixins: [OutsideClickClose],
+
     getInitialState : function() {
 
         var active_selector = this.props.selectors[0];
@@ -72,8 +74,29 @@ var SimpleSelectBlock = React.createClass({
 
     show_selectors : function() {
 
+        var new_open_state = !this.state.open;
+
+        if (new_open_state)
+        {
+
+            var self = this;
+
+            document.onclick = function(event) {
+
+                if(self.clickedOutsideElement(event, React.findDOMNode(self).getAttribute("data-reactid")))
+                {
+
+                    document.onclick = false;
+
+                    self.setState({
+                        "open" : false
+                    })
+                }
+            }
+        }
+
         this.setState({
-            "open" : !this.state.open
+            "open" : new_open_state
         })
 
     },
@@ -108,6 +131,8 @@ var SimpleSelectBlock = React.createClass({
 
         if (!this.state.open) selectors_style.display = "none";
 
+        var top_arrow_style = selectors_style;
+
         var class_name = "selectors_block";
 
         if (this.props.className)
@@ -123,8 +148,9 @@ var SimpleSelectBlock = React.createClass({
                     <span className="arrow"/>
                 </div>
 
+                <div className="top_arrow" style={top_arrow_style}/>
                 <div className="selectors_items" style={selectors_style}>
-                    <div className="top_arrow"/>
+
                     {
                         _.map(self.state.selectors, function(selector, id) {
 

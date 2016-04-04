@@ -8,9 +8,17 @@ var SidebarTop = React.createClass({
 
     handleClick : function(){
         //this.setState({ pushed : !this.state.pushed });
+
+          if (Object.keys(countlyGlobal['apps']).length === 0 && JSON.stringify(countlyGlobal['apps']) === JSON.stringify({})){
+              return false;
+          }
+
         this.props.onClick();
     },
     render: function() {
+
+        console.log("---- top render ----------");
+        console.log(this.props.active_app);
 
         var class_name = "";
 

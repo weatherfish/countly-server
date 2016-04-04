@@ -18,13 +18,7 @@
         }
     }
 
-    if(countlyGlobal["member"].lang){
-        var lang = countlyGlobal["member"].lang;
-        store.set("countly_lang", lang);
-        countlyCommon.BROWSER_LANG_SHORT = lang;
-        countlyCommon.BROWSER_LANG = lang;
-    }
-    else if (store.get("countly_lang")) {
+    if (store.get("countly_lang")) {
         var lang = store.get("countly_lang");
         countlyCommon.BROWSER_LANG_SHORT = lang;
         countlyCommon.BROWSER_LANG = lang;
@@ -889,6 +883,15 @@
             _state_single_graph_data  = single_graph_data;
             initial_single_graph_data = single_graph_data;
 
+            if (single_graph_data[1].color == "#bbbbbb") // todo: bad check
+            {
+                var previous_mode = true;
+            }
+            else
+            {
+                var previous_mode = false;
+            }
+
             var hoverDetail = new Rickshaw.Graph.HoverDetail({
               	graph: _rickshaw_graph,
               	formatter: function(series, x, y, x0, y0, point, is_bottom_block, parent_element) {
@@ -949,7 +952,15 @@
 
                     var date_element = document.createElement('div');
                     date_element.className = 'date_string';
-                    date_element.innerHTML = date_string;
+
+                    if (previous_mode)
+                    {
+                        date_element.innerHTML = series.name;
+                    }
+                    else
+                    {
+                        date_element.innerHTML = date_string;
+                    }
 
                     hover_wrapper.appendChild(date_element);
 
@@ -958,7 +969,7 @@
 
                     _state_single_graph_data.forEach(function(data, sg){
 
-                        for (var i=0; i < data.values.length; i++)
+                        for (var i = 0; i < data.values.length; i++)
                         {
                             if (data.values[i].x == x)
                             {
@@ -999,7 +1010,26 @@
 
                                 var label_element = document.createElement('div');
                                 label_element.className = 'name';
-                                label_element.innerHTML = data.name;
+
+
+
+                                if (previous_mode)
+                                {
+                                    if (sg == 0)
+                                    {
+                                        label_element.innerHTML = date_string;
+                                    }
+                                    else
+                                    {
+                                        label_element.innerHTML = "todo previous";
+                                    }
+                                }
+                                else
+                                {
+                                    label_element.innerHTML = data.name;
+                                }
+
+
 
                                 hover_element.appendChild(label_element);
 
@@ -3096,15 +3126,6 @@
         return dataArr;
     }
 
-    countlyCommon.formatDate = function(date, format){
-        if(countlyCommon.BROWSER_LANG_SHORT.toLowerCase() == "ko")
-            format = format.replace("MMM D", "MMM D[일]").replace("D MMM", "MMM D[일]");
-        else if(countlyCommon.BROWSER_LANG_SHORT.toLowerCase() == "ja")
-            format = format.replace("MMM D", "MMM D[日]").replace("D MMM", "MMM D[日]");
-        else if(countlyCommon.BROWSER_LANG_SHORT.toLowerCase() == "zh")
-            format = format.replace("MMMM", "M").replace("MMM", "M").replace("MM", "M").replace("DD", "D").replace("D M, YYYY", "YYYY M D").replace("D M", "M D").replace("D", "D[日]").replace("M", "M[月]").replace("YYYY", "YYYY[年]");
-        return date.format(format);
-    }
 
     // Private Methods
 
@@ -3196,7 +3217,7 @@
                     previousDay = previousDate.date();
 
                 previousPeriod = previousYear + "." + previousMonth + "." + previousDay;
-                periodMax = 23;
+                periodMax = hour;
                 periodMin = 0;
                 dateString = "HH:mm";
                 numberOfDays = 1;

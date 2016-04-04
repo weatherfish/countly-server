@@ -89,13 +89,13 @@ var AppUserList = React.createClass({
     },
 
     componentWillReceiveProps : function(nextProps){
-/*
+
         if (this.height < nextProps.max_block_height)
         {
             this.setState({
                 offset_top : ((nextProps.max_block_height - this.height) / 2)
             })
-        }*/
+        }
 
     },
 
@@ -135,8 +135,8 @@ var AppUserList = React.createClass({
         })
 
         var block_style = {
-      /*      "position" : "relative",
-            "top" : this.state.offset_top ? this.state.offset_top + "px" : false*/
+            "position" : "relative",
+            "top" : this.state.offset_top ? this.state.offset_top + "px" : false
         }
 
         return(
@@ -191,15 +191,18 @@ var ManageUserBlock = React.createClass({
 
     blocks_height : [],
 
+    previous_state : false,
+
     getInitialState: function() {
 
         return({
-            edit_open : false,
+            //edit_open : false,
             user : this.props.user,
             row_height : 40,
             global_admin : this.props.global_admin,
             email_key : this.props.user.email,
-            additional_open : false
+            additional_open : false,
+            //previous_state : false
         });
 
     },
@@ -212,6 +215,18 @@ var ManageUserBlock = React.createClass({
             height : height
         })
 
+    },
+
+    componentWillReceiveProps : function(nextProps){
+
+        if (nextProps.edit_active && !this.props.edit_active){
+
+            this.previous_state = JSON.parse(JSON.stringify(this.state));
+/*
+            this.setState({
+                previous_state : previous_state
+            })*/
+        }
     },
 
     componentDidUpdate : function(){
@@ -268,6 +283,12 @@ var ManageUserBlock = React.createClass({
     cancel : function() {
 
         this.props.close_click();
+
+        this.setState(this.previous_state);
+
+        this.previous_state = false;
+
+        return true;
     },
 
     delete : function() {
@@ -307,23 +328,9 @@ var ManageUserBlock = React.createClass({
 
         user.admin_of = apps;
 
-/*
-        if (user.admin_of.indexOf(app_id) > -1)
-        {
-            user.admin_of.splice(user.admin_of.indexOf(app_id), 1);
-        }
-        else
-        {
-            user.admin_of.push(app_id);
-        }
-*/
         this.setState({
-            //edit_open : false,
             user : user
         });
-
-
-
     },
 
     set_user_app : function(apps) {
@@ -359,13 +366,6 @@ var ManageUserBlock = React.createClass({
             });
         }
 
-        /*
-        if (new_height > this.max_height[label])
-        {
-            this.max_height[label]
-        }
-*/
-
     },
 
     handleGlobalAdminChange : function(e){
@@ -378,6 +378,7 @@ var ManageUserBlock = React.createClass({
         this.setState({
             user : user,//state,
             //row_height : 40
+            additional_open : state
         });
 
         return true;
@@ -626,6 +627,8 @@ var ManageUserBlock = React.createClass({
 
             admin_of_block_style.width = Math.floor((this.props.width - user_email_style.width) / 2) - 1 + "px";
             user_of_block_style.width =  Math.floor((this.props.width - user_email_style.width) / 2) - 2 - 70 + "px";
+
+            user_of_block_style['margin-right'] = 60 + "px";
 
             if (this.state.user.global_admin)
             {

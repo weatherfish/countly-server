@@ -74,7 +74,7 @@ var CalendarWrapper = React.createClass({
 
         global_controller.date_string = date_values.from_string + " - " + date_values.to_string;
 
-        $(event_emitter).trigger("date_init", {
+        $(event_emitter).trigger("date_init_event", {
             "state" : {
                 "from_string" : date_values.from_string,
                 "to_string"   : date_values.to_string
@@ -389,9 +389,9 @@ var CalendarWrapper = React.createClass({
         this.props.onDateChange({ "period" : choise, "state" : state_obj });
 
         //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
-/*
-        $(event_emitter).trigger("date_choise", { "period" : choise, "state" : state_obj });
 
+        $(event_emitter).trigger("date_choise_event", { "period" : choise, "state" : state_obj });
+/*
         $(event_emitter).trigger("date_choise_test", { "period" : choise, "state" : state_obj });
 */
 
@@ -448,9 +448,9 @@ var CalendarWrapper = React.createClass({
         this.props.onDateChange({ "period" : [date_from, date_to], "state" : state_obj });
 
         //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
-/*
-        $(event_emitter).trigger("date_choise", { "period" : [date_from, date_to], "state" : state_obj }); // todo: change date_fast_choise
 
+        $(event_emitter).trigger("date_choise_event", { "period" : [date_from, date_to], "state" : state_obj }); // todo: change date_fast_choise
+/*
         $(event_emitter).trigger("date_choise_test", { "period" : [date_from, date_to], "state" : state_obj }); // todo: change date_fast_choise
 */
     },

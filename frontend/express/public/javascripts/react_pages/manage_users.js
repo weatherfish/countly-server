@@ -1,6 +1,6 @@
 var NewUserWindow = React.createClass({
 
-    mixins: [React.LinkedStateMixin],
+    mixins: [React.LinkedStateMixin, OutsideClickClose],
 
     user_data : {
         global_admin : false
@@ -19,9 +19,32 @@ var NewUserWindow = React.createClass({
         }
 
         return ({
-            apps : apps
+            "apps" : apps,
+            "open" : false,
         });
 
+    },
+
+    componentWillReceiveProps : function(nextProps){
+
+        var self = this;
+
+        if (nextProps.open && nextProps.open != this.state.open){
+            document.onclick = function(event) {
+
+                if(self.clickedOutsideElement(event, React.findDOMNode(self).getAttribute("data-reactid")))
+                {
+                    document.onclick = false;
+                    self.props.onClose();
+                }
+            }
+        }
+
+        if (nextProps.open != this.state.open){
+            this.setState({
+                open : nextProps.open
+            });
+        }
     },
 
     on_row_change : function(key, value){
@@ -408,7 +431,7 @@ var ManageUsersPage = React.createClass({
             width : elements_width
         }
 
-        var manage_block_width = elements_width - 20 * 2; // todo: tmp variable, look this.refs.svg.getDOMNode().offsetWidth
+        var manage_block_width = elements_width - 30 * 2; // todo: tmp variable, look this.refs.svg.getDOMNode().offsetWidth
 
         var email_header_style = {};
         var adminof_header_style = {};
@@ -420,7 +443,7 @@ var ManageUsersPage = React.createClass({
 
             email_header_style.width = email_header_width + "px";
             adminof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 1 + "px";
-            userof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 1 + "px";
+            userof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 2 + "px";
 
             var cells_email_width = this.state.email_max_width + 60;
 
@@ -432,7 +455,7 @@ var ManageUsersPage = React.createClass({
 
             email_header_style.width = email_header_width + "px";
             adminof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 1 + "px";
-            userof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 1 + "px";
+            userof_header_style.width = Math.floor((manage_block_width - email_header_width) / 2) - 2 + "px";
 
             var cells_email_width = this.state.email_max_width;
 

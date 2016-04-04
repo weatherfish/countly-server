@@ -6,9 +6,6 @@ var HorizontalBarChart = React.createClass({
 
         var data = this.props.data_function();
 
-        console.log("---- HorizontalBarChart data -----------");
-        console.log(data);
-
         data = data.chartData;
 
         //var test_data = [];
@@ -47,9 +44,6 @@ var HorizontalBarChart = React.createClass({
                 }
             }
         }
-
-        console.log("============== HorizontalBarChart 2 data ==============");
-        console.log(data);
 
         return {
             data : data,
@@ -197,17 +191,17 @@ var HorizontalBarChart = React.createClass({
             var bars_count = 5;
         }
 
-        var current_data = data.slice(0, bars_count);
-        var other_data   = data.slice(bars_count, data.length);
-
         for (var k = 0; k < keys.length; k++)
         {
+
+            var shown_data = data.slice(0, bars_count);
+            var other_data   = data.slice(bars_count, data.length);
 
             var key = keys[k];
 
             var total = 0;
             var other_total = 0;
-            var other_percent = 0;
+            //var other_percent = 0;
 
             data.forEach(function(elem){
                 total += elem[key];
@@ -215,21 +209,37 @@ var HorizontalBarChart = React.createClass({
 
             other_data.forEach(function(elem){
                 other_total += elem[key];
-                other_percent += Math.round((elem[key] / total) * 100);
             });
 
-            var other_block = { };
+            console.log("---- key --", key);
+            console.log(other_data);
 
-            other_block[data_key_label] = "Other";
+            var other_percent = Math.round((other_total / total) * 100);
 
-            other_block[key] = other_total;
+            console.log("other_percent:", other_percent);
 
-            var combined_data = current_data.concat([/*other_block*/]);
+            if (other_data.length == 1)
+            {
+                shown_data.push(other_data[0]);
+            }
+            else if (data.length > shown_data.length)
+            {
+                var other_block = { };
 
-            combined_data.push(other_block);
+                other_block[data_key_label] = "Other";
+
+                other_block[key] = other_total;
+
+                console.log("[[[[[[[[[[ other_block ]]]]]]]]]]");
+                console.log(other_block);
+
+                //var combined_data = current_data.concat([/*other_block*/]);
+
+                shown_data.push(other_block);
+            }
 
             var bar_block = this.chart.selectAll("div.bar_block_" + k)
-                                .data(combined_data, function(d){
+                                .data(shown_data, function(d){
                                     var key = d[data_key_label].replace(new RegExp(" ", 'g'), '');
                                     return key;
                                 })
@@ -348,7 +358,7 @@ var HorizontalBarChart = React.createClass({
                   .style("line-height", bar_height + "px")
                   .style("background-color", function(d, i){
 
-                      if (i == combined_data.length - 1)
+                      if ((i == shown_data.length - 1) && (data.length > shown_data.length))
                       {
                           return "#cccccc";
                       }
@@ -381,19 +391,22 @@ var HorizontalBarChart = React.createClass({
                 .attr("class", "percent")
                 .html(function(d, i) {
 
-                    if (i < (50) || self.state.fully_opened)
-                    {
+                    console.log("::::::::: get percent ::::::::");
+                    console.log(d);
+
+                    /*if (i < (50) || self.state.fully_opened)
+                    {*/
                         var percent = Math.round((d[key] / total) * 100);
 
                         return (percent) + "%";
-                    }
+                    /*}
                     else if (i == (50))
                     {
                         return other_percent + "%";
                     }
                     else {
                        return "---";
-                    }
+                    }*/
 
 
                 })
@@ -734,28 +747,45 @@ var HorizontalBarChart = React.createClass({
             /*width : this.props.width,*/
         }
 
-        if (this.state.fully_opened)
-        {
-            var height = ((this.props.bar_height + this.props.margins.bar_bottom) * 12);
-        }
-        else
-        {
-            var height = ((this.props.bar_height + this.props.margins.bar_bottom) * 8);
-        }
-
-        var chart_style = {
-            width : this.props.width,
-            height : height + "px"
-        }
-
         var load_more_style = {};
 
-        if (this.state.fully_opened)
+        if (this.state.fully_opened || this.state.data.length < 7)
         {
             load_more_style.display = "none";
         }
         else {
             load_more_style.display = "block";
+        }
+
+        if (this.state.fully_opened)
+        {
+
+            if (this.state.data.length > 10)
+            {
+                var height = ((this.props.bar_height + this.props.margins.bar_bottom) * 12);
+            }
+            else
+            {
+                var height = ((this.props.bar_height + this.props.margins.bar_bottom) * (this.state.data.length + 2));
+            }
+
+        }
+        else
+        {
+            if (load_more_style.display == "block")
+            {
+                var height = ((this.props.bar_height + this.props.margins.bar_bottom) * 8);
+            }
+            else
+            {
+                var height = ((this.props.bar_height + this.props.margins.bar_bottom) * 7);
+            }
+
+        }
+
+        var chart_style = {
+            width : this.props.width,
+            height : height + "px"
         }
 
         var nodata_block_style = {

@@ -129,8 +129,10 @@ var TopBar = React.createClass({
 
                     console.log("===== click outside =============");
 
+                    self.setState({
+                        "user_menu_open" : false
+                    });
                 }
-
             }
         }
 
@@ -187,5 +189,30 @@ var TopBar = React.createClass({
 
               </div>
         );
-    }
+    },
+
+    clickedOutsideElement : function(event, elemId) {
+
+        if (!event)
+        {
+            return false;
+        }
+
+        var theElem = this.getEventTarget(event);
+        while(theElem != null) {
+          if(theElem.id == elemId)
+            return false;
+          theElem = theElem.offsetParent;
+        }
+        return true;
+    },
+
+    getEventTarget : function(evt) {
+        var targ = (evt.target) ? evt.target : evt.srcElement;
+        if(targ != null) {
+          if(targ.nodeType == 3)
+            targ = targ.parentNode;
+        }
+        return targ;
+    },
 });

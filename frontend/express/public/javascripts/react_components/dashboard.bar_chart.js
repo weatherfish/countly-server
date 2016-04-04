@@ -5,7 +5,7 @@ var DashboardBarChart = React.createClass({
             period : false
         };
     },
-
+/*
     componentWillMount: function() {
 
         $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
@@ -21,6 +21,12 @@ var DashboardBarChart = React.createClass({
 
 
         }.bind(this));
+
+    },
+*/
+    componentWillReceiveProps: function(nextProps) {
+
+        this.draw("#horizontal_chart"); // todo: !!!!!!!!!!!!
 
     },
 

@@ -181,12 +181,9 @@
         console.log(_activeEvent);
 
         var eventData = {},
-
-            mapKey = _activeEvent.replace("\\", "\\\\").replace("\$", "\\u0024").replace(".", "\\u002e"),
             eventMap = (_activeEvents) ? ((_activeEvents.map) ? _activeEvents.map : {}) : {},
-            countString = (eventMap[mapKey] && eventMap[mapKey].count) ? eventMap[mapKey].count : jQuery.i18n.map["events.table.count"],
-            sumString = (eventMap[mapKey] && eventMap[mapKey].sum) ? eventMap[mapKey].sum : jQuery.i18n.map["events.table.sum"],
-            durString = (eventMap[mapKey] && eventMap[mapKey].dur) ? eventMap[mapKey].dur : jQuery.i18n.map["events.table.dur"];
+            countString = (eventMap[_activeEvent] && eventMap[_activeEvent].count) ? eventMap[_activeEvent].count : jQuery.i18n.map["events.table.count"],
+            sumString = (eventMap[_activeEvent] && eventMap[_activeEvent].sum) ? eventMap[_activeEvent].sum : jQuery.i18n.map["events.table.sum"];
 
         if (_activeSegmentation) {
             eventData = {chartData:{}, chartDP:{dp:[], ticks:[]}};
@@ -309,18 +306,17 @@
 
         for (var i = 0; i < events.length; i++) {
             var arrayToUse = eventsWithoutOrder;
-            var mapKey = events[i].replace("\\", "\\\\").replace("\$", "\\u0024").replace(".", "\\u002e");
+
             if (eventOrder.indexOf(events[i]) !== -1) {
                 arrayToUse = eventsWithOrder;
             }
 
-            if (eventMap[mapKey] && eventMap[mapKey]["name"]) {
+            if (eventMap[events[i]] && eventMap[events[i]]["name"]) {
                 arrayToUse.push({
                     "key": events[i],
-                    "name": eventMap[mapKey]["name"],
-                    "count": eventMap[mapKey]["count"],
-                    "sum": eventMap[mapKey]["sum"],
-                    "dur": eventMap[mapKey]["dur"],
+                    "name": eventMap[events[i]]["name"],
+                    "count": eventMap[events[i]]["count"],
+                    "sum": eventMap[events[i]]["sum"],
                     "is_active": (_activeEvent == events[i])
                 });
             } else {
@@ -346,11 +342,11 @@
             eventNames = [];
 
         for (var event in eventSegmentations) {
-            var mapKey = event.replace("\\", "\\\\").replace("\$", "\\u0024").replace(".", "\\u002e");
-            if (eventMap[mapKey] && eventMap[mapKey]["name"]) {
+
+            if (eventMap[event] && eventMap[event]["name"]) {
                 eventNames.push({
                     "key": event,
-                    "name": eventMap[mapKey]["name"]
+                    "name": eventMap[event]["name"]
                 });
             } else {
                 eventNames.push({
@@ -360,10 +356,10 @@
             }
 
             for (var i = 0; i < eventSegmentations[event].length; i++) {
-                if (eventMap[mapKey] && eventMap[mapKey]["name"]) {
+                if (eventMap[event] && eventMap[event]["name"]) {
                     eventNames.push({
                         "key": event,
-                        "name": eventMap[mapKey]["name"] + " / " + eventSegmentations[event][i]
+                        "name": eventMap[event]["name"] + " / " + eventSegmentations[event][i]
                     });
                 } else {
                     eventNames.push({
@@ -390,9 +386,9 @@
 
     countlyEvent.getEventLongName = function (eventKey) {
         var eventMap = (_activeEvents) ? ((_activeEvents.map) ? _activeEvents.map : {}) : {};
-        var mapKey = eventKey.replace("\\", "\\\\").replace("\$", "\\u0024").replace(".", "\\u002e");
-        if (eventMap[mapKey] && eventMap[mapKey]["name"]) {
-            return eventMap[mapKey]["name"];
+
+        if (eventMap[eventKey] && eventMap[eventKey]["name"]) {
+            return eventMap[eventKey]["name"];
         } else {
             return eventKey;
         }
@@ -504,11 +500,8 @@
         };
 
         var eventMap = (_activeEvents)? ((_activeEvents.map)? _activeEvents.map : {}) : {},
-
-            mapKey = _activeEvent.replace("\\", "\\\\").replace("\$", "\\u0024").replace(".", "\\u002e"),
-            countString = (eventMap[mapKey] && eventMap[mapKey].count)? eventMap[mapKey].count.toUpperCase() : jQuery.i18n.map["events.count"],
-            sumString = (eventMap[mapKey] && eventMap[mapKeyt].sum)? eventMap[mapKey].sum.toUpperCase() : jQuery.i18n.map["events.sum"],
-            durString = (eventMap[mapKey] && eventMap[mapKey].dur)? eventMap[mapKey].dur.toUpperCase() : jQuery.i18n.map["events.dur"];
+            countString = (eventMap[_activeEvent] && eventMap[_activeEvent].count)? eventMap[_activeEvent].count.toUpperCase() : jQuery.i18n.map["events.count"],
+            sumString = (eventMap[_activeEvent] && eventMap[_activeEvent].sum)? eventMap[_activeEvent].sum.toUpperCase() : jQuery.i18n.map["events.sum"];
 
         var bigNumbers = {
             "class": "one-column",
@@ -553,10 +546,8 @@
         function extractDataForGraphAndChart(dataFromDb) {
             var eventData = {},
                 eventMap = (_activeEvents) ? ((_activeEvents.map) ? _activeEvents.map : {}) : {},
-                mapKey = _activeEvent.replace("\\", "\\\\").replace("\$", "\\u0024").replace(".", "\\u002e"),
-                countString = (eventMap[mapKey] && eventMap[mapKey].count) ? eventMap[mapKey].count : jQuery.i18n.map["events.table.count"],
-                sumString = (eventMap[mapKey] && eventMap[mapKey].sum) ? eventMap[mapKey].sum : jQuery.i18n.map["events.table.sum"],
-                durString = (eventMap[mapKey] && eventMap[mapKey].dur) ? eventMap[mapKey].dur : jQuery.i18n.map["events.table.dur"];
+                countString = (eventMap[_activeEvent] && eventMap[_activeEvent].count) ? eventMap[_activeEvent].count : jQuery.i18n.map["events.table.count"],
+                sumString = (eventMap[_activeEvent] && eventMap[_activeEvent].sum) ? eventMap[_activeEvent].sum : jQuery.i18n.map["events.table.sum"];
 
             var chartData = [
                     { data:[], label:countString, color: countlyCommon.GRAPH_COLORS[0] },

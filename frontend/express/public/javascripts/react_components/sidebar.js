@@ -34,13 +34,18 @@ var FullSidebar = React.createClass({
             var right_closed = true;
         }
 
+        var top_active = false;
+
+        if (Object.keys(countlyGlobal['apps']).length === 0 && JSON.stringify(countlyGlobal['apps']) === JSON.stringify({})){
+            top_active = true;
+        }
 
         return {
             selected_left : selected_left,
             in_transition : false,
             right_closed  : right_closed,
             previous_left : -1,
-            top_active    : false,
+            top_active    : top_active,
             active_app    : this.props.active_app,
             right_selected_item : right_selected_item,
             apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode(),
@@ -53,8 +58,12 @@ var FullSidebar = React.createClass({
 
         var self = this;
 
-        var icons = ['sidebar_hover.svg',
-                     'sidebar_active.svg']
+        var icons = ['sidebar.svg',
+                     'sidebar_hover.svg',
+                     'sidebar_active.svg',
+                     'sidebar/dashboard.svg',
+                     'sidebar/dashboard_hover.svg',
+                     'sidebar/dashboard_active.svg']
 
         var loaded = 0;
 
@@ -74,6 +83,7 @@ var FullSidebar = React.createClass({
               });
           });
     },
+
     componentWillReceiveProps: function(nextProps) {
 
         if (this.state.apps_list_hash == JSON.stringify(countlyGlobal['apps']).hashCode())
@@ -84,17 +94,67 @@ var FullSidebar = React.createClass({
         console.log("- +++ app changed  ------");
         console.log(countlyGlobal['apps']);
 
+        if (Object.keys(countlyGlobal['apps']).length === 0 && JSON.stringify(countlyGlobal['apps']) === JSON.stringify({})){
+
+            return this.setState({
+                top_active : true
+            });
+        }
+
+        // add first
+
+        if (!this.state.active_app && !(Object.keys(countlyGlobal['apps']).length === 0 && JSON.stringify(countlyGlobal['apps']) === JSON.stringify({})))
+        {
+
+            for (var app_id in countlyGlobal['apps'])
+            {
+                var active_app = countlyGlobal['apps'][app_id];
+                break;
+            }
+
+            this.setState({
+              active_app : active_app,
+              apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode(),
+              top_active : false
+            });
+
+            return true;
+        }
+
+        // reneme active
+
         var active_app = this.state.active_app;
+
+        var active_found = false;
 
         for (var app_id in countlyGlobal['apps']){
 
             if (app_id == this.state.active_app.id)
             {
                 active_app.name = countlyGlobal['apps'][app_id].name;
+                active_found = true;
                 break;
             }
 
         }
+
+        console.log("active found : ", active_found);
+        console.log(countlyGlobal['apps']);
+
+        var active_app = false;
+
+        if (!active_found){
+
+            for(var id in countlyGlobal['apps'])
+            {
+                active_app = countlyGlobal['apps'][id];
+                break;
+            }
+
+        }
+
+        console.log("{{{{{{{{{{{{{ active_app---}}}}}}}}}}}}}");
+        console.log(active_app);
 
         this.setState({
           active_app : active_app,

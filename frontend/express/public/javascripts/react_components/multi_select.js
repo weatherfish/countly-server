@@ -1,5 +1,7 @@
 var MultiSelectBlock = React.createClass({
 
+    mixins: [OutsideClickClose],
+
     getInitialState : function() {
 
         //var active_selector = this.props.selectors[0];
@@ -143,8 +145,33 @@ var MultiSelectBlock = React.createClass({
 
     show_selectors : function() {
 
+        var new_open_state = !this.state.open;
+
+        console.log("new_open_state:", new_open_state);
+
+        if (new_open_state)
+        {
+
+            var self = this;
+
+            document.onclick = function(event) {
+
+                if(self.clickedOutsideElement(event, React.findDOMNode(self).getAttribute("data-reactid")))
+                {
+
+                    console.log("--- click outside ----");
+
+                    document.onclick = false;
+
+                    self.setState({
+                        "open" : false
+                    })
+                }
+            }
+        }
+
         this.setState({
-            "open" : !this.state.open
+            "open" : new_open_state
         })
 
     },

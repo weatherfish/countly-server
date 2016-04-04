@@ -287,24 +287,9 @@ $.extend(Template.prototype, {
         element.off("keyup", ".cly-select .search input").on("keyup", ".cly-select .search input", function(event) {
             if (!$(this).val()) {
                 $(this).parents(".cly-select").find(".item").removeClass("hidden");
-                $(this).parents(".cly-select").find(".group").show();
             } else {
                 $(this).parents(".cly-select").find(".item:not(:contains('" + $(this).val() + "'))").addClass("hidden");
                 $(this).parents(".cly-select").find(".item:contains('" + $(this).val() + "')").removeClass("hidden");
-                var prevHeader = $(this).parents(".cly-select").find(".group").first();
-                prevHeader.siblings().each(function(){
-                    if($(this).hasClass("group")){
-                        if(prevHeader)
-                            prevHeader.hide();
-                        prevHeader = $(this);
-                    }
-                    else if($(this).hasClass("item") && $(this).is(":visible")){
-                        prevHeader = null;
-                    }
-
-                    if(!$(this).next().length && prevHeader)
-                        prevHeader.hide();
-                })
             }
         });
 
@@ -375,19 +360,6 @@ $.extend(Template.prototype, {
 			});
 		}
 	};
-
-    CountlyHelpers.closeRows = function(dTable){
-        if(dTable.aOpen){
-			$.each( dTable.aOpen, function ( i, id ) {
-				var nTr = $("#"+id)[0];
-				$(nTr).removeClass("selected");
-				$('div.datatablesubrow', $(nTr).next()[0]).slideUp( function () {
-					dTable.fnClose( nTr );
-					dTable.aOpen.splice( i, 1 );
-				} );
-			});
-		}
-    };
 
 	CountlyHelpers.appIdsToNames = function(context){
         var ret = "";

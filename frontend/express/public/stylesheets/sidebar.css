@@ -363,146 +363,132 @@
   width: 240px !important;
   background-position: left;
 }
-/*
-#sidebar #left_part div.app1 {
-    background-image : url('../images/sidebar/icon1.png');
-}
-
-#sidebar #left_part div.app1_active {
-    background-image : url('../images/sidebar/icon2_active.png');
-}*/
-/*
-#sidebar #left_part div.app2 {
-    background-image : url('../images/icon2.png');
-}
-
-#sidebar #left_part div.app2_active {
-    background-image : url('../images/icon2_active.png');
-}*/
-/* todo : move to javascript img */
-/*
-#sidebar #left_part .item_wrap.hoverable:hover .icon {
-    background-image : url('../images/icon2_active.png');
-}
-*/
+/* sidebar SVG icons  */
 /* user */
 #sidebar #left_part div.user {
-  background: url('../images/sidebar/user.png');
-  background-image: url("../images/sidebar/user.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_false.svg#user");
+  background-image: url("../images/sidebar.svg#user");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part div.user_active {
-  background: url('../images/sidebar/user_active.png');
-  background-image: url("../images/sidebar/user_active.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_active.svg#user");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.user {
-  background: url('../images/sidebar/user_hover.png');
-  background-image: url("../images/sidebar/user_hover.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_hover.svg#user");
   background-repeat: no-repeat;
   background-position: center;
 }
 /* metrics */
 #sidebar #left_part div.metrics {
-  background: url('../images/sidebar/metrics.png');
-  background-image: url("../images/sidebar/metrics.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_false.svg#metrics");
+  background-image: url("../images/sidebar.svg#metrics");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part div.metrics_active {
-  background: url('../images/sidebar/metrics_active.png');
-  background-image: url("../images/sidebar/metrics_active.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_active.svg#metrics");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.metrics {
-  background: url('../images/sidebar/metrics_hover.png');
-  background-image: url("../images/sidebar/metrics_hover.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_hover.svg#metrics");
   background-repeat: no-repeat;
   background-position: center;
 }
 /* engagement */
 #sidebar #left_part div.engagement {
-  background: url('../images/sidebar/engagement.png');
-  background-image: url("../images/sidebar/engagement.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_false.svg#engagement");
+  background-image: url("../images/sidebar.svg#engagement");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part div.engagement_active {
-  background: url('../images/sidebar/engagement_active.png');
-  background-image: url("../images/sidebar/engagement_active.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_active.svg#engagement");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.engagement {
-  background: url('../images/sidebar/engagement_hover.png');
-  background-image: url("../images/sidebar/engagement_hover.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_hover.svg#engagement");
   background-repeat: no-repeat;
   background-position: center;
 }
 /* messaging */
 #sidebar #left_part div.messaging {
-  background: url('../images/sidebar/messaging.png');
-  background-image: url("../images/sidebar/messaging.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_false.svg#messaging");
+  background-image: url("../images/sidebar.svg#messaging");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part div.messaging_active {
-  background: url('../images/sidebar/messaging_active.png');
-  background-image: url("../images/sidebar/messaging_active.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_active.svg#messaging");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.messaging {
-  background: url('../images/sidebar/messaging_hover.png');
-  background-image: url("../images/sidebar/messaging_hover.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_hover.svg#messaging");
   background-repeat: no-repeat;
   background-position: center;
 }
 /* funnels */
 #sidebar #left_part div.funnels {
-  background: url('../images/sidebar/funnels.png');
-  background-image: url("../images/sidebar/funnels.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_false.svg#funnels");
+  background-image: url("../images/sidebar.svg#funnels");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part div.funnels_active {
-  background: url('../images/sidebar/funnels_active.png');
-  background-image: url("../images/sidebar/funnels_active.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_active.svg#funnels");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.funnels {
-  background: url('../images/sidebar/funnels_hover.png');
-  background-image: url("../images/sidebar/funnels_hover.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_hover.svg#funnels");
   background-repeat: no-repeat;
   background-position: center;
 }
 /* crashes */
 #sidebar #left_part div.crashes {
-  background: url('../images/sidebar/crashes.png');
-  background-image: url("../images/sidebar/crashes.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_false.svg#crashes");
+  background-image: url("../images/sidebar.svg#crashes");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part div.crashes_active {
-  background: url('../images/sidebar/crashes_active.png');
-  background-image: url("../images/sidebar/crashes_active.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_active.svg#crashes");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.crashes {
-  background: url('../images/sidebar/crashes_hover.png');
-  background-image: url("../images/sidebar/crashes_hover.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_hover.svg#crashes");
   background-repeat: no-repeat;
   background-position: center;
 }
 /* drill */
 #sidebar #left_part div.drill {
-  background: url('../images/sidebar/drill.png');
-  background-image: url("../images/sidebar/drill.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_false.svg#drill");
+  background-image: url("../images/sidebar.svg#drill");
   background-repeat: no-repeat;
   background-position: center;
 }
@@ -510,27 +496,28 @@
   background-image: url('../images/sidebar/drill_active.png');
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.drill {
-  background: url('../images/sidebar/drill_hover.png');
-  background-image: url("../images/sidebar/drill_hover.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_hover.svg#drill");
   background-repeat: no-repeat;
   background-position: center;
 }
 /* manage */
 #sidebar #left_part div.manage {
-  background: url('../images/sidebar/manage.png');
-  background-image: url("../images/sidebar/manage.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_false.svg#manage");
+  background-image: url("../images/sidebar.svg#manage");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part div.manage_active {
-  background: url('../images/sidebar/manage_active.png');
-  background-image: url("../images/sidebar/manage_active.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_active.svg#manage");
   background-repeat: no-repeat;
   background-position: center;
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.manage {
-  background: url('../images/sidebar/manage_hover.png');
-  background-image: url("../images/sidebar/manage_hover.svg");
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_hover.svg#manage");
   background-repeat: no-repeat;
   background-position: center;
 }

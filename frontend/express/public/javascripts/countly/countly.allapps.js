@@ -9,12 +9,12 @@
 
     //Public Methods
     countlyAllApps.initialize = function () {
-        this.reset();
         return countlyAllApps.refresh();
     };
 
     countlyAllApps.refresh = function () {
         if (!countlyCommon.DEBUG) {
+			this.reset();
 			var deffereds = [];
 			_tempApp = countlyCommon.ACTIVE_APP_ID;
 			for(var i in countlyGlobal["apps"]){
@@ -74,11 +74,7 @@
     };
 
     countlyAllApps.reset = function () {
-		_appData = {"all":{_id:"all", name:"All apps"}};
 		_appIds = {};
-		_sessions = {};
-		_sessionData = {};
-        _type = "mobile";
     };
 	
 	countlyAllApps.getData = function () {

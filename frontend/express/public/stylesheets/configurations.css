@@ -143,3 +143,10 @@
     margin : 0px;
     background-color : #ffffff
 }
+
+.configurations_page .setting_block input[type="checkbox"]:checked:after {
+    background : url('../images/tick.svg');
+    background-image: url("../images/tick.svg");
+    background-repeat   : no-repeat;
+    background-position : center;
+}

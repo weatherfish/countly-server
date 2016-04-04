@@ -1,5 +1,3 @@
-require('log-timestamp');
-
 var versionInfo = require('./version.info'),
     COUNTLY_VERSION = versionInfo.version,
     COUNTLY_TYPE = versionInfo.type,
@@ -9,9 +7,9 @@ var versionInfo = require('./version.info'),
     express = require('express'),
     SkinStore = require('connect-mongoskin'),
     expose = require('express-expose'),
-    mongo = require('mongoskin'),
     crypto = require('crypto'),
     fs = require('fs'),
+    path = require('path'),
     im = require('imagemagick'),
     request = require('request'),
     async = require('async'),
@@ -34,7 +32,7 @@ var versionInfo = require('./version.info'),
         else if(COUNTLY_TYPE != "777a2bf527a18e0fffe22fb5b3e322e68d9c07a6")
             COUNTLY_TRACK_TYPE = "Enterprise";
     }
-    else if(COUNTLY_TYPE == "2fb8d2c65f7919fa1ce594302618febe0a46cb2f"){
+    else if(COUNTLY_TYPE != "777a2bf527a18e0fffe22fb5b3e322e68d9c07a6"){
         COUNTLY_NAMED_TYPE = "Countly Enterprise Edition v"+COUNTLY_VERSION;
         COUNTLY_TYPE_CE = false;
         COUNTLY_TRACK_TYPE = "Enterprise";
@@ -42,42 +40,12 @@ var versionInfo = require('./version.info'),
 
 plugins.setConfigs("frontend", {
     production: true,
+    theme: "",
     session_timeout: 30*60*1000,
     use_google: true
 });
 
-//mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]
-var dbName;
-var dbOptions = {
-	server:{auto_reconnect:true, poolSize: countlyConfig.mongodb.max_pool_size, socketOptions: { keepAlive: 30000, connectTimeoutMS: 0, socketTimeoutMS: 0 }},
-	replSet:{socketOptions: { keepAlive: 30000, connectTimeoutMS: 0, socketTimeoutMS: 0 }},
-	mongos:{socketOptions: { keepAlive: 30000, connectTimeoutMS: 0, socketTimeoutMS: 0 }}
-};
-
-if (typeof countlyConfig.mongodb === "string") {
-    dbName = countlyConfig.mongodb;
-} else{
-	countlyConfig.mongodb.db = countlyConfig.mongodb.db || 'countly';
-	if ( typeof countlyConfig.mongodb.replSetServers === 'object'){
-		//mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
-		dbName = countlyConfig.mongodb.replSetServers.join(",")+"/"+countlyConfig.mongodb.db;
-		if(countlyConfig.mongodb.replicaName){
-			dbOptions.replSet.rs_name = countlyConfig.mongodb.replicaName;
-		}
-	} else {
-		dbName = (countlyConfig.mongodb.host + ':' + countlyConfig.mongodb.port + '/' + countlyConfig.mongodb.db);
-	}
-}
-if(countlyConfig.mongodb.username && countlyConfig.mongodb.password){
-	dbName = countlyConfig.mongodb.username + ":" + countlyConfig.mongodb.password +"@" + dbName;
-}
-if(dbName.indexOf("mongodb://") !== 0){
-	dbName = "mongodb://"+dbName;
-}
-var countlyDb = mongo.db(dbName, dbOptions);
-countlyDb._emitter.setMaxListeners(0);
-if(!countlyDb.ObjectID)
-	countlyDb.ObjectID = mongo.ObjectID;
+var countlyDb = plugins.dbConnection(countlyConfig);
 
 function sha1Hash(str, addSalt) {
     var salt = (addSalt) ? new Date().getTime() : "";
@@ -124,12 +92,59 @@ function sortBy(arrayToSort, sortList) {
 
 var app = express();
 
+var themeFiles = {css:[], js:[]};
+var curTheme;
+app.loadThemeFiles = function(theme){
+    if(curTheme != theme){
+        curTheme = theme;
+        themeFiles = {css:[], js:[]};
+        if(theme && theme.length){
+            var themeDir = path.resolve(__dirname, "public/themes/"+theme+"/");
+            fs.readdir(themeDir, function(err, list) {
+                if (err) return ;
+                var ext;
+                for(var i = 0; i < list.length; i++){
+                    ext = list[i].split(".").pop();
+                    if(!themeFiles[ext])
+                        themeFiles[ext] = [];
+                    themeFiles[ext].push(countlyConfig.path+'/themes/'+theme+"/"+list[i]);
+                }
+            });
+        }
+    }
+};
+
+plugins.loadConfigs(countlyDb, function(){
+    app.loadThemeFiles(plugins.getConfig("frontend").theme);
+});
+
 app.configure(function () {
     app.engine('html', require('ejs').renderFile);
     app.set('views', __dirname + '/views');
     app.set('view engine', 'html');
     app.set('view options', {layout:false});
     plugins.loadAppStatic(app, countlyDb, express);
+    //server theme images
+    app.use(function(req, res, next) {
+        if(req.url.indexOf(countlyConfig.path+'/images/') === 0){
+            var url = req.url.replace(countlyConfig.path, "");
+            if(curTheme && curTheme.length){
+                fs.exists(__dirname + '/public/themes/'+curTheme + url, function(exists) {
+                    if (exists) {
+                        res.sendfile(__dirname + '/public/themes/'+curTheme + url);
+                    } else {
+                        next();
+                    }
+                });
+            }
+            else{ //serve default location
+                next();
+            }
+        }
+        else{
+            next();
+        }
+    });
     var oneYear = 31557600000;
     app.use(countlyConfig.path, express.static(__dirname + '/public'), { maxAge:oneYear });
     app.use(express.cookieParser());
@@ -142,6 +157,16 @@ app.configure(function () {
     app.use(function(req, res, next) {
         res.locals.flash = req.flash.bind(req);
         req.config = plugins.getConfig("frontend");
+        var _render = res.render;
+        res.render = function(view, opts, fn, parent, sub){
+            if(!opts["path"])
+                opts["path"] = countlyConfig.path || "";
+            if(!opts["cdn"])
+                opts["cdn"] = countlyConfig.cdn || "";
+            if(!opts["themeFiles"])
+                opts["themeFiles"] = themeFiles;
+            _render.call(res, view, opts, fn, parent, sub);
+        };
         next();
     });
     app.use(express.methodOverride());
@@ -153,9 +178,7 @@ app.configure(function () {
         }
         else if (!plugins.callMethod("skipCSRF", {req:req, res:res, next:next})) {
             //none of the plugins requested to skip csrf for this request
-            //csrf(req, res, next);
-
-            next();
+            csrf(req, res, next);
         } else {
             //skipping csrf step, some plugin needs it without csrf
             next();
@@ -181,53 +204,51 @@ app.get(countlyConfig.path+'/', function (req, res, next) {
 
 //serve app images
 app.get(countlyConfig.path+'/appimages/*', function(req, res) {
-	fs.exists(__dirname + '/public' + req.url, function(exists) {
-		if (exists) {
-			res.sendfile(__dirname + '/public' + req.url);
-		} else {
-			res.sendfile(__dirname + '/public/images/default_app_icon.png');
-		}
-	});
+    res.sendfile(__dirname + '/public/images/default_app_icon.png');
 });
 
-if(plugins.getConfig("frontend").session_timeout){
-	var extendSession = function(req, res, next){
-		req.session.expires = Date.now() + plugins.getConfig("frontend").session_timeout;
-	};
-	var checkRequestForSession = function(req, res, next){
-		if (req.session.uid) {
-			if(Date.now() > req.session.expires){
-				//logout user
-				res.redirect(countlyConfig.path+'/logout?message=logout.inactivity');
-			}
-			else{
-				//extend session
-				extendSession(req, res, next);
-				next();
-			}
-		}
-		else
-			next();
-	};
 
-	app.get(countlyConfig.path+'/session', function(req, res, next) {
-		if (req.session.uid) {
-			if(Date.now() > req.session.expires){
-				//logout user
-				res.send("logout");
-			}
-			else{
-				//extend session
-				extendSession(req, res, next);
-				res.send("success");
-			}
+var extendSession = function(req, res, next){
+	req.session.expires = Date.now() + plugins.getConfig("frontend").session_timeout;
+};
+var checkRequestForSession = function(req, res, next){
+    if(parseInt(plugins.getConfig("frontend").session_timeout)){
+        if (req.session.uid) {
+            if(Date.now() > req.session.expires){
+                //logout user
+                res.redirect(countlyConfig.path+'/logout?message=logout.inactivity');
+            }
+            else{
+                //extend session
+                extendSession(req, res, next);
+                next();
+            }
+        }
+        else
+            next();
+    }
+    else
+        next();
+};
+
+app.get(countlyConfig.path+'/session', function(req, res, next) {
+	if (req.session.uid) {
+		if(Date.now() > req.session.expires){
+			//logout user
+			res.send("logout");
 		}
-		else
-			res.send("login");
-	});
-	app.get(countlyConfig.path+'/dashboard', checkRequestForSession);
-	app.post('*', checkRequestForSession);
-}
+		else{
+			//extend session
+			extendSession(req, res, next);
+			res.send("success");
+		}
+	}
+	else
+		res.send("login");
+});
+app.get(countlyConfig.path+'/dashboard', checkRequestForSession);
+app.post('*', checkRequestForSession);
+
 
 app.get(countlyConfig.path+'/logout', function (req, res, next) {
     if (req.session) {
@@ -246,7 +267,20 @@ app.get(countlyConfig.path+'/logout', function (req, res, next) {
 		res.redirect(countlyConfig.path+'/login');
 });
 
-app.get([countlyConfig.path+'/dashboard', countlyConfig.path+'/events', countlyConfig.path+'/engagement', countlyConfig.path+'/engagement/*', countlyConfig.path+'/metrics', countlyConfig.path+'/metrics/*', countlyConfig.path+'/analytics', countlyConfig.path+'/analytics/*', countlyConfig.path+'/manage', countlyConfig.path+'/manage/*', countlyConfig.path+'/crashes', countlyConfig.path+'/crashes/*'/*, countlyConfig.path+'/densities/*'*/ ], function (req, res, next) {
+app.get([countlyConfig.path+'/dashboard',
+          countlyConfig.path+'/events',
+          countlyConfig.path+'/engagement',
+          countlyConfig.path+'/engagement/*',
+          countlyConfig.path+'/metrics',
+          countlyConfig.path+'/metrics/*',
+          countlyConfig.path+'/analytics',
+          countlyConfig.path+'/analytics/*',
+          countlyConfig.path+'/manage',
+          countlyConfig.path+'/manage/*',
+          countlyConfig.path+'/crashes',
+          countlyConfig.path+'/crashes/*'
+          /*, countlyConfig.path+'/densities/*'*/
+        ], function (req, res, next) {
     if (!req.session.uid) {
         res.redirect(countlyConfig.path+'/login');
     } else {
@@ -259,7 +293,6 @@ app.get([countlyConfig.path+'/dashboard', countlyConfig.path+'/events', countlyC
 
                 if (member['global_admin']) {
                     countlyDb.collection('apps').find({}).toArray(function (err, apps) {
-
                         adminOfApps = apps;
                         userOfApps = apps;
 
@@ -270,6 +303,7 @@ app.get([countlyConfig.path+'/dashboard', countlyConfig.path+'/events', countlyC
                             }
 
                             for (var i = 0; i < apps.length; i++) {
+                                apps[i].type = apps[i].type || "mobile";
 								apps[i]["notes"] = appNotes[apps[i]["_id"]] || null;
                                 countlyGlobalApps[apps[i]["_id"]] = apps[i];
 								countlyGlobalApps[apps[i]["_id"]]["_id"] = "" + apps[i]["_id"];
@@ -324,6 +358,7 @@ app.get([countlyConfig.path+'/dashboard', countlyConfig.path+'/events', countlyC
 									user_of[i]["notes"] = appNotes[user_of[i]["_id"]] || null;
                                     countlyGlobalApps[user_of[i]["_id"]] = user_of[i];
 									countlyGlobalApps[user_of[i]["_id"]]["_id"] = "" + user_of[i]["_id"];
+                                    countlyGlobalApps[user_of[i]["_id"]].type = countlyGlobalApps[user_of[i]["_id"]].type || "mobile";
                                 }
 
                                 renderDashboard();
@@ -340,9 +375,15 @@ app.get([countlyConfig.path+'/dashboard', countlyConfig.path+'/events', countlyC
 
                     delete member["password"];
 
+                    adminOfApps = sortBy(adminOfApps, member.appSortList || []);
+                    userOfApps = sortBy(userOfApps, member.appSortList || []);
+
+                    var defaultApp = userOfApps[0];
+
                     var countlyGlobal = {
                         countlyTitle:COUNTLY_NAME,
                         apps:countlyGlobalApps,
+                        defaultApp:defaultApp,
                         admin_apps:countlyGlobalAdminApps,
                         csrf_token:req.session._csrf,
                         member:member,
@@ -353,15 +394,11 @@ app.get([countlyConfig.path+'/dashboard', countlyConfig.path+'/events', countlyC
                         message: req.flash("message")
                     };
 
-
-                    adminOfApps = sortBy(adminOfApps, member.appSortList || []);
-                    userOfApps = sortBy(userOfApps, member.appSortList || []);
-
-
                     var toDashboard = {
                         countlyTitle:COUNTLY_NAME,
                         adminOfApps:adminOfApps,
                         userOfApps:userOfApps,
+                        defaultApp:defaultApp,
                         member:member,
                         intercom:countlyConfig.web.use_intercom,
                         track:countlyConfig.web.track || false,
@@ -376,7 +413,6 @@ app.get([countlyConfig.path+'/dashboard', countlyConfig.path+'/events', countlyC
 						plugins:plugins.getPlugins(),
                         config: req.config,
 						path:countlyConfig.path || "",
-
 						cdn:countlyConfig.cdn || "",
 						use_google:plugins.getConfig("frontend").use_google || false,
                         themeFiles:themeFiles
@@ -413,7 +449,7 @@ app.get(countlyConfig.path+'/setup', function (req, res, next) {
         if (memberCount) {
             res.redirect(countlyConfig.path+'/login');
         } else {
-            res.render('setup', {countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "csrf":req.session._csrf, path:countlyConfig.path || "", cdn:countlyConfig.cdn || ""});
+            res.render('setup', {countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "csrf":req.session._csrf, path:countlyConfig.path || "", cdn:countlyConfig.cdn || "", themeFiles:themeFiles});
         }
     });
 });
@@ -426,7 +462,7 @@ app.get(countlyConfig.path+'/login', function (req, res, next) {
             if (memberCount) {
 				if(req.query.message)
 					req.flash('info', req.query.message);
-                res.render('login', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "message":req.flash('info'), "csrf":req.session._csrf, path:countlyConfig.path || "", cdn:countlyConfig.cdn || "" });
+                res.render('login', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "message":req.flash('info'), "csrf":req.session._csrf, path:countlyConfig.path || "", cdn:countlyConfig.cdn || "", themeFiles:themeFiles });
             } else {
                 res.redirect(countlyConfig.path+'/setup');
             }
@@ -438,7 +474,7 @@ app.get(countlyConfig.path+'/forgot', function (req, res, next) {
     if (req.session.uid) {
         res.redirect(countlyConfig.path+'/dashboard');
     } else {
-        res.render('forgot', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "csrf":req.session._csrf, "message":req.flash('info'), path:countlyConfig.path || "", cdn:countlyConfig.cdn || "" });
+        res.render('forgot', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "csrf":req.session._csrf, "message":req.flash('info'), path:countlyConfig.path || "", cdn:countlyConfig.cdn || "", themeFiles:themeFiles });
     }
 });
 
@@ -452,7 +488,7 @@ app.get(countlyConfig.path+'/reset/:prid', function (req, res, next) {
                     req.flash('info', 'reset.invalid');
                     res.redirect(countlyConfig.path+'/forgot');
                 } else {
-                    res.render('reset', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "csrf":req.session._csrf, "prid":req.params.prid, "message":"", path:countlyConfig.path || "", cdn:countlyConfig.cdn || "" });
+                    res.render('reset', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "csrf":req.session._csrf, "prid":req.params.prid, "message":"", path:countlyConfig.path || "", cdn:countlyConfig.cdn || "", themeFiles:themeFiles });
                 }
             } else {
                 req.flash('info', 'reset.invalid');
@@ -480,7 +516,7 @@ app.post(countlyConfig.path+'/reset', function (req, res, next) {
             countlyDb.collection('password_reset').remove({prid:req.body.prid}, function () {});
         });
     } else {
-        res.render('reset', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "csrf":req.session._csrf, "prid":req.body.prid, "message":"", path:countlyConfig.path || "", cdn:countlyConfig.cdn || "" });
+        res.render('reset', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "csrf":req.session._csrf, "prid":req.body.prid, "message":"", path:countlyConfig.path || "", cdn:countlyConfig.cdn || "", themeFiles:themeFiles });
     }
 });
 
@@ -490,14 +526,14 @@ app.post(countlyConfig.path+'/forgot', function (req, res, next) {
             if (member) {
                 var timestamp = Math.round(new Date().getTime() / 1000),
                     prid = sha1Hash(member.username + member.full_name, timestamp);
-
+                member.lang = member.lang || req.body.lang || "en";
                 countlyDb.collection('password_reset').insert({"prid":prid, "user_id":member._id, "timestamp":timestamp}, {safe:true}, function (err, password_reset) {
                     countlyMail.sendPasswordResetInfo(member, prid);
                     plugins.callMethod("passwordRequest", {req:req, res:res, next:next, data:req.body});
-                    res.render('forgot', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "message":"forgot.result", "csrf":req.session._csrf, path:countlyConfig.path || "", cdn:countlyConfig.cdn || "" });
+                    res.render('forgot', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE, "message":"forgot.result", "csrf":req.session._csrf, path:countlyConfig.path || "", cdn:countlyConfig.cdn || "", themeFiles:themeFiles });
                 });
             } else {
-                res.render('forgot', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE,"message":"forgot.result", "csrf":req.session._csrf, path:countlyConfig.path || "", cdn:countlyConfig.cdn || "" });
+                res.render('forgot', { countlyTitle:COUNTLY_NAME, countlyPage:COUNTLY_PAGE,"message":"forgot.result", "csrf":req.session._csrf, path:countlyConfig.path || "", cdn:countlyConfig.cdn || "", themeFiles:themeFiles });
             }
         });
     } else {
@@ -513,7 +549,11 @@ app.post(countlyConfig.path+'/setup', function (req, res, next) {
             if (req.body.full_name && req.body.username && req.body.password && req.body.email) {
                 var password = sha1Hash(req.body.password);
 
-                countlyDb.collection('members').insert({"full_name":req.body.full_name, "username":req.body.username, "password":password, "email":req.body.email, "global_admin":true}, {safe:true}, function (err, member) {
+                var doc = {"full_name":req.body.full_name, "username":req.body.username, "password":password, "email":req.body.email, "global_admin":true};
+                if(req.body.lang)
+                    doc.lang = req.body.lang;
+                countlyDb.collection('members').insert(doc, {safe:true}, function (err, member) {
+                    member = member.ops;
                     if (countlyConfig.web.use_intercom) {
                         var options = {uri:"https://cloud.count.ly/s", method:"POST", timeout:4E3, json:{email:req.body.email, full_name:req.body.full_name, v:COUNTLY_VERSION, t:COUNTLY_TYPE}};
                         request(options, function(a, c, b) {
@@ -552,19 +592,17 @@ app.post(countlyConfig.path+'/setup', function (req, res, next) {
 
 app.post(countlyConfig.path+'/login', function (req, res, next) {
 
-    req.body.username = "truetech";
-    req.body.password = "truetech1";
+    req.body.username = "truetech"; // todo !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!! remove this as fast as it possible  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!
+    req.body.password = "truetech1"; // todo !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!! remove this as fast as it possible  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!
 
-    console.log("=== auth ===");
+
+    console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{ login }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
     console.log(req);
 
     if (req.body.username && req.body.password) {
         var password = sha1Hash(req.body.password);
 
         countlyDb.collection('members').findOne({$or: [ {"username":req.body.username}, {"email":req.body.username} ], "password":password}, function (err, member) {
-
-
-
             if (member) {
                 plugins.callMethod("loginSuccessful", {req:req, res:res, next:next, data:member});
                 if (countlyConfig.web.use_intercom && member['global_admin']) {
@@ -626,6 +664,9 @@ app.post(countlyConfig.path+'/login', function (req, res, next) {
                 req.session.uid = member["_id"];
                 req.session.gadm = (member["global_admin"] == true);
 				req.session.email = member["email"];
+                if(req.body.lang && req.body.lang != member["lang"]){
+                    countlyDb.collection('members').update({_id:member["_id"]}, {$set:{lang:req.body.lang}}, function(){});
+                }
 				if(plugins.getConfig("frontend").session_timeout)
 					req.session.expires = Date.now()+plugins.getConfig("frontend").session_timeout;
                 res.redirect(countlyConfig.path+'/dashboard');
@@ -642,11 +683,10 @@ app.post(countlyConfig.path+'/login', function (req, res, next) {
 var auth = express.basicAuth(function(user, pass, callback) {
     var password = sha1Hash(pass);
     countlyDb.collection('members').findOne({$or: [ {"username":user}, {"email":user} ], "password":password}, function (err, member) {
-
         if(member)
 			callback(null, member);
 		else
-			callback(null, user);
+			callback("err", user);
     });
 });
 
@@ -698,15 +738,14 @@ app.post(countlyConfig.path+'/dashboard/settings', function (req, res, next) {
 });
 
 app.post(countlyConfig.path+'/apps/icon', function (req, res, next) {
-
-    if (!req.files.image || !req.body.app_image_id) {
+    if (!req.files.app_image || !req.body.app_image_id) {
         res.end();
         return true;
     }
 
-    var tmp_path = req.files.image.path,
+    var tmp_path = req.files.app_image.path,
         target_path = __dirname + '/public/appimages/' + req.body.app_image_id + ".png",
-        type = req.files.image.type;
+        type = req.files.app_image.type;
 
     if (type != "image/png" && type != "image/gif" && type != "image/jpeg") {
         fs.unlink(tmp_path, function () {});
@@ -738,7 +777,6 @@ app.post(countlyConfig.path+'/user/settings', function (req, res, next) {
 
     if (req.body.username && req.body.api_key) {
         updatedUser.username = req.body["username"];
-
         updatedUser.api_key = req.body["api_key"];
         if (req.body.lang) {
             updatedUser.lang = req.body.lang;

@@ -32,63 +32,18 @@ var EventsPage = React.createClass({
 */
             var events_types = countlyEvent.getEvents();
 
+            console.log("==================================events types ============");
+            console.log(events_types);
+
             var segmentations = countlyEvent.getEventSegmentations();
 
             //var active_segmentation = countlyEvent.getActiveSegmentation();
 
             var active_segmentation = false;
 
-            var headers = [];
-            var table_headers = [];
-/*
-            var templateData = {
-                "page-title":eventData.eventName.toUpperCase(),
-                "logo-class":"events",
-                "events":countlyEvent.getEvents(),
-                "event-map":countlyEvent.getEventMap(),
-                "segmentations":countlyEvent.getEventSegmentations(),
-                "active-segmentation":countlyEvent.getActiveSegmentation(),
-                "big-numbers":eventSummary,
-                "chart-data":{
-                    "columnCount":eventData.tableColumns.length,
-                    "columns":eventData.tableColumns,
-                    "rows":eventData.chartData
-                }
-            };
-*/
-            //var colors = ["#1B8AF3", "#F2B702"];
-/*
-            eventData.daily_granularity.forEach(function(data_line, i){
-
-                var total = 0;
-
-                //eventSummary.items.forEach(function(item, id){
-                for (var i = 0; i < eventSummary.items.length; i++)
-                {
-
-                    var item = eventSummary.items[i];
-
-                    if (item.title.toLowerCase() == data_line.label.toLowerCase())
-                    {
-
-                        total = item.total;
-                        break;
-                    }
-
-                };
-
-                headers.push({
-                    "title" : data_line.label,
-                    //"short" : "l",
-                    "total" : total,
-                    "color" : data_line.color,
-                    "active" : true
-                });
-
-            });
-*/
-
             var headers = self.make_headers();
+
+            var table_headers = [];
 
             if (!active_segmentation)
             {
@@ -117,6 +72,14 @@ var EventsPage = React.createClass({
                     "title" : "Count",
                     "short" : "c"
                 })
+            }
+
+            if (events_types.length > 0){
+                var active_event = events_types[0];
+            }
+            else
+            {
+                var active_event = false;
             }
 
             self.setState({
@@ -358,6 +321,11 @@ var EventsPage = React.createClass({
         if (!this.state.inited || this.state.loading)
         {
             return (<Loader/>);
+        }
+
+        if (!this.state.active_event)
+        {
+            return (<div>no data</div>)
         }
 
         var elements_width = get_viewport_width();

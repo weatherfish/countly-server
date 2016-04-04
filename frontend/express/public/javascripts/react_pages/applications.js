@@ -1,6 +1,6 @@
 var NewAppWindow = React.createClass({
 
-    mixins: [React.LinkedStateMixin],
+    mixins: [React.LinkedStateMixin, OutsideClickClose],
 
     countries : [],
     categories : [],
@@ -49,11 +49,51 @@ var NewAppWindow = React.createClass({
 
         return ({
             //"confirmation_waiting" : false
+            "open" : false,
             "confirmation_waiting" : true,
             "confirmation_sign" : jQuery.i18n.map["management-applications.delete-confirm"],
             "confirmation_function" : false
         });
 
+    },
+/*
+    componentDidMount : function(){
+
+        var self = this;
+
+        document.onclick = function(event) {
+
+            if(self.clickedOutsideElement(event, React.findDOMNode(self).getAttribute("data-reactid")))
+            {
+
+                console.log("--- click outside ----");
+
+                document.onclick = false;
+                self.props.onClose();
+            }
+        }
+    },
+*/
+    componentWillReceiveProps : function(nextProps){
+
+        var self = this;
+
+        if (nextProps.open && nextProps.open != this.state.open){
+            document.onclick = function(event) {
+
+                if(self.clickedOutsideElement(event, React.findDOMNode(self).getAttribute("data-reactid")))
+                {
+                    document.onclick = false;
+                    self.props.onClose();
+                }
+            }
+        }
+
+        if (nextProps.open != this.state.open){
+            this.setState({
+                open : nextProps.open
+            });
+        }
     },
 
     on_setting_change : function(key, value){
@@ -214,6 +254,71 @@ var NewAppWindow = React.createClass({
     }
 });
 
+var ActionSelector = React.createClass({
+
+    mixins: [OutsideClickClose],
+
+    getInitialState: function() {
+        return ({
+            "open" : false
+        })
+    },
+
+    openClick : function(){
+
+        var new_open_state = !this.state.open;
+
+        if (new_open_state)
+        {
+
+            var self = this;
+
+            document.onclick = function(event) {
+
+                if(self.clickedOutsideElement(event, React.findDOMNode(self).getAttribute("data-reactid")))
+                {
+
+                    document.onclick = false;
+
+                    self.setState({
+                        "open" : false
+                    })
+                }
+            }
+        }
+
+        this.setState({
+            "open" : new_open_state
+        })
+
+    },
+
+    render : function(){
+
+        var actions_list_style = {};
+
+        if (this.state.open)
+        {
+            actions_list_style.display = "block";
+        }
+        else {
+            actions_list_style.display = "none";
+        }
+
+        return(<div className="action_selector">
+            <div className="open_button" onClick={this.openClick}>
+                <div className="sign">Action</div>
+                <div className="arrow"></div>
+            </div>
+            <div className="actions_list" style={actions_list_style}>
+                <div onClick={this.props.deleteApp}>Delete App</div>
+                <div onClick={this.props.clearData}>Clear Data</div>
+            </div>
+        </div>)
+    }
+
+});
+
 var ApplicationsPage = React.createClass({
 
     app_categories : false,
@@ -271,7 +376,7 @@ var ApplicationsPage = React.createClass({
             current_app : current_app,
             current_app_id : app_id,
             app_list_is_open : false,
-            actions_list_is_open : false,
+            //actions_list_is_open : false,
             new_app_open : new_app_open
         });
 
@@ -294,11 +399,13 @@ var ApplicationsPage = React.createClass({
 
     },
 
-    actionsListClick : function(){
+    onAppCreate : function(id){
 
-        this.setState({
-            actions_list_is_open : !this.state.actions_list_is_open
-        })
+        console.log("=========== on app create =======");
+
+        this.props.on_app_rename();
+
+        this.selectAppClick(id);
 
     },
 
@@ -589,16 +696,6 @@ var ApplicationsPage = React.createClass({
             app_list_style.display = "none";
         }
 
-        var actions_list_style = {};
-
-        if (this.state.actions_list_is_open)
-        {
-            actions_list_style.display = "block";
-        }
-        else {
-            actions_list_style.display = "none";
-        }
-
         var icon_style = {};
 
         icon_style["background-image"] = "url('/appimages/" + this.state.current_app._id + ".png?v=" + this.state.current_app.icon_version + "')";
@@ -640,7 +737,7 @@ var ApplicationsPage = React.createClass({
                 <NewAppWindow
                     open={this.state.new_app_open}
                     onClose={this.new_app_close}
-                    onCreate={self.selectAppClick}
+                    onCreate={self.onAppCreate}
                     upload_icon={this.upload_icon}
                 />
 
@@ -655,20 +752,14 @@ var ApplicationsPage = React.createClass({
                               <SimpleSelectBlock
                                   selectors={app_selectors}
                                   active_selector_key={self.state.current_app_id}
-                                  onChange={self.selectAppClick}
+                                  onChange={self.onAppCreate}
                                   className="application_selector"
                               />
 
-                              <div className="action_selector">
-                                  <div className="open_button" onClick={this.actionsListClick}>
-                                      <div className="sign">Action</div>
-                                      <div className="arrow"></div>
-                                  </div>
-                                  <div className="actions_list" style={actions_list_style}>
-                                      <div onClick={this.deleteApp}>Delete App</div>
-                                      <div onClick={this.clearData}>Clear Data</div>
-                                  </div>
-                              </div>
+                              <ActionSelector
+                                  deleteApp={this.deleteApp}
+                                  clearData={this.clearData}
+                              />
 
                               <div className="application_block">
 
@@ -752,8 +843,6 @@ var ApplicationsPage = React.createClass({
                     }
 
                 })()}
-
-
 
                 <div className="confirm_block" style={confirm_block_style}>
                     <div className="sign">{this.state.confirmation_sign}</div>
