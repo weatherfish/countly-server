@@ -229,19 +229,19 @@ var ConfigurationsPage = React.createClass({
 
                 <div className="category">
 
-                    <div className="block_label">Frontend</div>
+                    <div className="block_label">{jQuery.i18n.map["configs.frontend"]}</div>
 
                     <div className="block_elements">
 
                         <SwitchBlock
-                            label="Production mode"
+                            label={jQuery.i18n.map["configs.frontend-production"]}
                             enabled={this.state.config.frontend.production}
                             onChange={this.on_setting_change}
                             setting={["frontend", "production"]}
                         />
 
                         <InputBlock
-                            label="Session timeout in ms"
+                            label={jQuery.i18n.map["configs.frontend-session_timeout"]}
                             value={this.state.config.frontend.session_timeout}
                             onChange={this.on_setting_change}
                             setting={["frontend", "session_timeout"]}
@@ -254,26 +254,26 @@ var ConfigurationsPage = React.createClass({
 
                 <div className="category">
 
-                    <div className="block_label">API</div>
+                    <div className="block_label">{jQuery.i18n.map["configs.api"]}</div>
 
                     <div className="block_elements">
 
                         <InputBlock
-                            label="Domain in emails"
+                            label={jQuery.i18n.map["configs.api-domain"]}
                             value={this.state.config.api.domain}
                             onChange={this.on_setting_change}
                             setting={["api", "domain"]}
                         />
 
                         <SwitchBlock
-                            label="Safer API responses"
+                            label={jQuery.i18n.map["configs.api-safe"]}
                             enabled={this.state.config.api.safe}
                             onChange={this.on_setting_change}
                             setting={["api", "safe"]}
                         />
 
                         <InputBlock
-                            label="Maximal Session Duration"
+                            label={jQuery.i18n.map["configs.api-session_duration_limit"]}
                             value={this.state.config.api.session_duration_limit}
                             onChange={this.on_setting_change}
                             setting={["api", "session_duration_limit"]}
@@ -281,14 +281,14 @@ var ConfigurationsPage = React.createClass({
                         />
 
                         <SwitchBlock
-                            label="Track city data"
+                            label={jQuery.i18n.map["configs.api-city_data"]}
                             enabled={this.state.config.api.city_data}
                             onChange={this.on_setting_change}
                             setting={["api", "city_data"]}
                         />
 
                         <InputBlock
-                            label="Max unique event keys"
+                            label={jQuery.i18n.map["configs.api-event_limit"]}
                             value={this.state.config.api.event_limit}
                             onChange={this.on_setting_change}
                             setting={["api", "event_limit"]}
@@ -296,7 +296,7 @@ var ConfigurationsPage = React.createClass({
                         />
 
                         <InputBlock
-                            label="Max segmentation in each event"
+                            label={jQuery.i18n.map["configs.api-event_segmentation_limit"]}
                             value={this.state.config.api.event_segmentation_limit}
                             onChange={this.on_setting_change}
                             setting={["api", "event_segmentation_limit"]}
@@ -304,7 +304,7 @@ var ConfigurationsPage = React.createClass({
                         />
 
                         <InputBlock
-                            label="Max unique values in each segmentation"
+                            label={jQuery.i18n.map["configs.api-event_segmentation_value_limit"]}
                             value={this.state.config.api.event_segmentation_value_limit}
                             onChange={this.on_setting_change}
                             setting={["api", "event_segmentation_value_limit"]}

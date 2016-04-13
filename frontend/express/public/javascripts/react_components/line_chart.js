@@ -5,7 +5,7 @@ var LineChart = React.createClass({
     getInitialState() {
 
         var data_points = this.props.data_function();
-
+      
         var line_chart_width = this.props.width - (this.props.sides_padding * 2);
 
         if (data_points.daily_granularity[0].mode == "ghost") // if previous time range in 0 index
@@ -32,10 +32,16 @@ var LineChart = React.createClass({
             {
                 var granularity = "weekly";
             }
+            else if (countlyCommon.getPeriod() == "hour")
+            {
+                var granularity = "hourly";
+            }
             else
             {
                 var granularity = "daily";
             }
+
+            console.log("line chart init granularity:", granularity);
 
             if (granularity == "hourly")
             {
@@ -111,7 +117,7 @@ var LineChart = React.createClass({
                 }
             }
         }
-      
+
         if (this.props.reverse_dp)
         {
             granularity_rows.reverse();
@@ -172,7 +178,7 @@ var LineChart = React.createClass({
         }
 
         new_state.big_numbers = nextProps.big_numbers;
-
+        
         this.setState(new_state)
 
     },
@@ -326,7 +332,12 @@ var LineChart = React.createClass({
                 {
                     var new_granularity = "weekly";
                 }
-                else {
+                else if (countlyCommon.getPeriod() == "hour")
+                {
+                    var new_granularity = "hourly";
+                }
+                else
+                {
                     var new_granularity = "daily";
                 }
             }
@@ -586,12 +597,16 @@ var LineChart = React.createClass({
 
     componentDidUpdate : function()
     {
-        console.log("====== did update ====");
-        var updated_data = this.update(-1, this.state.granularity_type, true);
-/*
-        this.setState({
-            big_numbers : this.props.big_numbers
-        })*/
+        if (countlyCommon.getPeriod() == "hour")
+        {
+            var granularity_type = "hourly";
+        }
+        else
+        {
+            var granularity_type = this.state.granularity_type;
+        }
+
+        var updated_data = this.update(-1, granularity_type, true);
     },
 
     hasClass : function(el, cls) {

@@ -115,7 +115,7 @@ var LeftPart = React.createClass({
             <div className={full_classname}>
                 <div className={dashboard_sign_class} onClick={this.handleClick.bind(this, -1)}>
                     <div className="icon"></div>
-                    <span className={menu_sign_class}><span>Dashboard</span></span>
+                    <span className={menu_sign_class}><span>{jQuery.i18n.map["sidebar.dashboard"]}</span></span>
                 </div>
                 {navNodes}
             </div>

@@ -31,12 +31,12 @@ var CrashesPage = React.createClass({
             {
                 "title":jQuery.i18n.map["crashes.reports"],
                 "short" : "reports",
-                "width_percent" : 10
+                "width_percent" : 12
             },
             {
                 "title": jQuery.i18n.map["crashes.fatal"],
                 "short" : "nonfatal",
-                "width_percent" : 15,
+                "width_percent" : 14,
                 formatting_function :  function(value){
 
                     if (value != 0)
@@ -52,7 +52,7 @@ var CrashesPage = React.createClass({
             {
                 "title":jQuery.i18n.map["crashes.resolved"],
                 "short" : "is_resolved",
-                "width_percent" : 15,
+                "width_percent" : 14,
                 formatting_function :  function(value){
 
                     if (value != 0)
@@ -232,6 +232,9 @@ var CrashesPage = React.createClass({
     },
 
     componentWillReceiveProps: function(nextProps) {
+        
+        console.log("= crashes next props ===");
+        console.log(nextProps)
 
         var self = this;
 
@@ -419,7 +422,7 @@ var CrashesPage = React.createClass({
 
         if (this.state.long_text_flag)
         {
-            top_tab_style.height = (this.topbar_height + 20) + "px"
+            top_tab_style.height = (this.topbar_height + 10) + "px"
         }
         else
         {
@@ -518,11 +521,11 @@ var CrashesPage = React.createClass({
 
                         if (self.state.long_text_flag)
                         {
-                            style.height = "130px";
+                            style.height = (self.topbar_height + 10) + "px";
                         }
                         else
                         {
-                            style.height = "110px";
+                            style.height = (self.topbar_height) + "px"
                         }
 
                         return (

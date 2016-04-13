@@ -85,6 +85,10 @@ var appsApi = {},
         processAppProps(newApp);
 
         common.db.collection('apps').insert(newApp, function(err, app) {
+            
+            console.log("======= app created ===========");
+            console.log(app)
+            
             var appKey = common.sha1Hash(app.ops[0]._id, true);
 
             common.db.collection('apps').update({'_id': app.ops[0]._id}, {$set: {key: appKey}}, function(err, app) {});

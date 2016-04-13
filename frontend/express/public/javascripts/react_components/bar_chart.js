@@ -152,7 +152,7 @@ var Chart = React.createClass({
                 .attr("rx", 2)
                 .attr("ry", 2)
                 .style("fill", function(d) {
-                    return "gray";
+                    return "#141821";
                 })
 
         var triangle_width = 14;
@@ -167,7 +167,7 @@ var Chart = React.createClass({
                   var yv = tooltip_height - 1;
                   return "translate(" + xv + "," + yv + ")";
               })
-              .style("fill", "gray")
+              .style("fill", "#141821")
 
         tooltip.append("text")
                 .attr("class", "count")
@@ -197,7 +197,7 @@ var Chart = React.createClass({
                     return x;
                 })
                 .attr("y", 35)
-                .style("fill", "white")
+                .style("fill", "#eeeeee")
 
 
     },
@@ -699,7 +699,7 @@ var Chart = React.createClass({
                 <svg className="bar_chart" style={this.svg_style} id="bar_chart">
                 </svg>
 
-                <div style={nodata_block_style} className="nodata_block">No data</div>
+                <NoDataBlock display={nodata_block_style.display} width={nodata_block_style.width}/>
 
             </div>
         );

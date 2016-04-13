@@ -13,9 +13,10 @@ var CountriesPage = React.createClass({
 
         return ({
             sort_functions : sort_functions,
-            metric : "t",
+            metric : {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', "short":"t", "color" : "#1B8AF3"},
             radio_button : 0,
             inited : false,
+            active_app : this.props.active_app
             /*maps : maps,
             cur_map : cur_map*/
         })
@@ -91,38 +92,55 @@ var CountriesPage = React.createClass({
 
     componentWillReceiveProps : function(nextProps) {
 
-        var sessionData = countlySession.getSessionData();
+        if (nextProps.active_app != this.state.active_app) // active app changed
+        {                                               
+            this.setState({
+                active_app : nextProps.active_app,
+                inited : false
+            });
+            
+            var data_timestamp = Math.floor(Date.now());
 
-        var metrics = [
-            {
-                "title":jQuery.i18n.map["common.total-sessions"],
-                "total":sessionData.usage["total-sessions"].total,
-                "trend":sessionData.usage["total-sessions"].trend,
-                "help":"countries.total-sessions",
-                "short" : "t",
-                "color" : "#1B8AF3"
-            },
-            {
-                "title":jQuery.i18n.map["common.total-users"],
-                "total":sessionData.usage["total-users"].total,
-                "trend":sessionData.usage["total-users"].trend,
-                "help":"countries.total-users",
-                "short" : "u",
-                "color" : "#F2B702"
-            },
-            {
-                "title":jQuery.i18n.map["common.new-users"],
-                "total":sessionData.usage["new-users"].total,
-                "trend":sessionData.usage["new-users"].trend,
-                "help":"countries.new-users",
-                "short" : "n",
-                "color" : "#FF7D7D"
-            }
-        ]
+            this.init_data(data_timestamp);
+            
+        }
+        else
+        {
 
-        this.setState({
-            metrics : metrics
-        })
+            var sessionData = countlySession.getSessionData();
+    
+            var metrics = [
+                {
+                    "title":jQuery.i18n.map["common.total-sessions"],
+                    "total":sessionData.usage["total-sessions"].total,
+                    "trend":sessionData.usage["total-sessions"].trend,
+                    "help":"countries.total-sessions",
+                    "short" : "t",
+                    "color" : "#1B8AF3"
+                },
+                {
+                    "title":jQuery.i18n.map["common.total-users"],
+                    "total":sessionData.usage["total-users"].total,
+                    "trend":sessionData.usage["total-users"].trend,
+                    "help":"countries.total-users",
+                    "short" : "u",
+                    "color" : "#F2B702"
+                },
+                {
+                    "title":jQuery.i18n.map["common.new-users"],
+                    "total":sessionData.usage["new-users"].total,
+                    "trend":sessionData.usage["new-users"].trend,
+                    "help":"countries.new-users",
+                    "short" : "n",
+                    "color" : "#FF7D7D"
+                }
+            ]
+    
+            this.setState({
+                metrics : metrics
+            })
+            
+        }
 
     },
 
@@ -133,7 +151,7 @@ var CountriesPage = React.createClass({
             return true;
         }
 
-        var metric = this.state.metrics[id]["short"];
+        var metric = this.state.metrics[id];
 
         console.log("new map metric:", metric);
 
@@ -165,7 +183,7 @@ var CountriesPage = React.createClass({
         var table_headers = JSON.parse(JSON.stringify(this.state.metrics));
 
         table_headers.unshift({
-            "title" : "Country",
+            "title" : jQuery.i18n.map["countries.table.country"], // jQuery.i18n.map["countries.table.city"]
             //"help"  : "sessions.unique-sessions", // todo: add translate
             "short" : "country_flag",
         })
@@ -177,7 +195,7 @@ var CountriesPage = React.createClass({
                     width={map_width}
                     metric={this.state.metric}
                     height={480}
-                    headline_sign="COUNTRIES"
+                    headline_sign={jQuery.i18n.map["countries.title"]}
                 />
 
                 <div className="radio_buttons_container">

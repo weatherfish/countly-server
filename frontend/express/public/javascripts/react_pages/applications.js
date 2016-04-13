@@ -52,7 +52,7 @@ var NewAppWindow = React.createClass({
             "open" : false,
             "confirmation_waiting" : true,
             "confirmation_sign" : jQuery.i18n.map["management-applications.delete-confirm"],
-            "confirmation_function" : false
+            "confirmation_function" : false,
         });
 
     },
@@ -140,8 +140,7 @@ var NewAppWindow = React.createClass({
                     "country":data.country
                 };
 
-                countlyGlobal['apps'][data._id] = newAppObj;
-                countlyGlobal['admin_apps'][data._id] = newAppObj;
+                
 
                 // --------------------------------------------
 
@@ -158,7 +157,7 @@ var NewAppWindow = React.createClass({
 
                     //initAppManagement(new_app_id);
 
-                    self.props.onCreate(new_app_id);
+                    self.props.onCreate(data);
 
                     self.setState({
                         loading : false
@@ -201,14 +200,21 @@ var NewAppWindow = React.createClass({
             width : 440/*get_viewport_width()*/
         };
 
-        if (!this.props.open) new_app_block_style.display = "none";
+        if (!this.props.open){
+            new_app_block_style.display = "none";
+            //new_app_block_style.right = -440;
+        }
+        else
+        {
+            //new_app_block_style.right = 0;
+        }
 
         return(
             <div className="new_app_block" style={new_app_block_style}>
 
                 <div className="label">
                     <div className="cancel_button" onClick={this.cancel}></div>
-                    <span>CREATE A NEW APPLICATION</span>
+                    <span>{jQuery.i18n.map["management-applications.my-new-app"]}</span>
                 </div>
 
                 <InputBlock
@@ -304,6 +310,8 @@ var ActionSelector = React.createClass({
         else {
             actions_list_style.display = "none";
         }
+        
+        actions_list_style.width = "270px";
 
         return(<div className="action_selector">
             <div className="open_button" onClick={this.openClick}>
@@ -311,8 +319,13 @@ var ActionSelector = React.createClass({
                 <div className="arrow"></div>
             </div>
             <div className="actions_list" style={actions_list_style}>
-                <div onClick={this.props.deleteApp}>Delete App</div>
-                <div onClick={this.props.clearData}>Clear Data</div>
+                <div onClick={this.props.deleteApp}>{jQuery.i18n.map["common.delete"]}</div>
+                <div onClick={this.props.clearData.bind(this, "all-data")}>{jQuery.i18n.map["management-applications.clear-all-data"]}</div>
+                <div onClick={this.props.clearData.bind(this, "1month-data")}>{jQuery.i18n.map["management-applications.clear-1month-data"]}</div>
+                <div onClick={this.props.clearData.bind(this, "3month-data")}>{jQuery.i18n.map["management-applications.clear-3month-data"]}</div>
+                <div onClick={this.props.clearData.bind(this, "6month-data")}>{jQuery.i18n.map["management-applications.clear-6month-data"]}</div>
+                <div onClick={this.props.clearData.bind(this, "1year-data")}>{jQuery.i18n.map["management-applications.clear-1year-data"]}</div>
+                <div onClick={this.props.clearData.bind(this, "2year-data")}>{jQuery.i18n.map["management-applications.clear-2year-data"]}</div>
             </div>
         </div>)
     }
@@ -399,13 +412,13 @@ var ApplicationsPage = React.createClass({
 
     },
 
-    onAppCreate : function(id){
+    onAppCreate : function(app){
 
         console.log("=========== on app create =======");
 
-        this.props.on_app_rename();
+        this.props.on_app_create(app);
 
-        this.selectAppClick(id);
+        this.selectAppClick(app.id);
 
     },
 
@@ -463,23 +476,27 @@ var ApplicationsPage = React.createClass({
                 console.log(countlyGlobal['apps'][updated_app._id]);
                 console.log(data);
 
-                self.props.on_app_rename();
+                self.props.on_app_edit(updated_app._id);
 
             }
         });
     },
 
-    clearData : function(){
+    clearData : function(period){
 
         var current_app = this.state.current_app;
 
-        return false;
-
+        //return false;
+/*
         CountlyHelpers.confirm(jQuery.i18n.map["management-applications.clear-confirm"], "red", function (result) {
+            
             if (!result) {
                 return true;
             }
+*/
 
+        var _delete = function()
+        {
             var appId = current_app._id;
 
             $.ajax({
@@ -494,6 +511,9 @@ var ApplicationsPage = React.createClass({
                 },
                 dataType:"jsonp",
                 success:function (result) {
+                    
+                    console.log("{{{{{{{{{{ clear result }}}}}}}}}");
+                    console.log(result)
 
                     if (!result) {
                         CountlyHelpers.alert(jQuery.i18n.map["management-applications.clear-admin"], "red");
@@ -514,6 +534,12 @@ var ApplicationsPage = React.createClass({
                     }*/
                 }
             });
+        };//);
+        
+        this.setState({
+            "confirmation_waiting" : true,
+            "confirmation_sign" : jQuery.i18n.map["management-applications.clear-confirm"],
+            "confirmation_function" : _clear
         });
     },
 
@@ -524,6 +550,12 @@ var ApplicationsPage = React.createClass({
 
         var _delete = function()
         {
+
+            console.log("===== call delete =======");
+            console.log(self.state);
+            console.log(self.props);
+            
+            var _props = self.props;
 
             var appId = self.state.current_app._id;
 
@@ -546,10 +578,10 @@ var ApplicationsPage = React.createClass({
 
                     for (var app_id in countlyGlobal['apps'])
                     {
-                        current_app = countlyGlobal['apps'][app_id];
+                        current_app = countlyGlobal['apps'][app_id];                        
                         break;
                     }
-
+                    
                     self.setState({
                         current_app : current_app,
                         current_app_id : current_app._id,
@@ -558,7 +590,9 @@ var ApplicationsPage = React.createClass({
                         confirmation_sign : false,
                         confirmation_function : false
                     });
-
+                                          
+                    _props.on_app_delete(appId);
+            
                     /*
                     var activeApp = $(".app-container").filter(function () {
                         return $(this).data("id") && $(this).data("id") == appId;
@@ -633,7 +667,7 @@ var ApplicationsPage = React.createClass({
             countlyGlobal['apps'][self.state.current_app_id] = app;
             countlyGlobal['admin_apps'][self.state.current_app_id] = app;
 
-            self.props.on_app_rename();
+            self.props.on_app_edit(self.state.current_app_id);
 
             self.setState({
                 current_app : app
@@ -654,7 +688,7 @@ var ApplicationsPage = React.createClass({
             .field('name', file.name)
             .field("app_image_id", app_id)
             .field('size', file.size)
-            .attach('image', file, file.name)
+            .attach('app_image', file, file.name)
             .set('Accept', 'application/json')
             .set('x-csrf-token', countlyGlobal['csrf_token'])
             .end(function(err, res){
@@ -717,21 +751,26 @@ var ApplicationsPage = React.createClass({
             });
 
         };
-
+/*
         var confirm_block_style = {};
 
         if (this.state.confirmation_waiting)
         {
             confirm_block_style.display = "block";
             confirm_block_style.left = (elements_width / 2) - (300 / 2);
-        }
+        }*/
+        
+        /*
+         
+                
+        */
 
         return (
             <div id="applications_page" style={page_style}>
 
                 <div className="top_block">
-                    <span className="sign">APPLICATIONS MANAGEMENT</span>
-                    <div className="new_app_button" onClick={this.new_app_click}>Add New App</div>
+                    <span className="sign">{jQuery.i18n.map["management-applications.title"]}</span>
+                    <div className="new_app_button" onClick={this.new_app_click}>{jQuery.i18n.map["management-applications.my-new-app"]}</div>
                 </div>
 
                 <NewAppWindow
@@ -740,6 +779,19 @@ var ApplicationsPage = React.createClass({
                     onCreate={self.onAppCreate}
                     upload_icon={this.upload_icon}
                 />
+               
+                {(() => {
+                    
+                                        
+                    if (this.state.confirmation_waiting)
+                        return (<Alert 
+                            sign={this.state.confirmation_sign}
+                            on_cancel={this.cancel_confirmation}
+                            on_confirm={this.state.confirmation_function.bind(this)}
+                        />)
+                    
+                    
+                })()}
 
                 {(() => {
 
@@ -752,7 +804,7 @@ var ApplicationsPage = React.createClass({
                               <SimpleSelectBlock
                                   selectors={app_selectors}
                                   active_selector_key={self.state.current_app_id}
-                                  onChange={self.onAppCreate}
+                                  onChange={self.selectAppClick}
                                   className="application_selector"
                               />
 
@@ -768,24 +820,24 @@ var ApplicationsPage = React.createClass({
                                   <div className="info_block">
                                       <div className="table">
                                           <span className="row">
-                                              <span className="key">App ID</span>
+                                              <span className="key">{jQuery.i18n.map["management-applications.app-id"]}</span>
                                               <span className="value">{this.state.current_app._id}</span>
                                           </span>
 
                                           <EditableField
-                                              value_key={"App Name"}
+                                              value_key={jQuery.i18n.map["management-applications.application-name"]}
                                               value={this.state.current_app.name}
                                               on_save={this.saveApp}
                                               save_key="name"
                                           />
 
                                           <span className="row">
-                                              <span className="key">App Key</span>
+                                              <span className="key">{jQuery.i18n.map["management-applications.app-key"]}</span>
                                               <span className="value">{this.state.current_app.key}</span>
                                           </span>
 
                                           <EditableField
-                                              value_key={"Category"}
+                                              value_key={jQuery.i18n.map["management-applications.category"]}
                                               value={this.state.current_app.category}
                                               options_values={this.app_categories_options}
                                               on_save={this.saveApp}
@@ -793,7 +845,7 @@ var ApplicationsPage = React.createClass({
                                           />
 
                                           <EditableField
-                                              value_key={"Time Zone"}
+                                              value_key={jQuery.i18n.map["management-applications.time-zone"]}
                                               value={this.state.current_app.timezone}
                                               options_values={this.timezones_options}
                                               on_save={this.saveApp}
@@ -810,7 +862,7 @@ var ApplicationsPage = React.createClass({
 
                                           <form ref="uploadForm" enctype="multipart/form-data" id="add-app-image-form">
                                               <input ref="app_image" type="file" id="app_image" name="app_image" className="inputfile" onChange={this.handleIconChange}/>
-                                              <label for="app_image"><span className="sign">Icon</span>
+                                              <label for="app_image"><span className="sign">{jQuery.i18n.map["management-applications.icon"]}</span>
                                               <div className="icon" style={icon_style}></div></label>
                                           </form>
                                       </div>
@@ -843,16 +895,19 @@ var ApplicationsPage = React.createClass({
                     }
 
                 })()}
-
-                <div className="confirm_block" style={confirm_block_style}>
-                    <div className="sign">{this.state.confirmation_sign}</div>
-                    <div className="buttons">
-                        <span className="cancel" onClick={this.cancel_confirmation}>cancel</span>
-                        <span className="confirm" onClick={this.state.confirmation_function}>confirm</span>
-                    </div>
-                </div>
-
+                
             </div>
         );
     }
+    
+    /*
+    <div className="confirm_block" style={confirm_block_style}>
+                    <div className="sign">{this.state.confirmation_sign}</div>
+                    <div className="buttons">
+                        <span className="cancel" onClick={this.cancel_confirmation}>cancel</span>
+                        <span className="confirm" onClick={this.confirmation_function}>confirm</span>
+                    </div>
+                </div>
+    */
+    
 });

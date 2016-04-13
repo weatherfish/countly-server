@@ -8,19 +8,17 @@
         _list = {},
         _activeAppKey = 0,
         _initialized = false,
-        _period = {},
 		_periodObj = {},
 		_metrics = {},
-        _lastId = null,
         _usable_metrics = {};
-        
-    countlyCrashes.loadList = function (id) {
+
+    if(countlyGlobal.member && countlyGlobal.member.api_key){
         $.ajax({
             type:"GET",
             url:countlyCommon.API_PARTS.data.r,
             data:{
                 "api_key":countlyGlobal.member.api_key,
-                "app_id":id,
+                "app_id":countlyCommon.ACTIVE_APP_ID,
                 "method":"crashes",
                 "list":1
             },
@@ -32,33 +30,22 @@
             }
         });
     }
-    
-    if(countlyGlobal.member && countlyGlobal.member.api_key){
-        countlyCrashes.loadList(countlyCommon.ACTIVE_APP_ID);
-    }
 
     //Public Methods
     countlyCrashes.initialize = function (id) {
 		_activeAppKey = countlyCommon.ACTIVE_APP_KEY;
 		_initialized = true;
-		_metrics = {
-            "os_name":jQuery.i18n.map["crashes.os"], 
-            "browser":jQuery.i18n.map["crashes.browser"], 
-            "view":jQuery.i18n.map["crashes.view"], 
-            "app_version":jQuery.i18n.map["crashes.app_version"], 
+		_metrics = {"app_version":jQuery.i18n.map["crashes.app_version"],
             "os_version":jQuery.i18n.map["crashes.os_version"],
-			"manufacture":jQuery.i18n.map["crashes.manufacture"], 
-			"device":jQuery.i18n.map["crashes.device"], 
-			"resolution":jQuery.i18n.map["crashes.resolution"], 
+			"manufacture":jQuery.i18n.map["crashes.manufacture"],
+			"device":jQuery.i18n.map["crashes.device"],
+			"resolution":jQuery.i18n.map["crashes.resolution"],
 			"orientation":jQuery.i18n.map["crashes.orientation"],
 			"cpu":jQuery.i18n.map["crashes.cpu"],
 			"opengl":jQuery.i18n.map["crashes.opengl"]};
-            
-        
-        
-		_period = countlyCommon.getPeriodForAjax();
+
+
 		if(id){
-            _lastId = id;
 			return $.ajax({
 				type:"GET",
 				url:countlyCommon.API_PARTS.data.r,
@@ -66,7 +53,6 @@
 					"api_key":countlyGlobal.member.api_key,
 					"app_id":countlyCommon.ACTIVE_APP_ID,
 					"method":"crashes",
-                    "period":_period,
 					"group":id
 				},
 				dataType:"jsonp",
@@ -86,11 +72,7 @@
                             _usable_metrics[i] = i.charAt(0).toUpperCase() + i.slice(1);
                         }
                     }
-				}, 
-                error:function(){
-                    CountlyHelpers.alert(jQuery.i18n.map["crashes.not-found"], "red");
-                    app.navigate("/crashes", true);
-                }
+				}
 			});
 		}
 		else
@@ -100,7 +82,6 @@
 				data:{
 					"api_key":countlyGlobal.member.api_key,
 					"app_id":countlyCommon.ACTIVE_APP_ID,
-                    "period":_period,
 					"method":"crashes"
 				},
 				dataType:"jsonp",
@@ -122,27 +103,13 @@
 				}
 			});
     };
-    
+
     countlyCrashes.getCrashName = function(id){
         if(_list[id])
             return _list[id];
         return id;
     }
-    
-    countlyCrashes.getRequestData =  function(){
-        return {
-					"api_key":countlyGlobal.member.api_key,
-					"app_id":countlyCommon.ACTIVE_APP_ID,
-					"method":"crashes",
-					"group":_lastId,
-                    "userlist":true
-				};
-    };
-    
-    countlyCrashes.getId = function(){
-        return _lastId;
-    }
-    
+
     countlyCrashes.common = function (id, path, callback) {
 		$.ajax({
 			type:"GET",
@@ -165,7 +132,7 @@
 			}
 		});
     };
-	
+
 	countlyCrashes.markResolve = function (id, callback) {
         countlyCrashes.common(id, "resolve", function(json){
             if(json && json.version)
@@ -174,31 +141,31 @@
                 callback();
         });
     };
-	
+
 	countlyCrashes.markUnresolve = function (id, callback) {
         countlyCrashes.common(id, "unresolve", callback);
     };
-    
+
     countlyCrashes.share = function (id, callback) {
         countlyCrashes.common(id, "share", callback);
     };
-    
+
     countlyCrashes.unshare = function (id, callback) {
         countlyCrashes.common(id, "unshare", callback);
     };
-    
+
     countlyCrashes.hide = function (id, callback) {
         countlyCrashes.common(id, "hide", callback);
     };
-    
+
     countlyCrashes.show = function (id, callback) {
         countlyCrashes.common(id, "show", callback);
     };
-    
+
     countlyCrashes.del = function (id, callback) {
         countlyCrashes.common(id, "delete", callback);
     };
-    
+
     countlyCrashes.modifyShare = function (id, data, callback) {
 		$.ajax({
 			type:"GET",
@@ -222,7 +189,7 @@
 			}
 		});
     };
-    
+
     countlyCrashes.addComment = function (id, data, callback) {
         data = data || {};
         data.app_id = countlyCommon.ACTIVE_APP_ID;
@@ -245,7 +212,7 @@
 			}
 		});
     };
-    
+
     countlyCrashes.editComment = function (id, data, callback) {
         data = data || {};
         data.app_id = countlyCommon.ACTIVE_APP_ID;
@@ -268,7 +235,7 @@
 			}
 		});
     };
-    
+
     countlyCrashes.deleteComment = function (id, data, callback) {
         data = data || {};
         data.app_id = countlyCommon.ACTIVE_APP_ID;
@@ -292,8 +259,7 @@
 		});
     };
 
-    countlyCrashes.refresh = function (id) {		
-        _period = countlyCommon.getPeriodForAjax();
+    countlyCrashes.refresh = function (id) {
 		if(id){
 			return $.ajax({
 				type:"GET",
@@ -302,7 +268,6 @@
 					"api_key":countlyGlobal.member.api_key,
 					"app_id":countlyCommon.ACTIVE_APP_ID,
 					"method":"crashes",
-                    "period":_period,
 					"group":id
 				},
 				dataType:"jsonp",
@@ -332,7 +297,6 @@
 				data:{
 					"api_key":countlyGlobal.member.api_key,
 					"app_id":countlyCommon.ACTIVE_APP_ID,
-                    "period":_period,
 					"method":"crashes"
 				},
 				dataType:"jsonp",
@@ -349,7 +313,7 @@
 						_crashData.crashes.os = "None";
 					if(_crashData.crashes.highest_app == "")
 						_crashData.crashes.highest_app = "None";
-                    
+
                     countlyCommon.extendDbObj(_crashTimeline, json.data);
 				}
 			});
@@ -360,12 +324,10 @@
 		_groupData = {};
 		_reportData = {};
         _crashTimeline = {};
-        _metrics = {};
-        _usable_metrics = {};
     };
-	
+
 	countlyCrashes.processMetric = function (data, metric, label) {
-        
+
 		var ret = {dp:[{data:[[-1,null]], "label":label}],ticks:[[-1,""]]};
 		if(data){
 			var i = 0;
@@ -381,11 +343,11 @@
 		}
 		return ret;
     };
-    
-    countlyCrashes.getChartData = function(metric, name){
+
+    countlyCrashes.getChartData = function(metric, name, line_color){
 		var chartData = [
-                { data:[], label:name, color:'#DDDDDD', mode:"ghost" },
-                { data:[], label:name, color:'#333933' }
+                { data:[], label:name, color : '#bbbbbb', mode:"ghost" },
+                { data:[], label:name, color : line_color }
             ],
             dataProps = [
                 {
@@ -398,31 +360,28 @@
                 { name:metric }
             ];
 
-        return countlyCommon.extractChartData(_crashTimeline, countlyCrashes.clearObject, chartData, dataProps);
+        //return countlyCommon.extractChartData(_crashTimeline, countlyCrashes.clearObject, chartData, dataProps);
+        return countlyCommon.extractChartData_granularity(_crashTimeline, countlyCrashes.clearObject, chartData, dataProps);
 	};
-	
+
 	countlyCrashes.getMetrics = function () {
 		return _usable_metrics;
     };
-	
+
 	countlyCrashes.getData = function () {
 		return _crashData;
     };
-	
+
 	countlyCrashes.getGroupData = function () {
 		return _groupData;
     };
-    
+
     countlyCrashes.setGroupData = function (data) {
-        _metrics = {
-            "os_name":jQuery.i18n.map["crashes.os"], 
-            "browser":jQuery.i18n.map["crashes.browser"], 
-            "view":jQuery.i18n.map["crashes.view"], 
-            "os_version":jQuery.i18n.map["crashes.os_version"], 
-			"app_version":jQuery.i18n.map["crashes.app_version"], 
-			"manufacture":jQuery.i18n.map["crashes.manufacture"], 
-			"device":jQuery.i18n.map["crashes.device"], 
-			"resolution":jQuery.i18n.map["crashes.resolution"], 
+        _metrics = {"os_version":jQuery.i18n.map["crashes.os_version"],
+			"app_version":jQuery.i18n.map["crashes.app_version"],
+			"manufacture":jQuery.i18n.map["crashes.manufacture"],
+			"device":jQuery.i18n.map["crashes.device"],
+			"resolution":jQuery.i18n.map["crashes.resolution"],
 			"orientation":jQuery.i18n.map["crashes.orientation"],
 			"cpu":jQuery.i18n.map["crashes.cpu"],
 			"opengl":jQuery.i18n.map["crashes.opengl"]};
@@ -441,16 +400,16 @@
             }
         }
     };
-	
+
 	countlyCrashes.getReportData = function () {
 		return _reportData;
     };
-	
+
 	countlyCrashes.getErrorName = function () {
 		var error = _crashData.crashes.error.split(":")[0];
 		return error;
 	};
-	
+
 	countlyCrashes.getAffectedUsers = function () {
 		if(_crashData.users.total > 0){
             var ret = [];
@@ -470,7 +429,7 @@
 		}
 		return [];
 	};
-	
+
 	countlyCrashes.getFatalBars = function () {
 		if(_crashData.crashes.total > 0){
             var ret = [];
@@ -487,11 +446,11 @@
 		}
 		return [];
     };
-	
+
 	countlyCrashes.getResolvedBars = function () {
 		if(_crashData.crashes.unique > 0){
             var ret = [];
-            var total = Math.max(_crashData.crashes.resolved, 0) + Math.max(_crashData.crashes.unresolved,0);
+            var total = _crashData.crashes.resolved + _crashData.crashes.unresolved;
 			var resolved = (_crashData.crashes.resolved/total)*100;
 			var unresolved = (_crashData.crashes.unresolved/total)*100;
 			var name1 = Math.round(resolved)+"% "+jQuery.i18n.map["crashes.resolved"];
@@ -504,34 +463,20 @@
 		}
 		return [];
     };
-	
+
 	countlyCrashes.getPlatformBars = function () {
 		var res = [];
-        var data = [];
 		var total = 0;
-        
+		for(var i in _crashData.crashes.os){
+			total += _crashData.crashes.os[i];
+		}
 		for(var i in _crashData.crashes.os){
             if(_crashData.crashes.os[i] > 0)
-                data.push([i, _crashData.crashes.os[i]]);
+                res.push({"name":i,"percent":(_crashData.crashes.os[i]/total)*100});
 		}
-        
-        data.sort(function(a, b) {return b[1] - a[1]});
-        
-        var maxItems = 3;
-        if(data.length < maxItems)
-            maxItems = data.length;
-        
-		for(var i = 0; i < maxItems; i++){
-            total += data[i][1];
-        }
-        
-		for(var i = 0; i < maxItems; i++){
-            res.push({"name":data[i][0],"percent":(data[i][1]/total)*100});
-		}
-        
 		return res;
     };
-    
+
     countlyCrashes.getBoolBars = function (name) {
 		if(_groupData[name]){
             _groupData[name].yes = _groupData[name].yes || 0;
@@ -551,7 +496,7 @@
 		}
 		return [];
     };
-    
+
     countlyCrashes.getDashboardData = function () {
 
         //Update the current period object in case selected date is changed
@@ -656,7 +601,7 @@
 
         return dataArr;
     };
-    
+
     countlyCrashes.clearObject = function (obj) {
         if (obj) {
             if (!obj["cr"]) obj["cr"] = 0;
@@ -671,7 +616,7 @@
 
         return obj;
     };
-	
+
 	function setMeta() {
         if (_crashTimeline['meta']) {
 			for(var i in _crashTimeline['meta']){
@@ -687,5 +632,5 @@
 			}
         }
     }
-	
+
 }(window.countlyCrashes = window.countlyCrashes || {}, jQuery));

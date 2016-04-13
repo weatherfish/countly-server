@@ -245,9 +245,6 @@
                 });
             }
 
-            console.log("=========== segmentation events data ==============");
-            console.log(eventData);
-
         } else {
             var chartData = [
                     { data:[], label:countString, color: countlyCommon.GRAPH_COLORS[0] },

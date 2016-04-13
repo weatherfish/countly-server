@@ -68,7 +68,7 @@ new lazy(fs.createReadStream('./cities1000.txt'))
             "lat"  : lat,
             "lon"  : lon,
         }
-
+       
         insert_queue.push(data);
 
     }

@@ -70,7 +70,7 @@ npm install -g babel-cli
 npm install -g less
 
 #install grunt & npm modules
-( cd $DIR/.. ; npm install -g grunt-cli --unsafe-perm ; npm install )
+( cd $DIR/.. ; npm install -g grunt-cli --unsafe-perm; npm install grunt; npm install grunt-cli; npm install;  )
 
 #configure and start nginx
 cp /etc/nginx/sites-enabled/default $DIR/config/nginx.default.backup
@@ -106,8 +106,40 @@ cd $DIR/../frontend/express/public/javascripts
 babel --presets es2015,react react_components/ --out-dir react_components_compiled/
 babel --presets es2015,react react_pages/ --out-dir react_pages_compiled/
 cd $DIR/../frontend/express/public/stylesheets
-lessc ui.v2.less v2.css && lessc ui.calendar.less calendar.css && lessc tables.less tables.css && lessc map.less map.css
+
+lessc sidebar.less sidebar.css
+lessc calendar.less calendar.css
+lessc tables.less tables.css
+lessc map.less map.css
+lessc selector_with_search.less selector_with_search.css
+lessc applications.less applications.css
+lessc multi_select.less multi_select.css
+lessc select.less select.css
+lessc manage_users.less manage_users.css
+
 cd $DIR/../ && grunt dist-all
+
+# prepare maps data
+apt-get install -y zip
+
+cd $DIR/scripts
+# download geo data for datamaps visualization from "themapping.org"
+if wget -q http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip;
+  then echo "done";
+  else wget http://static.count.ly/TM_WORLD_BORDERS-0.3.zip;
+fi
+unzip ./TM_WORLD_BORDERS-0.3.zip -d ./geo_data
+# create mongodb table with geo data
+cd $DIR/scripts
+node ./create_country_table.js
+
+if wget -q http://download.geonames.org/export/dump/cities1000.zip;
+  then echo "done";
+  else wget http://static.count.ly/cities1000.zip;
+fi
+
+unzip cities1000.zip
+node create_city_table.js
 
 #finally start countly api and dashboard
 if [ "$INSIDE_DOCKER" != "1" ]

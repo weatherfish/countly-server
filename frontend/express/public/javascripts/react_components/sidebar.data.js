@@ -1,136 +1,84 @@
-var navigation = [
-    {
-        key         : 'Metrics',
+//var navigation = [
+
+
+var get_sidebar_data = function(){
+
+    var data = [{
+        key         : jQuery.i18n.map["sidebar.analytics"],
         icon        : 'metrics',
         path        : 'metrics',
         description : 'User profiles offer you a wide overwiew about your User profiles',
         items       : [
-                        ["Users", "/metrics/users"],
-                        ["Sessions", "/metrics/sessions"],
-                        ["Countries",   "/metrics/countries"],
-                        ["Devices", "/metrics/devices"],
-                        ["Resolutions", "/metrics/resolutions"],
+                        [jQuery.i18n.map["sidebar.analytics.users"], "/metrics/users"],
+                        [jQuery.i18n.map["sidebar.analytics.sessions"], "/metrics/sessions"],
+                        [jQuery.i18n.map["sidebar.analytics.countries"],   "/metrics/countries"],
+                        [jQuery.i18n.map["sidebar.analytics.devices"], "/metrics/devices"],
+                        [jQuery.i18n.map["sidebar.analytics.resolutions"], "/metrics/resolutions"],
                         /*["App Versions", "/analytics/durations"],*/
-                        ["Carriers", "/metrics/carriers"],
-                        ["Density", "/metrics/density"],
-                        ["Language", "/metrics/language"],
-                        ["Platforms", "/metrics/platforms"],    
+                        [jQuery.i18n.map["sidebar.analytics.carriers"], "/metrics/carriers"],
+                        [jQuery.i18n.map["sidebar.analytics.densities"], "/metrics/density"],
+                        [jQuery.i18n.map["sidebar.analytics.languages"], "/metrics/language"],
+                        [jQuery.i18n.map["sidebar.analytics.platforms"], "/metrics/platforms"],
                         ["Sessions by Countries", "/metrics/map_sessions"],
                         /*["Platforms", "/analytics/platforms"],
                         ["Densities", "/analytics/densities"],
                         ["Sources ", "/analytics/sources"],
                         ["Languages ", "/analytics/languages"],*/
                       ]
-    },
-    {
-        key: 'Engagement',
-        icon        : 'engagement',
-        path        : 'engagement',
-        description : 'Management offer you a wide overwiew about your apps Management',
-        items       : [
-                        ["Frequency",   "/engagement/frequency"],
-                        ["Durations",   "/engagement/durations"],
-                        ["Loyalty",     "/engagement/loyalty"],
-                      ]
-    },
-    {
-        key: 'Events',
-        icon        : 'funnels',
-        path        : 'events',
-        description : 'Crashes offer you a wide overwiew about your apps Crashes',
-        arrow       : -1, // todo: tmp
-        items       : ["events", "/events"]
-    },
-    {
-        key: 'Crashes',
-        icon        : 'crashes',
-        path        : 'crashes',
-        description : 'Crashes offer you a wide overwiew about your apps Crashes',
-        items       : ["crashes", "/crashes"]
-    },
-    {
-        key: 'Management',
-        icon        : 'manage',
-        path        : 'manage',
-        description : '',
-        arrow       : -1, // todo: tmp
-        items       : [
-                        ["Configurations", "/manage/configurations"],
-                        ["Applications", "/manage/apps"],
-                        ["User Roles", "/manage/users"],
-                        ["E-mails reports", "/manage/todo"],
-                        ["My Account", "/manage/todo"],
-                      ]
-
+        },
+        {
+            key: jQuery.i18n.map["sidebar.engagement"],
+            icon        : 'engagement',
+            path        : 'engagement',
+            description : 'Management offer you a wide overwiew about your apps Management',
+            items       : [
+                            [jQuery.i18n.map["sidebar.analytics.session-frequency"],   "/engagement/frequency"],
+                            [jQuery.i18n.map["sidebar.engagement.durations"],   "/engagement/durations"],
+                            [jQuery.i18n.map["sidebar.analytics.user-loyalty"],     "/engagement/loyalty"],
+                          ]
+        },
+        {
+            key: jQuery.i18n.map["sidebar.events"],
+            icon        : 'events',
+            path        : 'events',
+            description : 'Crashes offer you a wide overwiew about your apps Crashes',
+            arrow       : -1, // todo: tmp
+            items       : ["events", "/events"]
+        },
+        {
+            key: jQuery.i18n.map["crashes.title"],
+            icon        : 'crashes',
+            path        : 'crashes',
+            description : 'Crashes offer you a wide overwiew about your apps Crashes',
+            items       : ["crashes", "/crashes"]
+        },
+        {
+            key: jQuery.i18n.map["sidebar.management"],
+            icon        : 'manage',
+            path        : 'manage',
+            description : '',
+            arrow       : -1, // todo: tmp
+            items       : [                            
+                            ["Populator", "/manage/populator"],
+                            /*["E-mails reports", "/manage/todo"],
+                            ["My Account", "/manage/todo"],*/
+                          ]
+    
+        }
+    ]
+    
+    if(global_admin){
+        data[data.length - 1].items.unshift([jQuery.i18n.map["plugins.configs"], "/manage/configurations"]);
     }
-    /*
-    {
-        key         : 'User profiles',
-        icon        : 'user',
-        path        : 'user',
-        description : 'Metrics offer you a wide overwiew about your apps performance',
-        items       : [
-                        ["Frequency", "/analytics/frequency"],
-                        ["Countries",   "/analytics/countries"],
-                        ["Loyalty",     "/analytics/loyalty"],
-                        ["Devices",     "/analytics/devices"],
-                        ["Platforms",   "/analytics/platforms"],
-                        ["Versions",    "/analytics/versions"],
-                        ["Carriers",    "/analytics/carriers"],
-                        ["Events",      "/analytics/events"],
-                        ["Resolutions", "/analytics/resolutions"],
-                        ["Durations",   "/analytics/durations"],
-                      ]
-    },
+    
+    if(true || admin_of_apps){
+        data[data.length - 1].items.unshift([jQuery.i18n.map["sidebar.management.applications"], "/manage/apps"]);
+    }
+    
+    if(global_admin){
+        data[data.length - 1].items.unshift([jQuery.i18n.map["sidebar.management.users"], "/manage/users"]);
+    }
 
-    {
-        key: 'Messaging',
-        icon        : 'messaging',
-        path        : 'messaging',
-        description : 'Management offer you a wide overwiew about your apps Management',
-        items       : [
-                        ["Versions3",    "/analytics/versions"],
-                        ["Carriers3",    "/analytics/carriers"],
-                        ["Frequency3",   "/analytics/frequency"],
-                        ["Resolutions3", "/analytics/resolutions"],
-                        ["Durations3",   "/analytics/durations"],
+    return data;
 
-
-                      ]
-    },
-
-    {
-        key: 'Funnels',
-        icon        : 'funnels',
-        path        : 'funnels',
-        description : 'Funnels offer you a wide overwiew about Funnels',
-        arrow       : -1, // todo: tmp
-        items       : [
-                        ["Events4",      "/analytics/events"],
-                        ["Resolutions4", "/analytics/resolutions"],
-                        ["Durations4",   "/analytics/durations"],
-                        ["Loyalty4",     "/analytics/loyalty"],
-                        ["Devices4",     "/analytics/devices"],
-                        ["Platforms4",   "/analytics/platforms"],
-                      ]
-    },
-    {
-        key: 'Drill',
-        icon        : 'drill',
-        path        : 'drill',
-        description : 'Crashes offer you a wide overwiew about your apps Crashes',
-        arrow       : -1, // todo: tmp
-        items       : [
-                        ["Loyalty5",     "/analytics/loyalty"],
-                        ["Devices5",     "/analytics/devices"],
-                        ["Platforms5",   "/analytics/platforms"],
-                        ["Versions5",    "/analytics/versions"],
-                        ["Carriers5",    "/analytics/carriers"],
-                        ["Frequency5",   "/analytics/frequency"],
-                        ["Events5",      "/analytics/events"],
-                        ["Resolutions5", "/analytics/resolutions"],
-                        ["Durations5",   "/analytics/durations"],
-                      ]
-    },
-    */
-];
+}

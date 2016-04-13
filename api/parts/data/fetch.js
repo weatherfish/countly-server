@@ -9,6 +9,7 @@ var fetch = {},
     moment = require('moment'),
     _ = require('underscore'),
     crypto = require('crypto'),
+    fs = require('fs'),
     plugins = require('../../../plugins/pluginManager.js');
 
 (function (fetch) {
@@ -395,7 +396,52 @@ var fetch = {},
 
     fetch.fetchTimeObj = function (collection, params, isCustomEvent) {
         fetchTimeObj(collection, params, isCustomEvent, function(output) {
-            common.returnOutput(params, output);
+            
+            if (collection == "cities")
+            {
+
+                if (!output.meta)
+                {
+                    return common.returnOutput(params, output);
+                }
+
+                /*
+                    search gps coordinates for each city from statistics
+                    todo: async.queue or promise.each
+                */
+
+                async.map(output.meta.cities, function(city, __callback){
+                    common.db.collection('cities_coords').findOne({ "city" : city.toLowerCase() }, function (err, result) {
+                        __callback(err, result);
+                    });
+                }, function(err, results){
+
+                    if (err)
+                    {
+                        return false; // todo: common.returnError ?
+                    }
+
+                    output.citiesData = {};
+
+                    results.forEach(function(city_data){
+
+                        if (!city_data) return false;
+
+                        output.citiesData[city_data['city']] = {
+                            "lat" : city_data["lat"],
+                            "lon" : city_data["lon"]
+                        }
+                    });
+
+                    common.returnOutput(params, output);
+
+                });
+            }
+            else
+            {
+                common.returnOutput(params, output);
+            }
+            
         });
     };
 

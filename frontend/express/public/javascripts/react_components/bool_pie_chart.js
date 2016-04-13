@@ -40,32 +40,28 @@ var BoolPieChart = React.createClass({
                   }];
 
         var arc = d3.svg.arc()
-          .outerRadius(radius - 10)
-          .innerRadius(radius - 32);
+          .outerRadius(radius - 19 /*12*/)
+          .innerRadius(radius - 31);
 
         var arc2 = d3.svg.arc()
-              .outerRadius(radius - 12)
+              .outerRadius(radius - 20)
               .innerRadius(radius - 30);
-
-        var labelArc = d3.svg.arc()
-          .outerRadius(radius - 40)
-          .innerRadius(radius - 40);
-
-
 
         var labelArc = d3.svg.arc()
               .outerRadius(radius - 40)
               .innerRadius(radius - 40);
+/*
+        var labelArc = d3.svg.arc()
+              .outerRadius(radius - 40)
+              .innerRadius(radius - 40);*/
 
         var pie = d3.layout.pie()
           .sort(null)
           .value(function(d) { return d.value; });
 
-
         var svg = d3.select("#" + this.element_id)
               .attr("width", width)
               .attr("height", height)
-
 
         svg.selectAll('*').remove();
 
@@ -118,7 +114,7 @@ var BoolPieChart = React.createClass({
                 }
                 else
                 {
-                    return "#ff00000";
+                    return "#ff0000";
                 }
 
             })

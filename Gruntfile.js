@@ -52,52 +52,45 @@ module.exports = function(grunt) {
   		},
   		utils: {
   			src: [
-  				'frontend/express/public/javascripts/utils/underscore-min.js',
-  				/*'frontend/express/public/javascripts/utils/prefixfree.min.js',*/
-  				'frontend/express/public/javascripts/utils/moment/moment.min.js',
-  				'frontend/express/public/javascripts/utils/moment/moment.isocalendar.min.js',
-  				'frontend/express/public/javascripts/utils/moment/lang-all.min.js',
-  				/*'frontend/express/public/javascripts/utils/handlebars.js',
-  				'frontend/express/public/javascripts/utils/backbone-min.js',*/
-  				'frontend/express/public/javascripts/utils/jquery.i18n.properties-min-1.0.9.js',
-  				/*'frontend/express/public/javascripts/utils/jstz.min.js',*/
-  				'frontend/express/public/javascripts/utils/store+json2.min.js',
-  				'frontend/express/public/javascripts/utils/jquery.idle-timer.js',
-  				/*'frontend/express/public/javascripts/utils/textcounter.min.js',*/
-  				/*'frontend/express/public/javascripts/utils/initialAvatar.js',
-  				'frontend/express/public/javascripts/utils/jquery.amaran.min.js',
-  				'frontend/express/public/javascripts/utils/jquery.titlealert.js',*/
-          'frontend/express/public/javascripts/utils/globalize.min.js',
-  				'frontend/express/public/javascripts/countly/countly.common.js',
-          'frontend/express/public/javascripts/sort_functions.js',
-          'frontend/express/public/javascripts/utils/superagent.min.js'
+    			'frontend/express/public/javascripts/utils/underscore-min.js',
+    			/*'frontend/express/public/javascripts/utils/prefixfree.min.js',*/
+    			'frontend/express/public/javascripts/utils/moment/moment.min.js',
+    			'frontend/express/public/javascripts/utils/moment/moment.isocalendar.min.js',
+    			'frontend/express/public/javascripts/utils/moment/lang-all.min.js',
+    			/*'frontend/express/public/javascripts/utils/handlebars.js',
+    			'frontend/express/public/javascripts/utils/backbone-min.js',*/
+    			'frontend/express/public/javascripts/utils/jquery.i18n.properties-min-1.0.9.js',
+    			/*'frontend/express/public/javascripts/utils/jstz.min.js',*/
+    			'frontend/express/public/javascripts/utils/store+json2.min.js',
+    			'frontend/express/public/javascripts/utils/jquery.idle-timer.js',
+        		/*'frontend/express/public/javascripts/utils/textcounter.min.js',*/
+        		/*'frontend/express/public/javascripts/utils/initialAvatar.js',
+                'frontend/express/public/javascripts/utils/jquery.amaran.min.js',
+                'frontend/express/public/javascripts/utils/jquery.titlealert.js',*/
+                'frontend/express/public/javascripts/utils/globalize.min.js',
+    			'frontend/express/public/javascripts/countly/countly.common.js',
+                'frontend/express/public/javascripts/sort_functions.js',
+                'frontend/express/public/javascripts/utils/superagent.min.js'
   			],
   			dest: 'frontend/express/public/javascripts/min/countly.utils.concat.js'
-        //dest: 'frontend/express/public/javascripts/min/countly.utils.js'
+            //dest: 'frontend/express/public/javascripts/min/countly.utils.js'
   		},
   		visualization: {
   			src: [
-  				/*'frontend/express/public/javascripts/visualization/jquery.peity.min.js',
-  				'frontend/express/public/javascripts/visualization/flot/jquery.flot.js',
-  				'frontend/express/public/javascripts/visualization/flot/jquery.flot.tickrotor.js',
-  				'frontend/express/public/javascripts/visualization/flot/jquery.flot.pie.js',
-  				'frontend/express/public/javascripts/visualization/flot/jquery.flot.resize.js',
-  				'frontend/express/public/javascripts/visualization/flot/jquery.flot.stack.js',
-  				'frontend/express/public/javascripts/visualization/gauge.min.js',*/
-  				'frontend/express/public/javascripts/visualization/d3/d3.min.js',
-          'frontend/express/public/javascripts/visualization/d3/d3.geo.projection.min.js',
-  				'frontend/express/public/javascripts/visualization/rickshaw/rickshaw.js',
-          'frontend/express/public/javascripts/react-with-addons.js',
-          //'frontend/express/public/javascripts/JSXTransformer.js',
-          'frontend/express/public/javascripts/react-widgets/react-widgets.js',
-          'frontend/express/public/javascripts/fixed-data-table/dist/fixed-data-table.js',
-          'frontend/express/public/javascripts/ReactRouter.min.js',
-          'frontend/express/public/javascripts/visualization/datamaps/topojson.min.js',
-          'frontend/express/public/javascripts/visualization/datamaps/country_codes.js',
-          'frontend/express/public/javascripts/visualization/datamaps/datamaps.world.min.js',
+                'frontend/express/public/javascripts/visualization/d3/d3.min.js',
+                'frontend/express/public/javascripts/visualization/d3/d3.geo.projection.min.js',
+                'frontend/express/public/javascripts/visualization/rickshaw/rickshaw.js',
+                 'frontend/express/public/javascripts/react-with-addons.js',
+                 //'frontend/express/public/javascripts/JSXTransformer.js',
+                 'frontend/express/public/javascripts/react-widgets/react-widgets.js',
+                 'frontend/express/public/javascripts/fixed-data-table/dist/fixed-data-table.js',
+                 'frontend/express/public/javascripts/ReactRouter.min.js',
+                 'frontend/express/public/javascripts/visualization/datamaps/topojson.min.js',
+                 'frontend/express/public/javascripts/visualization/datamaps/country_codes.js',
+                 'frontend/express/public/javascripts/visualization/datamaps/datamaps.world.hires.min.js',
   			],
   			dest: 'frontend/express/public/javascripts/min/countly.visualization.concat.js'
-        //dest: 'frontend/express/public/javascripts/min/countly.visualization.js'
+            //dest: 'frontend/express/public/javascripts/min/countly.visualization.js'
   		},
   		lib: {
   			src: [
@@ -142,12 +135,12 @@ module.exports = function(grunt) {
   		},
   		dist: {
   			files: {
-  				'frontend/express/public/javascripts/min/countly.dom.js': 'frontend/express/public/javascripts/min/countly.dom.concat.js',
-  				'frontend/express/public/javascripts/min/countly.utils.js': 'frontend/express/public/javascripts/min/countly.utils.concat.js',
-  				'frontend/express/public/javascripts/min/countly.visualization.js': 'frontend/express/public/javascripts/min/countly.visualization.concat.js',
-  				'frontend/express/public/javascripts/min/countly.lib.js': 'frontend/express/public/javascripts/min/countly.lib.concat.js',
-          'frontend/express/public/javascripts/min/countly.react_components.js' : 'frontend/express/public/javascripts/min/countly.react_components.concat.js',
-          'frontend/express/public/javascripts/min/countly.react_pages.js' : 'frontend/express/public/javascripts/min/countly.react_pages.concat.js'
+                'frontend/express/public/javascripts/min/countly.dom.js': 'frontend/express/public/javascripts/min/countly.dom.concat.js',
+                'frontend/express/public/javascripts/min/countly.utils.js': 'frontend/express/public/javascripts/min/countly.utils.concat.js',
+                'frontend/express/public/javascripts/min/countly.visualization.js': 'frontend/express/public/javascripts/min/countly.visualization.concat.js',
+                'frontend/express/public/javascripts/min/countly.lib.js': 'frontend/express/public/javascripts/min/countly.lib.concat.js',
+                'frontend/express/public/javascripts/min/countly.react_components.js' : 'frontend/express/public/javascripts/min/countly.react_components.concat.js',
+                'frontend/express/public/javascripts/min/countly.react_pages.js' : 'frontend/express/public/javascripts/min/countly.react_pages.concat.js'
   			}
   		}
     },
@@ -155,11 +148,8 @@ module.exports = function(grunt) {
     cssmin: {
     	dist: {
     		files: {
-    			  'frontend/express/public/stylesheets/main.min.css': [
-    	    		  'frontend/express/public/stylesheets/main.css',
-    	    			//'frontend/express/public/stylesheets/amaranjs/amaran.min.css',
-    	    			//'frontend/express/public/javascripts/dom/tipsy/tipsy.css',
-    	    		  //'frontend/express/public/javascripts/visualization/rickshaw/rickshaw.min.css',
+                'frontend/express/public/stylesheets/main.min.css': [
+                'frontend/express/public/stylesheets/main.css',      
                 'frontend/express/public/stylesheets/sidebar.css',
                 "frontend/express/public/stylesheets/topbar.css",
                 "frontend/express/public/stylesheets/calendar.css",
@@ -187,7 +177,10 @@ module.exports = function(grunt) {
                 "frontend/express/public/stylesheets/crash_details.css",
                 "frontend/express/public/stylesheets/bool_pie_chart.css",
                 "frontend/express/public/stylesheets/average_bar.css",
-                "frontend/express/public/stylesheets/platforms.css"
+                "frontend/express/public/stylesheets/platforms.css",
+                "frontend/express/public/stylesheets/no_data_block.css",
+                "frontend/express/public/stylesheets/alert.css",    
+                "frontend/express/public/stylesheets/populator.css"                   
     	    	],
     		}
     	}

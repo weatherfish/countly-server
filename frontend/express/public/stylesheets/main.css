@@ -117,8 +117,8 @@ body {
     /*min-width:768px;
     min-height: 400px;*/
     position: absolute;
-    top : 141px;
-    z-index : 2000;
+    top : 151px;
+    z-index : 1000;
     overflow: visible;
 
     /*border : 1px solid #eeeeee;*/ /* todo:  enable fix for dashboard page*/

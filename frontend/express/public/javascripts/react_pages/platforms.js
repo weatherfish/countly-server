@@ -47,6 +47,7 @@ var PlatformsPage = React.createClass({
         return({
             "sort_functions" : sort_functions,
             "table_headers" : table_headers,
+            "active_app" : this.props.active_app
             //"active_bar_id" : 0
             //"active_tab" : 1
         });
@@ -122,18 +123,30 @@ var PlatformsPage = React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
 
-        console.log("--------- platform props --------------");
-        console.log(nextProps);
+        if (nextProps.active_app != this.state.active_app) // active app changed
+        {                                               
+            this.setState({
+                active_app : nextProps.active_app,
+                inited : false
+            });
+            
+            var data_timestamp = Math.floor(Date.now());
 
-        var horizontal_chart_headers = this.state.horizontal_chart_headers;
-
-        horizontal_chart_headers[0].data = countlyDeviceDetails.getPlatformData();
-        horizontal_chart_headers[1].data = countlyDeviceDetails.getOSVersionData(this.activePlatform);
-
-        this.setState({
-            horizontal_chart_headers : horizontal_chart_headers,
-        })
-
+            this.init_data(data_timestamp);
+            
+        }
+        else
+        {
+    
+            var horizontal_chart_headers = this.state.horizontal_chart_headers;
+    
+            horizontal_chart_headers[0].data = countlyDeviceDetails.getPlatformData();
+            horizontal_chart_headers[1].data = countlyDeviceDetails.getOSVersionData(this.activePlatform);
+    
+            this.setState({
+                horizontal_chart_headers : horizontal_chart_headers,
+            });      
+        }
     },
 
     change_platform : function(platform, color_id) {

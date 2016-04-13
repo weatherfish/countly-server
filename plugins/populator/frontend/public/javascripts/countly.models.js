@@ -383,10 +383,14 @@
 	var totalStats = {u:0,s:0,x:0,d:0,e:0,r:0,b:0,c:0,p:0};
 	
 	function updateUI(stats){
+	   
+        console.log("= update ui =======");
+        console.log(stats);
+       /*
 		for(var i in stats){
 			totalStats[i] += stats[i];
-			$("#populate-stats-"+i).text(totalStats[i]);
-		}
+			//$("#populate-stats-"+i).text(totalStats[i]);
+		}*/
 	}
     
     function createCampaign(id, name, cost, type, callback){
@@ -513,9 +517,9 @@
 		return userAmount;
 	};
 	countlyPopulator.generateUI = function(time){
-		for(var i in totalStats){
-			$("#populate-stats-"+i).text(totalStats[i]);
-		}
+		/*for(var i in totalStats){
+			//$("#populate-stats-"+i).text(totalStats[i]);
+		}*/
 	};
 	countlyPopulator.generateUsers = function (amount) {
 		stopCallback = null;
@@ -601,7 +605,7 @@
 			queued++;
 			var mult = Math.round(queued/10)+1;
 			timeout = bucket*100*mult*mult;
-			$("#populate-stats-br").text(queued);
+			//$("#populate-stats-br").text(queued);
 			countlyPopulator.bulking = true;
 			$.ajax({
 				type:"POST",
@@ -612,7 +616,7 @@
 				},
 				success:function (json) {
 					queued--;
-					$("#populate-stats-br").text(queued);
+					//$("#populate-stats-br").text(queued);
 					updateUI(temp);
 					countlyPopulator.bulking = false;
 					countlyPopulator.sync();
@@ -622,7 +626,7 @@
 				},
 				error:function(){
 					queued--;
-					$("#populate-stats-br").text(queued);
+					//$("#populate-stats-br").text(queued);
 					countlyPopulator.bulking = false;
 					countlyPopulator.sync();
 					if (!generating && stopCallback) {

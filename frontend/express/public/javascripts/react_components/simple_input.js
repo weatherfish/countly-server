@@ -16,6 +16,14 @@ var InputBlock = React.createClass({
         });
 
     },
+    
+    componentDidMount : function(){
+        
+        if (this.state.value){
+            this.props.onChange(this.props.setting, this.state.value);
+        } 
+          
+    },
 
     change_input : function(event)
     {
@@ -30,7 +38,9 @@ var InputBlock = React.createClass({
             }
         }
 
-        if (event.target.value.toString().length > 0) this.props.onChange(this.props.setting, event.target.value);
+        if (event.target.value.toString().length > 0){
+            this.props.onChange(this.props.setting, event.target.value);
+        } 
 
         this.setState({ value: event.target.value });
     },

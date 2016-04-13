@@ -103,8 +103,6 @@ var SimpleSelectBlock = React.createClass({
 
     select : function(selector) {
 
-        console.log("select 1:", selector);
-
         if (this.props.setting)
         {
             this.props.onChange(this.props.setting, selector.key);

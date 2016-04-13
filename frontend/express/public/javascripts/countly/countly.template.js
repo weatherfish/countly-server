@@ -718,6 +718,7 @@ $.extend(Template.prototype, {
     };
 
     function revealDialog(dialog) {
+        return false;
         $("body").append(dialog);
 
         var dialogHeight = dialog.outerHeight()+5,

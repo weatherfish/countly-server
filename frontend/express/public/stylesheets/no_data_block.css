@@ -1,0 +1,71 @@
+.horizontal_chart_wrapper .nodata_block {
+    position : absolute;
+    top : 10%;
+    /*left : 20px;*/
+
+    text-align : center;
+    z-index : 5000;
+    font-size : 24px;
+
+    margin-top : 100px;
+}
+
+.nodata_block {
+
+
+
+}
+
+.nodata_block .wrapper {
+    width : 100px;
+    height : 100px;
+    margin-right: auto;
+    margin-left: auto;
+    position: relative;
+}
+
+.nodata_block .zero {
+    /*position : absolute;
+    top : 0px;
+    left : 0px;*/
+    /*font-size : 156px;*/
+    display: block;
+    /*font-weight : bold;
+    font-family: Lato-Semibold;*/
+
+    background-image: url("../images/nodata_final.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100px;
+    width : 100px;
+    height : 100px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.nodata_block .sign {
+    /*position : absolute;
+    bottom : 0px;
+    left : 0px;*/
+
+    width : 100px;
+    height : 100px;
+
+    position: relative;
+    left: 3px;
+    top : -10px;
+
+    font-family: Lato-Semibold;
+    font-size: 17px;
+    color: #132737;
+    letter-spacing: 1.39px;
+
+}
+/*
+.nodata_block .lines {
+    position : absolute;
+    top : 0px;
+    left : 0px;
+    width : 100px;
+    height : 100px;
+}*/

@@ -22,17 +22,15 @@ var RightPart = React.createClass({
         if (this.props.selected_item)
         {
 
+            console.log("::::::::: selected ::::::::::::::");
+            console.log(this.props);
+
             var nav_data = {
                 fstmenu : this.props.nav_key,
-                sndmenu : this.props.selected_item.charAt(0).toUpperCase() + this.props.selected_item.slice(1),
+                sndmenu : this.props.selected_item//.charAt(0).toUpperCase() + this.props.selected_item.slice(1),
             }
 
-            //$(event_emitter).trigger('select', nav_data);
-
-            console.log("first:", nav_data.fstmenu, " >>",  nav_data.sndmenu);
-
             this.props.onChange(nav_data.fstmenu, nav_data.sndmenu);
-
         }
 
         return {
@@ -85,24 +83,12 @@ var RightPart = React.createClass({
 
     onItemClick: function(item, action_path) {
 
-        //event.preventDefault();
-
-        console.log("{{{{{{{{ set state }}}}}}}}");
-        console.log(item);
-
         var selected = item[1].split('/');
-
-        console.log("???????????? selected ?????????");
-        console.log(selected);
 
         var nav_data = {
             fstmenu : selected[1],
-            sndmenu : selected[2].charAt(0).toUpperCase() + selected[2].slice(1),
+            sndmenu : selected[2] //.charAt(0).toUpperCase() + selected[2].slice(1),
         }
-
-        //$(event_emitter).trigger('select', nav_data);
-
-        console.log("first:", nav_data.fstmenu, " >>",  nav_data.sndmenu);
 
         this.props.onChange(nav_data.fstmenu, nav_data.sndmenu);
 
@@ -131,8 +117,21 @@ var RightPart = React.createClass({
                 head_class_name += " transition_head";
             }
 
+            var head_sign = false;
+
+            for (var i = 0; i < navigation.length; i++)
+            {
+
+                if (navigation[i].path == this.props.nav_key){
+
+                    head_sign = navigation[i].key;
+
+                    break;
+                }
+            }
+
             var head_node = <div key="head_item" className={head_class_name}>
-                                <span className="sign">{this.props.nav_key}</span>
+                                <span className="sign">{head_sign}</span>
                                 <span className="close_icon" onClick={this.props.handleClose}></span>
                             </div>
         }
@@ -157,11 +156,22 @@ var RightPart = React.createClass({
 
                 var node_class_name = items_class_name;
 
-                if (self.state.selected_item && (self.state.selected_item.toLowerCase() == nav_item[0].toLowerCase()))
+                var path_part = false;
+
+                if (nav_item[1])
+                {
+                    var path_part = nav_item[1].split("/");
+
+                    if (path_part[2])
+                    {
+                        path_part = path_part[2].toLowerCase();
+                    }
+                }
+
+                if (self.state.selected_item && (self.state.selected_item.toLowerCase() == path_part))
                 {
                     node_class_name += " active";
                 }
-
 
                 // href={action_path}
                 /*return (

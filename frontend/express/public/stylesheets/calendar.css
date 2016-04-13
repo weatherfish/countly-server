@@ -1,6 +1,9 @@
+#calendar_block {
+  z-index: 5000;
+}
 #calendar_block .wrapper {
   position: absolute;
-  top: 70px;
+  top: 80px;
   left: 260px;
   height: 70px;
   background-color: #ffffff;
@@ -126,8 +129,8 @@
   text-align: left;
   color: gray;
   padding-left: 20px;
-  height: 46px;
-  line-height: 46px;
+  height: 40px;
+  line-height: 40px;
   border-bottom: 1px solid #2E3545;
   border-left: 1px solid #2E3545;
   cursor: pointer;
@@ -203,8 +206,8 @@
   position: absolute;
   top: 42px;
   left: 250px;
-  width: 440px;
-  height: 311px;
+  width: 420px;
+  height: 281px;
   background-color: #141821;
   opacity: 0;
   -webkit-transition: all 0.2s 0s linear;
@@ -310,13 +313,15 @@
 }
 #calendar .confirm_button {
   border: 1px solid #03CF57;
-  width: 120px;
+  min-width: 120px;
+  padding-left: 10px;
+  padding-right: 10px;
   height: 35px;
   line-height: 35px;
   color: #03CF57;
   position: absolute;
   bottom: 20px;
-  right: 20px;
+  right: 22px;
   cursor: pointer;
   border-radius: 6px;
   text-align: center;

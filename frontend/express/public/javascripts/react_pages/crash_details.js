@@ -185,7 +185,7 @@ var CrashDetailsPage = React.createClass({
         }
 
         var blocks_style = {
-            "width" : elements_width - 40
+            "width" : elements_width - 60
         }
 
         var crash_data = this.state.crash_data;
@@ -299,7 +299,7 @@ var CrashDetailsPage = React.createClass({
 
                             <div>
 
-                                <span className="sign">{jQuery.i18n.map["crashes.ram"].toUpperCase()}</span>
+                                <span className="sign">{jQuery.i18n.map["crashes.ram"].toLowerCase()}</span>
 
                                 <span className="value_block">
                                     <span className="value">{(crash_data.ram.total/crash_data.ram.count).toFixed(2)+" %"}</span>
@@ -326,7 +326,7 @@ var CrashDetailsPage = React.createClass({
 
                             <div>
 
-                                <span className="sign">{jQuery.i18n.map["crashes.disk"].toUpperCase()}</span>
+                                <span className="sign">{jQuery.i18n.map["crashes.disk"].toLowerCase()}</span>
 
                                 <span className="value_block">
                                     <span className="value">{(crash_data.disk.total/crash_data.disk.count).toFixed(2)+" %"}</span>
@@ -353,7 +353,7 @@ var CrashDetailsPage = React.createClass({
 
                             <div>
 
-                                <span className="sign">{jQuery.i18n.map["crashes.battery"].toUpperCase()}</span>
+                                <span className="sign">{jQuery.i18n.map["crashes.battery"].toLowerCase()}</span>
 
                                 <span className="value_block">
                                     <span className="value">{(crash_data.bat.total/crash_data.bat.count).toFixed(2)+" %"}</span>
@@ -380,7 +380,7 @@ var CrashDetailsPage = React.createClass({
 
                             <div>
 
-                                <span className="sign">{jQuery.i18n.map["crashes.run"].toUpperCase()}</span>
+                                <span className="sign">{jQuery.i18n.map["crashes.run"].toLowerCase()}</span>
 
                                 <span className="value_block">
                                     <span className="value">{(crash_data.run.total/crash_data.run.count).toFixed(2)+" %"}</span>

@@ -1,7 +1,5 @@
 var EventsPage = React.createClass({
 
-    //colors : ["#1B8AF3", "#F2B702"],
-
     mixins: [UpdatePageMixin],
 
     getInitialState: function() {
@@ -25,19 +23,10 @@ var EventsPage = React.createClass({
         var self = this;
 
         $.when(countlyEvent.initialize()).then(function () {
-/*
-            var eventData = countlyEvent.getEventData();
 
-            var eventSummary = countlyEvent.getEventSummary();
-*/
             var events_types = countlyEvent.getEvents();
 
-            console.log("==================================events types ============");
-            console.log(events_types);
-
             var segmentations = countlyEvent.getEventSegmentations();
-
-            //var active_segmentation = countlyEvent.getActiveSegmentation();
 
             var active_segmentation = false;
 
@@ -94,7 +83,7 @@ var EventsPage = React.createClass({
 
         });
     },
-
+/*
     on_graph_mount : function(mount_data) {
 
         console.log("===== graph mount ====");
@@ -103,9 +92,11 @@ var EventsPage = React.createClass({
         /*this.setState({
             "granularity" : mount_data.granularity
         });*/
-    },
+  /*  },*/
 
     make_headers : function(){
+
+        var self = this;
 
         var eventData = countlyEvent.getEventData();
 
@@ -114,7 +105,7 @@ var EventsPage = React.createClass({
         var headers = [];
 
         eventData.daily_granularity.forEach(function(data_line, i){
-
+                        
             var total = 0;
 
             //eventSummary.items.forEach(function(item, id){
@@ -317,6 +308,10 @@ var EventsPage = React.createClass({
     render : function(){
 
         var self = this;
+        
+        var elements_width = get_viewport_width();
+        var chart_height = 300;
+        var line_chart_hover_disable = false;
 
         if (!this.state.inited || this.state.loading)
         {
@@ -325,15 +320,15 @@ var EventsPage = React.createClass({
 
         if (!this.state.active_event)
         {
-            return (<div>no data</div>)
-        }
-
-        var elements_width = get_viewport_width();
-        var chart_height = 300;
-        var line_chart_hover_disable = false;
+            return (<NoDataBlock display={"block"} width={elements_width}/>);
+        }        
 
         var page_style = {
-            "width" : elements_width
+            width : elements_width
+        }
+        
+        var control_block_style = {
+            width : elements_width + 2
         }
 
         var events_selectors_current_style = { };
@@ -401,37 +396,41 @@ var EventsPage = React.createClass({
         {
             var convert_table_function = false;
         }
+        
+        
 
         return (
             <div className="page events_page" style={page_style}>
 
-                <div className="control_block">
+                <div className="control_block" style={control_block_style}>
 
                     <div className="events_selection">
 
                         <div className="sign">EVENT SELECTION</div>
-
-                        <div className="current" onClick={this.show_events_selectors}>
-                            <span className="sign">{this.state.active_event.name}</span>
-                            <span className="arrow"/>
-                        </div>
-
-                        <div className="selectors" style={events_selectors_current_style}>
-                            <div className="top_arrow"/>
-                            {
-                                _.map(self.state.events_types, function(event_type, id) {
-
-                                    if (event_type.name == self.state.active_event.name)
-                                    {
-                                        var class_name = "active";
-                                    }
-                                    else {
-                                        var class_name = "";
-                                    }
-
-                                    return (<span className={class_name} onClick={self.event_selector_click.bind(self, event_type)}>{event_type.name}</span>)
-                                })
-                            }
+                            
+                        <div className="selectors_wrapper">                        
+                            <div className="current" onClick={this.show_events_selectors}>
+                                <span className="sign">{this.state.active_event.name}</span>
+                                <span className="arrow"/>
+                            </div>
+    
+                            <div className="selectors" style={events_selectors_current_style}>
+                                <div className="top_arrow"/>
+                                {
+                                    _.map(self.state.events_types, function(event_type, id) {
+    
+                                        if (event_type.name == self.state.active_event.name)
+                                        {
+                                            var class_name = "active";
+                                        }
+                                        else {
+                                            var class_name = "";
+                                        }
+    
+                                        return (<span className={class_name} onClick={self.event_selector_click.bind(self, event_type)}>{event_type.name}</span>)
+                                    })
+                                }
+                            </div>
                         </div>
 
                         <div className="settings_button" onClick={self.settings_button_click}>
@@ -475,36 +474,38 @@ var EventsPage = React.createClass({
 
                     <div className="segmentation_selection">
 
-                          <div className="sign">SEGMENTATION SELECTION</div>
+                        <div className="sign">SEGMENTATION SELECTION</div>
 
-                          <div className="current" onClick={self.show_segmentation_selectors}>
-                              <span className="sign">{current_segmentation}</span>
-                              <span className="arrow" style={segmentation_arrow_style}/>
-                          </div>
+                        <div className="selectors_wrapper"> 
 
-                          <div className="selectors" style={segmentation_selectors_current_style}>
-                              <div className="top_arrow"/>
-                              <span className={no_segmantation_selector_class} onClick={self.segmentation_selector_click.bind(self, false)}>{jQuery.i18n.map["events.no-segmentation"]}</span>
-                              {
-                                  _.map(self.state.segmentations, function(segmentation, id) {
-
-                                      if (segmentation == countlyEvent.getActiveSegmentation())
-                                      {
-                                          var class_name = "active";
-                                      }
-                                      else {
-                                          var class_name = "";
-                                      }
-
-                                      return (<span className={class_name} onClick={self.segmentation_selector_click.bind(self, segmentation)}>{segmentation}</span>)
-
-                                  })
-
-                              }
-                          </div>
-
+                            <div className="current" onClick={self.show_segmentation_selectors}>
+                                <span className="sign">{current_segmentation}</span>
+                                <span className="arrow" style={segmentation_arrow_style}/>
+                            </div>
+    
+                            <div className="selectors" style={segmentation_selectors_current_style}>
+                                <div className="top_arrow"/>
+                                <span className={no_segmantation_selector_class} onClick={self.segmentation_selector_click.bind(self, false)}>{jQuery.i18n.map["events.no-segmentation"]}</span>
+                                {
+                                    _.map(self.state.segmentations, function(segmentation, id) {
+    
+                                        if (segmentation == countlyEvent.getActiveSegmentation())
+                                        {
+                                            var class_name = "active";
+                                        }
+                                        else 
+                                        {
+                                            var class_name = "";
+                                        }
+    
+                                        return (<span className={class_name} onClick={self.segmentation_selector_click.bind(self, segmentation)}>{segmentation}</span>)
+    
+                                    })
+    
+                                }
+                            </div>
+                        </div>
                     </div>
-
                 </div>
 
                 {(() => {

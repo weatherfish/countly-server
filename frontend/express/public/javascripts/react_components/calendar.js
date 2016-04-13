@@ -105,6 +105,10 @@ var CalendarWrapper = React.createClass({
     },
 
     date_extend : function(e, data){
+        
+        console.log("{{{{{{{ extension function }}}}}}}}");
+        console.log(data);
+        console.log(left_date);
 
         var ld = new Date(left_date.date);
         var extended_left_date = ld.setDate(ld.getDate() - data.days_extend);
@@ -651,7 +655,8 @@ var CalendarWrapper = React.createClass({
         var element_width = window.innerWidth - 240 - 20 - 20 - 16;
 
         var element_style = {
-            width : element_width
+            width : element_width,
+            top : this.props.offset_top ? (70 + this.props.offset_top) + "px" : false
         };
 
         return (
@@ -714,5 +719,3 @@ var CalendarWrapper = React.createClass({
     }
 
 });
-
-console.log(">>> finish load Calendar  >>>");

@@ -172,6 +172,10 @@ app.configure(function () {
     app.use(express.methodOverride());
     var csrf = express.csrf();
     app.use(function (req, res, next) {
+        
+        next(); // !!!!!!!!!!!! todo: remove !!!!!!!!!!
+        return true;
+        
         if (req.method == "GET" || req.method == 'HEAD' || req.method == 'OPTIONS'){
             //csrf not used, but lets regenerate token
             csrf(req, res, next);
@@ -592,13 +596,6 @@ app.post(countlyConfig.path+'/setup', function (req, res, next) {
 
 app.post(countlyConfig.path+'/login', function (req, res, next) {
 
-    req.body.username = "truetech"; // todo !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!! remove this as fast as it possible  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!
-    req.body.password = "truetech1"; // todo !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!! remove this as fast as it possible  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!
-
-
-    console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{ login }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
-    console.log(req);
-
     if (req.body.username && req.body.password) {
         var password = sha1Hash(req.body.password);
 
@@ -738,6 +735,11 @@ app.post(countlyConfig.path+'/dashboard/settings', function (req, res, next) {
 });
 
 app.post(countlyConfig.path+'/apps/icon', function (req, res, next) {
+    
+    console.log("[ app upload ]]]]");
+    console.log("req.files.app_image:", req.files);
+    console.log("req.body.app_image_id:", req.body.app_image_id);
+    
     if (!req.files.app_image || !req.body.app_image_id) {
         res.end();
         return true;

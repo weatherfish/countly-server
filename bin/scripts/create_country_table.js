@@ -8,8 +8,6 @@ var server = new Mongolian(monlog);
 
 var mongo_db = server.db("countly");
 
-
-
 var data_file  = './geo_data/TM_WORLD_BORDERS-0.3';
 var table_name = 'countries_geo_data';
 var threads    = 2;
@@ -34,7 +32,7 @@ var insert_queue = async.queue(function (country, callback) {
 
 insert_queue.drain = function() {
     console.log('all country have been inserted');
-    process.exit(1);
+    process.exit(0);
 }
 
 Shp.readFile(data_file, function(error, data){

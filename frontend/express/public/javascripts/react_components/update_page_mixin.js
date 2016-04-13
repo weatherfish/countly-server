@@ -2,8 +2,6 @@ var UpdatePageMixin = {
 
     componentDidMount : function() {
 
-        countlyCommon.DASHBOARD_REFRESH_MS = 1000000; // todo
-
         var self = this;
 
         var data_timestamp = Math.floor(Date.now());

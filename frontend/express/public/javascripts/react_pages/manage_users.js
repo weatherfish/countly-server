@@ -58,15 +58,15 @@ var NewUserWindow = React.createClass({
         var data = {};
 
         data.full_name = this.user_data.fullname;
-    		data.username = this.user_data.username;
-    		data.email = this.user_data.email;
-    		data.password = this.user_data.password;
+        data.username = this.user_data.username;
+        data.email = this.user_data.email;
+        data.password = this.user_data.password;
         data.global_admin = this.user_data.global_admin;
 
         data.admin_of = [];
         data.user_of = [];
 
-  			if (!this.user_data.global_admin)
+        if (!this.user_data.global_admin)
         {
 
             this.user_data.adminof.forEach(function(app){
@@ -77,8 +77,8 @@ var NewUserWindow = React.createClass({
                 data.user_of.push(app/*.key*/);
             });
 
-    				//data.admin_of = currUserDetails.find(".admin-apps .app-list").val().split(",");
-    				//data.user_of = currUserDetails.find(".user-apps .app-list").val().split(",");
+            //data.admin_of = currUserDetails.find(".admin-apps .app-list").val().split(",");
+            //data.user_of = currUserDetails.find(".user-apps .app-list").val().split(",");
   			}
 
         this.setState({
@@ -87,23 +87,20 @@ var NewUserWindow = React.createClass({
 
         $.ajax({
       			type: "GET",
-                  url: countlyCommon.API_PARTS.users.w + '/create',
-                  data: {
-                      args: JSON.stringify(data),
-                      api_key: countlyGlobal['member'].api_key
-                  },
-                  dataType: "jsonp",
+                url: countlyCommon.API_PARTS.users.w + '/create',
+                data: {
+                    args: JSON.stringify(data),
+                    api_key: countlyGlobal['member'].api_key
+                },
+                dataType: "jsonp",
       			success: function(result) {
 
-                console.log("========= add result ============");
-                console.log(result);
-
-                self.props.onUserAdd(result);
-                self.props.onClose();
-
-                self.setState({
-                    loading : false
-                });
+                    self.props.onUserAdd(result);
+                    self.props.onClose();
+    
+                    self.setState({
+                        loading : false
+                    });
       			}
     		});
     },
@@ -111,14 +108,11 @@ var NewUserWindow = React.createClass({
     cancel : function(){
 
         this.props.onClose();
-
     },
 
     handleGlobalAdminChange : function(e){
 
-        var state = e.target.checked;
-
-        console.log("<<<<<<<<<< global_admin changed >>>>>>>>>>", state);
+        var state = e.target.checked;        
         this.on_row_change("global_admin", state)
     },
 
@@ -139,32 +133,32 @@ var NewUserWindow = React.createClass({
 
             <div className="label">
                 <div className="cancel_button" onClick={this.cancel}></div>
-                <span>Create a new user</span>
+                <span>{jQuery.i18n.map["management-users.create-new-user"]}</span>
             </div>
 
             <InputBlock
-                label="user fullname"
+                label={jQuery.i18n.map["management-users.full-name"]}
                 value={""}
                 onChange={this.on_row_change}
                 setting={["fullname"]}
             />
 
             <InputBlock
-                label="user username"
+                label={jQuery.i18n.map["management-users.username"]}
                 value={""}
                 onChange={this.on_row_change}
                 setting={["username"]}
             />
 
             <InputBlock
-                label="user email"
+                label={jQuery.i18n.map["management-users.email"]}
                 value={""}
                 onChange={this.on_row_change}
                 setting={["email"]}
             />
 
             <InputBlock
-                label="user password"
+                label={jQuery.i18n.map["management-users.password"]}
                 value={""}
                 onChange={this.on_row_change}
                 setting={["password"]}
@@ -172,10 +166,10 @@ var NewUserWindow = React.createClass({
 
             <div className="setting_block">
 
-                <div className="setting_label">Admin of apps</div>
+                <div className="setting_label">{jQuery.i18n.map["management-users.admin-of"]}</div>
 
                 <MultiSelectBlock
-                    label="admin of app"
+                    label=""
                     blockWidth={240}
                     selectors={this.state.apps}
                     onChange={this.on_row_change}
@@ -187,10 +181,10 @@ var NewUserWindow = React.createClass({
 
             <div className="setting_block">
 
-                <div className="setting_label">User of apps</div>
+                <div className="setting_label">{jQuery.i18n.map["management-users.user-of"]}</div>
 
                 <MultiSelectBlock
-                    label="admin of app"
+                    label=""
                     blockWidth={240}
                     selectors={this.state.apps}
                     onChange={this.on_row_change}
@@ -201,13 +195,13 @@ var NewUserWindow = React.createClass({
             </div>
 
             <div className="setting_block">
-                <div className="setting_label">global admin</div>
+                <div className="setting_label">{jQuery.i18n.map["management-users.global-admin"]}</div>
                 <input key="global_admin" type="checkbox" id="global_admin_checkbox" onChange={this.handleGlobalAdminChange}/>
             </div>
 
             <div className="buttons_block">
 
-                <div className="add_button" onClick={this.add}>add</div>
+                <div className="add_button" onClick={this.add}>{jQuery.i18n.map["management-users.create-user"]}</div>
             </div>
 
         </div>)
@@ -466,7 +460,7 @@ var ManageUsersPage = React.createClass({
 
                 <div className="top_block">
                     <span className="sign">USER ROLES MANAGEMENT</span>
-                    <div className="new_user_button" onClick={this.new_user_click}>Add New User</div>
+                    <div className="new_user_button" onClick={this.new_user_click}>{jQuery.i18n.map["management-users.create-new-user"]}</div>
                 </div>
 
                 <NewUserWindow open={this.state.new_user_open} onClose={this.new_user_close} onUserAdd={this.on_user_add}/>
@@ -477,9 +471,9 @@ var ManageUsersPage = React.createClass({
 
                     <div className="users_table">
                               <div className="users_table_header">
-                                  <div className="email" style={email_header_style}>User E-mail</div>
-                                  <div className="admin_of" style={adminof_header_style}>Admin of</div>
-                                  <div className="user_of" style={userof_header_style}>User of</div>
+                                  <div className="email" style={email_header_style}>{jQuery.i18n.map["management-users.email"]}</div>
+                                  <div className="admin_of" style={adminof_header_style}>{jQuery.i18n.map["management-users.admin-of"]}</div>
+                                  <div className="user_of" style={userof_header_style}>{jQuery.i18n.map["management-users.user-of"]}</div>
                               </div>
                               {
                                   _.map(self.state.users_data, function(user, i){

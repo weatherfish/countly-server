@@ -13,7 +13,8 @@ var UserPage = React.createClass({
         return({
             granularity : "daily", // false, // todo - should be false
             sort_functions : sort_functions,
-            inited : false
+            inited : false,
+            active_app : this.props.active_app
         });
     },
 
@@ -28,7 +29,7 @@ var UserPage = React.createClass({
             var big_numbers = self.make_big_numbers();
 
             headers.unshift({
-                "title" : "Date",
+                "title" : jQuery.i18n.map["common.date"],
                 //"help"  : "sessions.unique-sessions", // todo: add translation
                 "short" : "date",
                 "big_numbers" : big_numbers
@@ -90,12 +91,27 @@ var UserPage = React.createClass({
     },
 
     componentWillReceiveProps : function(nextProps) {
+                       
+        if (nextProps.active_app != this.state.active_app) // active app changed
+        {                                               
+            this.setState({
+                active_app : nextProps.active_app,
+                inited : false
+            });
+            
+            var data_timestamp = Math.floor(Date.now());
 
-        var big_numbers = this.make_big_numbers();
+            this.init_data(data_timestamp);
+            
+        }
+        else
+        {
+            var big_numbers = this.make_big_numbers();
 
-        this.setState({
-            big_numbers : big_numbers
-        })
+            this.setState({
+                big_numbers : big_numbers
+            });
+        }       
 
     },
 
@@ -119,7 +135,7 @@ var UserPage = React.createClass({
             <div className="page" style={page_style}>
 
                 <LineChart
-                    trend_sign={"USERS TREND"}
+                    trend_sign={jQuery.i18n.map["users.title"]}
                     width={elements_width}
                     height={chart_height}
                     sides_padding={20}

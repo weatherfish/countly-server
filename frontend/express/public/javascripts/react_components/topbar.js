@@ -1,119 +1,61 @@
-var SettingsBlock = React.createClass({
-
-    getInitialState : function() {
-
-        return ({
-            //"confirmation_waiting" : false
-            "confirmation_waiting" : true,
-            "confirmation_sign" : jQuery.i18n.map["management-applications.delete-confirm"],
-            "confirmation_function" : false
-        });
-
-    },
-
-    render : function() {
-
-        if (this.state.loading)
-        {
-            return (<Loader/>);
-        }
-
-        var new_app_block_style = {
-            width : 440/*get_viewport_width()*/
-        };
-
-        if (!this.props.open) new_app_block_style.display = "none";
-
-        return(
-            <div className="new_app_block" style={new_app_block_style}>
-
-                <div className="label">
-                    <div className="cancel_button" onClick={this.cancel}></div>
-                    <span>CREATE A NEW APPLICATION</span>
-                </div>
-
-                <InputBlock
-                    label="app name"
-                    value={""}
-                    onChange={this.on_setting_change}
-                    setting={["name"]}
-                />
-
-                <SelectBlock
-                    label="Country"
-                    selectors={this.countries}
-                    active_selector_key={this.countries[0]}
-                    onChange={this.on_setting_change}
-                    setting={["country"]}
-                    width={240}
-                />
-
-                <SelectBlock
-                    label="Category"
-                    selectors={this.categories}
-                    active_selector_key={this.categories[0]}
-                    onChange={this.on_setting_change}
-                    setting={["category"]}
-                    width={240}
-                />
-
-                <div className="setting_block upload_icon_block">
-                    <div className="setting_label">Icon</div>
-                    <div className="upload_block">
-
-                        <form ref="uploadForm" enctype="multipart/form-data" id="add-app-image-form">
-                            <input ref="file" type="file" id="app_image" name="app_image"  onChange={this.handleIconAdd}/>
-                        </form>
-
-                    </div>
-                </div>
-
-                <div className="buttons_block">
-                    <div className="add_button" onClick={this.add}>add</div>
-                </div>
-          </div>);
-    }
-});
-
 var TopBar = React.createClass({
 
     getInitialState: function() {
+
         return {
-            fstmenu : "",
-            sndmenu : "Dashboard",
-            user_menu_open : false
+            fstmenu : false,
+            sndmenu : jQuery.i18n.map["sidebar.dashboard"],
+            user_menu_open : false,
+            language_menu_open : false,
+            language : this.props.language
         };
     },
 
     componentWillReceiveProps : function(nextProps) {
 
-        this.setState({
-            fstmenu : nextProps.first,
-            sndmenu : nextProps.second
-        })
+        var first = false;
+        var second = false;
 
-    },
-/*
-    componentDidMount: function(){
+        for (var i = 0; i < navigation.length; i++)
+        {
 
-        $(event_emitter).on('select', function(e, data){
+            if (navigation[i].path == nextProps.first){
 
-            console.log("======= topbar event ==========");
-            console.log(data);
+                first = navigation[i].key;
 
+                for (var j = 0; j < navigation[i].items.length; j++)
+                {
+
+                    if (navigation[i].items[j][1].split("/")[2] == nextProps.second)
+                    {
+                        second = navigation[i].items[j][0];
+                        break;
+                    }
+                }
+
+                break;
+            }
+        }
+
+        if (!second)
+        {
             this.setState({
-                fstmenu : data.fstmenu,
-                sndmenu : data.sndmenu,
-            });
-
-        }.bind(this));
+                fstmenu : false, //nextProps.first,
+                sndmenu : first, //nextProps.second,
+                language : nextProps.language
+            })
+        }
+        else
+        {
+            this.setState({
+                fstmenu : first, //nextProps.first,
+                sndmenu : second, //nextProps.second,
+                language : nextProps.language
+            })
+        }
 
     },
 
-    componentWillUnmount: function () {
-        $(event_emitter).off('select');
-    },
-*/
     handleOpenUserMenu : function(){
 
         if (this.state.user_menu_open == false)
@@ -130,15 +72,89 @@ var TopBar = React.createClass({
                     console.log("===== click outside =============");
 
                     self.setState({
-                        "user_menu_open" : false
+                        user_menu_open : false,
+                        language_menu_open : false
                     });
                 }
             }
         }
 
         this.setState({
-            "user_menu_open" : !this.state.user_menu_open
+            user_menu_open : !this.state.user_menu_open,
+            language_menu_open : (this.state.language_menu_open && this.state.user_menu_open) ? false : this.state.language_menu_open
         });
+    },
+
+    languageMenuState : function(){
+
+        this.setState({
+            language_menu_open : !this.state.language_menu_open
+        })
+
+    },
+
+    changeLanguage : function(langCode){
+
+        console.log("click change:", langCode);
+
+        var self = this;
+
+        //var langCode = $(this).data("language-code"),
+
+        var langCodeUpper = langCode.toUpperCase();
+
+        store.set("countly_lang", langCode);
+        //$(".reveal-language-menu").text(langCodeUpper);
+
+        countlyCommon.BROWSER_LANG_SHORT = langCode;
+        countlyCommon.BROWSER_LANG = langCode;
+
+        try {
+            moment.lang(countlyCommon.BROWSER_LANG_SHORT);
+        } catch(e) {
+            moment.lang("en");
+        }
+/*
+        $("#date-to").datepicker("option", $.datepicker.regional[countlyCommon.BROWSER_LANG]);
+        $("#date-from").datepicker("option", $.datepicker.regional[countlyCommon.BROWSER_LANG]);
+        */
+        $.ajax({
+            type:"POST",
+            url:countlyGlobal["path"]+"/user/settings/lang",
+            data:{
+                "username":countlyGlobal["member"].username,
+                "lang":countlyCommon.BROWSER_LANG_SHORT,
+                _csrf:countlyGlobal['csrf_token']
+            },
+            success:function (result) {}
+        });
+
+        jQuery.i18n.properties({
+            name:'locale',
+            cache:true,
+            language:countlyCommon.BROWSER_LANG_SHORT,
+            path:[countlyGlobal["cdn"]+'localization/min/'],
+            mode:'map',
+            callback:function () {
+                self.origLang = JSON.stringify(jQuery.i18n.map);
+                $.when(countlyLocation.changeLanguage()).then(function () {
+
+                    console.log("========= jQuery.i18n done =====");
+                    console.log();
+
+                    self.props.on_change_language(langCode);
+
+                    self.setState({
+                        user_menu_open : false,
+                        language_menu_open : false
+                    })
+
+                    /*self.activeView.render();
+                    self.pageScript();*/
+                });
+            }
+        });
+
     },
 
     render : function() {
@@ -165,26 +181,62 @@ var TopBar = React.createClass({
 
         var user_menu_style = {};
 
+        var language_menu_style = {};
+
         if (this.state.user_menu_open){
             user_menu_style.display = "block"
         }
+
+        if (this.state.language_menu_open){
+            user_menu_style["border-top-left-radius"] = "0px";
+            user_menu_style["border-bottom-left-radius"] = "0px";
+            language_menu_style.display = "block";
+            var language_menu_select_class = "active";
+        }
+        else
+        {
+            var language_menu_select_class = "";
+        }
+
+        // <div className="hint_icon"></div>
 
         return (
               <div className="navigation" style={block_style}>
                   <span className="fstmenu">{this.state.fstmenu}</span>
                   {arrow_block}
                   <span className={sndmenu_class}>{this.state.sndmenu}</span>
-                  <div className="hint_icon"></div>
+                  
 
                   <div className="user_name_block" onClick={this.handleOpenUserMenu}><span className="name">{this.props.user_name}</span><span className="arrow"></span></div>
                   <div className="user_menu" style={user_menu_style}>
 
                       <div className="top_arrow"></div>
 
-                      <span>Settings</span>
-                      <span>API Key</span>
-                      <span>Language</span>
-                      <span className="logout">Log Out</span>
+                      <span>{jQuery.i18n.map["sidebar.settings"]}</span>
+                      <span>{jQuery.i18n.map["user-settings.api-key"]}</span>
+                      <span onClick={this.languageMenuState} className={language_menu_select_class}><span className="arrow"></span>Language</span>
+                      <span className="logout">{jQuery.i18n.map["sidebar.logout"]}</span>
+                  </div>
+
+                  <div className="language_menu" style={language_menu_style}>
+                      <div className="group">
+                        <div onClick={this.changeLanguage.bind(this, "de")} className={(countlyCommon.BROWSER_LANG_SHORT == "de") ? "item active" : "item"}><img src="/images/flags/de.png"/>Deutsch</div>
+                        <div onClick={this.changeLanguage.bind(this, "en")} className={(countlyCommon.BROWSER_LANG_SHORT == "en") ? "item active" : "item"}><img src="/images/flags/gb.png"/>English</div>
+                        <div onClick={this.changeLanguage.bind(this, "es")} className={(countlyCommon.BROWSER_LANG_SHORT == "es") ? "item active" : "item"}><img src="/images/flags/es.png"/>Español</div>
+                        <div onClick={this.changeLanguage.bind(this, "fr")} className={(countlyCommon.BROWSER_LANG_SHORT == "fr") ? "item active" : "item"}><img src="/images/flags/fr.png"/>Français</div>
+                        <div onClick={this.changeLanguage.bind(this, "it")} className={(countlyCommon.BROWSER_LANG_SHORT == "it") ? "item active" : "item"}><img src="/images/flags/it.png"/>Italiano</div>
+                        <div onClick={this.changeLanguage.bind(this, "nl")} className={(countlyCommon.BROWSER_LANG_SHORT == "nl") ? "item active" : "item"}><img src="/images/flags/nl.png"/>Nederlands</div>
+                        <div onClick={this.changeLanguage.bind(this, "lv")} className={(countlyCommon.BROWSER_LANG_SHORT == "lv") ? "item active" : "item"}><img src="/images/flags/lv.png"/>Latviski</div>
+                      </div>
+                      <div className="group">
+                        <div onClick={this.changeLanguage.bind(this, "et")} className={(countlyCommon.BROWSER_LANG_SHORT == "et") ? "item active" : "item"}><img src="/images/flags/et.png"/>Eesti</div>
+                        <div onClick={this.changeLanguage.bind(this, "pt")} className={(countlyCommon.BROWSER_LANG_SHORT == "pt") ? "item active" : "item"}><img src="/images/flags/pt.png"/>Português</div>
+                        <div onClick={this.changeLanguage.bind(this, "ru")} className={(countlyCommon.BROWSER_LANG_SHORT == "ru") ? "item active" : "item"}><img src="/images/flags/ru.png"/>Русский язык</div>
+                        <div onClick={this.changeLanguage.bind(this, "tr")} className={(countlyCommon.BROWSER_LANG_SHORT == "tr") ? "item active" : "item"}><img src="/images/flags/tr.png"/>Türkçe</div>
+                        <div onClick={this.changeLanguage.bind(this, "zh")} className={(countlyCommon.BROWSER_LANG_SHORT == "zh") ? "item active" : "item"}><img src="/images/flags/ch.png"/>中文</div>
+                        <div onClick={this.changeLanguage.bind(this, "ja")} className={(countlyCommon.BROWSER_LANG_SHORT == "ja") ? "item active" : "item"}><img src="/images/flags/jp.png"/>日本語</div>
+                        <div onClick={this.changeLanguage.bind(this, "ko")} className={(countlyCommon.BROWSER_LANG_SHORT == "ko") ? "item active" : "item"}><img src="/images/flags/kr.png"/>한국어</div>
+                      </div>
                   </div>
 
               </div>

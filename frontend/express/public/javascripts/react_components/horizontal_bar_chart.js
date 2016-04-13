@@ -391,9 +391,6 @@ var HorizontalBarChart = React.createClass({
                 .attr("class", "percent")
                 .html(function(d, i) {
 
-                    console.log("::::::::: get percent ::::::::");
-                    console.log(d);
-
                     /*if (i < (50) || self.state.fully_opened)
                     {*/
                         var percent = Math.round((d[key] / total) * 100);
@@ -803,6 +800,8 @@ var HorizontalBarChart = React.createClass({
             //load_more_style.display = "block";
         }
 
+        // <div style={nodata_block_style} className="nodata_block">No data</div>
+
         return (
             <div className="horizontal_chart_wrapper" style={wrapper_style}>
                 <div className="chart_label">{this.props.graph_label.toUpperCase()}</div>
@@ -814,7 +813,7 @@ var HorizontalBarChart = React.createClass({
                     </span>
                 </div>
 
-                <div style={nodata_block_style} className="nodata_block">No data</div>
+                <NoDataBlock display={nodata_block_style.display} width={this.props.width}/>
 
             </div>
         );

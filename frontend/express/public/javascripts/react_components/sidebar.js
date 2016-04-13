@@ -8,6 +8,8 @@ var FullSidebar = React.createClass({
 
         current_location = current_location.split('/');
 
+        var left_full = false;
+
         if (current_location[2])
         {
 
@@ -24,12 +26,46 @@ var FullSidebar = React.createClass({
             }
 
             //var selected_left = selected_left;
+/*
+            var right_selected_item = false;
+
+            for (var i = 0; i < navigation.length; i++)
+            {
+
+                if (navigation[i].path == current_location[1]){
+
+                    for (var j = 0; j < navigation[i].items.length; j++)
+                    {
+                        if (navigation[i].items[j][1] == this.props.current_location)
+                        {
+                            right_selected_item = navigation[i].items[j][0];
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+            }
+*/
+
             var right_selected_item = current_location[2];
             var right_closed = false;
         }
         else
         {
             var selected_left = -1;
+
+            for (var i = 0; i < this.props.navigation.length; i++)
+            {
+
+                if (current_location[1] == this.props.navigation[i]['path']) // todo: now it compare icon property, this is not right
+                {
+                    selected_left = i;
+                    left_full = true;
+                    break;
+                }
+            }
+
             var right_selected_item = false;
             var right_closed = true;
         }
@@ -49,7 +85,8 @@ var FullSidebar = React.createClass({
             active_app    : this.props.active_app,
             right_selected_item : right_selected_item,
             apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode(),
-            icons_ready : false
+            icons_ready : false,
+            left_full : left_full
         };
     },
 
@@ -63,7 +100,9 @@ var FullSidebar = React.createClass({
                      'sidebar_active.svg',
                      'sidebar/dashboard.svg',
                      'sidebar/dashboard_hover.svg',
-                     'sidebar/dashboard_active.svg']
+                     'sidebar/dashboard_active.svg',                     
+                     'events_hover.svg', // todo : combine svg files
+                     'events_active.svg']
 
         var loaded = 0;
 
@@ -86,10 +125,23 @@ var FullSidebar = React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
 
+        console.log("{{{{{{{{{{{{{{{{{{{ applications }}}}}}}}}}}}}}}}}}}");
+        console.log(nextProps.applications);
+
         if (this.state.apps_list_hash == JSON.stringify(countlyGlobal['apps']).hashCode())
         {
             return false;
         }
+        /*
+        var active_app = countlyGlobal['apps'][app_id];
+        
+        this.setState({
+          active_app : active_app,
+          apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode()
+        });
+        */
+        
+        //return false;
 
         console.log("- +++ app changed  ------");
         console.log(countlyGlobal['apps']);
@@ -121,8 +173,10 @@ var FullSidebar = React.createClass({
             return true;
         }
 
-        // reneme active
+        return false;
 
+        // reneme active
+/*
         var active_app = this.state.active_app;
 
         var active_found = false;
@@ -160,6 +214,8 @@ var FullSidebar = React.createClass({
           active_app : active_app,
           apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode()
         });
+        
+        */
     },
 
     handle_top_click : function()
@@ -307,10 +363,13 @@ var FullSidebar = React.createClass({
 
     handle_active_app_change : function(app)
     {
+        
         this.setState({
-            "active_app" : app,
+            //"active_app" : app,
             "top_active" : false
         });
+        
+        this.props.on_active_app_change(app);
 /*
         $(event_emitter).trigger("app_changed", {
             "app_id"  : app.id,
@@ -319,6 +378,9 @@ var FullSidebar = React.createClass({
     },
 
     render : function() {
+
+        console.log("{{{{{{{{{{{{{ this.props.active_app }}}}}}}}}}}}}}}}");
+        console.log(this.props.active_app);
 
         if (!this.state.icons_ready)
         {
@@ -346,7 +408,7 @@ var FullSidebar = React.createClass({
 
             if (this.state.previous_left != -1 && this.state.previous_left != -2)
             {
-                var navigation_key   = full_navigation[this.state.previous_left].key;
+                var navigation_key   = full_navigation[this.state.previous_left].path;
                 var navigation_nodes = full_navigation[this.state.previous_left].items;
                 var description      = full_navigation[this.state.previous_left].description;
             }
@@ -363,7 +425,7 @@ var FullSidebar = React.createClass({
 
             var i = this.state.selected_left;
 
-            var navigation_key   = full_navigation[i].key;
+            var navigation_key   = full_navigation[i].path;
             var navigation_nodes = full_navigation[i].items;
             var description      = full_navigation[i].description;
         }
@@ -378,18 +440,27 @@ var FullSidebar = React.createClass({
 
                 <SidebarTop
                     is_active={this.state.top_active}
-                    active_app={this.state.active_app}
-                    onClick={this.handle_top_click}/>
+                    active_app={this.props.active_app}
+                    onClick={this.handle_top_click}
+                    language={this.props.language}/>
 
                 <ApplicationsList
                     applications={this.props.applications}
-                    active_app={this.state.active_app}
+                    active_app={this.props.active_app}
                     onAppChange={this.handle_active_app_change}
                     active={this.state.top_active}
+                    language={this.props.language}
                 />
 
                 <div id="left_part">
-                    <LeftPart navigation={full_navigation} selected_i={this.state.selected_left} is_active={is_left_active} in_transition={this.state.in_transition} handleClick={this.handle_left_click}/>
+                    <LeftPart
+                        navigation={full_navigation}
+                        selected_i={this.state.selected_left}
+                        is_active={is_left_active}
+                        in_transition={this.state.in_transition}
+                        handleClick={this.handle_left_click}
+                        language={this.props.language}
+                    />
                 </div>
                 <div id="right_part">
                     <RightPart transition={this.state.right_change}
@@ -403,14 +474,15 @@ var FullSidebar = React.createClass({
                         handleClose={this.handle_right_close.bind(this, -2)}
                         selected_item={this.state.right_selected_item}
                         onChange={this.props.onChange}
+                        language={this.props.language}
                     />
                 </div>
 
                 <div id="countly_logo_side"></div>
-            		<div id="countly_logo"></div>
+                <div id="countly_logo"></div>
                 <div id="countly_version">{this.props.countly_version}</div>
 
-            		<div id="right_part_back"></div>
+                <div id="right_part_back"></div>
 
             </div>
         );

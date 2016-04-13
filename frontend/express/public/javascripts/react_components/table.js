@@ -32,6 +32,14 @@ var TableHeader = (function (_React$Component) {
     }
 
     _createClass(TableHeader, [{
+            key : 'componentDidMount',
+            value : function componentDidMount(){
+                
+                var width = React.findDOMNode(this).offsetWidth;
+                console.log("- header mount -", width);
+            }
+        },
+        {
         key: 'render',
         value: function render() {
 
@@ -144,14 +152,9 @@ var TableCell = (function (_React$Component) {
 
 })(React.Component);
 
-
 var SortTable = React.createClass({
 
     getInitialState() {
-
-        console.log(":::::::::::::::: init ::::::::::::::::");
-
-        //var headers = JSON.parse(JSON.stringify(this.props.headers));
 
         var headers = this.props.headers;
 
@@ -177,9 +180,6 @@ var SortTable = React.createClass({
             var data = this.props.data_function();
         }
 
-        console.log("==================== table data =================");
-        console.log(data);
-
         if (data.get_current_data)
         {
             var full_rows = data.get_current_data(granularity); // todo: only daily
@@ -203,9 +203,6 @@ var SortTable = React.createClass({
             with_granularity : with_granularity
         }
 
-        console.log("========= full_rows ===========");
-        console.log(full_rows);
-
         var pagination = this.make_pagination(full_rows);
 
         for (var attrname in pagination) { init_object[attrname] = pagination[attrname]; }
@@ -227,7 +224,6 @@ var SortTable = React.createClass({
 
                 var granularity = data.new_granularity;
 
-                //console.log("==== date_choise ====", period);
                 var rows = this.props.data_function().get_current_data(granularity);
 
                 if (this.props.convert_data_function)
@@ -235,59 +231,12 @@ var SortTable = React.createClass({
                     rows = this.convert_data_rows(rows);
                 }
 
-                if (rows.length > 50000)
-                {
-                    var splitted = split(rows, 100);
-
-                    var combined = [];
-
-                    var i = 0;
-
-                    var load_part = function()
-                    {
-
-                        combined = combined.concat(splitted[i]);
-
-                        //console.log(combined);
-
-                        self.setState({
-                            rows : combined
-                        });
-
-                        i++;
-
-                        if (i < splitted.length)
-                        {
-                            setTimeout(function(){
-                                  load_part();
-                            }, 100);
-                        }
-                    }
-
-                    load_part();
-
-                }
-                else
-                {
-                    var pagination = this.make_pagination(rows);
-                    this.setState(pagination);
-                }
+                var pagination = this.make_pagination(rows);
+                this.setState(pagination);
 
             }.bind(this));
 
-        } else {
-
-            /*
-                date_choise event comes from calendar selectors element
-            */
-/*
-            $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
-
-
-
-            }.bind(this));*/
         }
-
 
         function split(a, n) {
             var len = a.length,out = [], i = 0;
@@ -297,13 +246,6 @@ var SortTable = React.createClass({
             }
             return out;
         }
-
-/*
-        $(event_emitter).on('data_changed', function(e, data){
-
-            this.update(-1, this.state.granularity_type);
-
-        }.bind(this));*/
     },
 
     componentWillReceiveProps: function(nextProps) {
@@ -313,7 +255,7 @@ var SortTable = React.createClass({
 
         /*if (nextProps.date != this.props.date) // todo !!!!!!!!!!!!!!!!!!!!!!
         {*/
-            
+
             if (nextProps.data)
             {
                 var data = nextProps.data;
@@ -344,28 +286,6 @@ var SortTable = React.createClass({
         //}
 
     },
-
-/*
-    componentWillUpdate : function()
-    {
-
-        console.log("+++++++++++++ will update ++++++++++++");
-
-        if (this.props.filter)
-        {
-            if (!this.state.orig_rows)
-            {
-                var orig_rows = this.state.rows;
-            }
-/*
-            this.setState({
-                //orig_rows : orig_rows,
-                rows : this.state.rows
-            });*/
-/*
-        }
-
-    },*/
 
     filterFunction : function(filter)
     {

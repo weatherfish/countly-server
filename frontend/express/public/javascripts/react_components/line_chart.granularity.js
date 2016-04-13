@@ -10,17 +10,6 @@ var Granularity = React.createClass({
 
         var weekly = { name : "Weekly", active : this.props.type == "weekly" ? true : false };
 
-/*
-        if (this.props.data.chartDP[0].mode == "ghost") // if previous time range in 0 position
-        {
-            var data_index = 1;
-        }
-        else
-        {
-            var data_index = 0;
-        }
-*/
-
         if (this.props.data.weekly_granularity[0].mode == "ghost") // if previous time range in 0 position
         {
             var data_index = 1;
@@ -136,9 +125,6 @@ var Granularity = React.createClass({
             }
 
             list.push(monthly);
-
-            console.log("==== granularity list ====");
-            console.log(list);
 
             self.setState({
                 list : list,
@@ -262,13 +248,12 @@ var Granularity = React.createClass({
 
     extend_click : function(element)
     {
-
-        console.log("---------- element --------------");
-        console.log(element);
-
         this.setState({
             info_open : false
         });
+        
+        console.log("::::::::::: extension click ::::::::::::");
+        console.log(element)
 
         $(event_emitter).trigger("date_extend", { "days_extend" : element.incomplete_left_days } );
     },
@@ -442,18 +427,5 @@ var Granularity = React.createClass({
 
         );
     }
-
-/*
-{(() => {
-
-    if (self.state.info_open && self.state.list[1].active)
-    {
-        return (
-
-        );
-    }
-
-})()}
-*/
 
 });

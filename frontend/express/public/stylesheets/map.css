@@ -1,23 +1,91 @@
 #map {
-  margin-top: 0px;
+  margin-top: 40px;
   text-align: center;
   position: relative;
+  min-height: 480px;
 }
-#map .hoverinfo {
+#map .city_hoverinfo {
   font-family: Lato-Regular;
+  position: relative;
+  top: -120px;
+  left: -50px;
+  min-width: 100px;
+  height: 60px;
+  background-color: #141821;
+  border-radius: 4px;
+  padding-left: 10px;
+  padding-right: 10px;
+  box-sizing: border-box;
 }
+#map .city_hoverinfo .name {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 18px;
+  color: white;
+}
+#map .city_hoverinfo .metric {
+  font-size: 24px;
+  font-family: Lato-Semibold;
+  color: white;
+}
+#map .city_hoverinfo .bottom_arrow {
+  position: absolute;
+  top: 60px;
+  left: 43px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 7px 7px 0 7px;
+  border-color: #141821 transparent transparent transparent;
+}
+/* ---------------- */
+#map .country_hoverinfo {
+  font-family: Lato-Regular;
+  position: relative;
+  top: -120px;
+  left: -50px;
+  min-width: 100px;
+  height: 60px;
+  background-color: #141821;
+  border-radius: 4px;
+  padding-left: 10px;
+  padding-right: 10px;
+  box-sizing: border-box;
+}
+#map .country_hoverinfo .name {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 18px;
+  color: white;
+}
+#map .country_hoverinfo .metric {
+  font-size: 24px;
+  font-family: Lato-Semibold;
+  color: white;
+}
+#map .country_hoverinfo .bottom_arrow {
+  position: absolute;
+  top: 60px;
+  left: 43px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 7px 7px 0 7px;
+  border-color: #141821 transparent transparent transparent;
+}
+/*  ----------------------------- */
 .map_wrapper .headline_sign {
   font-family: Lato-Semibold;
   font-size: 17px;
   color: #132737;
   letter-spacing: 1.39px;
   /*margin-top : 0px;
-		margin-left : 30px;*/
+    margin-left : 30px;*/
   position: absolute;
   top: 30px;
   left: 30px;
 }
-.search_block {
+.map_wrapper .search_block {
   position: relative;
   font-family: Lato-Regular;
   text-align: right;
@@ -25,15 +93,10 @@
   padding-right: 30px;
   /*padding-bottom : 20px;*/
 }
-.search_block span {
+.map_wrapper .search_block span {
   margin-right: 10px;
 }
-/*.table_filter_wrapper {
-    position : absolute;
-    right : 40px;
-    top : 20px;
-}*/
-.search_block div.icon {
+.map_wrapper .search_block div.icon {
   /*position : absolute;*/
   position: relative;
   left: 30px;
@@ -47,7 +110,7 @@
   background-repeat: no-repeat;
   background-position: center;
 }
-.search_block input {
+.map_wrapper .search_block input {
   width: 200px;
   height: 30px;
   padding-left: 30px;

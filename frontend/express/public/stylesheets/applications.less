@@ -11,6 +11,7 @@
     height : 60px;
     border : 1px solid #eeeeee;
     background-color : white;
+    transition: all 0.1s linear;;
 }
 
 #applications_page .top_block .sign {
@@ -24,7 +25,7 @@
 
 #applications_page .top_block .new_app_button {
 
-    width : 100px;
+    /*width : 100px;*/
     height : 35px;
     line-height : 35px;
     background-color : @green_button;
@@ -37,6 +38,8 @@
     position : absolute;
     right : 30px;
     top : 12px;
+    padding-left:10px;
+    padding-right:10px;
 }
 
 #applications_page .top_block .new_app_button:hover {
@@ -181,7 +184,7 @@
 #applications_page .action_selector .actions_list {
     position : absolute;
     top : 40px;
-    left : 0px;
+    left : -70px;
 
     font-size: 14px;
 
@@ -282,7 +285,7 @@
     border-bottom : 0px solid white;
 }
 
-#applications_page .table > span.row:hover {
+#applications_page .table > span.row.editable:hover {
     background-color: #FBFBFB;
 }
 
@@ -329,7 +332,9 @@
 #applications_page .table > span.row .save_block .save {
     /*margin-right : 20px;*/
     display : inline-block;
-    width: 60px;
+    /*width: 60px;*/
+    padding-left : 20px;
+    padding-right : 20px;
     height: 24px;
     line-height: 24px;
     background-color: #19CC63;

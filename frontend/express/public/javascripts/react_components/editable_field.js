@@ -175,12 +175,12 @@ var EditableField = React.createClass({
         // value={this.props.value}
 
         return (
-            <span className="row" onClick={this.edit_click} style={row_style}>
+            <span className="row editable" onClick={this.edit_click} style={row_style}>
                 <span className="key">{this.props.value_key}</span>
                 <span className="value" style={value_style}>{this.state.value}</span>
                 {input_value}
-                <span style={edit_button_style} className="edit">edit</span>
-                <span className="save_block" style={save_block_style}><span className="save" onClick={this.save}>Save</span><span className="cancel" onClick={this.cancel}></span></span>
+                <span style={edit_button_style} className="edit">{jQuery.i18n.map["common.edit"]}</span>
+                <span className="save_block" style={save_block_style}><span className="save" onClick={this.save}>{jQuery.i18n.map["common.save"]}</span><span className="cancel" onClick={this.cancel}></span></span>
             </span>
         );
     }

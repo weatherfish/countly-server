@@ -11,10 +11,12 @@ var SessionPage = React.createClass({
         }
 
         return({
-            granularity : "daily",//false, // todo - should be false
+            granularity : false, //"daily",//false, // todo - should be false
             sort_functions : sort_functions,
             inited : false,
-            data_timestamp : false
+            data_timestamp : false,
+            active_app : this.props.active_app,
+            big_numbers : false
         });
     },
 
@@ -29,7 +31,7 @@ var SessionPage = React.createClass({
             var big_numbers = self.make_big_numbers();
 
             headers.unshift({
-                "title" : "Date",
+                "title" : jQuery.i18n.map["common.date"],
                 "short" : "date",
             })
 
@@ -75,26 +77,49 @@ var SessionPage = React.createClass({
 
         for (var i = 0; i < big_numbers.length; i++)
         {
-            big_numbers[i].active = true;
+            if (this.state.big_numbers)
+            {
+                big_numbers[i].active = this.state.big_numbers[i].active;
+            }
+            else
+            {
+                big_numbers[i].active = true;
+            }
+            
         }
 
         return big_numbers;
     },
 
     on_graph_mount : function(mount_data) {
+
         this.setState({
             "granularity" : mount_data.granularity
         });
     },
 
     componentWillReceiveProps : function(nextProps) {
+                       
+        if (nextProps.active_app != this.state.active_app) // active app changed
+        {                                               
+            this.setState({
+                active_app : nextProps.active_app,
+                inited : false
+            });
+            
+            var data_timestamp = Math.floor(Date.now());
 
-        var big_numbers = this.make_big_numbers();
+            this.init_data(data_timestamp);
+            
+        }
+        else
+        {
+            var big_numbers = this.make_big_numbers();
 
-        this.setState({
-            big_numbers : big_numbers
-        });
-
+            this.setState({
+                big_numbers : big_numbers
+            });
+        }
     },
 
     render : function(){
@@ -122,7 +147,7 @@ var SessionPage = React.createClass({
             <div className="page" style={page_style}>
 
                 <LineChart
-                    trend_sign={"SESSIONS TREND"}
+                    trend_sign={jQuery.i18n.map["sessions.title"]}
                     width={elements_width}
                     height={chart_height}
                     sides_padding={20}

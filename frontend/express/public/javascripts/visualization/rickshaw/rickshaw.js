@@ -3776,13 +3776,8 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 
 		args = args || {};
 
-    console.log("============= render args ===========");
-
-
 		var graph = this.graph;
 		var series = args.series || graph.series;
-
-    console.log(series);
 
 		var vis = args.vis || graph.vis;
 		vis.selectAll('*').remove();
@@ -3796,25 +3791,25 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 			.data(data)
 			.enter().append("svg:path")
 			.classed('path', true)
-      .attr("transform", function(d) {
-           return "translate(" + (/*graph.circle_radius + */(graph.max_tick_width / 2)) + ", 0)"; } // tode: here in library is function for cross browser transform
-      )
-      .attr("class", function(d, i) {
-          var class_name = "graph_path path_" + series[i].color.replace("#", "");
-          return class_name;
-      })
-			.attr("d", this.seriesPathFactory());
+        .attr("transform", function(d) {
+            return "translate(" + (/*graph.circle_radius + */(graph.max_tick_width / 2)) + ", 0)"; } // tode: here in library is function for cross browser transform
+        )
+        .attr("class", function(d, i) {
+            var class_name = "graph_path path_" + series[i].color.replace("#", "");
+            return class_name;
+        })
+		.attr("d", this.seriesPathFactory());
 
 		if (this.stroke) {
         var strokeNodes = vis
-                            .selectAll('path.stroke')
-                            .data(data)
-                            .enter().append("svg:path")
-                            .attr("transform", function(d) {
-                                 return "translate(" + (/*graph.circle_radius +*/ (graph.max_tick_width / 2)) + ", 0)"; } // tode: here in library is function for cross browser transform
-                            )
-                    				.classed('stroke', true)
-                    				.attr("d", this.seriesStrokeFactory());
+            .selectAll('path.stroke')
+            .data(data)
+            .enter().append("svg:path")
+            .attr("transform", function(d) {
+                return "translate(" + (/*graph.circle_radius +*/ (graph.max_tick_width / 2)) + ", 0)"; } // tode: here in library is function for cross browser transform
+            )
+            .classed('stroke', true)
+            .attr("d", this.seriesStrokeFactory());
 		}
 
 		var i = 0;
@@ -3826,37 +3821,44 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 			i++;
 		}, this );
 
-    var self = this;
-
-    if (data[0] && data[0].length == 1)
-    {
-        var points_offset = self.graph.width / 2; //  If there is a single data point on graph, it should be centered
-    }
-    else {
-        var points_offset = 0;
-    }
-
-    this.graph.points_offset = points_offset; // used in hover block functions
-
-    if (!data || data.length == 0)
-    {
-        return false;
-    }
-
-    var space_between_points = Math.round(self.graph.x(data[0][1].x) - self.graph.x(data[0][0].x));
-
-    this.graph.space_between_points = space_between_points;
-
-    var points_paths = vis.selectAll('.dots')
-          .data(data)
-          .enter()
-          .append("g")
-                    .attr("class", "dots")
-                    .attr("transform", function(d) {
-                         return "translate(" + (/*graph.circle_radius +*/ (graph.max_tick_width / 2) + points_offset) + ", 0)"; } // tode: here in library is function for cross browser transform
-                    )
-
-    var points = points_paths
+        var self = this;
+    
+        if (data[0] && data[0].length == 1)
+        {
+            var points_offset = self.graph.width / 2; //  If there is a single data point on graph, it should be centered
+        }
+        else {
+            var points_offset = 0;
+        }
+    
+        this.graph.points_offset = points_offset; // used in hover block functions
+    
+        if (!data || data.length == 0)
+        {
+            return false;
+        }
+    
+        if (data[0][1])
+        {
+            var space_between_points = Math.round(self.graph.x(data[0][1].x) - self.graph.x(data[0][0].x));
+        }
+        else
+        {
+            var space_between_points = 200; // todo:
+        }
+    
+        this.graph.space_between_points = space_between_points;
+    
+        var points_paths = vis.selectAll('.dots')
+              .data(data)
+              .enter()
+              .append("g")
+                        .attr("class", "dots")
+                        .attr("transform", function(d) {
+                             return "translate(" + (/*graph.circle_radius +*/ (graph.max_tick_width / 2) + points_offset) + ", 0)"; } // tode: here in library is function for cross browser transform
+                        )
+    
+        var points = points_paths
                       .selectAll('.dot')
                       .data(function(d, index){
 
@@ -3874,22 +3876,22 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
                             return "translate(" + (Math.ceil(self.graph.x(d.x))) + "," + (self.graph.y(d.y)) + ")"; } // tode: here in library is function for cross browser transform
                        );
 
-    var ic = 0;
-
-    points
-        .append('circle')
-        .attr('class', function(d){
-            var class_name = 'one_dot ' + "dot_" + d.color.replace("#", "");
-            return class_name;
-        })
-        .attr("r", graph.circle_radius)
-        .attr('fill', function(d,i){
-/*
-            console.log("--- fill color ----");
-            console.log(d.color);
-*/
-            return d.color;
-        })
+        var ic = 0;
+    
+        points
+            .append('circle')
+            .attr('class', function(d){
+                var class_name = 'one_dot ' + "dot_" + d.color.replace("#", "");
+                return class_name;
+            })
+            .attr("r", graph.circle_radius)
+            .attr('fill', function(d,i){
+    /*
+                console.log("--- fill color ----");
+                console.log(d.color);
+    */
+                return d.color;
+            })
 
 	},
 

@@ -1,0 +1,89 @@
+.alert_block {
+
+    position : fixed;
+    top : 0px;
+    left : 0px;
+    z-index : 10000;
+    transition: all 0.5s linear;
+}
+
+.alert_block #back {
+    width : 100%;
+    height : 200%;
+    background-color : #ffffff;
+    opacity : 0.9;
+}
+
+.alert_block .alert_svg {
+    position : absolute;
+    top : 140px;
+    /*left : 0px;*/
+    overflow : visible;
+    background-color: white;
+    border-top-left-radius : 1px;
+    border-top-right-radius : 1px;
+    border-top: 1px solid #eeeeee;
+    border-top-left-radius : 4px;
+    border-top-right-radius : 4px;
+    box-sizing : border-box;
+    /*opacity : 0.5;*/
+    
+    /*box-shadow: -2px 0px 0px 0px rgba(90, 90, 90, 0.5);*/
+}
+
+.alert_block #info {
+    background-color: white;
+    position : absolute;
+    top : 260px;
+    /*border-top: 1px solid #eeeeee;*/
+    border-bottom: 1px solid #eeeeee;
+    border-left: 1px solid #eeeeee;
+    border-right: 1px solid #eeeeee;
+    margin-top : 10px;
+    border-bottom-left-radius : 4px;
+    border-bottom-right-radius : 4px;
+    padding-bottom : 30px;
+    box-sizing : border-box;
+}
+
+.alert_block #info span {
+    display : inline-block;
+    width : 100%;
+    font-family : Lato-Semibold;
+    margin-top : 30px;
+    text-align : center;
+    font-size : 24px;
+}
+
+.alert_block .buttons_wrapper {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.alert_block .buttons_wrapper > div {    
+    
+    font-family : Lato-Regular;
+    display: inline-block;
+    margin-right : 20px;      
+    min-width	 : 120px;
+    padding-left : 10px;
+    padding-right : 10px;
+    height      : 35px;
+    line-height : 35px;    
+    cursor      : pointer;
+    border-radius : 6px;
+    text-align    : center;
+           
+}
+
+.alert_block .confirm {
+    border : 1px solid #FF6138;
+    color : #FF6138;
+    text-transform : capitalize;
+}
+
+.alert_block .cancel {    
+    border : 1px solid #13B757;
+    color : #13B757;
+    text-transform : capitalize;
+}

@@ -50,11 +50,15 @@ var AppList = React.createClass({
         app_list_style.height = (screen_height - 60 - 50 - 50) + "px"; // todo: change values to variables
 
         var app_list = [];
-
+/*
         for (var app_id in countlyGlobal['apps']){
 
             var app = countlyGlobal['apps'][app_id];
-
+       */     
+        for (var i = 0; i < this.props.applications.length; i++){
+        
+            var app = this.props.applications[i];
+            
             if (self.props.app_filter_text != "" && app.name.toLowerCase().indexOf(self.props.app_filter_text) == -1)
             {
                 return false;
@@ -78,7 +82,7 @@ var AppList = React.createClass({
             }
 
             var logo_src = "/appimages/" + app.logo;
-
+            
             app_list.push(<div className={class_name} onClick={self.props.onAppChange.bind(self, app)}>
                 <img src={logo_src}/>
                 <span>{app.name}</span>
@@ -133,7 +137,7 @@ var ApplicationsList = React.createClass({
     getInitialState: function() {
         return {
             app_filter_text : false,
-            active          : false,
+            active          : this.props.active,
             showen          : 0
         };
     },
@@ -207,7 +211,13 @@ var ApplicationsList = React.createClass({
         return (
             <div id="app_info" className={class_name}>
                 <AppListSearch app_filter={this.app_filter}/>
-                <AppList is_active={this.props.active} applications={this.props.applications} active_app={this.props.active_app} onAppChange={this.props.onAppChange} app_filter_text={this.state.app_filter_text}/>
+                <AppList 
+                    is_active={this.props.active} 
+                    applications={this.props.applications} 
+                    active_app={this.props.active_app} 
+                    onAppChange={this.props.onAppChange} 
+                    app_filter_text={this.state.app_filter_text}
+                />
             </div>
         );
     }

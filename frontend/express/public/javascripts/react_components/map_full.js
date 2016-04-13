@@ -1,6 +1,6 @@
 var Map = React.createClass({
 
-    cityPoints : false,
+    //cityPoints : false,
     previous_data : false,
     loaded : false,
     datamap : false,
@@ -11,6 +11,9 @@ var Map = React.createClass({
 
         return {
             element_id : "map",
+            cityPoints : false,
+            selected_country  : false,
+            inited : false
         }
 
     },
@@ -18,42 +21,102 @@ var Map = React.createClass({
     componentDidMount: function() {
 
         var self = this;
-
-        this.formatCountryData(this.props.metric, function(error, cityPoints){
+       
+        this.getCitiesData(function(data){  
+           
             self.setState({
-                city_points : cityPoints
+                city_data : data,
+                inited : true
             })
         });
+        
+    },
+    
+    componentDidUpdate : function()
+    {
+
+        if (!this.state.city_data)
+        {
+            return false;
+        }
+
+        if (!this.state.selected_country)
+        {
+            if (!this.datamap)
+            {
+                this.draw();
+            }
+            else
+            {
+                this.redraw();
+            }           
+            
+        }
+        else
+        {
+            if (!this.state.inited)
+            {
+                this.draw_country({
+                    height : 450,
+                    metric : this.props.metric,
+                    countryIso3 : this.state.selected_country
+                });
+            }
+        }
+
+        /*if (!this.state.city_points)
+        {
+            return false;
+        }
+        else if (!this.loaded)
+        {
+            this.draw();
+            this.loaded = true;
+        }*/
+        /*else
+        {*/
+            
+        /*}*/
     },
 
     world_map_popup : function(geography, data) {
 
         if (data)
         {
-            var string = '<div class="hoverinfo"><strong>' + geography.properties.name + " : " + data.numberOfThings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); + '</strong></div>';
+            var html = '<div class="country_hoverinfo">';  
+            html += "<div class='name'>" + geography.properties.name + "</div>"; 
+            html += "<div class='metric'>" + data.numberOfThings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</div>"; 
+            html += "<div class='bottom_arrow'></div>";
+            html += '</div>';
         }
         else
         {
-            var string = '<div class="hoverinfo"><strong>' + geography.properties.name + ' : 0</strong></div>';
+            //var html = '<div class="country_hoverinfo">' + geography.properties.name + ' : 0</div>';
+            var html = '<div class="country_hoverinfo">';  
+            html += "<div class='name'>" + geography.properties.name + "</div>"; 
+            html += "<div class='metric'>0</div>"; 
+            html += "<div class='bottom_arrow'></div>";
+            html += '</div>';
         }
 
-        return string;
+        return html;
     },
 
     country_return_popup : function(geography, data) {
 
-        var string = '<div class="hoverinfo"><strong>return to world map</strong></div>';
+        var html = '<div class="hoverinfo"><strong>return to world map</strong></div>';
 
-        return string;
+        return html;
     },
 
     city_popup : function(geo, data) {
 
         var cityName = data.name.charAt(0).toUpperCase() + data.name.slice(1);
 
-        var html = "<div class='hoverinfo'>";
-        html += "<div><b>city: " + cityName + "</b></div>";
-        html += "<div>metric: " + data.metric + "</div>lat:" + data.latitude + ", long:" + data.longitude;
+        var html = "<div class='city_hoverinfo'>";
+        html += "<div class='name'>" + cityName + "</div>";
+        html += "<div class='metric'>" + data.metric + "</div>";
+        html += "<div class='bottom_arrow'></div>";
         html += "</div>";
 
         return html;
@@ -131,11 +194,17 @@ var Map = React.createClass({
 
                 var countryIso = elem.id;
 
+                self.setState({
+                    selected_country : countryIso,
+                    inited : false
+                })
+
+/*
                 self.draw_country({
                     height : 450,
                     metric : self.props.metric,
                     "countryIso3" : countryIso
-                });
+                });*/
 
             });
         }
@@ -148,11 +217,11 @@ var Map = React.createClass({
 
         var metric = this.props.metric;
 
-        var countryData = this.formatData(metric);
+        var countryData = this.formatData(metric);              
 
         for (var iso3 in this.previous_data)
         {
-            if (!countryData[iso3])
+            if (countryData[iso3].numberOfThings == 0)
             {
                 countryData[iso3] = {
                     "fillKey"        : "reset",//"0.0",
@@ -252,8 +321,13 @@ var Map = React.createClass({
                         "location_box"    : json.location_box
                     }
 
-                    self._draw_country(options.metric, zoomParams, chart_options, options.countryIso3);
-
+                    self.setState({
+                        "inited" : true
+                    })
+                    
+                    _.defer(function () {
+                        self._draw_country(options.metric, zoomParams, chart_options, options.countryIso3);
+                    });                                                 
                 }
             });
         }
@@ -265,8 +339,11 @@ var Map = React.createClass({
     },
 
     _draw_country : function(ob, zoomParams, chart_options, country_iso3) {
-
+        
         var self = this;
+        
+        console.log("======= self.props.metric ========");
+        console.log(self.props.metric)
 
         if (!zoomParams/* || !zoomParams.size*/)
         {
@@ -278,6 +355,7 @@ var Map = React.createClass({
 
         var element_id = this.state.element_id;
 
+        this.datamap = false;
         $("#" + element_id).empty();
 
         /*
@@ -319,6 +397,9 @@ var Map = React.createClass({
                 height     : mapHeight,
                 width      : mapWidth,
                 setProjection: function(element) {
+                    
+                    console.log("<<<<<<<< element >>>>>>>>>>>>");
+                    console.log(element)
 
                     var center_lat = parseFloat(zoomParams.lat.toFixed(3));
                     var center_lon = parseFloat(zoomParams.lon.toFixed(3));
@@ -343,15 +424,28 @@ var Map = React.createClass({
                 },
                 fills: {
                     "defaultFill" : "#fff", //_defaultFill,
-                    "selected"    : "#198af3",
-                    "bubble"      : "#12fa34",
+                    //"selected"    : "#0000ff",
+                    "bubble"      : self.props.metric.color,
                 },
-                geographyConfig : chart_options,
+                geographyConfig : chart_options,   
                 data : map_data,
                 scope : scope,
         });
 
-        country_map.bubbles(this.state.city_points, { "popupTemplate" : this.city_popup });
+        var bubbles_config = { 
+                    popupTemplate : this.city_popup,
+                    highlightFillColor: '#00C652',
+                    highlightBorderColor: '#141821',
+                    highlightBorderWidth: 2,
+                    highlightBorderOpacity: 1,
+                    highlightFillOpacity: 0.85,
+                    exitDelay: 100, 
+                    }
+
+
+        var city_points = this.formatCountryData(this.props.metric);
+
+        country_map.bubbles(city_points, bubbles_config);
 
         var bind_events = function()
         {
@@ -359,7 +453,9 @@ var Map = React.createClass({
             {
                 country_map.svg.selectAll('path').on('click', function(elem) {
 
-                    self.draw();
+                    self.setState({
+                        selected_country : false
+                    })
 
                     //countlyLocation.drawGeoChart(false);
                     //store.set("countly_location_city", false);
@@ -385,6 +481,14 @@ var Map = React.createClass({
         var chartData = {cols:[], rows:[]};
 
         var locations_db = countlyUser.getDbObj();
+        
+        console.log("======== locations_db =====");
+        console.log(locations_db);
+        
+        if (!locations_db.meta){
+            return {};
+        }
+        
         var countries = locations_db['meta']['countries'];// countlyCommon.union({}, locations_db['meta']['countries']);
 
         var tt = countlyCommon.extractTwoLevelData(locations_db, countries, countlyLocation.clearLocationObject, [
@@ -420,15 +524,15 @@ var Map = React.createClass({
                 };
             }
 
-            if (value[data_metric] > maxMetric)
+            if (value[data_metric.short] > maxMetric)
             {
-                maxMetric = value[data_metric];
+                maxMetric = value[data_metric.short];
             }
 
             return {
                 code    : value.code,
                 country : value.country,
-                metric  : value[data_metric]
+                metric  : value[data_metric.short]
             };
         });
 
@@ -436,14 +540,15 @@ var Map = React.createClass({
           .domain([0, maxMetric])
           .range([0.1, 1]);
 
-        var countryData = { };
-
+        var countryData = { };        
+        
         for (var i = 0; i < chartData.rows.length; i++)
         {
             var country = chartData.rows[i]["code"];
             var metric  = chartData.rows[i]["metric"];
+                       
             var linearMetric = (linear(metric) * 0.6).toFixed(1).toString();
-
+            
 /*
             if (country == "CHN")
             {
@@ -470,9 +575,11 @@ var Map = React.createClass({
 
         return countryData;
     },
-
-    formatCountryData : function(ob, __callback){
-
+    
+    getCitiesData : function(__callback){
+        
+        var self = this;
+        
         var period = countlyCommon.getPeriodForAjax();
 
         //_activeAppKey = countlyCommon.ACTIVE_APP_KEY;
@@ -489,19 +596,19 @@ var Map = React.createClass({
             },
             dataType:"jsonp",
             success:function (json) {
+                                
                 var locations_db = json;
                 //setMeta();
+                
+                self.citiesData = locations_db.citiesData;
 
                 if (locations_db['meta']) {
                    var cities = (locations_db['meta']['cities']) ? locations_db['meta']['cities'] : [];
                 } else {
                    var cities = [];
                 }
-
-                ob = ob || {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
-                var chartData = {cols:[], rows:[]};
-
-                var tt = countlyCommon.extractTwoLevelData(locations_db,cities, countlyCity.clearLocationObject, [
+                
+                var city_data = countlyCommon.extractTwoLevelData(locations_db,cities, countlyCity.clearLocationObject, [
                     {
                         "name":"city",
                         "func":function (rangeArr, dataObj) {
@@ -512,75 +619,142 @@ var Map = React.createClass({
                     { "name":"u" },
                     { "name":"n" }
                 ]);
+                
+                __callback(city_data);
+                
+            }});
+    },
 
-                chartData.cols = [
-                    {id:'city', label:"City", type:'string'}
-                ];
-                chartData.cols.push(ob);
+    formatCountryData : function(ob){
+        
+        var self = this;
+        
+        console.log("{{{{{{{{{{[ this.state.city_data }}}}}}}}}}");
+        console.log(this.state.city_data)
 
-                var maxMetric = 0;
+        ob = ob || {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
+        var chartData = {cols:[], rows:[]};
 
-                chartData.rows = _.map(tt.chartData, function (value, key, list) {
-                    if (value.city == "Unknown") {
-                        return {};
-                    }
+        chartData.cols = [
+            {id:'city', label:"City", type:'string'}
+        ];
+        chartData.cols.push(ob);
 
-                    if (value[ob.metric] > maxMetric)
-                    {
-                        maxMetric = value[ob.metric];
-                    }
+        var maxMetric = 0;
 
-                    return {
-                        city   : value.city,
-                        metric : value[ob.metric]
-                    };
-                });
+        chartData.rows = _.map(this.state.city_data.chartData, function (value, key, list) {
+            if (value.city == "Unknown") {
+                return {};
+            }
+            
+            if (!value[ob.short])
+            {
+                return false;
+            }                        
+                    
+            if (value[ob.short] > maxMetric)
+            {
+                maxMetric = value[ob.short];
+            }
+                        
+            return {
+                city   : value.city,
+                metric : value[ob.short]
+            };
+        });
 
-                var linear = d3.scale.linear()
+        var linear = d3.scale.linear()
                     .domain([0, maxMetric])
                     .range([5, 20]);
 
-                var cityPoints = [];
+        var cityPoints = [];
 
-                chartData.rows.forEach(function(cityChartData){
+        chartData.rows.forEach(function(cityChartData){
 
-                    if (!cityChartData.city)
-                    {
-                        return false;
-                    }
+            if (!cityChartData.city)
+            {
+                return false;
+            }
 
-                    var cityName   = cityChartData.city.toLowerCase();
-                    var coordsData = locations_db.citiesData[cityName];
+            var cityName   = cityChartData.city.toLowerCase();
+            var coordsData = self.citiesData[cityName];
+            
+            if (!coordsData)
+            {
+                return false;
+            }
 
-                    if (!coordsData)
-                    {
-                        return false;
-                    }
+            var linearMetric = parseInt(linear(cityChartData.metric));
 
-                    var linearMetric = parseInt(linear(cityChartData.metric));
+            if (!coordsData.lat || !coordsData.lon)
+            {
+                return false;
+            }
 
-                    if (!coordsData.lat || !coordsData.lon)
-                    {
-                        return false;
-                    }
+            cityPoints.push({
+                name      : cityName,
+                metric    : cityChartData.metric,
+                radius    : linearMetric,
+                fillKey   : 'bubble',
+                latitude  : parseFloat(coordsData.lat),
+                longitude : parseFloat(coordsData.lon)
+            });
+        });
 
-                    cityPoints.push({
-                        name      : cityName,
-                        metric    : cityChartData.metric,
-                        radius    : linearMetric,
-                        fillKey   : 'bubble',
-                        latitude  : parseFloat(coordsData.lat),
-                        longitude : parseFloat(coordsData.lon)
-                    });
-                });
+        console.log(".......... cityPoints .........");
+        console.log(cityPoints);
 
+        return cityPoints;
+/*
                 __callback(false, cityPoints);
 
             }
-        });
+        });*/
 
     },
 
+    
+
+    render : function(){
+
+        if (!this.state.inited)
+        {
+            return (<Loader/>);
+        }
+
+        var map_style = {};
+        
+        if (this.state.selected_country)
+        {
+            map_style.top = 40;
+        }
+
+        return (
+            <div className="map_wrapper">
+
+                {(() => {
+
+                    if (this.props.headline_sign){
+                        return(<div className="headline_sign">{this.props.headline_sign}</div>)
+                    }
+
+                })()}
+
+                <div id="map" style={map_style}>
+
+                </div>
+            </div>
+        )
+        
+        /*
+        <div className="search_block">
+                    <div className="icon"></div>
+                    <input type="search" placeholder="Search for Country"/>
+                </div>
+        */
+        
+    },
+    
     make_gradient : function(start_color, end_color, colors_count)
     {
         function hex (c) {
@@ -646,52 +820,4 @@ var Map = React.createClass({
         return tmp;
 
     },
-
-    render : function(){
-
-        return (
-            <div className="map_wrapper">
-
-                {(() => {
-
-                    if (this.props.headline_sign){
-                        return(<div className="headline_sign">{this.props.headline_sign}</div>)
-                    }
-
-                })()}
-
-                <div className="search_block">
-                    <div className="icon"></div>
-                    <input type="search" placeholder="Search for Country"/>
-                </div>
-                <div id="map">
-
-                </div>
-            </div>
-        )
-    },
-/*
-    componentDidMount : function()
-    {
-        //this.draw();
-    },
-*/
-    componentDidUpdate : function()
-    {
-
-        if (!this.state.city_points)
-        {
-            return false;
-        }
-        else if (!this.loaded)
-        {
-            this.draw();
-            this.loaded = true;
-        }
-        else
-        {
-            console.log("------- map redraw ----");
-            this.redraw();
-        }
-    }
 })

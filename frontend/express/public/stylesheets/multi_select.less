@@ -158,9 +158,17 @@
     width: 16px;
     height: 16px;
     border-radius: 8px;
-    background-color : @bg_color_1;/*rgba(255, 58, 0, 0.9);*/ /* #FF5800;*/
-    border : 4px solid @bg_color_4;
+   
+    border : 6px solid @bg_color_4;
     /*opacity : 0.6;*/
+}
+
+.search_selectors_block ::-webkit-scrollbar-button:vertical:increment {
+    background-color : @red_down;
+}
+
+.search_selectors_block ::-webkit-scrollbar-button:vertical:decrement {
+    background-color : @bg_color_1;
 }
 
 .multi_selectors_block ::-webkit-scrollbar-track {
@@ -172,6 +180,6 @@
 
 .multi_selectors_block ::-webkit-scrollbar-thumb {
     border-radius: 8px;
-    border : 5px solid @bg_color_4;
+    border : 7px solid @bg_color_4;
     background-color: @border_color_1;
 }

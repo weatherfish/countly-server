@@ -15,8 +15,8 @@
   text-rendering: optimizeLegibility;
   /*src: url(../fonts/Lato-Light/Lato-Light.eot);*/
   src: local("Lato-Light"), url("../fonts/Lato-Light/Lato-Light.ttf") format("truetype") /*,
-	       url('../fonts/Lato-Light/Lato-Light.woff2') format('woff2'),
-	       url('../fonts/Lato-Light/Lato-Light.woff') format('woff')*/;
+    url('../fonts/Lato-Light/Lato-Light.woff2') format('woff2'),
+    url('../fonts/Lato-Light/Lato-Light.woff') format('woff')*/;
 }
 @font-face {
   font-family: Lato-Regular;
@@ -31,8 +31,8 @@
   text-rendering: optimizeLegibility;
   /*src : url(../fonts/Lato-Regular/Lato-Regular.eot);*/
   src: local("Lato-Regular"), url("../fonts/Lato-Regular/Lato-Regular.ttf") format("truetype") /*,
-	       url('../fonts/Lato-Regular/Lato-Regular.woff2') format('woff2'),
-	       url('../fonts/Lato-Regular/Lato-Regular.woff') format('woff')*/;
+    url('../fonts/Lato-Regular/Lato-Regular.woff2') format('woff2'),
+    url('../fonts/Lato-Regular/Lato-Regular.woff') format('woff')*/;
 }
 @font-face {
   font-family: Lato-Semibold;
@@ -464,6 +464,25 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+/* events */
+#sidebar #left_part div.events {
+  /*.background_icon(events, false);*/
+  background-image: url("../images/events.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#sidebar #left_part div.events_active {
+  /*.background_icon(events, active);*/
+  background-image: url("../images/events_active.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#sidebar #left_part .item_wrap.hoverable:hover div.events {
+  /*.background_icon(events, hover);*/
+  background-image: url("../images/events_hover.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
 /* crashes */
 #sidebar #left_part div.crashes {
   /*background : url('../images/sidebar/@{image}.png');*/
@@ -493,7 +512,11 @@
   background-position: center;
 }
 #sidebar #left_part div.drill_active {
-  background-image: url('../images/sidebar/drill_active.png');
+  /*background : url('../images/sidebar/@{image}.png');*/
+  background-image: url("../images/sidebar_active.svg#drill");
+  background-repeat: no-repeat;
+  background-position: center;
+  /*background-image : url('../images/sidebar/drill_active.png');*/
 }
 #sidebar #left_part .item_wrap.hoverable:hover div.drill {
   /*background : url('../images/sidebar/@{image}.png');*/
@@ -659,6 +682,7 @@
   width: 240px;
   z-index: 100;
   background-color: #00C652;
+  overflow-y: hidden;
 }
 #app_info.active {
   -webkit-transform: translate3d(0, 60px, 0) !important;
@@ -805,7 +829,7 @@
   display: inline-block;
   padding-left: 17px;
   /*margin-bottom : 10px;*/
-  color: white;
+  color: #eeeeee;
   /*font-weight   : bold;*/
   font-size: 14px;
   letter-spacing: 0.45px

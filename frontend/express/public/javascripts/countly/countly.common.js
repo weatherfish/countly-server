@@ -44,8 +44,7 @@
         }
     };
 
-    countlyCommon.setActiveApp = function (appId) {
-        console.log("- inside function -");
+    countlyCommon.setActiveApp = function (appId) {  
         countlyCommon.ACTIVE_APP_KEY = countlyGlobal['apps'][appId].key;
         countlyCommon.ACTIVE_APP_ID = appId;
         store.set("countly_active_app", appId);
@@ -814,7 +813,7 @@
                     name  : data.name
                 });
             });
-
+            
             _rickshaw_graph = new Rickshaw.Graph({
               	element  : draw_element,
               	width    : graph_width,
@@ -1191,9 +1190,6 @@
                     "values" : [],
                     "color"  : color
                 }
-
-                console.log("--- set obj ----");
-                console.log(obj);
 
                 for(var j = 0; j < set_data.data.length; j++){
 

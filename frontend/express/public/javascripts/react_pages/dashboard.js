@@ -37,8 +37,67 @@ var Dashboard = React.createClass({
             "date_period" : false,
             "top_items_bars" : top_items_bars,
             "inited" : false,
-            "long_text_flag" : false
+            "long_text_flag" : false,
+            "language" : false
         }
+
+    },
+
+    make_tabs : function(){
+
+        var sessionData = countlySession.getSessionData();
+
+        var tabs = [
+        {
+              "title":jQuery.i18n.map["common.total-sessions"],
+              "data":sessionData.usage['total-sessions'],
+              "id":"draw-total-sessions",
+              "help":"dashboard.total-sessions",
+              "data_function" : countlySession.getSessionDPTotal, // data function for line chart
+              "data_item" : "total-sessions"
+        },
+        {
+              "title":jQuery.i18n.map["common.total-users"],
+              "data":sessionData.usage['total-users'],
+              "id":"draw-total-users",
+              "help":"dashboard.total-users",
+              "data_function" : countlySession.getUserDPActive, // data function for line chart
+              "data_item" : "total-users"
+        },
+        {
+              "title":jQuery.i18n.map["common.new-users"],
+              "data":sessionData.usage['new-users'],
+              "id":"draw-new-users",
+              "help":"dashboard.new-users",
+              "data_function" : countlySession.getUserDPNew, // data function for line chart
+              "data_item" : "new-users"
+        },
+        {
+              "title":jQuery.i18n.map["dashboard.time-spent"],
+              "data":sessionData.usage['total-duration'],
+              "id":"draw-total-time-spent",
+              "help":"dashboard.total-time-spent",
+              "data_function" : countlySession.getDurationDP, // data function for line chart
+              "data_item" : "total-duration"
+        },
+        {
+              "title":jQuery.i18n.map["dashboard.avg-time-spent"],
+              "data":sessionData.usage['avg-duration-per-session'],
+              "id":"draw-time-spent",
+              "help":"dashboard.avg-time-spent2",
+              "data_function" : countlySession.getDurationDPAvg, // data function for line chart
+              "data_item" : "avg-duration-per-session"
+        },
+        {
+              "title":jQuery.i18n.map["dashboard.avg-reqs-received"],
+              "data":sessionData.usage['avg-events'],
+              "id":"draw-avg-events-served",
+              "help":"dashboard.avg-reqs-received",
+              "data_function" : countlySession.getEventsDPAvg, // data function for line chart
+              "data_item" : "avg-events"
+        }];
+
+        return tabs;
 
     },
 
@@ -48,57 +107,7 @@ var Dashboard = React.createClass({
 
         $.when(countlyUser.initialize(), countlyCarrier.initialize(), countlyDeviceDetails.initialize()).then(function () {
 
-            var sessionData = countlySession.getSessionData();
-
-            var graph_tabs = [
-            {
-                  "title":jQuery.i18n.map["common.total-sessions"],
-                  "data":sessionData.usage['total-sessions'],
-                  "id":"draw-total-sessions",
-                  "help":"dashboard.total-sessions",
-                  "data_function" : countlySession.getSessionDPTotal, // data function for line chart
-                  "data_item" : "total-sessions"
-            },
-            {
-                  "title":jQuery.i18n.map["common.total-users"],
-                  "data":sessionData.usage['total-users'],
-                  "id":"draw-total-users",
-                  "help":"dashboard.total-users",
-                  "data_function" : countlySession.getUserDPActive, // data function for line chart
-                  "data_item" : "total-users"
-            },
-            {
-                  "title":jQuery.i18n.map["common.new-users"],
-                  "data":sessionData.usage['new-users'],
-                  "id":"draw-new-users",
-                  "help":"dashboard.new-users",
-                  "data_function" : countlySession.getUserDPNew, // data function for line chart
-                  "data_item" : "new-users"
-            },
-            {
-                  "title":jQuery.i18n.map["dashboard.time-spent"],
-                  "data":sessionData.usage['total-duration'],
-                  "id":"draw-total-time-spent",
-                  "help":"dashboard.total-time-spent",
-                  "data_function" : countlySession.getDurationDP, // data function for line chart
-                  "data_item" : "total-duration"
-            },
-            {
-                  "title":jQuery.i18n.map["dashboard.avg-time-spent"],
-                  "data":sessionData.usage['avg-duration-per-session'],
-                  "id":"draw-time-spent",
-                  "help":"dashboard.avg-time-spent2",
-                  "data_function" : countlySession.getDurationDPAvg, // data function for line chart
-                  "data_item" : "avg-duration-per-session"
-            },
-            {
-                  "title":jQuery.i18n.map["dashboard.avg-reqs-received"],
-                  "data":sessionData.usage['avg-events'],
-                  "id":"draw-avg-events-served",
-                  "help":"dashboard.avg-reqs-received",
-                  "data_function" : countlySession.getEventsDPAvg, // data function for line chart
-                  "data_item" : "avg-events"
-            }]
+            var graph_tabs = self.make_tabs();
 
             self.setState({
                 "graph_tabs" : graph_tabs,
@@ -112,9 +121,25 @@ var Dashboard = React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
 
+        console.log("=============== dashboard receive ===============");
+        console.log(nextProps);
+
+        if (this.state.language != nextProps.language)
+        {
+            var tabs = this.make_tabs();
+        }
+        else
+        {
+            var tabs = this.state.graph_tabs;
+        }
+
         /*if (nextProps.date != this.props.date) // todo
         {*/
-            this.setState({ "date_period" : nextProps.date.period });
+            this.setState({
+                "date_period" : nextProps.date,
+                "language" : nextProps.language,
+                "graph_tabs" : tabs
+            });
         //}
     },
 
@@ -144,7 +169,7 @@ var Dashboard = React.createClass({
     },
 
     render : function(){
-
+        
         var self = this;
 
         if (!this.state.inited)
@@ -187,7 +212,7 @@ var Dashboard = React.createClass({
 
         if (this.state.long_text_flag)
         {
-            top_tab_style.height = (this.topbar_height + 20) + "px"
+            top_tab_style.height = (this.topbar_height + 10) + "px"
         }
         else
         {
@@ -247,11 +272,11 @@ var Dashboard = React.createClass({
 
                         if (self.state.long_text_flag)
                         {
-                            style.height = "130px";
+                            style.height = (self.topbar_height + 10) + "px";
                         }
                         else
                         {
-                            style.height = "110px";
+                            style.height = (self.topbar_height) + "px"
                         }
 
                         return (
@@ -350,6 +375,6 @@ var Dashboard = React.createClass({
 
         </div>
         */
-    },
-
+    },    
+    
 });

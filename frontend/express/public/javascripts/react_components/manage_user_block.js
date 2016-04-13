@@ -687,7 +687,7 @@ var ManageUserBlock = React.createClass({
                     </div>
 
                     <div className="edit_button" style={edit_button_style}>
-                        Click to Edit
+                        {jQuery.i18n.map["common.edit"]}
                     </div>
 
               </div>
