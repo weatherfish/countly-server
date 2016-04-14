@@ -256,16 +256,7 @@ var PlatformsPage = React.createClass({
     },
 
     get_table_data : function(){
-/*
-        console.log("<<<<<<<<< get_table_function >>>>>>>>>>>");
-        console.log(this.get_active_tab().table_data_function());
-*/
-
-        console.log("===== table data =======");
-        console.log(this.get_active_tab().data);
-
         return this.get_active_tab().data;
-
     },
 
     render : function(){
@@ -319,7 +310,7 @@ var PlatformsPage = React.createClass({
                     height={chart_height}
                     data_function={false}
                     labels_mapping={this.state.horizontal_chart_headers}
-                    graph_label={"PLATFORMS DISTRIBUTION"}
+                    graph_label={jQuery.i18n.map["platforms.title"]}
                     label_key={false}
                     bar_height={34}
                     margins={chart_margins}

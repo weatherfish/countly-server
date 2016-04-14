@@ -39,7 +39,7 @@ var ResolutionsPage = React.createClass({
         ]
 
         headers.unshift({
-            "title" : "Resolution",
+            "title" : jQuery.i18n.map["resolutions.table.resolution"],
             //"help"  : "sessions.unique-sessions", // todo: add translation
             "short" : "resolution",
         })
@@ -117,7 +117,7 @@ var ResolutionsPage = React.createClass({
                     height={chart_height}
                     data_function={countlyDeviceDetails.getResolutionData}
                     labels_mapping={this.state.labels_mapping}
-                    graph_label={"RESOLUTIONS DISTRIBUTION"}
+                    graph_label={jQuery.i18n.map["resolutions.title"]}
                     label_key={"resolution"}
                     bar_height={34}
                     margins={chart_margins}

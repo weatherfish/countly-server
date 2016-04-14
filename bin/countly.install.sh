@@ -70,7 +70,7 @@ npm install -g babel-cli
 npm install -g less
 
 #install grunt & npm modules
-( cd $DIR/.. ; npm install -g grunt-cli --unsafe-perm; npm install grunt; npm install grunt-cli; npm install;  )
+( cd $DIR/.. ; npm install -g grunt-cli --unsafe-perm; npm install;  )
 
 #configure and start nginx
 cp /etc/nginx/sites-enabled/default $DIR/config/nginx.default.backup

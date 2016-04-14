@@ -188,8 +188,8 @@ var Alert = React.createClass({
                 <div id="info" style={info_style}>
                     <span>{this.props.sign}</span>
                     <div className="buttons_wrapper">
-                        <div className="confirm" onClick={this.props.on_confirm}>confirm</div>
-                        <div className="cancel" onClick={this.props.on_cancel}>cancel</div>
+                        <div className="confirm" onClick={this.props.on_confirm}>{jQuery.i18n.map["common.continue"]}</div>
+                        <div className="cancel" onClick={this.props.on_cancel}>{jQuery.i18n.map["common.cancel"]}</div>
                     </div>
                 </div>
             </div>

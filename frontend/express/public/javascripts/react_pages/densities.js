@@ -35,7 +35,7 @@ var DensitiesPage = React.createClass({
         ]
 
         headers.unshift({
-            "title" : "density", //jQuery.i18n.map["density.title"], // todo: connect plugins translation
+            "title" : jQuery.i18n.map["density.table.density"], //jQuery.i18n.map["density.title"], // todo: connect plugins translation
             "short" : "density",
         })
 
@@ -113,7 +113,7 @@ var DensitiesPage = React.createClass({
                     height={chart_height}
                     data_function={countlyDensity.getData}
                     labels_mapping={this.state.labels_mapping}
-                    graph_label={"DENSITY"/*jQuery.i18n.map["density.title"]*/}
+                    graph_label={jQuery.i18n.map["density.title"]}
                     label_key={"density"}
                     bar_height={34}
                     margins={chart_margins}

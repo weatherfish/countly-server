@@ -92,16 +92,31 @@ var CalendarWrapper = React.createClass({
             //right_date     : false,
             from_string : date_values.from_string,
             to_string   : date_values.to_string,
-            fast_choise : countlyCommon.getPeriod()
+            fast_choise : countlyCommon.getPeriod(),
+            language : this.props.language
         };
     },
+    
+    componentWillReceiveProps : function(nextProps){
+      
+        if (nextProps.language != this.state.language)
+        {
+            var date_range = countlyCommon.getDateRange();
+            date_range = date_range.split(" - ");
+            
+            var date_values = this.fill_date_values(date_range);
+          
+            this.setState({
+                language : nextProps.language,
+                from_string : date_values.from_string, // first_date_year - wrong variable name
+                to_string   : date_values.to_string,
+            })
+        }  
+          
+    },
 
-    componentDidMount : function(){
-
-        //var self = this;
-
+    componentDidMount : function(){        
         $(event_emitter).on('date_extend', this.date_extend.bind(this));
-
     },
 
     date_extend : function(e, data){
@@ -352,8 +367,6 @@ var CalendarWrapper = React.createClass({
     handleFastChoise : function(choise){
 
         //countlyCommon.setPeriod([date_from, date_to]);
-
-        console.log("fast choise:", choise);
 
         countlyCommon.setPeriod(choise);
 

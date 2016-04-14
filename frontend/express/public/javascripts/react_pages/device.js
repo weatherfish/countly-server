@@ -29,7 +29,7 @@ var DevicesPage = React.createClass({
             ];
 
         headers.unshift({
-            "title" : "Device",
+            "title" : jQuery.i18n.map["devices.table.device"],
             //"help"  : "sessions.unique-sessions", // todo: add translate
             "short" : "device",
         })
@@ -115,7 +115,7 @@ var DevicesPage = React.createClass({
                     width={elements_width}
                     data_function={countlyDevice.getDeviceData}
                     labels_mapping={this.state.labels_mapping}
-                    graph_label={"DEVICES DISTRIBUTION"}
+                    graph_label={jQuery.i18n.map["devices.title"]}
                     label_key={"device"}
                     bar_height={34}
                     margins={chart_margins}

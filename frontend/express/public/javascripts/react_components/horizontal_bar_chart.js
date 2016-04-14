@@ -13,37 +13,7 @@ var HorizontalBarChart = React.createClass({
         if (!data[0] || !data[0]["t"]) // todo: t change to a key
         {
             data = false;
-        }
-        else
-        {
-
-            var rand = this.getRandomInt(1, (data[0]["t"] / (data.length + 2)));
-
-            var last_value = false;
-
-            for (var i = 0; i < data.length; i++)
-            {
-                for (var key in data[i])
-                {
-
-                    if (key.length != 1) continue;
-
-                    //if (!this.props.labels_mapping[key] || typeof this.props.labels_mapping[key] == "undefined") continue;
-
-                    if (!last_value)
-                    {
-                        last_value = data[i][key];
-                    }
-                    else
-                    {
-                        last_value = Math.round(last_value - (last_value / 100 * this.getRandomInt(4, 10)));
-                    }
-
-                    data[i][key] = last_value;
-
-                }
-            }
-        }
+        }        
 
         return {
             data : data,
@@ -64,37 +34,7 @@ var HorizontalBarChart = React.createClass({
             {
                 data = false;
             }
-            else
-            {
-
-                var rand = this.getRandomInt(1, (data[0]["t"] / (data.length + 2)));
-
-                var last_value = false;
-
-                for (var i = 0; i < data.length; i++)
-                {
-                    for (var key in data[i])
-                    {
-
-                        if (key.length != 1) continue;
-
-                        if (!last_value)
-                        {
-                            last_value = data[i][key];
-                        }
-                        else
-                        {
-                            last_value = Math.round(last_value - (last_value / 100 * this.getRandomInt(2, 6)));
-                        }
-
-                        //console.log("last_value:", last_value, ", minus:", (last_value / 100 * getRandomInt(10, 40)));
-
-                        data[i][key] = last_value;
-
-                    }
-                }
-            }
-
+           
             this.setState({
                 data : data
             });

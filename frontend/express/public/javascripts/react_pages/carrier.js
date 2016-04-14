@@ -35,7 +35,7 @@ var CarrierPage = React.createClass({
         ]
 
         headers.unshift({
-            "title" : "Carrier",
+            "title" : jQuery.i18n.map["carriers.table.carrier"],
             //"help"  : "sessions.unique-sessions", // todo: add translation
             "short" : "carrier",
         })
@@ -98,7 +98,7 @@ var CarrierPage = React.createClass({
                     height={chart_height}
                     data_function={countlyCarrier.getCarrierData}
                     labels_mapping={this.state.labels_mapping}
-                    graph_label={"CARRIERS"}
+                    graph_label={jQuery.i18n.map["carriers.title"]}
                     label_key={"carrier"}
                     bar_height={34}
                     margins={chart_margins}

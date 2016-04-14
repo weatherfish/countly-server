@@ -31,7 +31,7 @@ var insert_queue = async.queue(function (city_obj, callback) {
 
 insert_queue.drain = function() {
     console.log('all cities have been inserted');
-    process.exit(1);
+    process.exit(0);
 }
 
 new lazy(fs.createReadStream('./cities1000.txt'))

@@ -45,7 +45,7 @@ var LanguagePage = React.createClass({
         ]
 
         headers.unshift({
-            "title" : "Language",
+            "title" : jQuery.i18n.map["languages.table.language"],
             //"help"  : "sessions.unique-sessions", // todo: add translation
             "short" : "langs",
         })
@@ -119,7 +119,7 @@ var LanguagePage = React.createClass({
                     height={chart_height}
                     data_function={countlyLanguage.getData}
                     labels_mapping={this.state.labels_mapping}
-                    graph_label={"LANGUAGE DISTRIBUTION"}
+                    graph_label={jQuery.i18n.map["languages.title"]}
                     label_key={"langs"}
                     bar_height={34}
                     margins={chart_margins}

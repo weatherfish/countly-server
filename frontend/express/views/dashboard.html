@@ -293,17 +293,17 @@
     
             <% for (var i = 0; i < userOfApps.length; i++) { %>
     
-              		var app_id   = "<%= userOfApps[i]._id %>";
-              		var app_name = "<%= userOfApps[i].name %>";
-              		var app_logo = "<%= userOfApps[i]._id %>.png";
-              		var app_key  = "<%= userOfApps[i].key %>";
+                var app_id   = "<%= userOfApps[i]._id %>";
+                var app_name = "<%= userOfApps[i].name %>";
+                var app_logo = "<%= userOfApps[i]._id %>.png";
+                var app_key  = "<%= userOfApps[i].key %>";
     
-              		initial_applications.push({
-                        id   : app_id,
-                        name : app_name,
-                        logo : app_logo,
-                        key  : app_key
-                    });
+                initial_applications.push({
+                    id   : app_id,
+                    name : app_name,
+                    logo : app_logo,
+                    key  : app_key
+                });
     
             <% } %>
     
@@ -312,12 +312,6 @@
             } catch(e) {
               	moment.lang("en");
             }
-    
-            console.log("================ init apps ==============");
-            console.log(initial_applications);
-    
-            console.log("--------- init global apps ----------");
-            console.log(countlyGlobal['apps']);
     
             if (!countlyCommon.ACTIVE_APP_ID) {
     
@@ -441,13 +435,13 @@
                     this.history.pushState(null, "/manage/apps");
                 }
             },
-            
+            /*
             componentWillReceiveProps : function(nextProps)
             {
-                console.log("[[[[[[[[[[[ app new props ]]]]]]]]]]]]");
+                console.log("app componentWillReceiveProps");
                 console.log(nextProps)
             },
-
+            */
             date_changed : function(new_date){
                 this.setState({
                     date : new_date
@@ -470,14 +464,8 @@
             
             change_language : function(language){
                 
-                console.log("========== change_language ========");
-                console.log(language);
-
                 navigation = get_sidebar_data();
                 
-                console.log("========== change_language 2 ========");
-                console.log(navigation);
-
                 this.setState({
                     language : language
                 });
@@ -501,6 +489,7 @@
                                         <CalendarWrapper
                                             onDateChange={this.date_changed}
                                             offset_top={calendar_offset_top}
+                                            language={this.state.language}
                                         />
                                    </div>
 
