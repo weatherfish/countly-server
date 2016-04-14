@@ -41,7 +41,7 @@ var EventsPage = React.createClass({
             if (!active_segmentation)
             {
                 table_headers.push({
-                    "title" : "date",
+                    "title" : jQuery.i18n.map["common.date"],
                     "short" : "date"
                 })
 
@@ -518,7 +518,7 @@ var EventsPage = React.createClass({
                     {
 
                         return(<LineChart
-                            trend_sign={"EVENTS"}
+                            trend_sign={jQuery.i18n.map["events.title"]}
                             width={elements_width}
                             height={chart_height}
                             sides_padding={20}
