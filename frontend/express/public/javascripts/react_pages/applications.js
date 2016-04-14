@@ -484,6 +484,8 @@ var ApplicationsPage = React.createClass({
 
     clearData : function(period){
 
+        var self = this;
+
         var current_app = this.state.current_app;
 
         //return false;
@@ -495,7 +497,7 @@ var ApplicationsPage = React.createClass({
             }
 */
 
-        var _delete = function()
+        var _clear = function()
         {
             var appId = current_app._id;
 
@@ -515,21 +517,29 @@ var ApplicationsPage = React.createClass({
                     console.log("{{{{{{{{{{ clear result }}}}}}}}}");
                     console.log(result)
 
-                    if (!result) {
+                    if(period == "all"){
+                        countlySession.reset();
+                        countlyLocation.reset();
+                        countlyCity.reset();
+                        countlyUser.reset();
+                        countlyDevice.reset();
+                        countlyCarrier.reset();
+                        countlyDeviceDetails.reset();
+                        countlyAppVersion.reset();
+                        countlyEvent.reset();
+                    }
+
+                    self.setState({                      
+                        confirmation_waiting : false,
+                        confirmation_sign : false,
+                        confirmation_function : false
+                    });
+
+                    /*if (!result) {
                         CountlyHelpers.alert(jQuery.i18n.map["management-applications.clear-admin"], "red");
                         return false;
-                    } /*else {
-                        if(period == "all"){
-                            countlySession.reset();
-                            countlyLocation.reset();
-                            countlyCity.reset();
-                            countlyUser.reset();
-                            countlyDevice.reset();
-                            countlyCarrier.reset();
-                            countlyDeviceDetails.reset();
-                            countlyAppVersion.reset();
-                            countlyEvent.reset();
-                        }
+                    }*/ /*else {
+                        
                         CountlyHelpers.alert(jQuery.i18n.map["management-applications.clear-success"], "black");
                     }*/
                 }

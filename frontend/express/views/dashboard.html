@@ -468,8 +468,14 @@
             },            
             
             change_language : function(language){
+                
+                console.log("========== change_language ========");
+                console.log(language);
 
                 navigation = get_sidebar_data();
+                
+                console.log("========== change_language 2 ========");
+                console.log(navigation);
 
                 this.setState({
                     language : language

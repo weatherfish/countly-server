@@ -86,7 +86,8 @@ var FullSidebar = React.createClass({
             right_selected_item : right_selected_item,
             apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode(),
             icons_ready : false,
-            left_full : left_full
+            left_full : left_full,
+            language : this.props.language
         };
     },
 
@@ -128,6 +129,14 @@ var FullSidebar = React.createClass({
         console.log("{{{{{{{{{{{{{{{{{{{ applications }}}}}}}}}}}}}}}}}}}");
         console.log(nextProps.applications);
 
+        if (nextProps.language != this.state.language)
+        {
+            console.log("sidebar change language:", nextProps.language);
+            return this.setState({
+                language : nextProps.language
+            });
+        }
+
         if (this.state.apps_list_hash == JSON.stringify(countlyGlobal['apps']).hashCode())
         {
             return false;
@@ -142,9 +151,6 @@ var FullSidebar = React.createClass({
         */
         
         //return false;
-
-        console.log("- +++ app changed  ------");
-        console.log(countlyGlobal['apps']);
 
         if (Object.keys(countlyGlobal['apps']).length === 0 && JSON.stringify(countlyGlobal['apps']) === JSON.stringify({})){
 
@@ -379,15 +385,15 @@ var FullSidebar = React.createClass({
 
     render : function() {
 
-        console.log("{{{{{{{{{{{{{ this.props.active_app }}}}}}}}}}}}}}}}");
-        console.log(this.props.active_app);
-
         if (!this.state.icons_ready)
         {
             return false;
         }
 
         var full_navigation = this.props.navigation;
+        
+        console.log("- full navigation --");
+        console.log(full_navigation);
 
         if (this.state.selected_left == -2)
         {

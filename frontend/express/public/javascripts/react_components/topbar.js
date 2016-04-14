@@ -104,6 +104,7 @@ var TopBar = React.createClass({
         var langCodeUpper = langCode.toUpperCase();
 
         store.set("countly_lang", langCode);
+        console.log("global cdn:", countlyGlobal["cdn"]);
         //$(".reveal-language-menu").text(langCodeUpper);
 
         countlyCommon.BROWSER_LANG_SHORT = langCode;
@@ -133,16 +134,18 @@ var TopBar = React.createClass({
             name:'locale',
             cache:true,
             language:countlyCommon.BROWSER_LANG_SHORT,
-            path:[countlyGlobal["cdn"]+'localization/min/'],
+            path:[countlyGlobal["cdn"]+'/localization/min/'], 
             mode:'map',
             callback:function () {
                 self.origLang = JSON.stringify(jQuery.i18n.map);
                 $.when(countlyLocation.changeLanguage()).then(function () {
 
                     console.log("========= jQuery.i18n done =====");
-                    console.log();
-
-                    self.props.on_change_language(langCode);
+                    console.log(jQuery.i18n.map);
+                    
+                    _.defer(function(){
+                        self.props.on_change_language(langCode);
+                    })                    
 
                     self.setState({
                         user_menu_open : false,
