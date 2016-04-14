@@ -1,6 +1,6 @@
 var CountriesPage = React.createClass({
 
-    mixins: [UpdatePageMixin],
+    mixins: [UpdatePageMixin, UnmounCheckMixin],
 
     getInitialState: function() {
 
@@ -38,6 +38,10 @@ var CountriesPage = React.createClass({
         var self = this;
 
         $.when(countlyUser.initialize(), countlyCity.initialize()).then(function () {
+
+            if (self.isUnmounted){                
+                return false;
+            }
 
             var sessionData = countlySession.getSessionData();
 

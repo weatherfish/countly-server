@@ -1,6 +1,6 @@
 var EventsPage = React.createClass({
 
-    mixins: [UpdatePageMixin],
+    mixins: [UpdatePageMixin, UnmounCheckMixin],
 
     getInitialState: function() {
 
@@ -23,7 +23,11 @@ var EventsPage = React.createClass({
         var self = this;
 
         $.when(countlyEvent.initialize()).then(function () {
-
+            
+            if (self.isUnmounted){                
+                return false;
+            }
+            
             var events_types = countlyEvent.getEvents();
 
             var segmentations = countlyEvent.getEventSegmentations();

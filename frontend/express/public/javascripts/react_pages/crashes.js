@@ -2,7 +2,7 @@ var Link = ReactRouter.Link;
 
 var CrashesPage = React.createClass({
 
-    mixins: [ UpdatePageMixin, ReactRouter.History ],
+    mixins: [ UpdatePageMixin, ReactRouter.History, UnmounCheckMixin ],
 
     topbar_height : 110,
 
@@ -207,6 +207,10 @@ var CrashesPage = React.createClass({
         var self = this;
 
         $.when(countlyCrashes.initialize()).then(function () {
+            
+            if (self.isUnmounted){                
+                return false;
+            }
 
             //var crashData = countlyCrashes.getData();
             //var chartData = countlyCrashes.getChartData(self.initial_metric, self.metrics[self.initial_metric]);

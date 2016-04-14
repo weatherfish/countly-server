@@ -699,7 +699,11 @@
     var initial_single_graph_data = false;
 
     countlyCommon.drawTimeGraph = function (granularity_rows, container, graph_colors, graph_width, graph_height, bucket, granularity_type, small_circles, zero_points) {
-        _.defer(function(){
+        //_.defer(function(){
+            
+            
+            console.log("{{{{{{{{{{[ drawTimeGraph }}}}}}}}}}}");
+            console.log(":::::::::::::::::::::::::::::::::::::::::::::::");
 
             if (container.indexOf("#") > -1)
             {
@@ -1028,8 +1032,6 @@
                                     label_element.innerHTML = data.name;
                                 }
 
-
-
                                 hover_element.appendChild(label_element);
 
                                 var value_element = document.createElement('div');
@@ -1079,7 +1081,7 @@
 
             return true;
 
-        });
+        //});
     };
 
     countlyCommon.updateTimeGraph = function (granularity_rows, container, data_items, bucket, granularity_type, small_circles, zero_points, __callback) {
@@ -1097,9 +1099,6 @@
             }
         }
 */
-
-        console.log("======== updateTimeGraph =============");
-        console.log(granularity_rows);
 
         //return false;
 
@@ -1131,9 +1130,6 @@
                     if (granularity_type == "monthly")
                     {
                         var full_days = new Date(elem[0]).monthDays();
-
-                        console.log("full_days:", full_days);
-                        console.log("days in period:", elem[2]);
 
                         var extension_days = full_days - elem[2];
 

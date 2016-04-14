@@ -1,6 +1,6 @@
 var UserPage = React.createClass({
 
-    mixins: [UpdatePageMixin],
+    mixins: [UpdatePageMixin, UnmounCheckMixin],
 
     getInitialState : function() {
 
@@ -23,6 +23,10 @@ var UserPage = React.createClass({
         var self = this;
 
         $.when(countlyUser.initialize()).then(function () {
+            
+            if (self.isUnmounted){                
+                return false;
+            }
 
             var headers = self.make_big_numbers();
 

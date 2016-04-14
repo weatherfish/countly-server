@@ -1,6 +1,6 @@
 var LoyaltyPage = React.createClass({
 
-    mixins: [UpdatePageMixin],
+    mixins: [UpdatePageMixin, UnmounCheckMixin],
 
     getInitialState: function() {
 
@@ -37,6 +37,10 @@ var LoyaltyPage = React.createClass({
         var self = this;
 
         $.when(countlyUser.initialize()).then(function () {
+
+            if (self.isUnmounted){                
+                return false;
+            }
 
             self.setState({
                 inited : true,

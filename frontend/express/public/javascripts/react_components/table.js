@@ -33,10 +33,8 @@ var TableHeader = (function (_React$Component) {
 
     _createClass(TableHeader, [{
             key : 'componentDidMount',
-            value : function componentDidMount(){
-                
-                var width = React.findDOMNode(this).offsetWidth;
-                console.log("- header mount -", width);
+            value : function componentDidMount(){                
+                var width = React.findDOMNode(this).offsetWidth;                
             }
         },
         {

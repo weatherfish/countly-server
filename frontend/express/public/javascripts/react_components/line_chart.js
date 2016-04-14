@@ -2,8 +2,18 @@ var LineChart = React.createClass({
 
     circle_radius : 4,
 
-    getInitialState() {
+    getInitialState : function() {
 
+        return {
+            active : true,
+            graph_ready : false
+        };
+    },
+    
+    componentDidMount : function()
+    {
+        console.log("===== mounted =======");
+        
         var data_points = this.props.data_function();
       
         var line_chart_width = this.props.width - (this.props.sides_padding * 2);
@@ -133,24 +143,49 @@ var LineChart = React.createClass({
             {
                 lines_descriptions[i]['color'] = granularity_rows[i].color;
             }
-
         }
         else
         {
             lines_descriptions = false;
         }
-
-        return {
-            big_numbers : this.props.big_numbers,
-            active : true,
+        
+        if (this.props.mount_callback)
+        {
+            this.props.mount_callback({
+                granularity : this.state.granularity_type
+            });
+        }
+        
+        this.setState({
+            big_numbers : this.props.big_numbers,            
             session_dp : data_points,
             granularity_type : granularity,
             lines_descriptions : lines_descriptions,
-            line_chart_width : line_chart_width
-        };
+            line_chart_width : line_chart_width,
+            graph_ready : true
+        })
+    },
+
+    componentDidUpdate : function()
+    {
+        if (countlyCommon.getPeriod() == "hour")
+        {
+            var granularity_type = "hourly";
+        }
+        else
+        {
+            var granularity_type = this.state.granularity_type;
+        }
+
+        var updated_data = this.update(-1, granularity_type, true);
     },
 
     componentWillReceiveProps : function(nextProps) {
+        
+        if (!this.state.graph_ready)
+        {
+            return false;
+        }
 
         var self = this;
 
@@ -530,13 +565,19 @@ var LineChart = React.createClass({
                     }
 
                 })()}
+                
+                {(() => {
 
-                <Granularity
-                    class_name={granularity_class_name}
-                    data={this.state.session_dp}
-                    type={this.state.granularity_type}
-                    period={this.props.period}
-                    disable_hover={this.props.disable_hover} />
+                    if (this.state.graph_ready){
+                        return(<Granularity
+                                    class_name={granularity_class_name}
+                                    data={this.state.session_dp}
+                                    type={this.state.granularity_type}
+                                    period={this.props.period}
+                                    disable_hover={this.props.disable_hover} />)
+                    }
+
+                })()}
 
                 <div id="dashboard-graph" style={graph_style}>
 
@@ -575,7 +616,7 @@ var LineChart = React.createClass({
 
                     }
 
-                    if (this.props.big_numbers){
+                    if (this.props.big_numbers && this.state.big_numbers){
                         return(<div className="big-numbers-container">{this.big_number_render()}</div>)
                     }
 
@@ -583,30 +624,6 @@ var LineChart = React.createClass({
 
             </div>
         )
-    },
-
-    componentDidMount : function()
-    {
-        if (this.props.mount_callback)
-        {
-            this.props.mount_callback({
-                granularity : this.state.granularity_type
-            });
-        }
-    },
-
-    componentDidUpdate : function()
-    {
-        if (countlyCommon.getPeriod() == "hour")
-        {
-            var granularity_type = "hourly";
-        }
-        else
-        {
-            var granularity_type = this.state.granularity_type;
-        }
-
-        var updated_data = this.update(-1, granularity_type, true);
     },
 
     hasClass : function(el, cls) {

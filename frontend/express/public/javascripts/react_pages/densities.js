@@ -1,6 +1,6 @@
 var DensitiesPage = React.createClass({
 
-    mixins: [UpdatePageMixin],
+    mixins: [UpdatePageMixin, UnmounCheckMixin],
 
     getInitialState: function() {
 
@@ -54,6 +54,10 @@ var DensitiesPage = React.createClass({
         var self = this;
 
         $.when(countlyDensity.initialize()).then(function () {
+
+            if (self.isUnmounted){                
+                return false;
+            }
 
             self.setState({
                 inited : true,
