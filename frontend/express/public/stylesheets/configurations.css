@@ -10,9 +10,7 @@
 }
 
 .configurations_page .category > div {
-
     display : inline-block;
-
 }
 
 .configurations_page .category > div.block_label {
@@ -38,7 +36,6 @@
     letter-spacing: 1.39px;
 
     text-transform: uppercase;
-
 }
 
 .configurations_page .category > div.block_elements {
@@ -83,7 +80,7 @@
     background-color: red;
 }
 
-.configurations_page input[type="text"] {
+.configurations_page input[type="text"], .configurations_page input[type="password"] {
     width : 240px;
     height: 30px;
     padding-left: 10px;
@@ -149,4 +146,54 @@
     background-image: url("../images/tick.svg");
     background-repeat   : no-repeat;
     background-position : center;
+}
+
+.configurations_page .api_key {
+    /*margin-left : 314px;
+    margin-bottom : 10px;*/
+    font-family : Lato-Semibold;
+    font-size : 14px;
+    width : 300px;
+    display: inline-block;
+    margin-right : 14px;
+    text-align : right;
+}
+
+.configurations_page .save_password_button, .configurations_page .generate_api_key {    
+    width: 120px;
+    height: 30px;
+    line-height: 31px;    
+    cursor: pointer;
+    border-radius: 6px;
+    text-align: center;    
+    margin-bottom : 20px;
+    display: inline-block;
+    
+}
+
+.configurations_page .save_password_button:hover, .configurations_page .generate_api_key:hover {
+    opacity : 1;
+}
+
+.configurations_page .generate_api_key {    
+    border: 1px solid #FF6138;
+    color: #FF6138;
+    opacity : 0.8;
+}
+
+.configurations_page .save_password_button {
+    margin-left : 314px;    
+    border: 1px solid #E7E7E7;
+    color: #E7E7E7;   
+}
+
+.configurations_page .save_password_button.active {    
+    border: 1px solid #FF6138;
+    color: #FF6138;
+    opacity : 0.8;
+}
+
+.configurations_page .inner_link {
+    position : relative;
+    top : -60px;
 }

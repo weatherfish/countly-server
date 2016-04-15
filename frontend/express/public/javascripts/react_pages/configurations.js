@@ -89,25 +89,6 @@ var SwitchBlock = React.createClass({
 
 var ConfigurationsPage = React.createClass({
 
-/*
-    {
-          "frontend":"Frontend",
-          "api":"API",
-          "apps":"Apps",
-          "frontend-production":"Production mode",
-          "frontend-session_timeout":"Session timeout in ms",
-          "api-domain":"Domain in emails",
-          "api-safe":"Safer API responses",
-          "api-session_duration_limit":"Maximal Session Duration",
-          "api-city_data":"Track city data",
-          "api-event_limit":"Max unique event keys",
-          "api-event_segmentation_limit":"Max segmentation in each event",
-          "api-event_segmentation_value_limit":"Max unique values in each segmentation",
-          "apps-country":"Default Country",
-          "apps-category":"Default Category"
-    }
-*/
-
     countries : [],
     categories : [],
 
@@ -138,6 +119,11 @@ var ConfigurationsPage = React.createClass({
 
         return({
             inited : false,
+            confirmation_waiting : false,
+            confirmation_sign : false, //jQuery.i18n.map["management-applications.delete-confirm"],
+            confirmation_function : false,
+            user_api_key : this.props.user_api_key,
+            password_change_is_active : false
         });
 
     },
@@ -160,14 +146,35 @@ var ConfigurationsPage = React.createClass({
 
         this.initializeConfigs(function(error, config){
 
-            console.log(":: config ::");
-            console.log(config);
+            config.user = {};
+            
+            config.user.username = self.props.username;
 
             self.setState({
                 config : config,
                 inited : true
             })
         });
+        
+        setTimeout(function(){
+            
+            var scrollToAnchor = function() {
+                         
+                const hashParts = window.location.hash.split('#');
+                
+                if (hashParts[1])
+                {
+                    var element = document.getElementById(hashParts[1]);
+                    element.scrollIntoView();
+                }
+            
+            }
+            
+            scrollToAnchor();
+            
+            window.onhashchange = scrollToAnchor; // todo : unbind                 
+            
+        }, 200)
     },
 
     updateConfigs : function (configs, callback) {
@@ -194,19 +201,135 @@ var ConfigurationsPage = React.createClass({
         var new_config = this.state.config;
 
         new_config[setting[0]][setting[1]] = value;
+        
+        var password_change_is_active = this.state.password_change_is_active;
+        
+        console.log("------- new_config ---------");
+        console.log(new_config)
 
-        this.updateConfigs(new_config, function(error, result){
+        if (setting[0] != "user")
+        {
+            this.updateConfigs(new_config, function(error, result){
 
-            if (error) console.log(error);
-
-            console.log(result);
-
-        });
+                if (error) console.log(error);
+    
+                console.log(result);
+    
+            });
+        }
+        else
+        {
+            
+            console.log("------- new_config 2 ---------");
+            console.log(new_config.user)
+            
+            if (new_config.user.old_pass && (new_config.user.new_pass && this.check_pass(new_config.user.new_pass) && (new_config.user.new_pass == new_config.user.new_pass_again)))
+            {
+                password_change_is_active = true;
+            }
+            else
+            {
+                password_change_is_active = false;
+            }
+        }        
 
         this.setState({
-            "config" : new_config
+            "config" : new_config,
+            "password_change_is_active" : password_change_is_active
         });
 
+    },
+    
+    check_pass : function(pass){
+        
+        console.log("check pass:", pass);
+        
+        if (pass.length < 6) return false;
+        
+        return true;
+    },
+    
+    change_pass : function(){
+                        
+        var self = this;
+        
+        var config = this.state.config;
+        
+        config.user.old_pass = "";
+        config.user.new_pass = "";
+        
+        this.setState({
+            config : config
+        })
+
+        $.ajax({
+            type:"POST",
+            url:countlyGlobal["path"]+"/user/settings",
+            data:{
+                "username":this.props.username,
+                "api_key":this.state.user_api_key,
+                "old_pwd":this.state.config.user.old_pass,
+                "new_pwd":this.state.config.user.new_pass,                
+                _csrf:countlyGlobal['csrf_token']
+            },
+            success:function (result) {
+                console.log("{{{{{{{ change_pass result }}}}");
+                console.log(result)
+            }
+        });
+
+    },
+    
+    generate_api_key : function(){
+        
+        _generate = function(){
+            
+            var key = "";
+            var possible = "abcdefghijklmnopqrstuvwxyz0123456789";
+        
+            for( var i=0; i < 32; i++ )
+                key += possible.charAt(Math.floor(Math.random() * possible.length));
+                                
+            this.setState({
+                "user_api_key" : key,
+                "confirmation_waiting" : false,
+                "confirmation_sign" : false,
+                "confirmation_function" : false,
+            });
+            
+            $.ajax({
+                type:"POST",
+                url:countlyGlobal["path"]+"/user/settings",
+                data:{
+                    "username":this.props.username,                   
+                    "api_key":key,
+                    _csrf:countlyGlobal['csrf_token']
+                },
+                success:function (result) {
+                    
+                    console.log("{{{{{{{{{ save result }}}}}}}}}}}}");
+                    console.log(result);                   
+                }
+            });
+        }
+        
+        this.setState({
+            "confirmation_waiting" : true,
+            "confirmation_sign" : "will change api key",
+            "confirmation_function" : _generate
+        });
+        
+        return false;        
+          
+    },
+
+    cancel_confirmation : function()
+    {
+        this.setState({
+            "confirmation_waiting" : false,
+            "confirmation_sign" : false,
+            "confirmation_function" : false
+        });
     },
 
     render : function(){
@@ -223,9 +346,27 @@ var ConfigurationsPage = React.createClass({
         var page_style = {
             "width" : elements_width
         }
+        
+        var password_change_button_class = "save_password_button";
+        
+        if (this.state.password_change_is_active)
+        {
+            password_change_button_class += " active";
+        }
 
         return(
             <div className="page configurations_page" style={page_style}>
+            
+                {(() => {                    
+                                        
+                    if (this.state.confirmation_waiting)
+                        return (<Alert 
+                            sign={this.state.confirmation_sign}
+                            on_cancel={this.cancel_confirmation}
+                            on_confirm={this.state.confirmation_function.bind(this)}
+                        />)
+                                        
+                })()}     
 
                 <div className="category">
 
@@ -339,6 +480,68 @@ var ConfigurationsPage = React.createClass({
 
                     </div>
                 </div>
+                
+                <h1 className="inner_link" id="user_settings"></h1>
+                
+                <div className="category">
+                
+                    <div className="block_label">User Settings</div>
+                                        
+                    <div className="block_elements">
+                    
+                        <InputBlock
+                                label={jQuery.i18n.map["user-settings.username"]}
+                                value={this.state.config.user.username}
+                                onChange={this.on_setting_change}
+                                setting={["user", "username"]}                            
+                            />
+                                            
+                        <InputBlock
+                                margin_top={20}
+                                label={jQuery.i18n.map["placeholder.old-password"]}
+                                value={this.state.config.user.old_pass}
+                                onChange={this.on_setting_change}
+                                type="password"
+                                setting={["user", "old_pass"]}                            
+                            />
+                            
+                        <InputBlock
+                                label={jQuery.i18n.map["placeholder.new-password"]}
+                                value={this.state.config.user.new_pass}
+                                onChange={this.on_setting_change}
+                                type="password"
+                                setting={["user", "new_pass"]}                            
+                            />
+                            
+                        <InputBlock
+                                label={jQuery.i18n.map["placeholder.again"]}
+                                value={this.state.config.user.new_pass_again}
+                                onChange={this.on_setting_change}
+                                type="password"
+                                setting={["user", "new_pass_again"]}                            
+                            />
+                            
+                        <div className={password_change_button_class} onClick={this.change_pass}>
+                            Change
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <h1 className="inner_link" id="api_key"></h1>
+                
+                <div className="category">
+                
+                    <div className="block_label">{jQuery.i18n.map["user-settings.api-key"]}</div>
+                                                
+                    <div className="block_elements">
+                        <div className="api_key">{this.state.user_api_key}</div>
+                        <div className="generate_api_key" onClick={this.generate_api_key}>
+                            Regenerate
+                        </div>
+                    </div>
+                </div>
+                
             </div>
         )
       }

@@ -330,6 +330,7 @@
     
     	
             var countly_version = "<%= countlyTypeName %>";
+            var username = "<%= member['username'] %>";
             var api_key =	"<%= member['api_key'] %>";
             var user_full_name = "<%= member['full_name'] %>";
             
@@ -416,7 +417,26 @@
         const App = React.createClass({
 
             mixins: [ ReactRouter.History ],
-
+/*
+            location: Router.HistoryLocation,
+            
+            scrollBehavior: {
+                updateScrollPosition: function updateScrollPosition() {
+                    
+                    console.log(":::::::: updateScrollPosition ::::::::");
+                    
+                  var hash = window.location.hash;
+                  if (hash) {
+                    var element = document.querySelector(hash);
+                    if (element) {
+                      element.scrollIntoView();
+                    }
+                  } else {
+                   window.scrollTo(0, 0);
+                  }
+                }
+            },
+*/
             getInitialState : function(){
 
                 return ({
@@ -557,7 +577,7 @@
         })
 
         var CountlyRouter = React.createClass({
-
+                        
             getInitialState: function() {
                                 
                 var active_app_id = countlyCommon.ACTIVE_APP_ID;
@@ -730,7 +750,10 @@
                                 })()}
                                 {(() => {
                                     if(global_admin){
-                                        return (<Route path="configurations" component={ConfigurationsPage}/>);
+                                        return (<Route path="configurations" component={wrapComponent(ConfigurationsPage, {
+                                            username : username,
+                                            user_api_key : api_key                                                                         
+                                        })}/>);
                                     }                                    
                                 })()}                                
                                 

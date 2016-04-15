@@ -12,8 +12,7 @@ var LineChart = React.createClass({
     
     componentDidMount : function()
     {
-        console.log("===== mounted =======");
-        
+             
         var data_points = this.props.data_function();
       
         var line_chart_width = this.props.width - (this.props.sides_padding * 2);
@@ -549,8 +548,7 @@ var LineChart = React.createClass({
 
         if (this.state.lines_descriptions)
         {
-            var description_blocks = JSON.parse(JSON.stringify(this.state.lines_descriptions));
-            //description_blocks.reverse();
+            var description_blocks = JSON.parse(JSON.stringify(this.state.lines_descriptions));            
         }
 
         // graph_width={this.props.width}

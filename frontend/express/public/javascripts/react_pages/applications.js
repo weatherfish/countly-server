@@ -50,8 +50,8 @@ var NewAppWindow = React.createClass({
         return ({
             //"confirmation_waiting" : false
             "open" : false,
-            "confirmation_waiting" : true,
-            "confirmation_sign" : jQuery.i18n.map["management-applications.delete-confirm"],
+            "confirmation_waiting" : false,
+            "confirmation_sign" : false, //jQuery.i18n.map["management-applications.delete-confirm"],
             "confirmation_function" : false,
         });
 
@@ -218,14 +218,14 @@ var NewAppWindow = React.createClass({
                 </div>
 
                 <InputBlock
-                    label="app name"
+                    label={jQuery.i18n.map["management-applications.application-name"]}
                     value={""}
                     onChange={this.on_setting_change}
                     setting={["name"]}
                 />
 
                 <SelectBlock
-                    label="Country"
+                    label={jQuery.i18n.map["management-applications.time-zone"]}
                     selectors={this.countries}
                     active_selector_key={this.countries[0]}
                     onChange={this.on_setting_change}
@@ -234,7 +234,7 @@ var NewAppWindow = React.createClass({
                 />
 
                 <SelectBlock
-                    label="Category"
+                    label={jQuery.i18n.map["management-applications.category"]}
                     selectors={this.categories}
                     active_selector_key={this.categories[0]}
                     onChange={this.on_setting_change}
@@ -243,7 +243,7 @@ var NewAppWindow = React.createClass({
                 />
 
                 <div className="setting_block upload_icon_block">
-                    <div className="setting_label">Icon</div>
+                    <div className="setting_label">{jQuery.i18n.map["help.manage-apps.app-icon"]}</div>
                     <div className="upload_block">
 
                         <form ref="uploadForm" enctype="multipart/form-data" id="add-app-image-form">
@@ -254,7 +254,7 @@ var NewAppWindow = React.createClass({
                 </div>
 
                 <div className="buttons_block">
-                    <div className="add_button" onClick={this.add}>add</div>
+                    <div className="add_button" onClick={this.add}>{jQuery.i18n.map["management-applications.add-application"]}</div>
                 </div>
           </div>);
     }

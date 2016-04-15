@@ -18,35 +18,12 @@ var FullSidebar = React.createClass({
             for (var i = 0; i < this.props.navigation.length; i++)
             {
 
-                if (current_location[1] == this.props.navigation[i]['path']) // todo: now it compare icon property, this is not right
+                if (current_location[1] == this.props.navigation[i]['path'])
                 {
                     selected_left = i;
                     break;
                 }
             }
-
-            //var selected_left = selected_left;
-/*
-            var right_selected_item = false;
-
-            for (var i = 0; i < navigation.length; i++)
-            {
-
-                if (navigation[i].path == current_location[1]){
-
-                    for (var j = 0; j < navigation[i].items.length; j++)
-                    {
-                        if (navigation[i].items[j][1] == this.props.current_location)
-                        {
-                            right_selected_item = navigation[i].items[j][0];
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-            }
-*/
 
             var right_selected_item = current_location[2];
             var right_closed = false;
@@ -87,7 +64,8 @@ var FullSidebar = React.createClass({
             apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode(),
             icons_ready : false,
             left_full : left_full,
-            language : this.props.language
+            language : this.props.language,
+            current_location : this.props.current_location
         };
     },
 
@@ -126,9 +104,70 @@ var FullSidebar = React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
 
-        console.log("{{{{{{{{{{{{{{{{{{{ applications }}}}}}}}}}}}}}}}}}}");
-        console.log(nextProps.applications);
+        console.log("{{{{{{{{{{{{{{{{{{{ sidebar componentWillReceiveProps }}}}}}}}}}}}}}}}}}}");
+        console.log(nextProps);
+/*
+        if (nextProps.current_location != this.state.current_location)
+        {
+            console.log("{{{{{{{{{{{{{{ update }}}}}}}}}}}");
+            console.log()
+            
+            var current_location = nextProps.current_location;
 
+            current_location = current_location.split('/');
+    
+            var left_full = false;
+    
+            if (current_location[2])
+            {
+    
+                var selected_left = 0;
+    
+                for (var i = 0; i < this.props.navigation.length; i++)
+                {
+    
+                    if (current_location[1] == this.props.navigation[i]['path'])
+                    {
+                        selected_left = i;
+                        break;
+                    }
+                }
+    
+                var right_selected_item = current_location[2];
+                var right_closed = false;
+            }
+            else
+            {
+                var selected_left = -1;
+    
+                for (var i = 0; i < this.props.navigation.length; i++)
+                {
+    
+                    if (current_location[1] == this.props.navigation[i]['path']) // todo: now it compare icon property, this is not right
+                    {
+                        selected_left = i;
+                        left_full = true;
+                        break;
+                    }
+                }
+    
+                var right_selected_item = false;
+                var right_closed = true;
+            }
+            
+            return this.setState({
+                current_location : nextProps.current_location,   
+                selected_left : selected_left,                
+                right_closed  : right_closed,
+                previous_left : this.state.selected_left,                
+                right_selected_item : right_selected_item,                
+                left_full : left_full,
+                right_change   : true,
+                right_change_i : right_selected_item,
+                in_transition : true
+            });
+        }
+*/
         if (nextProps.language != this.state.language)
         {
             console.log("sidebar change language:", nextProps.language);

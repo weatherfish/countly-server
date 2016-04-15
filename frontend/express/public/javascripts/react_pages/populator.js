@@ -41,6 +41,9 @@ var Populator = React.createClass({
         
         console.log("{{{{{{ start generation }}}}}}}}}]");
         
+        this.settings.date_from = "2016-02-02";
+        this.settings.date_to = "2016-02-04";
+        
         var start_time = moment(this.settings.date_from, 'YYYY-MM-DD').unix();
         var end_time = moment(this.settings.date_to, 'YYYY-MM-DD').unix();
         
@@ -75,6 +78,21 @@ var Populator = React.createClass({
             "width" : elements_width
         }
  
+ /*
+ <InputBlock
+                            label={jQuery.i18n.map["populator.date-from"]}
+                            value={"2016-02-02"}
+                            onChange={this.on_setting_change}
+                            setting={"date_from"}                            
+                        />
+                        <InputBlock
+                            label={jQuery.i18n.map["populator.date-to"]}
+                            value={"2016-02-04"}
+                            onChange={this.on_setting_change}
+                            setting={"date_to"}                            
+                        />
+ */
+ 
         return (
                 <div id="populator" style={page_style}>
                     <div className="headline">data populator</div>
@@ -88,18 +106,7 @@ var Populator = React.createClass({
                             type="int"
                         />
                         
-                        <InputBlock
-                            label={jQuery.i18n.map["populator.date-from"]}
-                            value={"2016-02-02"}
-                            onChange={this.on_setting_change}
-                            setting={"date_from"}                            
-                        />
-                        <InputBlock
-                            label={jQuery.i18n.map["populator.date-to"]}
-                            value={"2016-02-04"}
-                            onChange={this.on_setting_change}
-                            setting={"date_to"}                            
-                        />
+                        
                         <InputBlock
                             label={jQuery.i18n.map["populator.maxtime"]}
                             value={200}

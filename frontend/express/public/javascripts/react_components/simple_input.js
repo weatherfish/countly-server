@@ -24,6 +24,15 @@ var InputBlock = React.createClass({
         } 
           
     },
+    /*
+    componentWillReceiveProps : function(nextProps){
+        
+        if(nextProps.value != this.state.value){
+            this.setState({
+                value : this.state.value
+            })
+        }            
+    },*/
 
     change_input : function(event)
     {
@@ -62,11 +71,25 @@ var InputBlock = React.createClass({
         {
             style.width = this.props.width;
         }
+        
+        if (this.props.margin_top)
+        {
+            style["margin-top"] = this.props.margin_top + "px";
+        }
+        
+        if (this.props.type == "password")
+        {
+            var type = "password";
+        }
+        else
+        {
+            var type = "text";
+        }
 
         return(
             <div className="setting_block">
                 {label}
-                <input type="text" value={this.state.value} onChange={this.change_input} style={style}/>
+                <input type={type} value={this.state.value} onChange={this.change_input} style={style}/>
             </div>
         )
     },

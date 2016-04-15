@@ -203,11 +203,11 @@ var Dashboard = React.createClass({
 
         var lines_descriptions = [
             {
-                "label" : "Previous Time Range"
+                "label" : "Current Time Range"
             },
             {
-                "label" : "Current Time Range"
-            }
+                "label" : "Previous Time Range"
+            }            
         ]
 
         if (this.state.long_text_flag)

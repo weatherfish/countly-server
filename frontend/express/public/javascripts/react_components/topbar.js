@@ -1,5 +1,7 @@
 var TopBar = React.createClass({
 
+    mixins: [ ReactRouter.History ],
+
     getInitialState: function() {
 
         return {
@@ -159,6 +161,16 @@ var TopBar = React.createClass({
         });
 
     },
+    
+    close_user_menu : function(){
+        
+        this.history.pushState(null, "/manage/configurations#user_settings");
+        
+        this.setState({
+            user_menu_open : false
+        });
+          
+    },
 
     render : function() {
 
@@ -190,19 +202,31 @@ var TopBar = React.createClass({
             user_menu_style.display = "block"
         }
 
+        var language_menu_select_class = "language";
+
         if (this.state.language_menu_open){
             user_menu_style["border-top-left-radius"] = "0px";
             user_menu_style["border-bottom-left-radius"] = "0px";
             language_menu_style.display = "block";
-            var language_menu_select_class = "active";
+            language_menu_select_class += " active";
+        }
+       
+        // <div className="hint_icon"></div>
+        
+        console.log("====== window.location ========");
+        console.log(window.location.pathname);
+        
+        if (window.location.pathname == "/manage/configurations")
+        {            
+            var links_block_1 = <span><a href="/manage/configurations#user_settings" onClick={this.close_user_menu}>{jQuery.i18n.map["sidebar.settings"]}</a></span>
+            var links_block_2 = <span><a href="/manage/configurations#api_key" onClick={this.close_user_menu}>{jQuery.i18n.map["user-settings.api-key"]}</a></span>   
         }
         else
         {
-            var language_menu_select_class = "";
+            var links_block_1 = <span><Link to="/manage/configurations#user_settings" onClick={this.close_user_menu}>{jQuery.i18n.map["sidebar.settings"]}</Link></span>
+            var links_block_2 = <span><Link to="/manage/configurations#api_key" onClick={this.close_user_menu}>{jQuery.i18n.map["user-settings.api-key"]}</Link></span>
         }
-
-        // <div className="hint_icon"></div>
-
+        
         return (
               <div className="navigation" style={block_style}>
                   <span className="fstmenu">{this.state.fstmenu}</span>
@@ -214,11 +238,10 @@ var TopBar = React.createClass({
                   <div className="user_menu" style={user_menu_style}>
 
                       <div className="top_arrow"></div>
-
-                      <span>{jQuery.i18n.map["sidebar.settings"]}</span>
-                      <span>{jQuery.i18n.map["user-settings.api-key"]}</span>
+                      {links_block_1}
+                      {links_block_2}
                       <span onClick={this.languageMenuState} className={language_menu_select_class}><span className="arrow"></span>Language</span>
-                      <span className="logout">{jQuery.i18n.map["sidebar.logout"]}</span>
+                      <span className="logout"><a href="/logout">{jQuery.i18n.map["sidebar.logout"]}</a></span>
                   </div>
 
                   <div className="language_menu" style={language_menu_style}>

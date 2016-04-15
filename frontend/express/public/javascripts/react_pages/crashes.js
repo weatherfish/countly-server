@@ -394,11 +394,11 @@ var CrashesPage = React.createClass({
 
         var lines_descriptions = [
             {
-                "label" : "Previous Time Range"
+                "label" : "Current Time Range"
             },
             {
-                "label" : "Current Time Range"
-            }
+                "label" : "Previous Time Range"
+            }            
         ]
 /*
         var text_check_style = "normal 12px Lato-Semibold"; // toto: non-english languages will have another font-family

@@ -32,8 +32,6 @@ var Alert = React.createClass({
 
         var self = this;
 
-        console.log("-- did moint ");
-
         var add_point = function(){
 
             var lines_data = self.state.lines_data;
@@ -101,7 +99,9 @@ var Alert = React.createClass({
     			.attr('height', (vis_height) + "px")
                 .attr("class", "alert_svg")
                 .style("left", 101)
-                .style("background-color", "#FF6138")  // #FF6138
+                .style("background-color", "#ffffff"/*"#FF6138"*/)  // #FF6138
+                //.style("border", "1px solid #FF6138")  // #FF6138
+                //.style("border-bottom", "1px solid #ffffff")
         }
 
         var x = d3.scale.linear().range([0, width]).domain([0, 100]);
@@ -112,7 +112,7 @@ var Alert = React.createClass({
             .x(function(d) {
               return x(d.x);
             })
-            .y(function(d) { return y(d.y); })
+            .y(function(d) { return y(d.y) + 20; })
             .interpolate('linear').tension(0.8);  // 'cardinal',
 /*
         vis.selectAll("path")
@@ -121,6 +121,7 @@ var Alert = React.createClass({
             .attr("d", line)*/
             
         var color = "#ffffff";
+        var color = "#FF6138";
 
         var enter_path = this.vis.selectAll('.line')
             .data(this.state.lines_data)
@@ -144,16 +145,33 @@ var Alert = React.createClass({
                       .append('g')
                       .attr("class", "dot")
                       .attr("transform", function(d) {
-                            return "translate(" + (Math.ceil(x(d.x))) + "," + (Math.ceil(y(d.y))) + ")"; } // tode: here in library is function for cross browser transform
+                            return "translate(" + (Math.ceil(x(d.x))) + "," + (Math.ceil(y(d.y)) + 20) + ")"; } // tode: here in library is function for cross browser transform
                       )
                       .append('circle')
                       .attr("r", 4)
                       .attr('fill', color)
                       .style("opacity", 0)
-
+              /*        
+        var enter_points2 = this.vis.selectAll('.dot2')
+                      .data(this.state.points_data)
+                      .enter()
+                      .append('g')
+                      .attr("class", "dot2")
+                      .attr("transform", function(d) {
+                            return "translate(" + (Math.ceil(x(d.x))) + "," + (Math.ceil(y(d.y))) + ")"; } // tode: here in library is function for cross browser transform
+                      )
+                      .append('circle')
+                      .attr("r", 2)
+                      .attr('fill', "#ffffff")
+                      .style("opacity", 0)              
+*/
         enter_points.transition()
             .duration(500)
             .style("opacity", 1)
+        /*    
+        enter_points2.transition()
+            .duration(500)
+            .style("opacity", 1)*/
 
 
     },
@@ -176,9 +194,9 @@ var Alert = React.createClass({
         
 
         var info_style = {
-            "width" : (document.body.clientWidth - 200) + 2 + "px",
+            "width" : (document.body.clientWidth - 200) + "px",
             "height" : 130 + "px",
-            "left" : 100 + "px"
+            "left" : 100 + 1 + "px"
         }
 
         return(
@@ -187,9 +205,9 @@ var Alert = React.createClass({
                 <div id="svg_wrapper"/>
                 <div id="info" style={info_style}>
                     <span>{this.props.sign}</span>
-                    <div className="buttons_wrapper">
-                        <div className="confirm" onClick={this.props.on_confirm}>{jQuery.i18n.map["common.continue"]}</div>
+                    <div className="buttons_wrapper">                        
                         <div className="cancel" onClick={this.props.on_cancel}>{jQuery.i18n.map["common.cancel"]}</div>
+                        <div className="confirm" onClick={this.props.on_confirm}>{jQuery.i18n.map["common.continue"]}</div>
                     </div>
                 </div>
             </div>
