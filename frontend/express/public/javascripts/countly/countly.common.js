@@ -92,9 +92,6 @@
     countlyCommon.drawGraph = function (dataPoints, container, graphType, width, height) {
         _.defer(function(){
 
-            console.log("========== drawGraph ==========");
-            console.log(dataPoints);
-
             var get_domain = function(data) {
 
                 // Requires that at least one series contains some data
@@ -140,9 +137,6 @@
                 .domain([1, 50000])
                 .range([0, 300]);*/
 
-//console.log("============== y =================");
-            //console.log(y);
-            //console.log(y(10000));
 
             x.domain(dataPoints.map(function(d) { return d.f; }));
             //y.domain([0, d3.max(dataPoints, function(d) { return d.t; })]);
@@ -158,9 +152,6 @@
 
 
             //var chart = d3.select(".chart");
-
-            console.log("----------- this.chart --------------");
-            console.log(this.chart);
 
             if (!this.chart)
             {
@@ -186,8 +177,6 @@
             dataPoints.forEach(function(element){
                 total_count += element.t;
             });
-
-            console.log("total_count:", total_count);
 
             var bar = this.chart.selectAll("g")
                             .data(dataPoints)
@@ -430,9 +419,6 @@
 
                 //var ticks = axis.;
 
-                console.log("============ ticks ============");
-                console.log(y_scale_log.ticks());
-
                 var ticks = y_scale_log.ticks();
 
                 //axis.tickFormat(function(x) { return x });
@@ -457,8 +443,6 @@
 
                 var first_digit = parseInt(y_domain.toString()[0]);
 
-                //console.log("first digit:", first_digit);
-
                 var y_domain_string = (first_digit + 1).toString();
 
                 for (var i = 0; i < y_domain.toString().length - 1; i++)
@@ -467,8 +451,6 @@
                 }
 
                 y_domain = parseInt(y_domain_string);
-
-                //console.log("new domain:", y_domain);
 
                 //var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, height - bars_margin_bottom]);
                 var y_inverted = y_scale_log;
@@ -523,8 +505,6 @@
 
                 var first_digit = parseInt(y_domain.toString()[0]);
 
-                //console.log("first digit:", first_digit);
-
                 var y_domain_string = (first_digit + 1).toString();
 
                 for (var i = 0; i < y_domain.toString().length - 1; i++)
@@ -533,8 +513,6 @@
                 }
 
                 y_domain = parseInt(y_domain_string);
-
-                //console.log("new domain:", y_domain);
 
                 //var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, height - bars_margin_bottom]);
                 var y_inverted = y_scale_log;
@@ -700,11 +678,7 @@
 
     countlyCommon.drawTimeGraph = function (granularity_rows, container, graph_colors, graph_width, graph_height, bucket, granularity_type, small_circles, zero_points) {
         //_.defer(function(){
-            
-            
-            console.log("{{{{{{{{{{[ drawTimeGraph }}}}}}}}}}}");
-            console.log(":::::::::::::::::::::::::::::::::::::::::::::::");
-
+                                            
             if (container.indexOf("#") > -1)
             {
                 var draw_element = document.getElementById(container.replace("#", ""));
@@ -753,6 +727,7 @@
                     }
                     else
                     {
+                        /*
                         var full_days = 7;
 
                         var extension_days = full_days - elem[2];
@@ -762,7 +737,7 @@
 
                         granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][0] = extension_date.getTime();
                         granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][2] = full_days;
-
+*/
                     }
                 }
             }
@@ -794,12 +769,17 @@
                     var point_data = {
                         "x" : set_data.data[j][0],
                         "y" : set_data.data[j][1],
+                        "previous_x" : set_data.data[j][3],
                     }
 
                     if (set_data.data[j][2])
                     {
                         point_data["days_count"] = set_data.data[j][2];
+                        point_data["real_days_count"] = set_data.data[j][4];
                     }
+                    /*
+                    console.log("---------- point_data ------------");
+                    console.log(point_data);*/
 
                     obj.values.push(point_data);
                 }
@@ -817,7 +797,7 @@
                     name  : data.name
                 });
             });
-            
+                        
             _rickshaw_graph = new Rickshaw.Graph({
               	element  : draw_element,
               	width    : graph_width,
@@ -883,8 +863,8 @@
                 //tickFormat: format
             });
 
-            _state_single_graph_data  = single_graph_data;
-            initial_single_graph_data = single_graph_data;
+            _state_single_graph_data  = JSON.parse(JSON.stringify(single_graph_data));
+            initial_single_graph_data = JSON.parse(JSON.stringify(single_graph_data));
 
             if (single_graph_data[1].color == "#bbbbbb") // todo: bad check
             {
@@ -894,16 +874,40 @@
             {
                 var previous_mode = false;
             }
-
+            
             var hoverDetail = new Rickshaw.Graph.HoverDetail({
               	graph: _rickshaw_graph,
               	formatter: function(series, x, y, x0, y0, point, is_bottom_block, parent_element) {
 
-                    var date = new Date(x);
+                    var previous_x = false;  
+                        
+                    for (var i = 0; i < _state_single_graph_data[1].values.length; i++)
+                    {                        
+                        if (_state_single_graph_data[1].values[i].x == x)
+                        {
+                            //var days_count = series.data[i].days_count;
+                                                      
+                            previous_x = _state_single_graph_data[1].values[i].previous_x;
+                                
+                            break;
+                        }
+                    }
 
-                    if (this.graph.granularity == "weekly")
+                    var date = new Date(x);                               
+                    
+                    var one_week_ago = false;
+                                        
+                    /*
+                    for (var j = 0; j < _state_single_graph_data[1].values.length; j++)
                     {
+                        console.log("look date:", new Date(_state_single_graph_data[1].values[j].previous_x));
+                    }
+                    */
+                    series = _state_single_graph_data[0];
+                    series.data = series.values;
 
+                    if (_rickshaw_graph.granularity == "weekly")
+                    {      
                         for (var i = 0; i < series.data.length; i++)
                         {
                             if (series.data[i].x == x)
@@ -912,14 +916,21 @@
                                 break;
                             }
                         }
-
-                        var one_week_ago = new Date(x);
+                                                
+                        one_week_ago = new Date(x);
                         one_week_ago.setDate(one_week_ago.getDate() - days_count + 1);
 
                         var date_string = d3.time.format("%d %b")(one_week_ago) + " - " + d3.time.format("%d %b %Y")(date) /*+ "  (" + d3.time.format("%a")(one_week_ago) + " - " + d3.time.format("%a")(date) + ")"*/;
+                                                                        
+                        var previous_date = new Date(previous_x);
+                        
+                        var one_week_ago_previous = new Date(previous_x);
+                        one_week_ago_previous.setDate(one_week_ago_previous.getDate() - days_count + 1);
+                        
+                        var date_string_previous = d3.time.format("%d %b")(one_week_ago_previous) + " - " + d3.time.format("%d %b %Y")(previous_date);
 
                     }
-                    else if (this.graph.granularity == "monthly")
+                    else if (_rickshaw_graph.granularity == "monthly")
                     {
 
                         for (var i = 0; i < series.data.length; i++)
@@ -937,10 +948,19 @@
 
                         var date_string = d3.time.format("%d %b")(one_month_ago) + " - " + d3.time.format("%d %b %Y")(date) /*+ "  (" + d3.time.format("%a")(one_month_ago) + " - " + d3.time.format("%a")(date) + ")"*/;
 
+                        var previous_date = new Date(previous_x);
+                        
+                        var one_month_ago_previous = new Date(previous_x);
+                        one_month_ago_previous.setDate(one_month_ago_previous.getDate() - days_count + 1);
+                        
+                        var date_string_previous = d3.time.format("%d %b")(one_month_ago_previous) + " - " + d3.time.format("%d %b %Y")(previous_date);
+                    
                     }
-                    else
-                    {
+                    else // daily
+                    {                      
+                        var previous_date = new Date(previous_x);                       
                         var date_string = d3.time.format("%d %b %Y")(date);
+                        var date_string_previous = d3.time.format("%d %b %Y")(previous_date);
                     }
 
                     var x_label = document.createElement('div');
@@ -969,6 +989,8 @@
 
                     var max_label_width = 0;
                     var max_value_width = 0;
+                    
+                    var days_in_period = false;
 
                     _state_single_graph_data.forEach(function(data, sg){
 
@@ -976,6 +998,16 @@
                         {
                             if (data.values[i].x == x)
                             {
+                                
+                                if (data.values[i].real_days_count)
+                                {
+                                    days_in_period = data.values[i].real_days_count;
+                                }                           
+                                else
+                                {
+                                    days_in_period = data.values[i].days_count;
+                                }
+                                
                                 var value = data.values[i].y.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
                                 var hover_element = document.createElement('div');
@@ -1014,8 +1046,6 @@
                                 var label_element = document.createElement('div');
                                 label_element.className = 'name';
 
-
-
                                 if (previous_mode)
                                 {
                                     if (sg == 0)
@@ -1024,7 +1054,7 @@
                                     }
                                     else
                                     {
-                                        label_element.innerHTML = "todo previous";
+                                        label_element.innerHTML = date_string_previous;
                                     }
                                 }
                                 else
@@ -1053,12 +1083,161 @@
                                 {
                                     max_value_width = value_element.offsetWidth;
                                 }
+                                
+                                // --------------------------
+                                // ------------------------
+                                                                
+                                if (_rickshaw_graph.granularity == "daily" && previous_mode)
+                                {
+                                    
+                                    var days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+                    
+                                    var weeks_calendar = document.createElement('div');
+                                    weeks_calendar.className = 'weeks_calendar_daily';
+                                    
+                                    weeks_calendar.innerHTML = "";
+                                    
+                                    if (sg == 0)
+                                    {
+                                        var day_of_week = date.getDay();
+                                    }
+                                    else
+                                    {
+                                        var day_of_week = previous_date.getDay();
+                                    }                                                                        
+                                    
+                                    if (day_of_week == 0)
+                                    {
+                                        day_of_week = 6;
+                                    }
+                                    else
+                                    {
+                                        day_of_week = day_of_week - 1;
+                                    }
+                                
+                                    
+                                    for (var i = 0; i < days.length; i++)
+                                    {
+                                        var class_name = "";
+                                                                 
+                                        if (day_of_week == i)
+                                        {
+                                            class_name += " active";
+                                        }
+                                        
+                                        weeks_calendar.innerHTML += "<span class='" + class_name + "'>" + days[i] + "</span>";
+                                    }       
+                                    
+                                    hover_wrapper.appendChild(weeks_calendar);
+                                }                                                                
 
                                 break;
                             }
                         }
                     });
-
+                    
+                    // todo: clone #rw_1_calendar elements
+                    
+                    var days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+                    
+                    var weeks_calendar = document.createElement('div');
+                    weeks_calendar.className = 'weeks_calendar';
+                    
+                    weeks_calendar.innerHTML = "";
+                                        
+                    if (one_week_ago)
+                    {
+                        var day_of_week_date = one_week_ago;
+                    }
+                    else
+                    {
+                        var day_of_week_date = date;
+                    }                    
+                    
+                    var day_of_week = day_of_week_date.getDay();
+                    
+                    if (day_of_week == 0)
+                    {
+                        day_of_week = 6;
+                    }
+                    else
+                    {
+                        day_of_week = day_of_week - 1;
+                    }
+                    
+                    if (_rickshaw_graph.granularity == "daily" && !previous_mode)
+                    {
+                        
+                        for (var i = 0; i < days.length; i++)
+                        {
+                            var class_name = "";
+                                                     
+                            if (day_of_week == i)
+                            {
+                                class_name += " active";
+                            }
+                            
+                            weeks_calendar.innerHTML += "<span class='" + class_name + "'>" + days[i] + "</span>";
+                        }   
+                        
+                        hover_wrapper.appendChild(weeks_calendar);
+                        
+                    }
+                    else if (_rickshaw_graph.granularity == "weekly")
+                    {                      
+                        
+                        if (days_in_period == 7)
+                        {
+                            for (var i = 0; i < days.length; i++)
+                            {
+                                var class_name = "";
+                                
+                                class_name += " active";                                
+                                
+                                weeks_calendar.innerHTML += "<span class='" + class_name + "'>" + days[i] + "</span>";
+                            }  
+                        }
+                        else
+                        {
+                                                       
+                            if (day_of_week == 0){ // start from monday, first part of week
+                            
+                                for (var i = 0; i < days.length; i++)
+                                {
+                                    var class_name = "";
+                                                             
+                                    if (i < days_in_period)
+                                    {
+                                        class_name += " active";
+                                    }
+                                    
+                                    weeks_calendar.innerHTML += "<span class='" + class_name + "'>" + days[i] + "</span>";
+                                }  
+                            }
+                            else // second part of week
+                            {                                                             
+                                
+                                for (var i = 0; i < days.length; i++)
+                                {
+                                    var class_name = "";
+                                                             
+                                    if (i > day_of_week - 1)
+                                    {
+                                        class_name += " active";
+                                    }
+                                    
+                                    weeks_calendar.innerHTML += "<span class='" + class_name + "'>" + days[i] + "</span>";
+                                }  
+                            }                                                              
+                        }
+                        
+                        hover_wrapper.appendChild(weeks_calendar);
+                        
+                    }
+                            
+                    /*
+                    weeks_calendar.innerHTML = "<span class='active'>Mo</span><span class='active'>Tu</span><span class='active'>We</span><span class='active'>Th</span><span>Fr</span><span>Sa</span><span>Su</span>";*/
+                  
                     /*console.log("max_value_width:", max_value_width);*/
 
                     var block_width = 12 + 8 + 10 + max_label_width + 10 + max_value_width + 12; // todo: variables
@@ -1090,6 +1269,7 @@
         {
             return false;
         }
+                
 /*
         if (granularity_rows[0] && granularity_rows[0].data[0][0] == 1) {
             for (var i = 0; i < granularity_rows.length; i++) {
@@ -1125,7 +1305,7 @@
 
                 for (var i = 0; i < granularity_rows.length; i++)
                 {
-                    var elem = granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1];
+                    var elem = granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1]; // take last element
 
                     if (granularity_type == "monthly")
                     {
@@ -1136,21 +1316,26 @@
                         var extension_date = new Date(elem[0]);
                         extension_date.setDate(extension_date.getDate() + extension_days);
 
-                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][0] = extension_date.getTime();
-                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][2] = full_days;
+                        elem[0] = extension_date.getTime();
+                        elem[2] = full_days;
 
                     }
-                    else
+                    else if (granularity_type == "weekly")
                     {
+
                         var full_days = 7;
 
                         var extension_days = full_days - elem[2];
 
                         var extension_date = new Date(elem[0]);
                         extension_date.setDate(extension_date.getDate() + extension_days);
+                        
+                        //elem[3] = elem[0];
 
-                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][0] = extension_date.getTime();
-                        granularity_rows[i]['data'][granularity_rows[i]['data'].length - 1][2] = full_days;
+                        elem[4] = elem[2]; // pass for calendar tooltip indication
+
+                        elem[0] = extension_date.getTime();
+                        elem[2] = full_days;
 
                     }
                 }
@@ -1162,6 +1347,17 @@
             {
 
                 var set_data = granularity_rows[i];
+                /*
+                if (i == 1)
+                {
+                    console.log("<<<<<< set_data >>>>>>>>>>>>");
+                    console.log(set_data.data);
+                    /*
+                    for (var j = 0; j < set_data.data.length; j++)
+                    {
+                        console.log("~~ d ~", new Date(set_data.data[j][3]));
+                    }*/
+               /* }                */
 
                 if (set_data.color)
                 {
@@ -1192,11 +1388,13 @@
                     var point_data = {
                         "x" : set_data.data[j][0]/*.unix() * 1000*/,
                         "y" : Math.round(parseInt(set_data.data[j][1])), // todo!!! maybe inaccuracy
+                        "previous_x" : set_data.data[j][3],
                     }
 
                     if (set_data.data[j][2])
                     {
                         point_data["days_count"] = set_data.data[j][2];
+                        point_data["real_days_count"] = set_data.data[j][4];
                     }
 
                     obj.values.push(point_data);
@@ -1304,8 +1502,18 @@
             });
         }
 
-        _state_single_graph_data = single_graph_data; // todo: remove
-
+        _state_single_graph_data = JSON.parse(JSON.stringify(single_graph_data)); // todo: remove
+        //initial_single_graph_data = single_graph_data;        
+ /*       
+        console.log("========= update draph _state_single_graph_data============");
+        console.log(_state_single_graph_data);*/
+/*
+        for (var s = 0; s < _state_single_graph_data[1].values.length; s++){
+            
+            console.log("******** _state_single_graph_data[1].values:", new Date(_state_single_graph_data[1].values[s].previous_x));
+            
+        }
+*/
         /*
             add or remove graph line path element
         */
@@ -1592,7 +1800,7 @@
 
     countlyCommon.extractChartData_granularity = function(db, clearFunction, chartData, dataProperties) {
 
-        countlyCommon.periodObj = getPeriodObj();
+        countlyCommon.periodObj = getPeriodObj();                       
 
         var hourly_granularity   = JSON.parse(JSON.stringify(chartData)); // clone
         hourly_granularity.format_date = function(timestamp){
@@ -1607,14 +1815,7 @@
             var date_string = d3.time.format("%d %b %Y")(date);
             return date_string;
         }
-
-        var daily_granularity   = JSON.parse(JSON.stringify(chartData)); // clone
-        daily_granularity.format_date = function(timestamp){
-            var date = new Date(timestamp);
-            var date_string = d3.time.format("%d %b %Y")(date);
-            return date_string;
-        }
-
+        
         var weekly_granularity  = JSON.parse(JSON.stringify(chartData));
         weekly_granularity.format_date = function(timestamp, days_in_period){
             var date = new Date(timestamp);
@@ -1673,7 +1874,7 @@
 
             var month_count = 0;
             var month_days_count = 0;
-
+                       
             for (var i = periodMin; i < periodMax; i++) {
 
                 if (!countlyCommon.periodObj.isSpecialPeriod) {
@@ -1700,7 +1901,7 @@
                         var formattedDate_next = false;
                     }
                 }
-
+                
                 dataObj = clearFunction(dataObj);
 
                 if (!tableData[i]) {
@@ -1731,7 +1932,7 @@
 
                 var day_num = formattedDate.day(); //.format('dddd');
 
-                if (day_num == 0) /*"Sunday"*/
+                if (day_num == 0) // todo: if Globalize locale == ... -> /*"Sunday"*/
                 {
                     //weekly_granularity[j]["data"][weekly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, week_count, week_days_count];
                     weekly_granularity[j]["data"].push([formattedDate.unix() * 1000, week_count, week_days_count]);
@@ -1755,15 +1956,14 @@
                 }
             }
 
-            // add the remaining days of the week
-            //weekly_granularity[j]["data"][weekly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, week_count, week_days_count];
+            // add the remaining days of the week            
             weekly_granularity[j]["data"].push([formattedDate.unix() * 1000, week_count, week_days_count])
-            // add the remaining days of the month
-            //monthly_granularity[j]["data"][monthly_granularity[j]["data"].length] = [formattedDate.unix() * 1000, month_count, month_days_count];
+            
+            // add the remaining days of the month            
             monthly_granularity[j]["data"].push([formattedDate.unix() * 1000, month_count, month_days_count])
 
         }
-
+       
         var keyEvents = [];
 
         for (var k = 0; k < chartData.length; k++) {
@@ -1795,7 +1995,7 @@
             "chartDP"        : chartData,
             "hourly_granularity"  : hourly_granularity,
             "daily_granularity"   : daily_granularity,
-            "weekly_granularity"  : weekly_granularity,
+            "weekly_granularity"  : JSON.parse(JSON.stringify(weekly_granularity)),
             "monthly_granularity" : monthly_granularity,
             "chartData"           : _.compact(tableData),
             "keyEvents"   : keyEvents,
@@ -1803,7 +2003,6 @@
             "time_format" : countlyCommon.periodObj.dateString,
             "previous_period_length" : previous_period_length,
             get_current_data : function(granularity){
-
 
                 if (!granularity)
                 {

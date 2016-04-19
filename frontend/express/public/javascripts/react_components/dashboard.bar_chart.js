@@ -95,9 +95,7 @@ var DashboardBarChart = React.createClass({
 
         data.every(function(element){
 
-            var text_width = self.getTextWidth(element.title, text_check_style); // toto: non-english languages will have another font-family
-
-            console.log("text_width check:", text_width);
+            var text_width = self.getTextWidth(element.title, text_check_style);
 
             if (text_width > width)
             {

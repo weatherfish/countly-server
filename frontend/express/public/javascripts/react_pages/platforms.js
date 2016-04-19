@@ -62,12 +62,7 @@ var PlatformsPage = React.createClass({
 
             active_platform : null;
 
-            console.log("============= countlyDeviceDetails.getPlatformData() ============");
-
             var platform_data = countlyDeviceDetails.getPlatformData();
-
-            console.log(platform_data);
-
 
             if (!self.state.horizontal_chart_headers) // todo: fast fix
             {
@@ -256,7 +251,7 @@ var PlatformsPage = React.createClass({
     },
 
     get_table_data : function(){
-        return this.get_active_tab().data;
+        return JSON.parse(JSON.stringify(this.get_active_tab().data));
     },
 
     render : function(){

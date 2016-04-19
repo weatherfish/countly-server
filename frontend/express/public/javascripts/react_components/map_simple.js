@@ -22,14 +22,23 @@ var DashboardMap = React.createClass({
 
         if (data)
         {
-            var string = '<div class="hoverinfo"><strong>' + geography.properties.name + " : " + data.numberOfThings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); + '</strong></div>';
+            var html = '<div class="country_hoverinfo">';  
+            html += "<div class='name'>" + geography.properties.name + "</div>"; 
+            html += "<div class='metric'>" + data.numberOfThings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</div>"; 
+            html += "<div class='bottom_arrow'></div>";
+            html += '</div>';
         }
         else
         {
-            var string = '<div class="hoverinfo"><strong>' + geography.properties.name + ' : 0</strong></div>';
+            //var html = '<div class="country_hoverinfo">' + geography.properties.name + ' : 0</div>';
+            var html = '<div class="country_hoverinfo">';  
+            html += "<div class='name'>" + geography.properties.name + "</div>"; 
+            html += "<div class='metric'>0</div>"; 
+            html += "<div class='bottom_arrow'></div>";
+            html += '</div>';
         }
 
-        return string;
+        return html;
     },
 
     draw : function() {

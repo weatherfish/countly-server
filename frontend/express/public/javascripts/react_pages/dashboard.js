@@ -2,7 +2,7 @@ var Dashboard = React.createClass({
 
     topbar_height : 110,
 
-    mixins: [UpdatePageMixin],
+    mixins: [UpdatePageMixin, TimeRangeMixin],
 
     getInitialState: function() {
 
@@ -42,6 +42,30 @@ var Dashboard = React.createClass({
         }
 
     },
+    
+    __getSessionDPTotal : function(){                          
+        return this.GetTimeRanges(countlySession.getSessionDPTotal);          
+    },
+    
+    __getUserDPActive : function(){                          
+        return this.GetTimeRanges(countlySession.getUserDPActive);          
+    },
+    
+    __getUserDPNew : function(){                          
+        return this.GetTimeRanges(countlySession.getUserDPNew);          
+    },
+    
+    __getDurationDP : function(){                          
+        return this.GetTimeRanges(countlySession.getDurationDP);          
+    },
+    
+    __getDurationDPAvg : function(){                          
+        return this.GetTimeRanges(countlySession.getDurationDPAvg);          
+    },
+    
+    __getEventsDPAvg : function(){
+        return this.GetTimeRanges(countlySession.getEventsDPAvg); 
+    },
 
     make_tabs : function(){
 
@@ -53,7 +77,7 @@ var Dashboard = React.createClass({
               "data":sessionData.usage['total-sessions'],
               "id":"draw-total-sessions",
               "help":"dashboard.total-sessions",
-              "data_function" : countlySession.getSessionDPTotal, // data function for line chart
+              "data_function" : this.__getSessionDPTotal, // data function for line chart
               "data_item" : "total-sessions"
         },
         {
@@ -61,7 +85,7 @@ var Dashboard = React.createClass({
               "data":sessionData.usage['total-users'],
               "id":"draw-total-users",
               "help":"dashboard.total-users",
-              "data_function" : countlySession.getUserDPActive, // data function for line chart
+              "data_function" : this.__getUserDPActive, // data function for line chart
               "data_item" : "total-users"
         },
         {
@@ -69,7 +93,7 @@ var Dashboard = React.createClass({
               "data":sessionData.usage['new-users'],
               "id":"draw-new-users",
               "help":"dashboard.new-users",
-              "data_function" : countlySession.getUserDPNew, // data function for line chart
+              "data_function" : this.__getUserDPNew, // data function for line chart
               "data_item" : "new-users"
         },
         {
@@ -77,7 +101,7 @@ var Dashboard = React.createClass({
               "data":sessionData.usage['total-duration'],
               "id":"draw-total-time-spent",
               "help":"dashboard.total-time-spent",
-              "data_function" : countlySession.getDurationDP, // data function for line chart
+              "data_function" : this.__getDurationDP, // data function for line chart
               "data_item" : "total-duration"
         },
         {
@@ -85,7 +109,7 @@ var Dashboard = React.createClass({
               "data":sessionData.usage['avg-duration-per-session'],
               "id":"draw-time-spent",
               "help":"dashboard.avg-time-spent2",
-              "data_function" : countlySession.getDurationDPAvg, // data function for line chart
+              "data_function" : this.__getDurationDPAvg, // data function for line chart
               "data_item" : "avg-duration-per-session"
         },
         {
@@ -93,7 +117,7 @@ var Dashboard = React.createClass({
               "data":sessionData.usage['avg-events'],
               "id":"draw-avg-events-served",
               "help":"dashboard.avg-reqs-received",
-              "data_function" : countlySession.getEventsDPAvg, // data function for line chart
+              "data_function" : this.__getEventsDPAvg, // data function for line chart
               "data_item" : "avg-events"
         }];
 
@@ -180,7 +204,8 @@ var Dashboard = React.createClass({
         var elements_width = get_viewport_width();
 
         var graph_width = elements_width - 40; // todo
-        var map_width = elements_width - 500; // todo
+        var map_width = elements_width - 260;
+        var map_height = 560;
 
         var dashboard_style = {
             "width" : elements_width
@@ -333,7 +358,7 @@ var Dashboard = React.createClass({
 
                 <DashboardMap
                     width={map_width}
-                    height={420}
+                    height={map_height}
                     data={this.state.top_items_bars}
                 />
 

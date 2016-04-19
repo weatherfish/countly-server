@@ -58,7 +58,7 @@ var LineChart = React.createClass({
             }
             else if (granularity == "weekly")
             {
-                var granularity_rows = data_points.weekly_granularity;
+                var granularity_rows = JSON.parse(JSON.stringify(data_points.weekly_granularity));
             }
             else if (granularity == "monthly")
             {
@@ -115,6 +115,9 @@ var LineChart = React.createClass({
             var granularity_rows = this.props.data_function().get_current_data();
             var granularity = "daily";
         }
+        
+        console.log("---------- granularity_rows ------------");
+        console.log(granularity_rows);
 
         if (granularity_rows[0] && granularity_rows[0].mode == "ghost") // todo: fix for previous time ranges
         {
@@ -122,6 +125,7 @@ var LineChart = React.createClass({
             {
                 if (granularity_rows[1].data[i])
                 {
+                    granularity_rows[0].data[i][3] = granularity_rows[0].data[i][0]; // pass for previous date in tooltip 
                     granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0]; // projection of previous time range on current time range
                 }
             }
@@ -131,8 +135,11 @@ var LineChart = React.createClass({
         {
             granularity_rows.reverse();
         }
+        
+        console.log("[ point 1 ]]");
+        console.log(granularity_rows);
 
-        countlyCommon.drawTimeGraph(granularity_rows, "#dashboard-graph", this.props.big_numbers/*tmp_colors*/, line_chart_width - 40 - 40, this.props.height, false, granularity, false, zero_points); // !remove
+        countlyCommon.drawTimeGraph(JSON.parse(JSON.stringify(granularity_rows)), "#dashboard-graph", this.props.big_numbers/*tmp_colors*/, line_chart_width - 40 - 40, this.props.height, false, granularity, false, zero_points);
 
         if (this.props.lines_descriptions)
         {
@@ -479,13 +486,21 @@ var LineChart = React.createClass({
         {
             for (var i = 0; i < granularity_rows[1].data.length; i++)
             {
-
-                if (!granularity_rows[0].data[i]) // previous time range in "month granularity mode" can be less then current
+/*
+                if (!granularity_rows[0].data[i])
                 {
                     continue;
                 }
+*/
 
-                granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0];
+
+                //granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0];
+                
+                //console.log("construct:", new Date(granularity_rows[0].data[i][0]));
+                
+                granularity_rows[0].data[i][3] = granularity_rows[0].data[i][0]; // pass real date for previous date in tooltip 
+                granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0]; // projection of previous time range on current time range
+                
             }
         }
         //_granularity = new_granularity; // todo: remove global variable

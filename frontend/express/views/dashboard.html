@@ -166,6 +166,7 @@
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/update_page_mixin.js"></script>
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/outside_click_close_mixin.js"></script>
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/unmount_check_mixin.js"></script>
+            <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/previous_timerange_mixin.js"></script>
             
             <!--script type="text/jsx" src="<%- cdn %>/javascripts/react_pages_compiled/router.js"></script-->
 
@@ -384,6 +385,8 @@
     <% } %>
 
     <script type="text/jsx">
+    
+        Globalize('en-gb'); // todo: https://github.com/jquense/react-widgets/issues/98
 
         jQuery.i18n.properties({
             name:'locale',
@@ -392,7 +395,6 @@
             path:[countlyGlobal["cdn"]+'/localization/min/'],
             mode:'map'
         });
-
 
         var navigation = get_sidebar_data();
         
@@ -417,26 +419,7 @@
         const App = React.createClass({
 
             mixins: [ ReactRouter.History ],
-/*
-            location: Router.HistoryLocation,
-            
-            scrollBehavior: {
-                updateScrollPosition: function updateScrollPosition() {
-                    
-                    console.log(":::::::: updateScrollPosition ::::::::");
-                    
-                  var hash = window.location.hash;
-                  if (hash) {
-                    var element = document.querySelector(hash);
-                    if (element) {
-                      element.scrollIntoView();
-                    }
-                  } else {
-                   window.scrollTo(0, 0);
-                  }
-                }
-            },
-*/
+
             getInitialState : function(){
 
                 return ({
@@ -455,14 +438,9 @@
                     this.history.pushState(null, "/manage/apps");
                 }
             },
-            /*
-            componentWillReceiveProps : function(nextProps)
-            {
-                console.log("app componentWillReceiveProps");
-                console.log(nextProps)
-            },
-            */
+    
             date_changed : function(new_date){
+                                
                 this.setState({
                     date : new_date
                 })

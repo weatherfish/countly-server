@@ -69,7 +69,11 @@
     position : relative;
 }
 
-.x_label .triangle.top {
+.rickshaw_graph .detail .x_label {
+    padding-bottom : 10px;
+}
+
+.rickshaw_graph .detail .x_label .triangle.top {
 
     position : absolute;
     bottom : -7px;
@@ -83,7 +87,7 @@
 
 }
 
-.x_label .triangle.bottom {
+.rickshaw_graph .detail .x_label .triangle.bottom {
 
     position : absolute;
     top : -7px;
@@ -134,7 +138,7 @@
     /*font-size: 12px;
     color: #FFFFFF;
     letter-spacing : 0.83px*/
-    padding : 10px 0 10px 0;
+    padding : 10px 0 10px 10px;
 }
 
 .hover_element .circle {
@@ -145,7 +149,7 @@
     border-radius: 4px;
     /*background-color: white;*/
     display : inline-block;
-    margin-left : 12px;
+    margin-left : 3px;
 }
 
 .hover_element .name {
@@ -177,6 +181,49 @@
     font-size: 12px;
     color: #FFFFFF;
     letter-spacing : 0.83px;
+}
+
+.hover_wrapper .weeks_calendar {
+    font-size: 10px;
+    font-family: Lato-Light;  
+    text-align: center; 
+    /*margin-bottom : 10px;
+    height : 30px;
+    line-height : 30px;*/
+    /*position : relative;
+    top : -2px;*/
+    margin-top : 10px;
+}
+
+.hover_wrapper .weeks_calendar span {    
+    display : inline-block;
+    width : 18px;    
+    color: #999999;       
+}
+
+.hover_wrapper .weeks_calendar span.active {
+    color: #E6E6E6;       
+}
+
+.hover_wrapper .weeks_calendar_daily {
+    font-size: 10px;
+    font-family: Lato-Light;  
+    text-align: center; 
+    /*margin-bottom : 10px;*/
+    /*height : 10px;
+    line-height : 10px;*/
+    position : relative;
+    top : -2px;
+}
+
+.hover_wrapper .weeks_calendar_daily span {    
+    display : inline-block;
+    width : 18px;    
+    color: #999999;       
+}
+
+.hover_wrapper .weeks_calendar_daily span.active {
+    color: #E6E6E6;       
 }
 
 .trend_name {

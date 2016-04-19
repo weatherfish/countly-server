@@ -179,7 +179,8 @@ var CountriesPage = React.createClass({
 
         var elements_width = get_viewport_width();
         var map_width = elements_width - 360;
-
+        var map_height = 480;
+        
         var page_style = {
             "width" : elements_width
         }
@@ -198,7 +199,7 @@ var CountriesPage = React.createClass({
                 <Map
                     width={map_width}
                     metric={this.state.metric}
-                    height={480}
+                    height={map_height}
                     headline_sign={jQuery.i18n.map["countries.title"]}
                 />
 

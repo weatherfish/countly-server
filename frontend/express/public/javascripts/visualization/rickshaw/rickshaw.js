@@ -620,9 +620,6 @@ Rickshaw.Graph = function(args) {
             this.max_tick_width = 38;
         }
         
-        console.log("{{{{{{ call update }}}}");
-        console.log(document.getElementsByClassName('rickshaw_graph'))
-        
         var element = document.getElementsByClassName('rickshaw_graph')[0];
         
         if (element.getElementsByClassName('detail') && element.getElementsByClassName('detail')[0])
@@ -2533,100 +2530,100 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 				Math.pow(Math.abs(graph.y(value.y + value.y0) - eventY), 2)
 			);
 
-      var x_distance = Math.abs(graph.x(value.x) - eventX);
+            var x_distance = Math.abs(graph.x(value.x) - eventX);
+            
+                //if(x_distance > (this.graph.space_between_points / 3)) // todo: make var, todo: executing inside forEach !
+                
+                if (this.graph.granularity == "daily")
+                {
+                    var active_area = graph.circle_radius;
+                    var active_area = (this.graph.space_between_points / 2);
+                }
+                else
+                {
+                var active_area = graph.circle_radius * 3;
+                
+                if ((graph.circle_radius * 3) < (this.graph.space_between_points / 2))
+                {
+                    var active_area = graph.circle_radius * 3;
+                }
+                else
+                {
+                    var active_area = (this.graph.space_between_points / 2);
+                }
+            
+            }
 
-      //if(x_distance > (this.graph.space_between_points / 3)) // todo: make var, todo: executing inside forEach !
+            if(x_distance > active_area)
+            {
+                skip = true;
+                //this.point_focused = false;
+                return false;
+            }
+            else
+            {
+                      //this.point_focused = true;
+            }
 
-      if (this.graph.granularity == "daily")
-      {
-          var active_area = graph.circle_radius;
-          var active_area = (this.graph.space_between_points / 2);
-      }
-      else
-      {
-          var active_area = graph.circle_radius * 3;
+            //console.log("x_distance:", Math.pow(Math.abs(graph.x(value.x) - eventX), 2));
 
-          if ((graph.circle_radius * 3) < (this.graph.space_between_points / 2))
-          {
-              var active_area = graph.circle_radius * 3;
-          }
-          else
-          {
-              var active_area = (this.graph.space_between_points / 2);
-          }
+            var xFormatter = series.xFormatter || this.xFormatter;
+            var yFormatter = series.yFormatter || this.yFormatter;
 
-      }
+            var point = {
+                formattedXValue: xFormatter(value.x),
+                formattedYValue: yFormatter(series.scale ? series.scale.invert(value.y) : value.y),
+                series: series,
+                value: value,
+                distance: distance,
+                order: j,
+                name: series.name
+            };
 
-      if(x_distance > active_area)
-      {
-          skip = true;
-          //this.point_focused = false;
-          return false;
-      }
-      else
-      {
-          //this.point_focused = true;
-      }
+            if (!nearestPoint || distance < nearestPoint.distance) {
+                nearestPoint = point;
+            }
 
-      //console.log("x_distance:", Math.pow(Math.abs(graph.x(value.x) - eventX), 2));
+            points.push(point);
 
-			var xFormatter = series.xFormatter || this.xFormatter;
-			var yFormatter = series.yFormatter || this.yFormatter;
+        }, this );
 
-			var point = {
-				formattedXValue: xFormatter(value.x),
-				formattedYValue: yFormatter(series.scale ? series.scale.invert(value.y) : value.y),
-				series: series,
-				value: value,
-				distance: distance,
-				order: j,
-				name: series.name
-			};
-
-			if (!nearestPoint || distance < nearestPoint.distance) {
-				nearestPoint = point;
-			}
-
-			points.push(point);
-
-		}, this );
-
-    if (skip)
-    {
-        //this.element.classList.add('transition');
-        this.point_leave();
-        return;
-    }
-    else
-    {
-        //this.element.classList.remove('transition');
-    }
-
-//var p = points[0];
-
-    /* search top point */
-
-    var max_point_y = -1;
-    var max_point = false;
-
-    points.forEach(function(p){
-
-        /*console.log("seacrh point: >>>>>>> ");
-        console.log(p.value.y);*/
-
-        if (p.value.y > max_point_y)
+        if (skip)
         {
-            max_point = p;
-            max_point_y = p.value.y;
+            //this.element.classList.add('transition');
+            this.point_leave();
+            return;
+        }
+        else
+        {
+            //this.element.classList.remove('transition');
         }
 
-    });
+        //var p = points[0];
 
-    if (!this.current_point || (max_point && max_point.value.x != this.last_point.value.x)) /*this.last_point &&*/
-    {
-        this.point_changed(max_point, points);
-        this.last_point = max_point;
-    }
+        /* search top point */
+        
+        var max_point_y = -1;
+        var max_point = false;
+        
+        points.forEach(function(p){
+        
+            /*console.log("seacrh point: >>>>>>> ");
+            console.log(p.value.y);*/
+        
+            if (p.value.y > max_point_y)
+            {
+                max_point = p;
+                max_point_y = p.value.y;
+            }
+        
+        });
+
+        if (!this.current_point || (max_point && max_point.value.x != this.last_point.value.x)) /*this.last_point &&*/
+        {
+            this.point_changed(max_point, points);
+            this.last_point = max_point;
+        }
 
 		if (!nearestPoint)
 			return;
@@ -2646,7 +2643,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 			mouseY: eventY,
 			formattedXValue: formattedXValue,
 			domainX: domainX,
-      hide : skip
+            hide : skip
 		} );
 	},
 
@@ -2668,7 +2665,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 		}
 	},
 
-  getScrollTop : function (){
+    getScrollTop : function (){
       if(typeof pageYOffset!= 'undefined'){
           //most browsers except IE before #9
           return pageYOffset;
@@ -2679,259 +2676,261 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
           D= (D.clientHeight)? D: B;
           return D.scrollTop;
       }
-  },
+    },
 
-  find_top_position : function(id) {
-      var node = document.getElementById(id);
-      var curtop = 0;
-      var curtopscroll = 0;
-      if (node.offsetParent) {
-          do {
-              curtop += node.offsetTop;
-              curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+    find_top_position : function(id) {
+        var node = document.getElementById(id);
+        var curtop = 0;
+        var curtopscroll = 0;
+        if (node.offsetParent) {
+            do {
+                curtop += node.offsetTop;
+                curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+        
+            } while (node = node.offsetParent);
+            return (curtop - curtopscroll)
+        }
+    },
 
-          } while (node = node.offsetParent);
-          return (curtop - curtopscroll)
-      }
-  },
+    find_left_position : function(id) {
+        var node = document.getElementById(id);
+        var curleft = 0;
+        //var curtopscroll = 0;
+        if (node.offsetParent) {
+            do {
+                curleft += node.offsetLeft;
+                //curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+        
+            } while (node = node.offsetParent);
+            return (curleft)
+        }
+    },
 
-  find_left_position : function(id) {
-      var node = document.getElementById(id);
-      var curleft = 0;
-      //var curtopscroll = 0;
-      if (node.offsetParent) {
-          do {
-              curleft += node.offsetLeft;
-              //curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+    point_leave : function()
+    {
+        var self = this;
+        
+        this.current_point = false;
+        this.current_points = false;
+        
+        this.element.classList.add('transition');
+        
+        this.guide_line.style.display = "none";
+        
+        clearTimeout(this.point_change_timeout);
+    
+    },
 
-          } while (node = node.offsetParent);
-          return (curleft)
-      }
-  },
-
-  point_leave : function()
-  {
-      var self = this;
-
-      this.current_point = false;
-      this.current_points = false;
-
-      this.element.classList.add('transition');
-
-      this.guide_line.style.display = "none";
-
-      clearTimeout(this.point_change_timeout);
-
-  },
-
-  point_changed : function(point, points)
-  {
-
-      var self = this;
-
-      var delay = 0;
-
-      clearTimeout(this.point_change_timeout);
-
-      this.point_change_timeout = setTimeout(function(){ // todo: remove setTimeout
-          self.element.classList.remove('transition');
-          self.current_point = point;
-          self.current_points = points;
-          self.transition = false;
-          self.render(self.render_args);
-          clearInterval(self.transition_interval);
-      }, delay);
-  },
+    point_changed : function(point, points)
+    {
+    
+        var self = this;
+        
+        var delay = 0;
+        
+        clearTimeout(this.point_change_timeout);
+        
+        this.point_change_timeout = setTimeout(function(){ // todo: remove setTimeout
+            self.element.classList.remove('transition');
+            self.current_point = point;
+            self.current_points = points;
+            self.transition = false;
+            self.render(self.render_args);
+            clearInterval(self.transition_interval);
+        }, delay);
+    },
 
 	render: function(args) {
 
-    this.render_args = args;
-
-		var graph = this.graph;
-		var points = args.points;
-		var p = points.filter( function(p) { return p.active } ).shift();
-
-    /*
-        todo: move variables below
-    */
-
-    var block_date_header_height = 12;
-    var block_date_header_padding = 10;
-    var datapoint_height = 14;
-    var datapoint_padding = 10;
-    var triangle_height = 7;
-    var triangle_width = 14;
-    var top_position = 15;
-    var topbar_height = 60; // todo: pass from top functions
-    var sidebar_width = 240;
-    var content_container_margin_left = 20;
-    //var block_width = 180;
-    //var block_height = 156;
-    /*var calendar_block_height = 120;*/
-
-    if (!this.current_points)
-    {
-        this.guide_line.style.display = "none";
-        return false;
-    }
-    else
-    {
-        this.guide_line.style.display = "block";
-    }
-
-    var current_points_length = this.current_points.length;
-
-    if (!this.block_height && !document.getElementsByClassName("hover_wrapper")[0]) // first initialization
-    {
-
-        var block_height = (block_date_header_height + (block_date_header_padding * 2)) + ((datapoint_height * current_points_length) + (datapoint_padding * 2 * current_points_length)) + triangle_height + top_position; // todo: not the real block height
-
-        this.block_height = block_height;
-
-    }
-    else if (document.getElementsByClassName("hover_wrapper")[0]) // todo: this block never works
-    {
-        var block_height = document.getElementsByClassName("hover_wrapper")[0].clientHeight + top_position;
-        this.block_height = block_height;
-    }
-
-    if (!block_height)
-    {
-        block_height = this.block_height;
-    }
-
-    if (!this.current_point)
-    {
-        this.guide_line.style.display = "none";
-        return false;
-    }
-
-    point = this.current_point;
-
-    if ((this.find_top_position("graph_svg") + graph.y(point.value.y) - topbar_height) < block_height + 10) // 10 - extra additional place
-    {
-        var is_bottom_block = true;
-
-        /* search bottom path */
-
-        var min_y_value = false;
-
-        this.current_points.forEach(function(p){
-
-            if (parseInt(p.formattedYValue) < min_y_value || !min_y_value)
+        this.render_args = args;
+    
+        var graph = this.graph;
+        var points = args.points;
+        var p = points.filter( function(p) { return p.active } ).shift();
+    
+        /*
+            todo: move variables below
+        */
+    
+        var block_date_header_height = 12;
+        var block_date_header_padding = 10;
+        var datapoint_height = 14;
+        var datapoint_padding = 10;
+        var triangle_height = 7;
+        var triangle_width = 14;
+        var top_position = 15;
+        var topbar_height = 60; // todo: pass from top functions
+        var sidebar_width = 240;
+        var content_container_margin_left = 20;
+        //var block_width = 180;
+        //var block_height = 156;
+        /*var calendar_block_height = 120;*/
+    
+        if (!this.current_points)
+        {
+            this.guide_line.style.display = "none";
+            return false;
+        }
+        else
+        {
+            this.guide_line.style.display = "block";
+        }
+    
+        var current_points_length = this.current_points.length;
+    
+        if (!this.block_height && !document.getElementsByClassName("hover_wrapper")[0]) // first initialization
+        {
+    
+            var block_height = (block_date_header_height + (block_date_header_padding * 2)) + ((datapoint_height * current_points_length) + (datapoint_padding * 2 * current_points_length)) + triangle_height + top_position; // todo: not the real block height
+    
+            this.block_height = block_height;
+    
+        }
+        else if (document.getElementsByClassName("hover_wrapper")[0]) // todo: this block never works
+        {
+            var block_height = document.getElementsByClassName("hover_wrapper")[0].clientHeight + top_position;
+            this.block_height = block_height;
+        }
+    
+        if (!block_height)
+        {
+            block_height = this.block_height;
+        }
+    
+        if (!this.current_point)
+        {
+            this.guide_line.style.display = "none";
+            return false;
+        }
+    
+        point = this.current_point;
+    
+        if ((this.find_top_position("graph_svg") + graph.y(point.value.y) - topbar_height) < block_height + 10) // 10 - extra additional place
+        {
+            var is_bottom_block = true;
+    
+            /* search bottom path */
+    
+            var min_y_value = false;
+    
+            this.current_points.forEach(function(p){
+    
+                if (parseInt(p.formattedYValue) < min_y_value || !min_y_value)
+                {
+                    min_y_value = parseInt(p.formattedYValue);
+                    point = p;
+                }
+            });
+        }
+        else
+        {
+            var is_bottom_block = false;
+        }
+    
+        if (point.value.y === null) return;
+    
+        var formattedXValue = point.formattedXValue;
+        var formattedYValue = point.formattedYValue;
+            
+        this.element.innerHTML = '';
+    
+        if(graph.left_time_extension == false)
+        {
+            var left_extension_width = 0;
+        }
+        else
+        {
+            var left_extension_width = _left_extension_width;
+        }
+    
+        var tooltip_left = this.graph.axis_width + Math.ceil((graph.x(point.value.x) + /*graph.circle_radius +*/ (graph.max_tick_width / 2) + this.graph.points_offset));
+    
+        this.element.style.left = tooltip_left + 'px';
+    
+        if (!is_bottom_block)
+        {
+            var hover_top_position = graph.y(point.value.y) - block_height;
+            
+            hover_top_position -= 10; // todo: better to calculate block height
+        }
+        else
+        {
+            var hover_top_position = graph.y(point.value.y) + triangle_height + top_position/*+ block_height*/;
+        }   
+        
+        this.element.style.top = hover_top_position + "px";
+    
+        var series = point.series;
+    		var actualY = series.scale ? series.scale.invert(point.value.y) : point.value.y;
+    
+        var xLabel = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point, is_bottom_block, this.element);// formattedXValue;
+        xLabel.className = 'x_label';
+    
+        var block_width = xLabel.offsetWidth;
+    
+        var triangle = document.createElement('div');
+    
+        if (is_bottom_block)
+        {
+            triangle.className = 'triangle bottom';
+        }
+        else
+        {
+            triangle.className = 'triangle top';
+        }
+    
+        xLabel.appendChild(triangle);
+    
+        xLabel.style.position = "relative";
+    
+        if (graph.x(point.value.x) > this.graph.width / 2) // right side
+        {
+    
+            if ((tooltip_left + (block_width / 4)) > this.graph.width)
             {
-                min_y_value = parseInt(p.formattedYValue);
-                point = p;
+                var shift_left = this.graph.width - (tooltip_left + (block_width / 4));
             }
-        });
-    }
-    else
-    {
-        var is_bottom_block = false;
-    }
-
-		if (point.value.y === null) return;
-
-		var formattedXValue = point.formattedXValue;
-		var formattedYValue = point.formattedYValue;
-
-		this.element.innerHTML = '';
-
-    if(graph.left_time_extension == false)
-    {
-        var left_extension_width = 0;
-    }
-    else
-    {
-        var left_extension_width = _left_extension_width;
-    }
-
-    var tooltip_left = this.graph.axis_width + Math.ceil((graph.x(point.value.x) + /*graph.circle_radius +*/ (graph.max_tick_width / 2) + this.graph.points_offset));
-
-    this.element.style.left = tooltip_left + 'px';
-
-    if (!is_bottom_block)
-    {
-        var hover_top_position = graph.y(point.value.y) - block_height;
-    }
-    else
-    {
-        var hover_top_position = graph.y(point.value.y) + triangle_height + top_position/*+ block_height*/;
-    }
-
-    this.element.style.top = hover_top_position + "px";
-
-    var series = point.series;
-		var actualY = series.scale ? series.scale.invert(point.value.y) : point.value.y;
-
-    var xLabel = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point, is_bottom_block, this.element);// formattedXValue;
-    xLabel.className = 'x_label';
-
-    var block_width = xLabel.offsetWidth;
-
-    var triangle = document.createElement('div');
-
-    if (is_bottom_block)
-    {
-        triangle.className = 'triangle bottom';
-    }
-    else
-    {
-        triangle.className = 'triangle top';
-    }
-
-    xLabel.appendChild(triangle);
-
-    xLabel.style.position = "relative";
-
-    if (graph.x(point.value.x) > this.graph.width / 2) // right side
-    {
-
-        if ((tooltip_left + (block_width / 4)) > this.graph.width)
-        {
-            var shift_left = this.graph.width - (tooltip_left + (block_width / 4));
+            else
+            {
+                var shift_left = 0;
+            }
+    
+            xLabel.style.left = -1 * (block_width / 2) + shift_left + 'px';
+    
+            triangle.style.left = ((block_width / 2) - (triangle_width / 2) - shift_left) + "px";
+    
         }
-        else
+        else // left side
         {
-            var shift_left = 0;
+    
+            if (tooltip_left < block_width / 2)
+            {
+                var shift_right = (block_width / 2) - tooltip_left/* - 20*/;
+            }
+            else
+            {
+                var shift_right = 0;
+            }
+    
+            xLabel.style.left = -1 * (block_width / 2) + shift_right + 'px';
+    
+            triangle.style.left = ((block_width / 2) - (triangle_width / 2) - shift_right) + "px";
+    
         }
-
-        xLabel.style.left = -1 * (block_width / 2) + shift_left + 'px';
-
-        triangle.style.left = ((block_width / 2) - (triangle_width / 2) - shift_left) + "px";
-
-    }
-    else // left side
-    {
-
-        if (tooltip_left < block_width / 2)
-        {
-            var shift_right = (block_width / 2) - tooltip_left/* - 20*/;
-        }
-        else
-        {
-            var shift_right = 0;
-        }
-
-        xLabel.style.left = -1 * (block_width / 2) + shift_right + 'px';
-
-        triangle.style.left = ((block_width / 2) - (triangle_width / 2) - shift_right) + "px";
-
-    }
-
-		var item = document.createElement('div');
-
-		item.className = 'item';
-
-		// invert the scale if this series displays using a scale
-
-    item.style.display = "none";
-
-		this.element.appendChild(item);
-
-    // -- guide line
-
-    this.guide_line.style.left = (tooltip_left - 1) + 'px';
+    
+        var item = document.createElement('div');
+            
+        item.className = 'item';
+    
+    		// invert the scale if this series displays using a scale
+    
+        item.style.display = "none";
+    
+        this.element.appendChild(item);
+    
+        // -- guide line
+    
+        this.guide_line.style.left = (tooltip_left - 1) + 'px';
 
 
 		var dot = document.createElement('div');

@@ -334,9 +334,9 @@ var CalendarWrapper = React.createClass({
         left_date.month = month;
 
         left_date.date = date;
-
-        this.setState({
-            "left_date" : date
+ 
+        this.setState({  // todo: remove setState()
+            "left_date" : date 
         });
 
         return true;
@@ -430,8 +430,12 @@ var CalendarWrapper = React.createClass({
         var date_from = left_date.date.getTime();
         var date_to   = right_date.date.getTime();
 
-        console.log("from:", date_from);
-        console.log("to:" , date_to);
+        console.log("calendar from:", date_from);
+        console.log("calendar to:" , date_to);
+        
+        //date_to += ((24 * 60 * 60) - 1) * 1000; // todo
+        
+        //console.log("calendar to new:" , date_to);
 
         countlyCommon.setPeriod([date_from, date_to]);
 
@@ -713,6 +717,7 @@ var CalendarWrapper = React.createClass({
                 </div>
             </div>
         );
+                
     },
 
     whichTransitionEvent: function(el){

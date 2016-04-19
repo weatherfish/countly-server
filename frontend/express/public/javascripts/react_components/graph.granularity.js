@@ -65,9 +65,6 @@ var Granularity = React.createClass({
             var new_granularity = data.new_granularity;
             var period          = data.period;
 
-            console.log("{}[[[}{{{}}}]]] new granularity ------->>>>>>>");
-            console.log(new_granularity);
-
             var list = [ { name : "Daily", active : (new_granularity == "daily" ? true : false) /*self.state.list[0].active*/ } ];
 
             var weekly = { name : "Weekly", active : (new_granularity == "weekly" ? true : false) /*self.state.list[1].active*/ };
@@ -99,14 +96,8 @@ var Granularity = React.createClass({
 
         }.bind(this));
     },
-/*
-    componentWillUpdate: function(nextProps, nextState){
-        return true;
-    },
-*/
-    handleClick : function(granularity){
 
-        console.log("granularity click:", granularity);
+    handleClick : function(granularity){
 
         var new_list = [];
 
@@ -172,11 +163,6 @@ var Granularity = React.createClass({
 
         this.last_y = event.pageY;
 
-        //console.log("direction:", this.mouse_move_direction);
-
-        /*this.setState({
-            info_open : false
-        });*/
     },
 
     onhover_all_block : function(event)
