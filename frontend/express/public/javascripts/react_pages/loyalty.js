@@ -102,7 +102,7 @@ var LoyaltyPage = React.createClass({
                     sort_functions={this.state.sort_functions}
                     data_function={countlyUser.getLoyaltyData}
                     convert_data_function={false}
-                    initial_sort={"loyalty"}
+                    initial_sort={"l"}
                     rows_per_page={20}
                     date={this.props.date}
                 />

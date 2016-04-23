@@ -2,18 +2,18 @@ var LeftPart = React.createClass({
 
     getInitialState: function() {
         return {
-            selected      : -1,
+            //selected      : -1,
             active        : true,
             in_transition : false
         };
     },
 
     handleClick: function(i, href) {
-
+/*
         this.setState({
             selected : i,
         });
-
+*/
         this.props.handleClick(i, href);
     },
 

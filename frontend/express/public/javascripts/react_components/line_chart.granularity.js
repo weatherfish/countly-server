@@ -25,6 +25,9 @@ var Granularity = React.createClass({
             weekly.incomplete_left = true;
             weekly.incomplete_left_days = 7 - this.props.data.weekly_granularity[data_index].data[0][2];
         }
+        
+        console.log("{{{{{{{{{ weekly.incomplete_left_days }}}}}}}}}}}}}]]]");
+        console.log(weekly.incomplete_left_days);
 
         list.push(weekly);
 
@@ -41,7 +44,7 @@ var Granularity = React.createClass({
 
         var days_in_month = new Date(self.props.data.monthly_granularity[data_index].data[0][0]).monthDays();
 
-        if (this.props.data.monthly_granularity[data_index].data[0][2] < days_in_month) // todo : 31
+        if (this.props.data.monthly_granularity[data_index].data[0][2] < days_in_month)
         {
             monthly.incomplete_left = true;
             monthly.incomplete_left_days = days_in_month - this.props.data.monthly_granularity[data_index].data[0][2];
@@ -118,7 +121,7 @@ var Granularity = React.createClass({
 
             var days_in_month = new Date(session_dp.monthly_granularity[data_index].data[0][0]).monthDays();
 
-            if (session_dp.monthly_granularity[data_index].data[0][2] < days_in_month) // todo : 31
+            if (session_dp.monthly_granularity[data_index].data[0][2] < days_in_month)
             {
                 monthly.incomplete_left = true;
                 monthly.incomplete_left_days = days_in_month - session_dp.monthly_granularity[data_index].data[0][2];
@@ -139,8 +142,6 @@ var Granularity = React.createClass({
     },
 */
     handleClick : function(granularity){
-
-        console.log("granularity click:", granularity);
 
         var new_list = [];
 
@@ -165,7 +166,9 @@ var Granularity = React.createClass({
             list : new_list
         });
 
-        $(event_emitter).trigger('granularity', granularity);
+        //$(event_emitter).trigger('granularity', granularity);
+        
+        this.props.onChange(granularity);
 
     },
 

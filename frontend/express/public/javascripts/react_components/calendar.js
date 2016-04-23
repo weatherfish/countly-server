@@ -67,6 +67,19 @@ var CalendarWrapper = React.createClass({
 
         var date_range = countlyCommon.getDateRange();
         date_range = date_range.split(" - ");
+        
+        console.log(":::::: date_range :::::::::::");
+        console.log(date_range);
+        
+        console.log("{{{{{{{{{ initial period }}}}}}}}}}}");
+        console.log(countlyCommon.getPeriod());
+        
+        var period_obj = countlyCommon.periodObj;
+        
+        console.log("{{{{{{{{{ initial periodObj }}}}}}}}}}}");
+        console.log(period_obj);
+        
+        this.props.onDateChange({ "period" : countlyCommon.getPeriod(), "period_timestamp" : [period_obj.start_of_period, period_obj.end_of_period] });
 
         // ------------
 
@@ -121,10 +134,6 @@ var CalendarWrapper = React.createClass({
 
     date_extend : function(e, data){
         
-        console.log("{{{{{{{ extension function }}}}}}}}");
-        console.log(data);
-        console.log(left_date);
-
         var ld = new Date(left_date.date);
         var extended_left_date = ld.setDate(ld.getDate() - data.days_extend);
 
@@ -272,8 +281,6 @@ var CalendarWrapper = React.createClass({
 
         var state_obj = { };
 
-        console.log("handle click:", countlyCommon.getPeriod());
-
         if (this.state.choise_open)
         {
             /* if time range calendars are open, close them first */
@@ -373,9 +380,14 @@ var CalendarWrapper = React.createClass({
         document.onclick = false; // unbind closing on outside place
 
         // ----------
-
+        
         var date_range = countlyCommon.getDateRange();
         date_range = date_range.split(" - ");
+
+        console.log("= new getPeriod ========");
+        console.log(countlyCommon.periodObj);
+        
+        var period_obj = countlyCommon.periodObj;
 
         // ----------
 
@@ -384,7 +396,7 @@ var CalendarWrapper = React.createClass({
         var state_obj = {
             from_string : date_values.from_string, // first_date_year - wrong variable name
             to_string   : date_values.to_string,
-            fast_choise : choise
+            fast_choise : choise,
         }
 
         /* if time range calendars are open, close them first */
@@ -403,11 +415,11 @@ var CalendarWrapper = React.createClass({
 
         this.setState(state_obj);
 
-        this.props.onDateChange({ "period" : choise, "state" : state_obj });
+        this.props.onDateChange({ "period" : choise, "state" : state_obj, "period_timestamp" : [period_obj.start_of_period, period_obj.end_of_period] });
 
         //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
 
-        $(event_emitter).trigger("date_choise_event", { "period" : choise, "state" : state_obj });
+        $(event_emitter).trigger("date_choise_event", { "period" : choise, "period_timestamp" : [period_obj.start_of_period, period_obj.end_of_period], "state" : state_obj });
 /*
         $(event_emitter).trigger("date_choise_test", { "period" : choise, "state" : state_obj });
 */

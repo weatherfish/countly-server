@@ -54,6 +54,7 @@
 .events_page .selectors_wrapper {
     position : relative;
     display : inline-block;
+    font-family : Lato-Regular;
 }
 
 .events_page .current {

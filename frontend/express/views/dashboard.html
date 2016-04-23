@@ -190,7 +190,6 @@
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/table_filter.js"></script>
 
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/line_chart.js"></script>
-            <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/line_chart.time_extension.js"></script>
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/line_chart.granularity.js"></script>
 
             <script type="text/jsx" src="<%- cdn %>/javascripts/react_components/bar_chart.js"></script>
@@ -447,6 +446,8 @@
             },
 
             path_changed : function(first, second){
+                
+                console.log("====== path changed ========", first, " >> ", second);
 
                 if (!first)
                 {
@@ -540,14 +541,21 @@
                         </div>
 
                         {calendar}
-
-                        <div id="content-container" style={container_style}>
-                            {this.props.children && React.cloneElement(this.props.children, {
-                                language : this.state.language,
-                                date : this.state.date,
-                                active_app : __active_app             
-                            })}
-                        </div>
+                        
+                        {(() => {
+                            
+                            if (this.state.date)
+                            {
+                                return (<div id="content-container" style={container_style}>
+                                    {this.props.children && React.cloneElement(this.props.children, {
+                                        language : this.state.language,
+                                        date : this.state.date,
+                                        active_app : __active_app             
+                                    })}
+                                </div>);
+                            }   
+                            
+                        })()}
 
                     </div>
                 )
@@ -685,6 +693,8 @@
             },
 
             render() {
+                
+                // <Route path="crashes"   component={CrashesPage}></Route>                            
 
                 return (
                     <Router history={ReactRouter.browserHistory}>
@@ -708,8 +718,10 @@
                                 <Route path="durations" component={DurationPage}/>
                             </Route>
                             <Route path="events"    component={EventsPage}></Route>
-                            <Route path="crashes"   component={CrashesPage}></Route>
-                            <Route name="crashes_detail" path="/crashes/:crash_id" component={CrashDetailsPage}/>
+                            <Route path="crashes"   component={CrashesPage}>
+                                
+                            </Route>
+                            <Route path="/crashes/:crash_id" component={CrashDetailsPage}/>
                             <Route path="manage">                                    
                                              
                                 {(() => {

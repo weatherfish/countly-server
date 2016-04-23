@@ -48,7 +48,7 @@ var DashboardBarChart = React.createClass({
 
         var height = this.props.height;
         var width = this.props.width;
-        var bar_blocks_top_margin = 30;
+        var bar_blocks_top_margin = 45;
         var bar_height = 34;
         var bar_margin_bottom = 15;
         var bar_margin_right = 40;
@@ -65,7 +65,7 @@ var DashboardBarChart = React.createClass({
             .domain([0, 100])
             .range([0, width])
 
-        var text_check_style = "normal 15pt Lato-Regular"; // toto: non-english languages will have another font-family
+        var text_check_style = "normal 15px Lato-Regular";
 
         var long_text_flag = false;
 
@@ -88,7 +88,7 @@ var DashboardBarChart = React.createClass({
                     .style("left",  (di * (width + bar_margin_right)) + "px")
                     .style("width",  width + "px")
                     .html(function(d, i){
-                        return data[di].title.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+                        return data[di].title.toLowerCase();
                     })
             }
         }

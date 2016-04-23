@@ -7,6 +7,9 @@ var HorizontalBarChart = React.createClass({
         var data = this.props.data_function();
 
         data = data.chartData;
+        
+        console.log("[[[[[[[[ HorizontalBarChart  data ]]]]]]]]]]]]]");
+        console.log(data);
 
         //var test_data = [];
 
@@ -192,24 +195,9 @@ var HorizontalBarChart = React.createClass({
                 .attr("class", "bar_block bar_block_" + k)
                 .style("left", function(d, i){
 
-                    if (i < 50 || self.state.fully_opened)
-                    {
-                        //return "translate(" + (k * (width + self.props.margins.right)) + ", " + (parseInt(i * (self.props.margins.bar_bottom + bar_height)) + self.props.margins.top) + ")";
-                        var left = k * (bar_width + self.props.margins.right);
-                    }
-                    else {
-
-                        var percent = Math.round((d[key] / total) * 100);
-                        var rect_width = Math.round(horizontal_scale(percent));
-
-                        var x = (k * (bar_width + self.props.margins.right)) + skip_width;
-                        //var y = parseInt(5 * (self.props.margins.bar_bottom + bar_height)) + self.props.margins.top;
-
-                        skip_width += rect_width;
-
-                        var left = x;
-                    }
-
+                    //return "translate(" + (k * (width + self.props.margins.right)) + ", " + (parseInt(i * (self.props.margins.bar_bottom + bar_height)) + self.props.margins.top) + ")";
+                    var left = k * (bar_width + self.props.margins.right);
+                    
                     return left  + "px";
               })
               .style("top", function(d, i){
@@ -237,22 +225,8 @@ var HorizontalBarChart = React.createClass({
             var bar_outer = enter_blocks.append("div")
                     .attr("class", "bar-outer")
                     .style("height", bar_height + "px")
-                    .style("width", function(d, i){
-
-                        if (i < (50 + 1) || self.state.fully_opened) // +1 - first rect in set
-                        {
-                            return bar_width + "px";
-                        }
-                        else
-                        {
-
-                            var percent = Math.round((d[key] / total) * 100);
-                            var rect_width = Math.round(horizontal_scale(percent));
-                            return rect_width + "px";
-
-                            //return "20px";
-                        }
-
+                    .style("width", function(d, i){                    
+                        return bar_width + "px";                   
                     })
                     .style("background-color", function(d) {
                         return "#F5F5F5";
@@ -280,71 +254,67 @@ var HorizontalBarChart = React.createClass({
                     })
 
             bar_outer.append("div")
-                  .attr("class", "bar-inner")
-                  .style("width", function(d, i){
+                .attr("class", "bar-inner")
+                .style("width", function(d, i){
+                    
+                    if (d[key])
+                    {                    
+                        var percent = Math.round((d[key] / total) * 100);
+                        return (percent) + "%";   
+                    }
+                    else
+                    {
+                        return "0px";
+                    }                    
+                     
+                })
+                .style("height", bar_height + "px")
+                .style("line-height", bar_height + "px")
+                .style("background-color", function(d, i){
 
-                      if (i < (50 + 1) || self.state.fully_opened)
-                      {
-                          var percent = Math.round((d[key] / total) * 100);
-                          return (percent) + "%";
-                      }
-                      else
-                      {
-                          return "100%";
-                      }
+                    if ((i == shown_data.length - 1) && (data.length > shown_data.length))
+                    {
+                        return "#cccccc";
+                    }
+                    else
+                    {
+                        return self.colors[k];
+                    }
 
-                  })
-                  .style("height", bar_height + "px")
-                  .style("line-height", bar_height + "px")
-                  .style("background-color", function(d, i){
+                })
+                .append("span")
+                    .attr("class", "bar-inner-text")
+                    .style("line-height", bar_height + "px")
+                    .html(function(d, i) {
 
-                      if ((i == shown_data.length - 1) && (data.length > shown_data.length))
-                      {
-                          return "#cccccc";
-                      }
-                      else
-                      {
-                          return self.colors[k];
-                      }
-
-                  })
-                  .append("span")
-                      .attr("class", "bar-inner-text")
-                      .style("line-height", bar_height + "px")
-                      .html(function(d, i) {
-
-                          if (i < 50 || self.state.fully_opened)
-                          {
-                              return d[data_key_label];
-                          }
-                          else if (i == data.length - 1)
-                          {
-                              return "Other";
-                          }
-                          else
-                          {
-                              return "";
-                          }
-                      })
+                        if (i < 50 || self.state.fully_opened)
+                        {
+                            return d[data_key_label];
+                        }
+                        else if (i == data.length - 1)
+                        {
+                            return "Other";
+                        }
+                        else
+                        {
+                            return "";
+                        }
+                    })
 
             enter_blocks.append("div")
                 .attr("class", "percent")
                 .html(function(d, i) {
 
-                    /*if (i < (50) || self.state.fully_opened)
-                    {*/
-                        var percent = Math.round((d[key] / total) * 100);
-
-                        return (percent) + "%";
-                    /*}
-                    else if (i == (50))
+                    if (d[key])
                     {
-                        return other_percent + "%";
+                        var percent = Math.round((d[key] / total) * 100);
                     }
-                    else {
-                       return "---";
-                    }*/
+                    else
+                    {
+                        var percent = 0;
+                    }                    
 
+                    return (percent) + "%";                 
 
                 })
                 .style("height", bar_height + "px")

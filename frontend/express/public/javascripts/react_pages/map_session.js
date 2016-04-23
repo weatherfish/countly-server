@@ -196,7 +196,7 @@ var MapSessionPage = React.createClass({
 
                 <Map
                     width={map_width}
-                    metric={"t"}
+                    metric={{id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', "short":"t", "color" : "#1B8AF3"}}
                     height={480}
                     headline_sign="SELECT A COUNTRY"
                     onCountryClick={this.data_modificator}

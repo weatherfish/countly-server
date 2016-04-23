@@ -38,10 +38,19 @@ var FullSidebar = React.createClass({
                 if (current_location[1] == this.props.navigation[i]['path']) // todo: now it compare icon property, this is not right
                 {
                     selected_left = i;
-                    left_full = true;
+                    left_full = true;   
                     break;
                 }
             }
+            
+            if (selected_left > -1)
+            {
+                this.props.onChange(false, this.props.navigation[i]['key'].toLowerCase());
+            }
+            /*else
+            {
+                this.props.onChange(false, jQuery.i18n.map["sidebar.dashboard"]);
+            }*/
 
             var right_selected_item = false;
             var right_closed = true;
@@ -104,8 +113,6 @@ var FullSidebar = React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
 
-        console.log("{{{{{{{{{{{{{{{{{{{ sidebar componentWillReceiveProps }}}}}}}}}}}}}}}}}}}");
-        console.log(nextProps);
 /*
         if (nextProps.current_location != this.state.current_location)
         {
@@ -169,8 +176,7 @@ var FullSidebar = React.createClass({
         }
 */
         if (nextProps.language != this.state.language)
-        {
-            console.log("sidebar change language:", nextProps.language);
+        {            
             return this.setState({
                 language : nextProps.language
             });
@@ -210,9 +216,9 @@ var FullSidebar = React.createClass({
             }
 
             this.setState({
-              active_app : active_app,
-              apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode(),
-              top_active : false
+                active_app : active_app,
+                apps_list_hash : JSON.stringify(countlyGlobal['apps']).hashCode(),
+                top_active : false
             });
 
             return true;
@@ -237,9 +243,6 @@ var FullSidebar = React.createClass({
 
         }
 
-        console.log("active found : ", active_found);
-        console.log(countlyGlobal['apps']);
-
         var active_app = false;
 
         if (!active_found){
@@ -251,9 +254,6 @@ var FullSidebar = React.createClass({
             }
 
         }
-
-        console.log("{{{{{{{{{{{{{ active_app---}}}}}}}}}}}}}");
-        console.log(active_app);
 
         this.setState({
           active_app : active_app,
@@ -281,8 +281,6 @@ var FullSidebar = React.createClass({
     handle_left_click : function(i, href)
     {
 
-        console.log("click:", i, " --> ", href);
-
         if (this.state.selected_left == i) // already selected element
         {
             return true;
@@ -298,7 +296,7 @@ var FullSidebar = React.createClass({
 
                 var nav_data = {
                     fstmenu : false,
-                    sndmenu : "Dashboard",
+                    sndmenu : jQuery.i18n.map["sidebar.dashboard"],
                 }
 
                 this._handleClick("/dashboard");

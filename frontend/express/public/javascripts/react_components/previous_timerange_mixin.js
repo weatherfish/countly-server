@@ -1,18 +1,29 @@
 var TimeRangeMixin = {
    
-    GetTimeRanges : function(data_function){
-        
-        var first_set = /*JSON.parse(JSON.stringify(*/data_function()/*))*/;
-        
-        //return JSON.parse(JSON.stringify(first_set));
+    GetTimeRanges : function(data_function, data_function_args){
+                
+        if (data_function_args)
+        {
+            var first_set = data_function.apply(this, data_function_args);
+        }
+        else
+        {     
+            var first_set = data_function();
+        }
                                       
         var current_period = countlyCommon.getPeriod();
-                
+                        
         if (!Array.isArray(current_period))
-        {            
-            return first_set;
+        {              
+            var real_current_period = current_period;
+            
+            current_period = [this.props.date.period_timestamp[0], this.props.date.period_timestamp[1]];            
         }
-        
+        else
+        {
+            real_current_period = false;
+        }
+                        
         var current_period_start = current_period[0];
         var current_period_end = current_period[1];
                
@@ -41,11 +52,18 @@ var TimeRangeMixin = {
         var weekly_granularity_border = current_period[0] - (day_of_week_start/*day_of_week_start*/ /*+ 1*/) * (60 * 60 * 24 * 1000);        
         var previous_period_end = weekly_granularity_border - (7 - day_of_week_end) * (60 * 60 * 24 * 1000);                
         var previous_period_start = previous_period_end - (current_period[1] - current_period[0]);     
-        
+                
         countlyCommon.setPeriod([previous_period_start, previous_period_end]);
-        
-        var previous_set = /*JSON.parse(JSON.stringify(*/data_function()/*))*/;
-                             
+                        
+        if (data_function_args)
+        {
+            var previous_set = data_function.apply(this, data_function_args);
+        }
+        else
+        {     
+            var previous_set = data_function();
+        }
+                                         
         first_set.weekly_granularity[0] = JSON.parse(JSON.stringify(previous_set.weekly_granularity[1]));
                
         first_set.weekly_granularity[0].color = "#bbbbbb";
@@ -65,11 +83,26 @@ var TimeRangeMixin = {
         var previous_period_monthly_start = previous_period_monthly_end - (current_period[1] - current_period[0]);    
          
         countlyCommon.setPeriod([previous_period_monthly_start, previous_period_monthly_end]);
-        
-        var previous_set_monthly = data_function();                           
+                
+        if (data_function_args)
+        {
+            var previous_set_monthly = data_function.apply(this, data_function_args);
+        }
+        else
+        {     
+            var previous_set_monthly = data_function();
+        }                            
         
         // return time period to default values
-        countlyCommon.setPeriod([current_period_start, current_period_end]);
+        
+        if (real_current_period)
+        {
+            countlyCommon.setPeriod(real_current_period);
+        }
+        else
+        {
+            countlyCommon.setPeriod([current_period_start, current_period_end]);
+        }                
  
         first_set.monthly_granularity[0] = JSON.parse(JSON.stringify(previous_set_monthly.monthly_granularity[1]));
                 
@@ -77,6 +110,5 @@ var TimeRangeMixin = {
         first_set.monthly_granularity[0].mode = "ghost";
                                                           
         return first_set;
-    }
-    
+    },
 };

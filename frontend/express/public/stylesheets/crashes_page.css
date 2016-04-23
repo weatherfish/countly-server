@@ -58,6 +58,8 @@
 
     font-size: 14px;
 
+    box-sizing : border-box;
+
     /*background-color: white;
     position: relative;*/
 
@@ -121,7 +123,7 @@
     border-style: solid;
     border-width: 0 7px 7px 7px;
     border-color: transparent transparent #202531 transparent;
-    position: relative;
+    position: absolute;
     top: -7px;
     left: 152px;
 }

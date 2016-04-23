@@ -88,8 +88,8 @@ var PlatformsPage = React.createClass({
                     },
                     {
                         "title":version_title,
-                        "data":countlyDeviceDetails.getOSVersionData(this.activePlatform),
-                        "table_data_function":countlyDeviceDetails.getOSVersionData.bind(this, this.activePlatform),
+                        "data":countlyDeviceDetails.getOSVersionData(self.activePlatform),
+                        "table_data_function":countlyDeviceDetails.getOSVersionData.bind(self, self.activePlatform),
                         "help":"dashboard.top-platforms",
                         "label_key" : "os_version",
                         "color" : self.colors[0],
@@ -104,9 +104,6 @@ var PlatformsPage = React.createClass({
                 horizontal_chart_headers[0].data = countlyDeviceDetails.getPlatformData();
                 horizontal_chart_headers[1].data = countlyDeviceDetails.getOSVersionData(self.activePlatform);
             }
-
-            console.log("::::::::::::::::::: init data ::::::::::::::::");
-            console.log(horizontal_chart_headers);
 
             self.setState({
                 horizontal_chart_headers : horizontal_chart_headers,
@@ -145,26 +142,24 @@ var PlatformsPage = React.createClass({
     },
 
     change_platform : function(platform, color_id) {
-
-        /*
-            todo: ....
-        */
+        
+        this.activePlatform = platform;
 
         var headers = this.state.horizontal_chart_headers;
 
         headers[1].title = jQuery.i18n.map["platforms.table.platform-version"] + " " + platform;
-
+/*
         if (platform == "Blackberry" || platform == "WatchOS")
         {
             var real_platform = platform;
             platform = "Android";
         }
-
+*/
         headers[1].data = countlyDeviceDetails.getOSVersionData(platform);
         headers[1].color = this.colors[color_id];
 
         headers[0].active_bar_id = color_id;
-
+/*
         if (real_platform && real_platform == "Blackberry")
         {
             for (var i = 0; i < headers[1].data.chartData.length; i++)
@@ -180,7 +175,7 @@ var PlatformsPage = React.createClass({
                 headers[1].data.chartData[i]["os_version"] = headers[1].data.chartData[i]["os_version"].replace("Android", "WatchOs");
             }
         }
-
+*/
         this.setState({
             "horizontal_chart_headers" : headers,
             //"active_bar_id" : color_id,

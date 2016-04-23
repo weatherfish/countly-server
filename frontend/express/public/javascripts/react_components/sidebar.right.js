@@ -20,11 +20,7 @@ var RightPart = React.createClass({
     getInitialState: function() {
 
         if (this.props.selected_item)
-        {
-
-            console.log("::::::::: selected ::::::::::::::");
-            console.log(this.props);
-
+        {            
             var nav_data = {
                 fstmenu : this.props.nav_key,
                 sndmenu : this.props.selected_item//.charAt(0).toUpperCase() + this.props.selected_item.slice(1),

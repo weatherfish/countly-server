@@ -19,7 +19,7 @@
     left : -50px;
     min-width : 100px;
     height : 60px;
-    background-color : #141821;
+    /*background-color : #141821;*/
     border-radius : 4px;
     padding-left : 10px;
     padding-right : 10px;
@@ -27,10 +27,24 @@
 }
 
 #map .city_hoverinfo .name {
-    display : inline-block;
+    
+    /*display : inline-block;
     margin-top : 10px;
     font-size : 18px;
     color : white;
+   */
+    
+    background-color: #202531;
+    padding: 10px;
+    border-radius: 4px;
+    /* font-weight: bold; */
+    font-family: Lato-Medium;
+    font-size: 10px;
+    color: #f5f5f5;
+    letter-spacing: 0.69px;
+    text-align: center;
+    
+    
 }
 
 #map .city_hoverinfo .metric {
@@ -60,19 +74,31 @@
     top : -120px;
     left : -50px;
     min-width : 100px;
-    height : 60px;
+    /*height : 60px;*/
     background-color : #141821;
     border-radius : 4px;
-    padding-left : 10px;
-    padding-right : 10px;
+    /*padding-left : 10px;
+    padding-right : 10px;*/
     box-sizing : border-box;    
 }
 
 #map .country_hoverinfo .name {
-    display : inline-block;
+    
+    /*display : inline-block;
     margin-top : 10px;
     font-size : 18px;
-    color : white;
+    color : white;*/    
+    
+    background-color: #202531;
+    padding: 10px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    /* font-weight: bold; */
+    font-family: Lato-Medium;
+    font-size: 10px;
+    color: #f5f5f5;
+    letter-spacing: 0.69px;
+    text-align: center;
 }
 
 #map .country_hoverinfo .metric {
@@ -80,12 +106,12 @@
     font-size : 24px;
     font-family : Lato-Semibold;
     color : white;
-
+    padding : 10px;
 }
 
 #map .country_hoverinfo .bottom_arrow {
     position : absolute;
-    top : 60px;
+    top : 80px;
     left : 43px;
     width: 0;
     height: 0;
@@ -106,6 +132,7 @@
     position : absolute;
     top : 30px;
     left : 30px;
+    text-transform : uppercase;
 }
 
 .map_wrapper .search_block {

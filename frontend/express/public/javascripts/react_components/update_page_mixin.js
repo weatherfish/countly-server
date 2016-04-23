@@ -3,6 +3,8 @@ var UpdatePageMixin = {
     componentDidMount : function() {
 
         var self = this;
+        
+        countlyCommon.DASHBOARD_REFRESH_MS = 50000;
 
         var data_timestamp = Math.floor(Date.now());
 
@@ -17,7 +19,7 @@ var UpdatePageMixin = {
         }, countlyCommon.DASHBOARD_REFRESH_MS);
 
     },
-
+    
     componentWillUnmount: function() {
         clearInterval(this.interval);
     }

@@ -11,9 +11,12 @@ var LineChart = React.createClass({
     },
     
     componentDidMount : function()
-    {
+    {            
              
         var data_points = this.props.data_function();
+        
+        console.log("================= data_points =======================");
+        console.log(data_points);
       
         var line_chart_width = this.props.width - (this.props.sides_padding * 2);
 
@@ -116,9 +119,6 @@ var LineChart = React.createClass({
             var granularity = "daily";
         }
         
-        console.log("---------- granularity_rows ------------");
-        console.log(granularity_rows);
-
         if (granularity_rows[0] && granularity_rows[0].mode == "ghost") // todo: fix for previous time ranges
         {
             for (var i = 0; i < granularity_rows[0].data.length; i++)
@@ -130,15 +130,15 @@ var LineChart = React.createClass({
                 }
             }
         }
+        
+        console.log("{{{{{{{{{{{{ did mount granularity_rows before reverse }}}}}}}}}}}}}}}}}}}");
+        console.log(granularity_rows);
 
         if (this.props.reverse_dp)
         {
             granularity_rows.reverse();
         }
         
-        console.log("[ point 1 ]]");
-        console.log(granularity_rows);
-
         countlyCommon.drawTimeGraph(JSON.parse(JSON.stringify(granularity_rows)), "#dashboard-graph", this.props.big_numbers/*tmp_colors*/, line_chart_width - 40 - 40, this.props.height, false, granularity, false, zero_points);
 
         if (this.props.lines_descriptions)
@@ -154,11 +154,11 @@ var LineChart = React.createClass({
         {
             lines_descriptions = false;
         }
-        
+                
         if (this.props.mount_callback)
         {
             this.props.mount_callback({
-                granularity : this.state.granularity_type
+                granularity : granularity
             });
         }
         
@@ -199,10 +199,15 @@ var LineChart = React.createClass({
 
         var new_state = {};
 
-        if (this.props.lines_descriptions)
+        if (this.props.lines_descriptions) // update colors
         {
 
             var granularity_rows = nextProps.data_function().get_current_data();
+
+            if (self.props.reverse_dp)
+            {
+                granularity_rows.reverse();
+            }
 
             var lines_descriptions = this.props.lines_descriptions;
 
@@ -217,13 +222,13 @@ var LineChart = React.createClass({
 */
             new_state.lines_descriptions = lines_descriptions;
         }
-
+        
         new_state.big_numbers = nextProps.big_numbers;
         
         this.setState(new_state)
 
     },
-
+/*
     componentWillMount: function() {
 
         $(event_emitter).off('granularity');
@@ -235,6 +240,17 @@ var LineChart = React.createClass({
 
         }.bind(this));
 
+    },
+
+*/
+    onGranularityChange : function(granularity){
+        
+        this.update(-1, granularity);
+        
+        if (this.props.onGranularityChange)
+        {
+            this.props.onGranularityChange(granularity);
+        }                  
     },
 
     big_number_render : function() {
@@ -413,12 +429,17 @@ var LineChart = React.createClass({
         {
             var granularity_rows = this.props.data_function().get_current_data();
         }
+        
+        console.log("{{{{{{{{{{{ will check }}}}}}}}}}}}}}}}}}");
+        console.log(granularity_rows);
 
         granularity_rows.every(function(datapath){
 
             datapath.data.every(function(datapoint){
 
                 var value = datapoint[1];
+                
+                console.log("check value :", value);
 
                 if (value > 0)
                 {
@@ -492,8 +513,6 @@ var LineChart = React.createClass({
                     continue;
                 }
 */
-
-
                 //granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0];
                 
                 //console.log("construct:", new Date(granularity_rows[0].data[i][0]));
@@ -506,7 +525,7 @@ var LineChart = React.createClass({
         //_granularity = new_granularity; // todo: remove global variable
 
         if (this.props.reverse_dp)
-        {
+        {            
             granularity_rows.reverse();
         }
 
@@ -587,7 +606,9 @@ var LineChart = React.createClass({
                                     data={this.state.session_dp}
                                     type={this.state.granularity_type}
                                     period={this.props.period}
-                                    disable_hover={this.props.disable_hover} />)
+                                    disable_hover={this.props.disable_hover}
+                                    onChange={this.onGranularityChange}
+                                />)
                     }
 
                 })()}

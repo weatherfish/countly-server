@@ -2,7 +2,7 @@ var Link = ReactRouter.Link;
 
 var CrashesPage = React.createClass({
 
-    mixins: [ UpdatePageMixin, ReactRouter.History, UnmounCheckMixin ],
+    mixins: [ UpdatePageMixin, ReactRouter.History, UnmounCheckMixin, TimeRangeMixin ],
 
     topbar_height : 110,
 
@@ -15,7 +15,7 @@ var CrashesPage = React.createClass({
         var table_headers = [
             {
                 "title":jQuery.i18n.map["crashes.error"],
-                "short" : "name",
+                "short" : "error",
                 "width_percent" : 30
             },
             {
@@ -31,12 +31,12 @@ var CrashesPage = React.createClass({
             {
                 "title":jQuery.i18n.map["crashes.reports"],
                 "short" : "reports",
-                "width_percent" : 12
+                "width_percent" : 15
             },
             {
                 "title": jQuery.i18n.map["crashes.fatal"],
                 "short" : "nonfatal",
-                "width_percent" : 14,
+                "width_percent" : 11,
                 formatting_function :  function(value){
 
                     if (value != 0)
@@ -84,9 +84,9 @@ var CrashesPage = React.createClass({
             "reports" : math_sort,
             "users" : math_sort,
             "os" : math_sort,
-            "name" : math_sort,
+            "error" : math_sort,
             "lastTs" : math_sort,
-            "is_resolved" : math_sort,
+            "is_resolved" : math_sort,            
         }
 
         var crashes_types = [
@@ -146,7 +146,8 @@ var CrashesPage = React.createClass({
             "crashes_types" : crashes_types,
             "active_crash_filter" : crashes_types[0], // todo: ((store.get("countly_crashfilter")) ? store.get("countly_crashfilter") : "crash-all"),
             "loading" : false,
-            "long_text_flag" : false
+            "long_text_flag" : false,
+            "active_app" : this.props.active_app
         }
 
     },
@@ -205,6 +206,10 @@ var CrashesPage = React.createClass({
     init_data : function(timestamp) {
 
         var self = this;
+        /*
+        this.setState({
+            "inited" : false
+        });*/
 
         $.when(countlyCrashes.initialize()).then(function () {
             
@@ -223,9 +228,9 @@ var CrashesPage = React.createClass({
 
             self.setState({
                 "graph_tabs" : graph_tabs,
-                "chart_color" : graph_tabs[0].color,
-                "active_top_tab" : 0,
-                "active_metric" : self.initial_metric,
+                "chart_color" : self.state.chart_color ? self.state.chart_color : graph_tabs[0].color,
+                "active_top_tab" : self.state.active_top_tab ? self.state.active_top_tab : 0,
+                "active_metric" : self.state.active_metric ? self.state.active_metric : self.initial_metric,
                 "tabs_data_function" : countlyCrashes.getDashboardData, // data function for tabs data
                 "graph_data_function" : countlyCrashes.getChartData, // data function for line chart
                 "inited" : true,
@@ -237,29 +242,34 @@ var CrashesPage = React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
         
-        console.log("= crashes next props ===");
-        console.log(nextProps)
-
         var self = this;
+                        
+        if (nextProps.active_app != this.state.active_app) // active app changed
+        { 
+            
+            this.setState({
+                loading : true,
+                active_app : nextProps.active_app
+            });
+            
+            $.when(countlyCrashes.refresh(this.state.active_crash_filter)).then(function () {
 
-        this.setState({
-            loading : true
-        });
-
-        $.when(countlyCrashes.refresh(this.state.active_crash_filter)).then(function () {
-
+                self.setState({
+                    "graph_tabs" : self.make_graph_tabs(),
+                    "date_period" : nextProps.date.period,
+                    "loading" : false
+                });
+            });    
+            
+        }
+        else
+        {
             self.setState({
                 "graph_tabs" : self.make_graph_tabs(),
                 "date_period" : nextProps.date.period,
                 "loading" : false
             });
-
-        });
-
-        /*if (nextProps.date != this.props.date) // todo
-        {*/
-
-        //}
+        }        
     },
 
     top_tab_click : function(i, tab) {
@@ -279,7 +289,9 @@ var CrashesPage = React.createClass({
 
     graph_data_function : function(){
 
-        return this.state.graph_data_function(this.state.active_metric, this.metrics[this.state.active_metric], this.state.chart_color);
+        var ready_data = this.GetTimeRanges(this.state.graph_data_function, [this.state.active_metric, this.metrics[this.state.active_metric], this.state.chart_color]);
+
+        return ready_data;
 
     },
 
@@ -289,6 +301,9 @@ var CrashesPage = React.createClass({
         var self = this;
 
         var data = countlyCrashes.getData().groups;
+        
+        console.log("========= crash table data ============");
+        console.log(data);
 
         if (this.state.active_crash_filter.type != "crash-all")
         {
@@ -321,15 +336,14 @@ var CrashesPage = React.createClass({
     },
 
     show_crash_selectors : function()
-    {
+    {      
         this.setState({
             crash_selectors_active : !this.state.crash_selectors_active
         })
     },
 
     crash_type_select : function(type)
-    {
-
+    {        
         store.set("countly_crashfilter", type);
 
         this.setState({
@@ -574,7 +588,7 @@ var CrashesPage = React.createClass({
                     sort_functions={this.state.sort_functions}
                     data_function={this.table_data_function}
                     convert_data_function={false}
-                    initial_sort={"name"}
+                    initial_sort={"error"}
                     rows_per_page={20}
                     date={this.props.date}
                     additional_filter={additional_filter}

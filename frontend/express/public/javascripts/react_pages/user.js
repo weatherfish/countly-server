@@ -93,6 +93,13 @@ var UserPage = React.createClass({
         });
 
     },
+    
+    onGranularityChange : function(new_granularity){
+                
+        this.setState({
+            "granularity" : new_granularity
+        });
+    },
 
     componentWillReceiveProps : function(nextProps) {
                        
@@ -150,6 +157,7 @@ var UserPage = React.createClass({
                     with_granularity={true}
                     mount_callback={this.on_graph_mount}
                     date={this.props.date}
+                    onGranularityChange={this.onGranularityChange}
                 />
 
                 {(() => {

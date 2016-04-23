@@ -7,6 +7,8 @@ var CrashDetailsPage = React.createClass({
     pie_charts_colors : ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"],
 
     getInitialState: function() {
+        
+        console.log("init crash details:");
 
         // "00bf85dafddf7e8d0a31edb903dd1535e15b724a"
 
@@ -150,6 +152,25 @@ var CrashDetailsPage = React.createClass({
     },
 
     mark : function(){
+        
+        if (!this.state.is_resolved){
+            countlyCrashes.markResolve(this.state.crash_data._id, function(version){
+                console.log("mark result:", version);
+                /*if(!version){        
+                    CountlyHelpers.alert(jQuery.i18n.map["crashes.try-later"], "red");
+                }*/
+            });
+        }
+        else
+        {
+            countlyCrashes.markUnresolve(this.state.crash_data._id, function(data){                    
+                /*if(data){                      
+                }
+                else{
+                    CountlyHelpers.alert(jQuery.i18n.map["crashes.try-later"], "red");
+                }*/
+            });
+        }        
 
         this.setState({
             "is_resolved" : !this.state.is_resolved

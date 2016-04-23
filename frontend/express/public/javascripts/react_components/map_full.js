@@ -138,6 +138,9 @@ var Map = React.createClass({
         }
 
         var countryData = this.formatData(metric);
+        
+        console.log("======== countryData =============", metric);
+        console.log(countryData);
 
         this.previous_data = countryData;
 
@@ -217,11 +220,14 @@ var Map = React.createClass({
 
         var metric = this.props.metric;
 
-        var countryData = this.formatData(metric);              
+        var countryData = this.formatData(metric);    
+        
+        console.log("////////////// countryData redraw ////////////////");
+        console.log(countryData);          
 
         for (var iso3 in this.previous_data)
         {
-            if (countryData[iso3].numberOfThings == 0)
+            if (!countryData[iso3] || !countryData[iso3].numberOfThings || countryData[iso3].numberOfThings == 0)
             {
                 countryData[iso3] = {
                     "fillKey"        : "reset",//"0.0",
@@ -398,9 +404,6 @@ var Map = React.createClass({
                 width      : mapWidth,
                 setProjection: function(element) {
                     
-                    console.log("<<<<<<<< element >>>>>>>>>>>>");
-                    console.log(element)
-
                     var center_lat = parseFloat(zoomParams.lat.toFixed(3));
                     var center_lon = parseFloat(zoomParams.lon.toFixed(3));
 
@@ -481,10 +484,7 @@ var Map = React.createClass({
         var chartData = {cols:[], rows:[]};
 
         var locations_db = countlyUser.getDbObj();
-        
-        console.log("======== locations_db =====");
-        console.log(locations_db);
-        
+                
         if (!locations_db.meta){
             return {};
         }
@@ -549,28 +549,21 @@ var Map = React.createClass({
                        
             var linearMetric = (linear(metric) * 0.6).toFixed(1).toString();
             
-/*
-            if (country == "CHN")
-            {
-                countryData[country] = {
-                    "fillKey"        : 'increase',
-                    "numberOfThings" : metric
-                }
+            /*
+            countryData[country] = {
+                "fillKey"        : 'increase',
+                "numberOfThings" : metric
+            }    
+            countryData[country] = {
+                "fillKey"        : 'decrease',
+                "numberOfThings" : metric
+            }*/
+ 
+            countryData[country] = {
+                "fillKey"        : linearMetric,
+                "numberOfThings" : metric
             }
-            else if (country == "AUS")
-            {
-                countryData[country] = {
-                    "fillKey"        : 'decrease',
-                    "numberOfThings" : metric
-                }
-            }
-            else
-            {*/
-                countryData[country] = {
-                    "fillKey"        : linearMetric,
-                    "numberOfThings" : metric
-                }
-            /*}*/
+  
         }
 
         return countryData;
@@ -628,10 +621,7 @@ var Map = React.createClass({
     formatCountryData : function(ob){
         
         var self = this;
-        
-        console.log("{{{{{{{{{{[ this.state.city_data }}}}}}}}}}");
-        console.log(this.state.city_data)
-
+              
         ob = ob || {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
         var chartData = {cols:[], rows:[]};
 
@@ -701,20 +691,10 @@ var Map = React.createClass({
             });
         });
 
-        console.log(".......... cityPoints .........");
-        console.log(cityPoints);
-
         return cityPoints;
-/*
-                __callback(false, cityPoints);
-
-            }
-        });*/
 
     },
-
     
-
     render : function(){
 
         if (!this.state.inited)

@@ -524,7 +524,6 @@ var Chart = React.createClass({
           this.vis.selectAll('*').remove();
         }
 */
-
         var y_domain = Math.round(this.domain.y[1]);
 
         var first_digit = parseInt(y_domain.toString()[0]);
@@ -596,7 +595,7 @@ var Chart = React.createClass({
 
         var ticks = this.y_scale_log.ticks();
 
-        var gridSize = this.svg_style.width - this.axis_width * 2; //todo: var
+        var gridSize = this.svg_style.width - this.axis_width * 2;
 
         var y_domain = Math.round(this.domain.y[1]);
 
@@ -624,7 +623,22 @@ var Chart = React.createClass({
 
         if (!this.grid_inited)
         {
-
+/*
+            var y_grid_back = this.chart
+                .insert("svg:g",":first-child")
+                .attr("class", "y_grid_back")
+        
+            for (var i = 0; i < (self.props.width - this.axis_width * 4) / 10; i++)
+            {
+                y_grid_back
+                    .append("rect")
+                    .attr("width", "5px")
+                    .attr("height", (self.props.height) + "px")
+                    //.style("stroke-width", "3px")
+                    .style("fill", "#fff")
+                    .attr("transform", "translate(" + (this.axis_width + (10 * i)) + ",-2)")
+            }   
+*/
             this.chart
                 .append("svg:g")
                 .attr("class", "y_grid")
@@ -638,14 +652,26 @@ var Chart = React.createClass({
         }
         else
         {
-            //var svg = d3.select("body").transition();
-
+            
             var svg = d3.select("body").transition();
 
-            svg.select(".y_grid")
+            var y_grid = svg.select(".y_grid")
                 .duration(750)
                 .call(axis.tickSize(gridSize).tickValues(tick_values));
+            /*
+            var rect_grids = y_grid
+                .selectAll('g')
+                //.attr('stroke-width','5px')
+                //.attr("fill", "none")
 
+            rect_grids.selectAll("line").remove();
+             
+            rect_grids.append("rect")
+                .attr("width", gridSize + "px")
+                .attr("height", "1px")
+                //.style("stroke-width", "3px")
+                .style("fill", "#d2d2d2")  */
+            
         }
 
     },

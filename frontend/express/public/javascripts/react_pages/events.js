@@ -108,7 +108,7 @@ var EventsPage = React.createClass({
 
         var headers = [];
 
-        eventData.daily_granularity.forEach(function(data_line, i){
+        eventData.daily_granularity.forEach(function(data_line, dl){
                         
             var total = 0;
 
@@ -126,13 +126,22 @@ var EventsPage = React.createClass({
                 }
 
             };
+            
+            if (self.state.headers && self.state.headers[dl])
+            {
+                var is_active = self.state.headers[dl].active;
+            }
+            else
+            {
+                var is_active = true;
+            }
 
             headers.push({
                 "title" : data_line.label,
                 //"short" : "l",
                 "total" : total,
                 "color" : data_line.color,
-                "active" : true
+                "active" : is_active
             });
 
         });
@@ -399,9 +408,7 @@ var EventsPage = React.createClass({
         else
         {
             var convert_table_function = false;
-        }
-        
-        
+        }       
 
         return (
             <div className="page events_page" style={page_style}>
@@ -558,7 +565,7 @@ var EventsPage = React.createClass({
                     sort_functions={this.state.sort_functions}
                     data_function={countlyEvent.getEventData}
                     convert_data_function={convert_table_function}
-                    initial_sort={"loyalty"}
+                    initial_sort={"date"}
                     rows_per_page={20}
                     date={this.props.date}
                 />

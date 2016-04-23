@@ -172,10 +172,7 @@ app.configure(function () {
     app.use(express.methodOverride());
     var csrf = express.csrf();
     app.use(function (req, res, next) {
-        
-        next(); // !!!!!!!!!!!! todo: remove !!!!!!!!!!
-        return true;
-        
+       
         if (req.method == "GET" || req.method == 'HEAD' || req.method == 'OPTIONS'){
             //csrf not used, but lets regenerate token
             csrf(req, res, next);
@@ -281,8 +278,10 @@ app.get([countlyConfig.path+'/dashboard',
           countlyConfig.path+'/analytics/*',
           countlyConfig.path+'/manage',
           countlyConfig.path+'/manage/*',
-          countlyConfig.path+'/crashes',
-          countlyConfig.path+'/crashes/*'
+          countlyConfig.path+'/crash/*',
+          countlyConfig.path+'/crash',
+          countlyConfig.path+'/crash*',
+          countlyConfig.path+'/crashes'          
           /*, countlyConfig.path+'/densities/*'*/
         ], function (req, res, next) {
     if (!req.session.uid) {

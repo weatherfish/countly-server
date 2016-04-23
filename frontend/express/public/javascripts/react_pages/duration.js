@@ -65,6 +65,11 @@ var DurationPage = React.createClass({
     },
 
     render : function(){
+        
+        if (!this.state.inited)
+        {
+            return (<Loader/>);
+        }
 
         var elements_width = get_viewport_width();
         var chart_height = 300;
@@ -73,42 +78,35 @@ var DurationPage = React.createClass({
             "width" : elements_width
         }
 
-        if (this.state.inited)
-        {
-            return (
+        return (
 
-                <div className="page" style={page_style}>
+            <div className="page" style={page_style}>
 
-                    <Chart headline_sign={"DURATION"}
-                        headers={this.state.headers}
-                        width={elements_width}
-                        height={chart_height}
-                        side_margin={30}
-                        bar_width={40}
-                        data_function={countlySession.getDurationData}
-                        tooltip_width={60}
-                        tooltip_height={44}
-                        bar_width={40}
-                    />
+                <Chart headline_sign={"DURATION"}
+                    headers={this.state.headers}
+                    width={elements_width}
+                    height={chart_height}
+                    side_margin={30}
+                    bar_width={40}
+                    data_function={countlySession.getDurationData}
+                    tooltip_width={60}
+                    tooltip_height={44}
+                    bar_width={40}
+                />
 
-                    <SortTable
-                        headers={this.state.headers}
-                        width={elements_width}
-                        row_height={50}
-                        data_sign={"DATA"}
-                        sort_functions={this.state.sort_functions}
-                        data_function={countlySession.getDurationData}
-                        convert_data_function={false}
-                        initial_sort={"duration"}
-                        rows_per_page={20}
-                    />
+                <SortTable
+                    headers={this.state.headers}
+                    width={elements_width}
+                    row_height={50}
+                    data_sign={"DATA"}
+                    sort_functions={this.state.sort_functions}
+                    data_function={countlySession.getDurationData}
+                    convert_data_function={false}
+                    initial_sort={"ds"}
+                    rows_per_page={20}
+                />
 
-                </div>
-            )
-        }
-        else
-        {
-            return (<Loader/>);
-        }
+            </div>
+        )     
     }
 })

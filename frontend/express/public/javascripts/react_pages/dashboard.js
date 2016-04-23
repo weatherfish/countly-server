@@ -32,13 +32,42 @@ var Dashboard = React.createClass({
                 "help":"dashboard.top-users"
             }
         ];
-
+        
+        var map_metrics = [
+            {
+                "id": "total",                
+                "label":jQuery.i18n.map["common.total-sessions"],      
+                "title":jQuery.i18n.map["common.total-sessions"],                  
+                "metric": "t",
+                "type": "number",                
+                "color" : "#1B8AF3"
+            },
+            {   
+                //"id": "total",                
+                "label":jQuery.i18n.map["common.total-users"], 
+                "title":jQuery.i18n.map["common.total-users"],                    
+                "metric" : "u",
+                "color" : "#1B8AF3",
+                "type": "number",                
+            },
+            {
+                "label":jQuery.i18n.map["common.new-users"],    
+                "title":jQuery.i18n.map["common.new-users"],                               
+                "metric" : "n",
+                "color" : "#1B8AF3",
+                "type": "number",                                
+            }
+        ];
+             
         return {
             "date_period" : false,
             "top_items_bars" : top_items_bars,
             "inited" : false,
             "long_text_flag" : false,
-            "language" : false
+            "language" : false,
+            "map_metric" : { id: "total", title : "test", label: "Sessions", type: "number", metric: "t" },
+            "map_metrics" : map_metrics,
+            "map_radio_button" : 0
         }
 
     },
@@ -55,7 +84,11 @@ var Dashboard = React.createClass({
         return this.GetTimeRanges(countlySession.getUserDPNew);          
     },
     
-    __getDurationDP : function(){                          
+    __getDurationDP : function(){
+        
+        console.log("[[[[[[[ __getDurationDP ]]]]]]]]]]]");
+        console.log(countlySession.getDurationDP());
+        
         return this.GetTimeRanges(countlySession.getDurationDP);          
     },
     
@@ -135,18 +168,15 @@ var Dashboard = React.createClass({
 
             self.setState({
                 "graph_tabs" : graph_tabs,
-                "active_top_tab" : 0,
-                "tabs_data_function" : countlySession.getSessionData, // data function for tabs data
-                "graph_data_function" : graph_tabs[0].data_function, // data function for line chart
+                "active_top_tab" : self.state.active_top_tab ? self.state.active_top_tab : 0,
+                "tabs_data_function" : self.state.tabs_data_function ? self.state.tabs_data_function : countlySession.getSessionData, // data function for tabs data
+                "graph_data_function" : self.state.graph_data_function ? self.state.graph_data_function : graph_tabs[0].data_function, // data function for line chart
                 "inited" : true
             })
         });
     },
 
     componentWillReceiveProps: function(nextProps) {
-
-        console.log("=============== dashboard receive ===============");
-        console.log(nextProps);
 
         if (this.state.language != nextProps.language)
         {
@@ -190,6 +220,25 @@ var Dashboard = React.createClass({
                 long_text_flag : true
             })
         }
+    },
+    
+    radio_button_click : function(id)
+    {
+
+        if (id == this.state.map_radio_button){
+            return true;
+        }
+
+        var metric = this.state.map_metrics[id];
+
+        console.log("====== set metric ========");
+        console.log(metric);
+
+        this.setState({
+            map_radio_button : id,
+            map_metric : metric
+        });
+
     },
 
     render : function(){
@@ -237,7 +286,7 @@ var Dashboard = React.createClass({
 
         if (this.state.long_text_flag)
         {
-            top_tab_style.height = (this.topbar_height + 10) + "px"
+            top_tab_style.height = (this.topbar_height + 15) + "px"
         }
         else
         {
@@ -297,7 +346,7 @@ var Dashboard = React.createClass({
 
                         if (self.state.long_text_flag)
                         {
-                            style.height = (self.topbar_height + 10) + "px";
+                            style.height = (self.topbar_height + 15) + "px";
                         }
                         else
                         {
@@ -360,7 +409,23 @@ var Dashboard = React.createClass({
                     width={map_width}
                     height={map_height}
                     data={this.state.top_items_bars}
+                    metric={this.state.map_metric}
                 />
+                
+                <div className="radio_buttons_container">
+                {
+                    _.map(self.state.map_metrics, function(radio_button, i) {
+
+                        return <RadioButton
+                                  id={i}
+                                  data={radio_button}
+                                  on_click={self.radio_button_click.bind(self, i)}
+                                  current_button_id={self.state.map_radio_button}
+                                  />
+                    })
+                }
+
+                </div>
 
             </div>
         );

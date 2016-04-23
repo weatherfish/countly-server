@@ -1855,49 +1855,47 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
 	setSize: function(args) {
 
-		args = args || {};
+        args = args || {};
 
-		if (!this.element) return;
+        if (!this.element) return;
 
-		if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined') {
 
-			var style = window.getComputedStyle(this.element.parentNode, null);
-			var elementWidth = parseInt(style.getPropertyValue('width'), 10);
+            var style = window.getComputedStyle(this.element.parentNode, null);
+            var elementWidth = parseInt(style.getPropertyValue('width'), 10);
 
-			if (!args.auto) {
-				var elementHeight = parseInt(style.getPropertyValue('height'), 10);
-			}
-		}
+            if (!args.auto) {
+                var elementHeight = parseInt(style.getPropertyValue('height'), 10);
+            }
+        }
 
-		this.width = args.width || elementWidth || this.graph.width * this.berthRate;
-		this.height = args.height || elementHeight || this.graph.height;
+        this.width = args.width || elementWidth || this.graph.width * this.berthRate;
+        this.height = args.height || elementHeight || this.graph.height;
 
-    //this.height += 40; // todo: variable
+        //this.height += 40; // todo: variable
 
 		this.vis
 			.attr('width', this.width)
 			.attr('height', this.height /** (1 + this.berthRate)*/);
 
-		var berth = this.height * this.berthRate;
+        var berth = this.height * this.berthRate;
 
-		if (this.orientation == 'left') {
-			this.element.style.top = -1 * berth + 'px';
+        if (this.orientation == 'left') 
+        {
+            this.element.style.top = -1 * berth + 'px';
 		}
-    else {
-      this.element.style.top = -10 + 'px';
-    }
+        else 
+        {
+            this.element.style.top = -10 + 'px';
+        }
 
-    //this.element.style.left = "40px";
-
-	},
+    },
 
 	render: function() {
 
 		if (this._renderHeight !== undefined && this.graph.height !== this._renderHeight) this.setSize({ auto: true });
 
 		this.ticks = this.staticTicks || Math.floor(this.graph.height / this.pixelsPerTick);
-
-        //console.log("ticks count:", this.ticks);
 
         if (this.graph.zero_points)
         {
@@ -1997,8 +1995,28 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
   */
 
 	_drawGrid: function(axis) {
-
-        //var axis_width = 40;
+        
+        /*
+            svg <line/> draws 2px lines even with stroke-width 1px
+            make white back for dashed lines 
+        */
+        
+        var y_grid_back = this.graph.vis
+            .insert("svg:g",":first-child")
+            .attr("class", "y_grid_back")
+        
+        for (var i = 0; i < this.graph.width / 10; i++)
+        {
+            y_grid_back
+                .append("rect")
+                .attr("width", "5px")
+                .attr("height", (this.graph.height) + "px")
+                //.style("stroke-width", "3px")
+                .style("fill", "#fff")
+                .attr("transform", "translate(" + (10 * i) + ",-2)")
+        }                
+                
+        // ---------------------------------------------------------------------------------------
 
         var domain = this.graph.renderer.domain();
         
@@ -2035,11 +2053,28 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
             .attr("class", "y_grid")
             .call(axis.ticks(this.ticks).scale(y_inverted).tickSize(gridSize).tickValues(tick_values)) /*.tickSubdivide(0)*/ /*.tickPadding([0])*/
 
-        grids
+        var rect_grids = grids
             .selectAll('g')
-            .attr('stroke-width','1px')
-            .attr("fill", "none")
+            //.attr('stroke-width','5px')
+            //.attr("fill", "none")
 
+        rect_grids.selectAll("line").remove();
+
+        //test_grids.append("div");              
+                
+        gridSize = -1 * gridSize;
+        
+        /*
+            svg <line/> draws 2px lines even with stroke-width 1px
+            make white back for dashed lines 
+        */
+        
+        rect_grids.append("rect")
+            .attr("width", gridSize + "px")
+            .attr("height", "1px")
+            //.style("stroke-width", "3px")
+            .style("fill", "#d2d2d2")
+              
         grids
             .selectAll('g')
             .last()
@@ -2047,12 +2082,9 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
         grids
             .selectAll('text')
-            .each(function() {
-            //console.log("grid text:", this.textContent);
-            //this.parentNode.setAttribute('data-y-value', this.textContent);
-        this.remove();
-        
-      });
+            .each(function() {          
+                this.remove();        
+            });
 	}
 });
 

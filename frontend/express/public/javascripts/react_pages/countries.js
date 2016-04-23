@@ -22,13 +22,13 @@ var CountriesPage = React.createClass({
         })
 
         /*
-                var maps = {
-                    "map-list-sessions": {id:'total', label:jQuery.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"},
-                    "map-list-users": {id:'total', label:jQuery.i18n.map["sidebar.analytics.users"], type:'number', metric:"u"},
-                    "map-list-new": {id:'total', label:jQuery.i18n.map["common.table.new-users"], type:'number', metric:"n"}
-                };
+        var maps = {
+            "map-list-sessions": {id:'total', label:jQuery.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"},
+            "map-list-users": {id:'total', label:jQuery.i18n.map["sidebar.analytics.users"], type:'number', metric:"u"},
+            "map-list-new": {id:'total', label:jQuery.i18n.map["common.table.new-users"], type:'number', metric:"n"}
+        };
 
-                var cur_map = "map-list-sessions";
+        var cur_map = "map-list-sessions";
         */
 
     },
@@ -157,8 +157,6 @@ var CountriesPage = React.createClass({
 
         var metric = this.state.metrics[id];
 
-        console.log("new map metric:", metric);
-
         this.setState({
             radio_button : id,
             metric : metric
@@ -230,6 +228,7 @@ var CountriesPage = React.createClass({
                     rows_per_page={20}
                     filter_field={"country"}
                     date={this.props.date}
+                    initial_sort={"country_flag"}
                 />
 
             </div>

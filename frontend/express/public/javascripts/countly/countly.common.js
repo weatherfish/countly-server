@@ -769,13 +769,22 @@
                     var point_data = {
                         "x" : set_data.data[j][0],
                         "y" : set_data.data[j][1],
-                        "previous_x" : set_data.data[j][3],
+                        //"previous_x" : set_data.data[j][3],
                     }
-
+                    
                     if (set_data.data[j][2])
                     {
-                        point_data["days_count"] = set_data.data[j][2];
-                        point_data["real_days_count"] = set_data.data[j][4];
+                        point_data.days_count = set_data.data[j][2];                        
+                    }
+                    
+                    if (set_data.data[j][3])
+                    {
+                        point_data.previous_x = set_data.data[j][3];
+                    }
+                                        
+                    if (set_data.data[j][4])
+                    {                       
+                        point_data.real_days_count = set_data.data[j][4];
                     }
                     /*
                     console.log("---------- point_data ------------");
@@ -786,6 +795,9 @@
 
                 single_graph_data.push(obj);
             }
+            
+            console.log("======== single_graph_data ==============");
+            console.log(single_graph_data);
 
             var series = [];
 
@@ -1915,6 +1927,8 @@
                 } else {
                     propertyValue = dataObj[propertyNames[j]];
                 }
+                
+                propertyValue = parseFloat(propertyValue);
 
                 chartData[j]["data"][chartData[j]["data"].length] = [i, propertyValue];
                 tableData[i][propertyNames[j]] = propertyValue;
@@ -3349,6 +3363,10 @@
             dateString,
             uniquePeriodsCheck = [],
             previousUniquePeriodsCheck = [];
+            
+        var now_timestamp = new Date();
+        var end_of_period = new Date(now_timestamp.getFullYear(), now_timestamp.getMonth(), now_timestamp.getDate()).getTime(); // start of day
+        //var timestamp = startOfDay / 1000;
 
         switch (_period) {
             case "month":
@@ -3366,6 +3384,8 @@
                 var day = Math.floor(diff / oneDay);
 
                 numberOfDays = daysInPeriod = day;
+                
+                var start_of_period = end_of_period - 30 * oneDay; // todo: not 30 days
 
                 break;
             case "day":
@@ -3381,6 +3401,9 @@
                 periodMin = 1;
                 dateString = "D MMM";
                 numberOfDays = moment().format("D");
+                
+                var start_of_period = end_of_period - (24 * 60 * 60 * 1000);
+                
                 break;
             case "yesterday":
                 var yesterday = moment().subtract('days', 1),
@@ -3399,6 +3422,11 @@
                 periodMin = 0;
                 dateString = "D MMM, HH:mm";
                 numberOfDays = 1;
+                
+                var start_of_period = end_of_period - (24 * 60 * 60 * 1000);
+                end_of_period -= 1000;
+                
+                
                 break;
             case "hour":
                 activePeriod = year + "." + month + "." + day;
@@ -3412,18 +3440,25 @@
                 periodMin = 0;
                 dateString = "HH:mm";
                 numberOfDays = 1;
+                
+                var start_of_period = end_of_period; // todo: today
+                
                 break;
             case "7days":
                 numberOfDays = daysInPeriod = 7;
+                var start_of_period = end_of_period - numberOfDays * (24 * 60 * 60 * 1000);
                 break;
             case "30days":
                 numberOfDays = daysInPeriod = 30;
+                var start_of_period = end_of_period - numberOfDays * (24 * 60 * 60 * 1000);
                 break;
             case "60days":
                 numberOfDays = daysInPeriod = 60;
+                var start_of_period = end_of_period - numberOfDays * (24 * 60 * 60 * 1000);
                 break;
             case "90days":
                 numberOfDays = daysInPeriod = 90;
+                var start_of_period = end_of_period - numberOfDays * (24 * 60 * 60 * 1000);
                 break;
             default:
                 break;
@@ -3536,7 +3571,9 @@
             "uniquePeriodArr":getUniqArray(currWeeksArr, currWeekCounts, currMonthsArr, currMonthCounts, currPeriodArr),
             "uniquePeriodCheckArr":getUniqCheckArray(currWeeksArr, currWeekCounts, currMonthsArr, currMonthCounts),
             "previousUniquePeriodArr":getUniqArray(prevWeeksArr, prevWeekCounts, prevMonthsArr, prevMonthCounts, prevPeriodArr),
-            "previousUniquePeriodCheckArr":getUniqCheckArray(prevWeeksArr, prevWeekCounts, prevMonthsArr, prevMonthCounts)
+            "previousUniquePeriodCheckArr":getUniqCheckArray(prevWeeksArr, prevWeekCounts, prevMonthsArr, prevMonthCounts),
+            "start_of_period" : start_of_period,
+            "end_of_period" : end_of_period
         };
 
         return periodObj;

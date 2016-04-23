@@ -6,8 +6,6 @@ var RadioButton = React.createClass({
         };
     },
 
-    //  style="background-image:url('images/dashboard/{this.props.trend}trend.png');"
-
     onhover : function()
     {
 
@@ -51,9 +49,7 @@ var RadioButton = React.createClass({
             "color" : number_font_color
         }
 
-        var circle_style = {
-            /*"background-color" : this.props.data.color*/
-        }
+        var circle_style = { };
 
         var inner_circle_style = { };
 
@@ -61,7 +57,17 @@ var RadioButton = React.createClass({
 
         var title = this.props.data.title.toLowerCase().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 
-        var value = this.props.data.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        if (this.props.data.total !== false && typeof this.props.data.total != 'undefined')
+        {
+            var value = this.props.data.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        else
+        {
+            var value = false;
+            
+            select_style.position = "relative";
+            select_style.top = "2px";            
+        }
 
         //var circle_classname = "circle_select";
 

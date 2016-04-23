@@ -4,6 +4,8 @@ var TopBar = React.createClass({
 
     getInitialState: function() {
 
+        console.log("sign --------- > :", jQuery.i18n.map["sidebar.dashboard"]);
+        
         return {
             fstmenu : false,
             sndmenu : jQuery.i18n.map["sidebar.dashboard"],
@@ -17,6 +19,19 @@ var TopBar = React.createClass({
 
         var first = false;
         var second = false;
+        
+        console.log("===== receive props ======");
+        console.log(nextProps);
+
+        if (!nextProps.first && !nextProps.second)
+        {
+            return this.setState({
+                language : nextProps.language
+            })
+        }
+        
+        console.log("====== navigation =====");
+        console.log(navigation);
 
         for (var i = 0; i < navigation.length; i++)
         {
@@ -38,14 +53,29 @@ var TopBar = React.createClass({
                 break;
             }
         }
+        
+        console.log("receive props:", first,  " -- > second:", second);
 
         if (!second)
         {
-            this.setState({
-                fstmenu : false, //nextProps.first,
-                sndmenu : first, //nextProps.second,
-                language : nextProps.language
-            })
+            
+            if (first)
+            {
+                this.setState({
+                    fstmenu : false, //nextProps.first,
+                    sndmenu : first, //nextProps.second,
+                    language : nextProps.language
+                })
+            }
+            else
+            {
+                this.setState({
+                    fstmenu : false, //nextProps.first,
+                    sndmenu : jQuery.i18n.map["sidebar.dashboard"], //nextProps.second,
+                    language : nextProps.language
+                })
+            }            
+            
         }
         else
         {
@@ -70,9 +100,7 @@ var TopBar = React.createClass({
                 {
 
                     document.onclick = false;
-
-                    console.log("===== click outside =============");
-
+                    
                     self.setState({
                         user_menu_open : false,
                         language_menu_open : false
@@ -96,8 +124,6 @@ var TopBar = React.createClass({
     },
 
     changeLanguage : function(langCode){
-
-        console.log("click change:", langCode);
 
         var self = this;
 
@@ -141,9 +167,6 @@ var TopBar = React.createClass({
             callback:function () {
                 self.origLang = JSON.stringify(jQuery.i18n.map);
                 $.when(countlyLocation.changeLanguage()).then(function () {
-
-                    console.log("========= jQuery.i18n done =====");
-                    console.log(jQuery.i18n.map);
                     
                     _.defer(function(){
                         self.props.on_change_language(langCode);
@@ -159,7 +182,6 @@ var TopBar = React.createClass({
                 });
             }
         });
-
     },
     
     close_user_menu : function(){
@@ -210,12 +232,7 @@ var TopBar = React.createClass({
             language_menu_style.display = "block";
             language_menu_select_class += " active";
         }
-       
-        // <div className="hint_icon"></div>
-        
-        console.log("====== window.location ========");
-        console.log(window.location.pathname);
-        
+               
         if (window.location.pathname == "/manage/configurations")
         {            
             var links_block_1 = <span><a href="/manage/configurations#user_settings" onClick={this.close_user_menu}>{jQuery.i18n.map["sidebar.settings"]}</a></span>
@@ -229,11 +246,11 @@ var TopBar = React.createClass({
         
         return (
               <div className="navigation" style={block_style}>
+              
                   <span className="fstmenu">{this.state.fstmenu}</span>
                   {arrow_block}
                   <span className={sndmenu_class}>{this.state.sndmenu}</span>
                   
-
                   <div className="user_name_block" onClick={this.handleOpenUserMenu}><span className="name">{this.props.user_name}</span><span className="arrow"></span></div>
                   <div className="user_menu" style={user_menu_style}>
 

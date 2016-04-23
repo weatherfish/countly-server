@@ -1,14 +1,14 @@
 @import "common.less";
 
 .background_image(@image){
-		background : url('../images/@{image}.png');
-		background-image: url("../images/@{image}.svg");
-		background-repeat   : no-repeat;
-		background-position : center;
+    background : url('../images/@{image}.png');
+    background-image: url("../images/@{image}.svg");
+    background-repeat   : no-repeat;
+    background-position : center;
 }
 
 .table_block {
-		position : relative;
+    position : relative;
 }
 
 .table_wrapper {
@@ -25,130 +25,128 @@
 .data_sign {
     width : 500px;
     font-family: Lato-Semibold;
-		font-size: 17px;
-		color: #132737;
-		letter-spacing: 1.39px;
-		/*padding-left : 40px;*/
+    font-size: 17px;
+    color: #132737;
+    letter-spacing: 1.39px;
+    /*padding-left : 40px;*/
 }
 
 .data_date_sign {
     width : 500px;
-		font-family: Lato-Regular;
-		font-size: 11px;
-		color: #9D9D9E;
-		letter-spacing: 0.5px;
-		/*padding-left : 40px;*/
+    font-family: Lato-Regular;
+    font-size: 11px;
+    color: #9D9D9E;
+    letter-spacing: 0.5px;
+    /*padding-left : 40px;*/
 }
 
 .table_filter_wrapper {
     position : absolute;
     right : 30px;
     top : 20px;
-		/*width : 400px;*/
-		z-index : 500;
+    /*width : 400px;*/
+    z-index : 500;
 }
 
 .export_block {
-		/*position : absolute;
-		right : 80px;
-		top : 20px;*/
-
-		position : relative;
-
-		width : 100px;
-		display : inline-block;
-
-		font-family : Lato-Regular;
-
-		cursor : pointer;
-
-		font-size : 12px;
+        
+    position : relative;    
+    top : 2px;
+    width : 100px;
+    display : inline-block;    
+    font-family : Lato-Regular;    
+    cursor : pointer;    
+    font-size : 12px;
 }
 
 .export_block .sign {
-		color : #00c652;
+    color : #00c652;
+    font-family : Lato-Light;
 }
 
 .export_block .down_arrow {
-
-		background-image: url("../images/time_range_arrow.svg");
-		background-repeat: no-repeat;
-		background-position: center;
-		display: inline-block;
-		width: 20px;
-		height: 20px;
-		position: relative;
-		top: 6px;
-		left : 4px;
-
+    background-image: url("../images/time_range_arrow.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    top: 6px;
+    left : 4px;
 }
 
 .save_as {
-		width : 170px;
-		/*height : 90px;*/
-		position : absolute;
-		top : 35px;
-		left : 10px;
-
-		background-color : #273743;
-		/*border: 1px solid #324656;*/
-		box-sizing: border-box;
-		/*box-shadow: 0px 2px 7px 0px rgba(0,0,0,0.38);*/
-		border-radius: 2px;
+    width : 170px;
+    /*height : 90px;*/
+    position : absolute;
+    top : 35px;
+    right : 0px;
+    
+    background-color : #273743;
+    /*border: 1px solid #324656;*/
+    box-sizing: border-box;
+    /*box-shadow: 0px 2px 7px 0px rgba(0,0,0,0.38);*/
+    border-radius: 4px;
 }
 
 .save_as div {
-		/*width : 100%;*/
-		height : 45px;
-		line-height : 45px;
-		/*border : 1px solid green;
-		background-color: @bg_color_3;*/
-		color : #ffffff;
-		text-align : left;
-		font-family: Lato-Regular;
-		font-size: 12px;
-		color: #FFFFFF;
-		border-bottom: 1px solid #324656;
-		box-sizing: border-box;
+    /*width : 100%;*/
+    height : 40px;
+    line-height : 40px;
+    /*border : 1px solid green;
+    background-color: @bg_color_3;*/
+    color : #ffffff;
+    text-align : left;
+    font-family: Lato-Regular;
+    font-size: 14px;
+    color: #FFFFFF;
+    border-bottom: 1px solid #324656;
+    box-sizing: border-box;
+    color : gray;
+}
+
+.save_as div:hover {
+    color : #ffffff;    
 }
 
 .save_as div:last-child {
-    border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
 }
 
 .save_as div .icon {
-		display : inline-block;
-		width : 20px;
-		height : 20px;
-		position : relative;
-		top : 5px;
-		margin-left : 10px;
-		margin-right : 10px;
+    display : inline-block;
+    width : 20px;
+    height : 20px;
+    position : relative;
+    top : 5px;
+    margin-left : 10px;
+    margin-right : 10px;
 }
 
 .save_as div .icon.csv {
-		.background_image(export_csv);
+    .background_image(export_csv);
 }
 
 .save_as div .icon.excel {
-		.background_image(export_csv);
+    .background_image(export_csv);
 }
 
 .save_as .top_arrow {
-		width: 0;
-		height: 0;
-		border-style: solid;
-		border-width: 0 7px 7px 7px;
-		border-color: transparent transparent #202531 transparent;
-		position: relative;
-		top: -7px;
-		left: 62px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 7px 7px 7px;
+    border-color: transparent transparent #273743 transparent;
+    position: absolute;
+    top: -7px;
+    right: 17px;
 }
 
 .filter_block {
-		position : relative;
-		display : inline-block;
+    position : relative;
+    display : inline-block;
 }
 
 .filter_block div.icon {
@@ -166,108 +164,124 @@
     padding-left : 30px;
     border-radius : 2px;
     border : 1px solid #E7E7E7;
+    
+    font-family : Lato-Light;
 
 }
 
 .sort_table_wrapper {
-		margin-top : 20px;
-		/*padding-left : 40px;*/
+    margin-top : 20px;
+    /*padding-left : 40px;*/
 }
 
 .cell {
-		position : relative;
-		color : #7F7F7F;
+    position : relative;
+    color : #7F7F7F;
 }
 .cell.sorted {
-		color : #3D3D3D;
+    color : #3D3D3D;
 }
 .cell .cell_label {
-		position : absolute;
-		right : 17px;
-		top : 2px;
-		font-family: Lato-Regular;
-		font-size: 10px;
-		color: #A3A3A3;
-		letter-spacing: 0.43px;
-
-		/*display: table-cell;
-		vertical-align: middle;*/
+    position : absolute;
+    right : 17px;
+    top : 2px;
+    font-family: Lato-Regular;
+    font-size: 10px;
+    color: #A3A3A3;
+    letter-spacing: 0.43px;
+    
+    /*display: table-cell;
+    vertical-align: middle;*/
 }
 
 .percent_cell, .cell_value {
-		display : inline-block;
+    display : inline-block;
 }
 
 .percent_cell {
-		margin-left : 10px;
+    margin-left : 10px;
 }
 
 .percent_cell {
-		background-color: #EFEFF2;
-		border-radius : 2px;
-		position : relative;
-		top : 0px;
+    background-color: #EFEFF2;
+    border-radius : 2px;
+    position : relative;
+    top : 0px;
 }
 
 .percent_cell > div {
-		height : 10px;
-		background-color: #1B8AF3;
-		/*margin-top : 10px;*/
-		border-radius : 2px;
-		/*position : relative;
-		top : 5px;*/
+    height : 10px;
+    background-color: #1B8AF3;
+    /*margin-top : 10px;*/
+    border-radius : 2px;
+    /*position : relative;
+    top : 5px;*/
 }
 
 .img_cell .img_text {
-		display : inline-block;
-		margin-left : 10px;
+    display : inline-block;
+    margin-left : 10px;
 }
 
 .cell_value {
-		line-height : 50px;
-		width : 40px;
+    line-height : 50px;
+    width : 40px;
 }
 
 .pagination {
-		margin-top : 20px;
-		text-align : right;
-		font-family: Lato-Regular;
+    margin-top : 20px;
+    text-align : right;
+    font-family: Lato-Regular;
 }
 
 .pagination div {
-		display : inline-block;
-		font-size: 12px;
-		color: #9B9B9B;
-		width : 35px;
-		height : 35px;
-		border : 1px solid #E7E7E7;
-		margin-left : 5px;
-		line-height : 35px;
-		text-align : center;
-		cursor : pointer;
-		border-radius : 2px;
-		background-color : #FBFBFB;
+    display : inline-block;
+    font-size: 12px;
+    color: #9B9B9B;
+    width : 35px;
+    height : 35px;
+    border : 1px solid #E7E7E7;
+    margin-left : 5px;
+    line-height : 35px;
+    text-align : center;
+    cursor : pointer;
+    border-radius : 2px;
+    background-color : #FBFBFB;
 }
 
 .pagination div.active {
-		background-color : #E7E7E7;
-		color : #3D3D3D;
+    background-color : #E7E7E7;
+    color : #3D3D3D;
 }
 
 .pagination .prev_page, .pagination .next_page {
-		padding-right : 10px;
-		padding-left : 10px;
+    padding-right : 10px;
+    padding-left : 10px;
 }
 
 .pagination .prev_page {
-		margin-right : 5px;
+    margin-right : 5px;
 }
 
 .pagination .next_page {
-		margin-left : 10px;
+    margin-left : 10px;
 }
 
 .pagination .dots {
-		cursor : default;
-		border : 1px solid white;
+    cursor : default;
+    border : 1px solid white;
+}
+
+.table_wrapper .table_no_data {
+    border-bottom : 1px solid #eeeeee;
+    border-left : 1px solid #eeeeee;
+    border-right : 1px solid #eeeeee;
+    font-family : Lato-Regular;
+    width : 100%;
+    padding-left : 10px;
+    height : 50px;
+    line-height : 50px;
+    box-sizing : border-box;
+    text-align: center;
+    font-family: Lato-Light;
 }

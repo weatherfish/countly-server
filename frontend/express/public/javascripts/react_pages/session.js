@@ -95,10 +95,17 @@ var SessionPage = React.createClass({
         return big_numbers;
     },
 
-    on_graph_mount : function(mount_data) {
-
+    on_graph_mount : function(mount_data){
+                
         this.setState({
             "granularity" : mount_data.granularity
+        });
+    },
+    
+    onGranularityChange : function(new_granularity){
+                
+        this.setState({
+            "granularity" : new_granularity
         });
     },
 
@@ -141,12 +148,7 @@ var SessionPage = React.createClass({
         var page_style = {
             "width" : elements_width
         }
-
-        /*
-        margin_left={40 + 20}
-        graph_width={elements_width}
-        */
-
+                
         return(
             <div className="page" style={page_style}>
 
@@ -161,6 +163,7 @@ var SessionPage = React.createClass({
                     with_granularity={true}
                     mount_callback={this.on_graph_mount}
                     date={this.props.date}
+                    onGranularityChange={this.onGranularityChange}
                 />
 
                 {(() => {

@@ -102,7 +102,7 @@ var FrequencyPage = React.createClass({
                     sort_functions={this.state.sort_functions}
                     data_function={countlyUser.getFrequencyData}
                     convert_data_function={false}
-                    initial_sort={"frequency"}
+                    initial_sort={"f"}
                     rows_per_page={20}
                     date={this.props.date}
                 />

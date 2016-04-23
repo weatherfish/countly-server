@@ -12,7 +12,8 @@
     line-height : 30px;*/
     background-color : #F5F5F5;
     font-family : Lato-Regular;
-    margin-bottom : 30px;
+    /*margin-bottom : 30px;*/
+    height : 50px;    
 }
 
 .crash_details .return_to_crashes .arrow {

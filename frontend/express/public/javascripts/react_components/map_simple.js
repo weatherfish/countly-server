@@ -12,10 +12,19 @@ var DashboardMap = React.createClass({
 
     },
 
-    componentWillReceiveProps: function(nextProps) {
+    componentDidMount : function()
+    {
+        this.draw(this.props.metric);
+    },
 
-        this.redraw(); // todo: !!!!!!!!!!!!
-
+    componentWillReceiveProps: function(nextProps) 
+    {
+        this.redraw(nextProps.metric); 
+    },
+        
+    componentDidUpdate : function()
+    {
+        this.redraw(this.props.metric);
     },
 
     popupTemplate : function(geography, data) {
@@ -41,9 +50,9 @@ var DashboardMap = React.createClass({
         return html;
     },
 
-    draw : function() {
+    draw : function(metric) {
 
-        var ob = { id: "total", label: "Sessions", type: "number", metric: "t" };
+        //var ob = { id: "total", label: "Sessions", type: "number", metric: "t" };
 
         var countryFills = {
             defaultFill : "#ffffff",
@@ -54,15 +63,11 @@ var DashboardMap = React.createClass({
           create 10 gradations of brightness
         */
 
-        //countryFills["0.0"] = "#c0dffb";
-
-        //var gradient = this.make_gradient("#c0dffb", "#198AF3", 10);
-
         var gradient = this.make_gradient("#198af3", "#c0dffb", 10);
 
         var j = 0;
 
-        for (var i = 0/* 0.1*/; i < 1; i+=0.1)
+        for (var i = 0; i < 1; i+=0.1)
         {
             //countryFills[i.toFixed(1).toString()] = this.colorLuminance(countryFills["0.0"], i * (-1)); // .toFixed(1) because Javascript have some problem with float: http://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
             countryFills[i.toFixed(1).toString()] = "#" + gradient[j];
@@ -73,7 +78,7 @@ var DashboardMap = React.createClass({
 
         var geographyConfig = {
             borderWidth: 1,
-            borderColor: '#E6E6E6',
+            borderColor: '#eeeeee',
             popupOnHover: true,
             highlightOnHover: true,
             highlightFillColor: "#024873",
@@ -82,8 +87,8 @@ var DashboardMap = React.createClass({
             popupTemplate : this.popupTemplate
         }
 
-        var countryData = this.formatData(ob);
-
+        var countryData = this.formatData(metric);
+        
         this.previous_data = countryData;
 
         this.datamap = new Datamap({
@@ -98,9 +103,15 @@ var DashboardMap = React.createClass({
 
     },
 
-    redraw : function (ob) {
+    redraw : function (metric) {
 
-        var countryData = this.formatData(ob);
+        if (!this.datamap)
+        {
+            console.log("!this.datamap");
+            //return false;
+        }
+
+        var countryData = this.formatData(metric);
 
         for (var iso3 in this.previous_data)
         {
@@ -185,33 +196,33 @@ var DashboardMap = React.createClass({
             var metric  = chartData.rows[i]["metric"];
             var linearMetric = (linear(metric) * 0.6).toFixed(1).toString();
 
-/*
-            if (country == "CHN")
-            {
-                countryData[country] = {
+/*              countryData[country] = {
                     "fillKey"        : 'increase',
                     "numberOfThings" : metric
-                }
-            }
-            else if (country == "AUS")
-            {
+            
                 countryData[country] = {
                     "fillKey"        : 'decrease',
                     "numberOfThings" : metric
                 }
+            */
+            countryData[country] = {
+                "fillKey"        : linearMetric,
+                "numberOfThings" : metric
             }
-            else
-            {*/
-                countryData[country] = {
-                    "fillKey"        : linearMetric,
-                    "numberOfThings" : metric
-                }
-            /*}*/
         }
 
         return countryData;
     },
+    
+    render : function(){
 
+        return (
+            <div id="map">
+            </div>
+        )
+
+    },
+    
     make_gradient : function(start_color, end_color, colors_count)
     {
         function hex (c) {
@@ -277,24 +288,5 @@ var DashboardMap = React.createClass({
         return tmp;
 
     },
-
-    render : function(){
-
-        return (
-            <div id="map">
-            </div>
-        )
-
-    },
-
-    componentDidMount : function()
-    {
-        this.draw();
-    },
-
-    componentDidUpdate : function()
-    {
-        this.redraw();
-    }
 
 })
