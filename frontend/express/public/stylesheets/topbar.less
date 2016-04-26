@@ -1,3 +1,5 @@
+@import "common.less";
+
 #top_bar {
     position : fixed;
     top      : 0px;
@@ -70,21 +72,14 @@
     top : 0px;
     right : 0px;
     /*width : 200px;*/
-
     padding-left : 20px;
     height : 100%;
     border-left: 1px solid #F0F0F0;
     z-index : 2000;
-
     cursor : pointer;
-
     font-family : Lato-Semibold;
     font-size   : 14px;
-
-  /*  text-align : right;*/
-
     text-transform: capitalize;
-
 }
 
 #top_bar .navigation .user_name_block .name {
@@ -107,32 +102,19 @@
 #top_bar .navigation .user_menu {
 
     display : none;
-
     position : absolute;
     top : 56px;
     width: 130px;
     right : 130px;
-
     font-family: Lato-Regular;
     font-size: 14px;
     text-align: left;
-/*
-    background-color : #0C0E13;
-
-    position: relative;
-    width: 150px;
-    */
-
     font-family: Lato-Regular;
-
-    background-color: #202531;
-    border-top: 1px solid #2E3545;
-    border-right: 1px solid #2E3545;
-
+    background-color: @bg_color_3;
+    border-top: 1px solid @border_color_1;
+    border-right: 1px solid @border_color_1;
     box-sizing: border-box;
-
     /*opacity: 0;*/
-
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     border-bottom-left-radius: 4px;
@@ -154,25 +136,20 @@
     height: 0;
     border-style: solid;
     border-width: 0 7px 7px 7px;
-    border-color: transparent transparent #202531 transparent;
+    border-color: transparent transparent @bg_color_3 transparent;
     position: absolute;
     top: -7px;
     left: 105px;
 }
 
 #top_bar .navigation .user_menu > span {
-
     display : block;
-
     text-align: right;
-    color: gray;
-    /*padding-right: 20px;*/
+    color: gray;  
     height: 50px;
     line-height: 50px;
-    border-bottom: 1px solid #2E3545;
-    /*border-left: 1px solid #2E3545;*/
-    cursor: pointer;
-    /*padding-top: 10px;*/
+    border-bottom: 1px solid @border_color_1;
+    cursor: pointer;    
     box-sizing: border-box;
     position : relative;
 }
@@ -243,18 +220,15 @@
 }
 
 #top_bar .language_menu {
-    /*width : 200px;*/
     height : 210px;
-    background-color : #141821;
-
+    background-color : @bg_color_4;
     position : absolute;
     top : 73px;
     right : 160px;
-    padding : 14px;
+    padding : 14px 14px 14px 25px;
     box-sizing : border-box;
     border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    padding-left : 25px;
+    border-bottom-left-radius: 4px;    
     display : none;
 }
 
@@ -273,11 +247,9 @@
 }
 
 #top_bar .language_menu .group > div span {
-
     color : gray;
     font-family: Lato-Regular;
     font-size: 14px;
-
 }
 
 #top_bar .language_menu .group > div:hover span {

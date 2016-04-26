@@ -1,12 +1,14 @@
+@import "common.less";
+
 .configurations_page {
 
     padding-bottom : 400px;
-    border: 1px solid #EEEEEE;
+    border: 1px solid @border_color_3;
 }
 
 .configurations_page .category {
     font-family: Lato-Regular;
-    border-bottom : 1px solid #eeeeee;
+    border-bottom : 1px solid @border_color_3;
 }
 
 .configurations_page .category > div {
@@ -14,58 +16,34 @@
 }
 
 .configurations_page .category > div.block_label {
-/*
-    width : 20%;
-    height : 100%;
-    line-height: 100%;
-
-    /*float : left;*/
-/*
-    position : relative;
-    top : 30px;
-    left : 30px;
-*/
-
     margin-left : 30px;
     margin-top : 30px;
     margin-bottom : 30px;
-
     font-family: Lato-Semibold;
     font-size: 17px;
     color: #132737;
     letter-spacing: 1.39px;
-
     text-transform: uppercase;
 }
 
 .configurations_page .category > div.block_elements {
-
     /*width : 80%;*/
     display : block;
     padding-left : 30px;
-
 }
 
 .configurations_page .button {
     width: 100px;
     height: 35px;
     line-height: 35px;
-
     cursor: pointer;
     font-family: Lato-Regular;
     font-size: 11px;
     color: #FFFFFF;
     text-align: center;
     border-radius: 2px;
-
     margin-left : 20px;
-
-    opacity : 0.5;
-
-    /*position: absolute;
-    right: 30px;
-    top: 12px;*/
-
+    opacity : 0.5;    
 }
 
 .configurations_page .button.active {
@@ -104,16 +82,8 @@
 }
 
 .configurations_page .setting_block {
-
-    /*height : 60px;
-    line-height: 60px;*/
-
-    /*border-bottom : 1px solid #eeeeee;*/
-
     margin-bottom : 20px;
-
     font-family : Lato-Regular;
-
 }
 
 .configurations_page .setting_block div {
@@ -167,8 +137,7 @@
     border-radius: 6px;
     text-align: center;    
     margin-bottom : 20px;
-    display: inline-block;
-    
+    display: inline-block;    
 }
 
 .configurations_page .save_password_button:hover, .configurations_page .generate_api_key:hover {
@@ -176,8 +145,8 @@
 }
 
 .configurations_page .generate_api_key {    
-    border: 1px solid #FF6138;
-    color: #FF6138;
+    border: 1px solid @green_button_type_2;
+    color: @green_button_type_2;
     opacity : 0.8;
 }
 
@@ -188,8 +157,8 @@
 }
 
 .configurations_page .save_password_button.active {    
-    border: 1px solid #FF6138;
-    color: #FF6138;
+    border: 1px solid @green_button_type_2;
+    color: @green_button_type_2;
     opacity : 0.8;
 }
 

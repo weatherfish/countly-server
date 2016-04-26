@@ -429,7 +429,8 @@ var fetch = {},
 
                         output.citiesData[city_data['city']] = {
                             "lat" : city_data["lat"],
-                            "lon" : city_data["lon"]
+                            "lon" : city_data["lon"],
+                            "country" : city_data["country"]
                         }
                     });
 

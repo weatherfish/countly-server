@@ -7,8 +7,7 @@
     background-color : white;
 }
 
-.big-numbers-container > div {
-    /*width : 33%;*/
+.big-numbers-container > div {    
     display : inline-block;
     margin-left  : auto;
     margin-right : auto;
@@ -46,7 +45,6 @@
 }
 
 .big-numbers-container > div .tick .tick_img {
-
     background : url('../images/tick.svg');
     background-image: url("../images/tick.svg");
     background-repeat   : no-repeat;
@@ -55,20 +53,13 @@
     height : 16px;
 }
 
-.big-numbers-container div .select {
-    /*position : absolute;
-    left : 40px;
-    top : 0px;*/
+.big-numbers-container div .select {   
     margin-left : 10px;
     font-size: 15px;
     color : #3d3d3d;
 }
 
 .big-numbers-container div .number {
-    /*position : absolute;
-    left : 40px;
-    top : 20px;*/
-
     margin-left : 10px;
     font-size : 22px;
     color : #132737;

@@ -6,7 +6,7 @@ var child_process = require('child_process');
 
 var exec = require('exec');
 
-var folder = '/home/ubuntu/countly_sidebar_work/frontend/express/public/stylesheets';
+var folder = '/home/ubuntu/apr_04_uiv2/frontend/express/public/stylesheets';
 
 deploying = false;
 
@@ -17,7 +17,7 @@ watcher
 
       if (path.indexOf(".css") > -1)
       {
-          console.log("simple css");
+          console.log("simple css", path);
           return false;
       }
 
@@ -25,8 +25,24 @@ watcher
       {
 
           deploying = true;
+          
+          var file = path.split("/");
+          
+          var less_filename = file[file.length - 1];
+          
+          var css_filename = less_filename.replace("less", "css");
 
-            var cmd = 'cd ' + folder + ' && lessc ui.v2.less v2.css && lessc ui.calendar.less calendar.css && lessc tables.less tables.css && lessc map.less map.css && grunt dist-all';
+            //var cmd = 'cd ' + folder + ' && lessc calendar.less calendar.css && lessc tables.less tables.css && lessc map.less map.css && lessc selector_with_search.less selector_with_search.css';
+
+            var cmd = 'cd ' + folder + ' && lessc ' + less_filename + " compiled_css_" + css_filename;
+
+            console.log("new_cmd:", cmd);
+
+            //var cmd = 'cd ' + folder + ' && ./change_colors2.sh';
+
+            //console.log("cmd");
+            
+            console.log("--triger --");
 
             setTimeout(function(){
                 exec(cmd, function(err, out, code) {
@@ -40,7 +56,7 @@ watcher
 
                 });
 
-            }, 2000);
+            }, 100);
 
             console.log('File', path, 'has been changed');
       }

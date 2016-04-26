@@ -1,18 +1,13 @@
+@import "common.less";
+
 .crash_details {
-
-    /*padding-left : 20px;
-    padding-right : 20px;*/
     box-sizing : border-box;
-
 }
 
 .crash_details .return_to_crashes {
-    width : 100%;
-    /*height : 30px;
-    line-height : 30px;*/
+    width : 100%;   
     background-color : #F5F5F5;
-    font-family : Lato-Regular;
-    /*margin-bottom : 30px;*/
+    font-family : Lato-Regular;   
     height : 50px;    
 }
 
@@ -32,29 +27,22 @@
 }
 
 .crash_details .border_wrapper {
-    border-left: 1px solid #eeeeee;
-    border-right: 1px solid #eeeeee;
+    border-left: 1px solid @border_color_3;
+    border-right: 1px solid @border_color_3;
 }
 
 .crash_details .info_block {
-
     width : 100%;
     height : 80px;
-
     padding-top : 20px;
-
     position : relative;
-
 }
 
 .crash_details .info_block .name {
-
     font-family : Lato-Semibold;
     font-size : 20px;
-
     /*margin-top : 30px;*/
     margin-left : 30px;
-
 }
 
 .crash_details .info_block .status {
@@ -64,18 +52,16 @@
 }
 
 .crash_details .info_block .status.resolved {
-    color: #F85D02;
+    color: @red_down;
 }
 
 .crash_details .info_block .status.unresolved {
-    color: #19CC63;
+    color: @green_button;
 }
 
-.crash_details .info_block .mark_button {
-    /*width: 100px;*/
+.crash_details .info_block .mark_button {    
     height: 35px;
-    line-height: 35px;
-    /*background-color: #19CC63;*/
+    line-height: 35px;    
     cursor: pointer;
     font-family: Lato-Regular;
     font-size: 11px;
@@ -90,19 +76,11 @@
 }
 
 .crash_details .info_block .mark_button.resolved {
-
-    background-color: #19CC63;
-
+    background-color: @green_button;
 }
 
 .crash_details .info_block .mark_button.unresolved {
-
-    background-color: #F85D02;
-
-}
-
-.crash_details .tabs {
-
+    background-color: @red_down;
 }
 
 .crash_details .tabs > span {
@@ -115,18 +93,16 @@
     font-family : Lato-Regular;
     font-size : 16px;
     box-sizing : border-box;
-
     cursor : pointer;
-
     border-top: 4px solid #F5F5F5;
     background-color: #F5F5F5;
-    border-bottom : 2px solid #eeeeee;
+    border-bottom : 2px solid @border_color_3;
     color : gray;
 }
 
 .crash_details .tabs > span.active {
 
-    border-top : 4px solid #19CC63!important;
+    border-top : 4px solid @green_up!important;
     background-color: #ffffff;
     border-bottom : 2px solid #ffffff;
     color : #000000;
@@ -136,17 +112,14 @@
 .crash_details .description, .crash_details .comments {
 
     font-family : Lato-Semibold;
-
     margin-top : 20px;
     margin-left : 30px;
     margin-right : 30px;
     padding-top : 30px;
     height : 240px;
-
     background-color : #F5F5F5;
-    border : 1px solid #eeeeee;
+    border : 1px solid @border_color_3;
     border-radius : 2px;
-
     margin-bottom : 40px;
 }
 
@@ -162,10 +135,8 @@
 
 .crash_details .data_block {
     width : 100%;
-    border-top : 1px solid #eeeeee;
-    padding-top : 30px;
-    /*padding-left : 20px;
-    padding-right : 20px;*/
+    border-top : 1px solid @border_color_3;
+    padding-top : 30px;   
     box-sizing : border-box;
 }
 
@@ -181,15 +152,6 @@
     margin-left: 30px;
     text-transform: uppercase;
 }
-/*
-.crash_details .data_block > div {
-    display : inline-block;
-    width : 25%;
-}
-
-.crash_details .data_block > div > .value {
-    display : block;
-}*/
 
 .crash_details .data_block .simple_blocks {
     width : 100%;
@@ -209,26 +171,14 @@
     width : 25%;
     height : 100px;
     text-align : center;
-
     border-right : 1px solid #E7E7E7;
-
     display : inline-block;
     box-sizing: border-box;
     position : relative;
-/*
-    padding-left : 20px;
-    padding-right : 20px;*/
 }
 
 .crash_details .data_block .simple_blocks > div:last-child {
-
     border-right : 0px solid #E7E7E7;
-}
-
-.crash_details .data_block .simple_blocks > div span {
-
-    /*line-height : 50px;*/
-
 }
 
 .crash_details .data_block .simple_blocks > div .value {
@@ -264,23 +214,17 @@
 }
 
 .crash_details .data_block .advanced_blocks > div {
-
     width : 25%;
     /*height : 200px;*/
     text-align : center;
-
     display : inline-block;
     box-sizing: border-box;
     position : relative;
-
     border-right : 1px solid #E7E7E7;
-
     padding-bottom : 20px;
-
 }
 
 .crash_details .data_block .advanced_blocks > div:last-child {
-
     border-right : 0px solid #EFEFF2;
 }
 
@@ -294,7 +238,6 @@
     color : #6D6D6D;
     border-bottom : 1px solid #E7E7E7;
     text-transform : capitalize;
-
 }
 
 .crash_details .data_block .advanced_blocks > div .value_block {
@@ -349,19 +292,12 @@
     text-align : center;
 }
 
-.crash_details .data_block .pie_charts_blocks .pie_wrapper .sign {
-
-    /*width : 100%;*/
+.crash_details .data_block .pie_charts_blocks .pie_wrapper .sign {    
     text-align : center;
-
     font-family : Lato-Regular;
-
     margin-top : 10px;
-
-    color : #6D6D6D;
-    
+    color : #6D6D6D;    
     font-size : 16px;
-
 }
 
 .crash_details .data_block .bar_chart_block {

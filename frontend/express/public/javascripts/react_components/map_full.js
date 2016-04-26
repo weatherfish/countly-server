@@ -1,6 +1,5 @@
 var Map = React.createClass({
 
-    //cityPoints : false,
     previous_data : false,
     loaded : false,
     datamap : false,
@@ -63,61 +62,215 @@ var Map = React.createClass({
                 });
             }
         }
-
-        /*if (!this.state.city_points)
+    },
+    
+    componentWillReceiveProps(nextProps){
+                
+        var self = this;
+        
+        if (this.state.selected_country && nextProps.metric.id != this.props.metric.id)
         {
-            return false;
+            _.defer(function () { // todo: _draw_country uses this.props.metric.color to change a color. this.props.metric.color contain old value now
+                self._draw_country(self.props.metric, self.zoomParams, self.chart_options, self.state.selected_country);  
+            });
         }
-        else if (!this.loaded)
-        {
-            this.draw();
-            this.loaded = true;
-        }*/
-        /*else
-        {*/
-            
-        /*}*/
+        
     },
 
     world_map_popup : function(geography, data) {
 
+        var self = this;
+/*
+        if (data)
+        {*/
+        
         if (data)
         {
-            var html = '<div class="country_hoverinfo">';  
-            html += "<div class='name'>" + geography.properties.name + "</div>"; 
-            html += "<div class='metric'>" + data.numberOfThings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</div>"; 
-            html += "<div class='bottom_arrow'></div>";
-            html += '</div>';
+            var count = data.numberOfThings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
         else
         {
-            //var html = '<div class="country_hoverinfo">' + geography.properties.name + ' : 0</div>';
-            var html = '<div class="country_hoverinfo">';  
-            html += "<div class='name'>" + geography.properties.name + "</div>"; 
-            html += "<div class='metric'>0</div>"; 
-            html += "<div class='bottom_arrow'></div>";
-            html += '</div>';
+            var count = 0;
         }
+        
+        var html = '<div class="country_hoverinfo" id="country_hoverinfo">';  
+        html += "<div class='name'>" + geography.properties.name + "</div>"; 
+        html += "<div class='metric'><span class='label'>" + this.props.metric.title.toLowerCase() + "</span><span class='count'>" + count + "</span></div>"; 
+        html += "<div class='bottom_arrow'></div>";
+        html += '</div>';
+            
+        // <span class='circle' style='background-color':'" + this.props.metric.color + "'></span>
+            
+        setTimeout(function(){
+            self.draw_tooltip_graph(geography.id);
+        }, 0);        
 
         return html;
     },
+    
+    draw_tooltip_graph : function(iso3) {
 
+        var self = this;
+
+        var width = 100;
+        var height = 30;// document.body.clientHeight;
+
+        //var iso3 = country_data.id;
+        var selected_iso2 = false;
+
+        for (var iso2 in iso3_country_codes)
+        {
+
+            if (iso3_country_codes[iso2].toLocaleLowerCase() == iso3.toLocaleLowerCase())
+            {
+                selected_iso2 = iso2/*.toLocaleLowerCase()*/;
+                break;
+            }
+        }
+        
+        var data = countlySession.getSessionDP_map(selected_iso2);
+        
+        if (data.chartDP[this.props.metric.id].data.length == 0)
+        {
+            return false;
+        }
+                
+        var step_size = Math.round(data.chartDP[this.props.metric.id].data.length / 10);
+                
+        var ready_data = [];
+        var cur_y = 0;
+        var cur_s = 0;
+        
+        for (var i = 0; i < data.chartDP[this.props.metric.id].data.length; i++)
+        {
+            
+            cur_y += data.chartDP[this.props.metric.id].data[i][1];
+            cur_s++;
+            
+            if (cur_s == step_size)
+            {
+                ready_data.push([data.chartDP[this.props.metric.id].data[i][0], cur_y]);
+                
+                cur_y = 0;
+                cur_s = 0;
+            }
+        }   
+        
+        if (cur_s > 0) // add last part of data also there
+        {
+            ready_data.push([data.chartDP[this.props.metric.id].data[data.chartDP[this.props.metric.id].data.length - 1][0], cur_y]);     
+        }        
+                    
+        var metric_data = [];
+        
+        for (var i = 0; i < ready_data.length; i++)
+        {
+            metric_data.push({
+                "x" : i/*ready_data[i][0]*/,
+                "y" : ready_data[i][1],
+            })
+        }
+             
+        var max_y = 0;
+        
+        for (var i = 0; i < metric_data.length; i++)
+        {
+            if (metric_data[i].y > max_y)
+            {
+                max_y = metric_data[i].y;
+            }            
+        }
+        
+        var test_data = [1];
+            
+        this.country_tooltip_svg = d3.select("#country_hoverinfo").selectAll(".country_chart").data(test_data)
+            .enter()
+            .append("svg:svg")
+            .attr("class", "country_chart")
+            .attr('width', width + "px")
+            .attr('height', (height) + "px")               
+            //.style("background-color", "#ffffff"/*"#FF6138"*/)  // #FF6138
+                
+        this.selected_iso2 = selected_iso2;
+                   
+        var x = d3.scale.linear().range([0, width]).domain([0, (metric_data.length - 1)]);
+        var y = d3.scale.linear().range([0, height]).domain([max_y, 0]);
+
+        var line = d3.svg.line()
+            .x(function(d) {                
+              return x(d.x);
+            })
+            .y(function(d) { return y(d.y); })
+            .interpolate('linear').tension(0.8);  // 'cardinal',                    
+                
+        var enter_path = this.country_tooltip_svg
+            .datum(metric_data)            
+                .append("path")          
+                .attr("class", "line")
+                .attr("d", line)
+                .attr("stroke", this.props.metric.color)
+                .attr("stroke-width", "2px")
+                .attr("fill", "none")
+                .style("opacity", 1)
+
+    },
+    
     country_return_popup : function(geography, data) {
 
-        var html = '<div class="hoverinfo"><strong>return to world map</strong></div>';
+        var html = '<div class="hoverinfo return">return to world map</div>';
 
         return html;
     },
+
+    cityName : false,
+    
+    city_popup_left : false,
+    arrow_popup_left : false,
 
     city_popup : function(geo, data) {
 
-        var cityName = data.name.charAt(0).toUpperCase() + data.name.slice(1);
+        var self = this;
 
-        var html = "<div class='city_hoverinfo'>";
-        html += "<div class='name'>" + cityName + "</div>";
-        html += "<div class='metric'>" + data.metric + "</div>";
-        html += "<div class='bottom_arrow'></div>";
+        var cityName = data.name.charAt(0).toUpperCase() + data.name.slice(1);
+        
+        if (self.city_popup_left && this.cityName == cityName)
+        {
+            var left_style = "style='left:" + self.city_popup_left + "px'";
+            var arrow_left_style = "style='left:" + self.arrow_popup_left + "px'";
+        }
+        else
+        {
+            var left_style = "";
+            var arrow_left_style = "";
+        }
+
+        var html = "<div class='city_hoverinfo' id='city_hoverinfo' " + left_style + ">";
+        html += "<div class='name'>" + cityName + "</div>";        
+        html += "<div class='metric'><span class='circle' style='background-color:" + this.props.metric.color + "'></span><span class='label'>" + this.props.metric.title.toLowerCase() + "</span><span class='count'>" + data.metric + "</span></div>";         
+        html += "<div class='bottom_arrow' id='city_hoverinfo_arrow' " + arrow_left_style + "></div>";
         html += "</div>";
+        
+        if (this.cityName != cityName)
+        {
+            
+            self.cityName = cityName;
+            
+            _.defer(function(){
+            
+                var width = document.getElementById('city_hoverinfo').offsetWidth;
+                
+                self.city_popup_left = (-1 * (width / 2));
+                
+                document.getElementById("city_hoverinfo").style.left = (self.city_popup_left) + "px";
+                
+                self.arrow_popup_left = ((width / 2) - 7);
+                
+                document.getElementById("city_hoverinfo_arrow").style.left = (self.arrow_popup_left) + "px";                
+                
+                //console.log('=== tooltip width -------');
+                //console.log(width);
+            });
+        }                              
 
         return html;
     },
@@ -127,9 +280,7 @@ var Map = React.createClass({
         var self = this;
 
         $("#" + this.state.element_id).empty();
-
-        //var ob = {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric : this.props.metric/*this.state.current_metric*//*"t"*/};
-
+        
         var metric = this.props.metric;
 
         var countryFills = {
@@ -139,9 +290,6 @@ var Map = React.createClass({
 
         var countryData = this.formatData(metric);
         
-        console.log("======== countryData =============", metric);
-        console.log(countryData);
-
         this.previous_data = countryData;
 
         /*
@@ -152,7 +300,7 @@ var Map = React.createClass({
 
         var j = 0;
 
-        for (var i = 0/*0.1*/; i < 1; i+=0.1)
+        for (var i = 0; i < 1; i+=0.1)
         {
             countryFills[i.toFixed(1).toString()] = "#" + gradient[j];
             j++
@@ -160,7 +308,7 @@ var Map = React.createClass({
 
         countryFills["1.0"] = "#198af3"; // todo:
 
-        var chart_options = {
+        var geography_config = {
             borderWidth: 1,
             borderColor: '#d3d3d3',//'#E6E6E6',
             popupOnHover: true,
@@ -171,14 +319,19 @@ var Map = React.createClass({
             popupTemplate : this.world_map_popup,
             hideAntarctica: true,
         }
+        /*
+        var projection_rotate = d3.geo.mercator()
+                                .center([0, 0])       
+                                .rotate([-50, 0])*/
 
         this.datamap = new Datamap({
             element : document.getElementById(this.state.element_id),
             height  : this.props.height,
             width   : this.props.width,
             projection : 'mercator',//'eckert3',
+            //setProjection : projection_rotate,           
             fills      : countryFills,
-            geographyConfig : chart_options,
+            geographyConfig : geography_config,
             data : countryData
         });
 
@@ -201,36 +354,27 @@ var Map = React.createClass({
                     selected_country : countryIso,
                     inited : false
                 })
-
-/*
-                self.draw_country({
-                    height : 450,
-                    metric : self.props.metric,
-                    "countryIso3" : countryIso
-                });*/
-
-            });
+                
+                if (self.props.onCountryClickAdditional){
+                    self.props.onCountryClickAdditional(countryIso);
+                }
+                
+            });   
         }
-
     },
 
     redraw : function () {
-
-        //var ob = {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric : this.props.metric/*this.state.current_metric*//*"t"*/};
 
         var metric = this.props.metric;
 
         var countryData = this.formatData(metric);    
         
-        console.log("////////////// countryData redraw ////////////////");
-        console.log(countryData);          
-
         for (var iso3 in this.previous_data)
         {
             if (!countryData[iso3] || !countryData[iso3].numberOfThings || countryData[iso3].numberOfThings == 0)
             {
                 countryData[iso3] = {
-                    "fillKey"        : "reset",//"0.0",
+                    "fillKey"        : "reset",
                     "numberOfThings" : 0
                 };
             }
@@ -247,7 +391,7 @@ var Map = React.createClass({
 
         var self = this;
 
-        if (options.countryIso3.toLowerCase() != "rus") // no russia in topojson files
+        if (options.countryIso3.toLowerCase() != "rus" && options.countryIso3.toLowerCase() != "usa") // no russia in topojson files
         {
             var dataUrl = "/javascripts/visualization/datamaps/tjson/" + options.countryIso3.toLowerCase() + ".tjson";
         }
@@ -267,15 +411,7 @@ var Map = React.createClass({
             dataUrl: dataUrl
         }
 
-        //_periodObj = countlyCommon.periodObj;
-
-        //$("#" + this.state.element_id).empty();
-
         if (options) {
-
-            /*if (options.chartElementId) {
-                element_id = options.chartElementId;
-            }*/
 
             if (options.height) {
                 chart_options.height = options.height;
@@ -331,6 +467,10 @@ var Map = React.createClass({
                         "inited" : true
                     })
                     
+                    self.zoomParams = zoomParams;
+                    self.chart_options = chart_options;
+                    
+                    
                     _.defer(function () {
                         self._draw_country(options.metric, zoomParams, chart_options, options.countryIso3);
                     });                                                 
@@ -348,14 +488,8 @@ var Map = React.createClass({
         
         var self = this;
         
-        console.log("======= self.props.metric ========");
-        console.log(self.props.metric)
-
-        if (!zoomParams/* || !zoomParams.size*/)
-        {
-            /* todo */
-            /*countlyLocation.drawGeoChart(false);
-            store.set("countly_location_city", false);*/
+        if (!zoomParams)
+        {            
             return false;
         }
 
@@ -397,42 +531,52 @@ var Map = React.createClass({
         else {
             var scope = "world";
         }
-
-        var country_map = new Datamap({
-                element    : document.getElementById(element_id),
-                height     : mapHeight,
-                width      : mapWidth,
-                setProjection: function(element) {
+                
+        var projection_function = function(element) {
                     
-                    var center_lat = parseFloat(zoomParams.lat.toFixed(3));
-                    var center_lon = parseFloat(zoomParams.lon.toFixed(3));
+            var center_lat = parseFloat(zoomParams.lat.toFixed(3));
+            var center_lon = parseFloat(zoomParams.lon.toFixed(3));
 
-                    var width_projection = (element.offsetHeight / 2) * 1.92;
+            var width_projection = (element.offsetHeight / 2) * 1.92;
 
-                    var projection = d3.geo.mercator()
-                            .center([center_lon, center_lat])
-                            //.rotate([-32, 0])
-                            .scale(scale)
-                            //.translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+            var projection = d3.geo.mercator()
+                            .center([center_lon, center_lat])                          
+                            .scale(scale)                           
                             .translate([mapWidth/2, mapHeight/2]); // You should also only translate the projection by half the width and height of the container, otherwise the center will be in the bottom right corner.
 
-                    var path = d3.geo
-                                .path()
-                                .projection(projection);
+            var path = d3.geo
+                        .path()
+                        .projection(projection);
 
-                    return {
-                              "path"       : path,
-                              "projection" : projection
-                           };
-                },
-                fills: {
-                    "defaultFill" : "#fff", //_defaultFill,
-                    //"selected"    : "#0000ff",
-                    "bubble"      : self.props.metric.color,
-                },
-                geographyConfig : chart_options,   
-                data : map_data,
-                scope : scope,
+            return {
+                "path"       : path,
+                "projection" : projection
+            };
+        }               
+
+        if (scope == "usa")
+        {
+            projection_function = null;
+            
+            var datamap_lib = Datamap_usa;
+        }
+        else
+        {
+            var datamap_lib = Datamap;
+        }
+
+        var country_map = new datamap_lib({
+            element    : document.getElementById(element_id),
+            height     : mapHeight,
+            width      : mapWidth,
+            setProjection : projection_function,
+            fills: {
+                "defaultFill" : "#fff",                 
+                "bubble"      : self.props.metric.color,
+            },
+            geographyConfig : chart_options,   
+            data : map_data,
+            scope : scope,
         });
 
         var bubbles_config = { 
@@ -444,7 +588,6 @@ var Map = React.createClass({
                     highlightFillOpacity: 0.85,
                     exitDelay: 100, 
                     }
-
 
         var city_points = this.formatCountryData(this.props.metric);
 
@@ -458,10 +601,12 @@ var Map = React.createClass({
 
                     self.setState({
                         selected_country : false
-                    })
+                    });
+                    
+                    if (self.props.onCountryClickAdditional){
+                        self.props.onCountryClickAdditional(false);
+                    }
 
-                    //countlyLocation.drawGeoChart(false);
-                    //store.set("countly_location_city", false);
                     return true;
                 });
             }
@@ -592,8 +737,13 @@ var Map = React.createClass({
                                 
                 var locations_db = json;
                 //setMeta();
-                
+                                
                 self.citiesData = locations_db.citiesData;
+                
+                if (self.props.onCitiesData)
+                {
+                    self.props.onCitiesData(self.citiesData);
+                }
 
                 if (locations_db['meta']) {
                    var cities = (locations_db['meta']['cities']) ? locations_db['meta']['cities'] : [];
@@ -612,7 +762,7 @@ var Map = React.createClass({
                     { "name":"u" },
                     { "name":"n" }
                 ]);
-                
+                               
                 __callback(city_data);
                 
             }});
@@ -621,6 +771,17 @@ var Map = React.createClass({
     formatCountryData : function(ob){
         
         var self = this;
+        
+        var selected_iso2 = false;
+
+        for (var iso2 in iso3_country_codes)
+        {
+            if (iso3_country_codes[iso2].toLowerCase() == self.state.selected_country.toLowerCase())
+            {
+                selected_iso2 = iso2.toLowerCase();
+                break;
+            }
+        }
               
         ob = ob || {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', metric:"t"};
         var chartData = {cols:[], rows:[]};
@@ -673,7 +834,12 @@ var Map = React.createClass({
             {
                 return false;
             }
-
+         
+            if (selected_iso2 != coordsData.country.toLowerCase())
+            {
+                return false;
+            }
+            
             var linearMetric = parseInt(linear(cityChartData.metric));
 
             if (!coordsData.lat || !coordsData.lon)

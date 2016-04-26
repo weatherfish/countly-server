@@ -197,14 +197,18 @@ var SortTable = React.createClass({
         {
             var data = this.props.data_function();
         }
-        
+              
         if (data.get_current_data)
         {
             var full_rows = data.get_current_data(granularity); // todo: only daily
         }
-        else
+        else if (data.chartData)
         {
             var full_rows = data.chartData;
+        }
+        else
+        {
+            var full_rows = data; // /metrics/countries - city data
         }
 
         if (this.props.convert_data_function)
@@ -229,6 +233,16 @@ var SortTable = React.createClass({
     },
 
     componentWillReceiveProps: function(nextProps) {
+        
+        if (nextProps.initial_sort != this.props.initial_sort)
+        {
+            
+            this.setState({
+                sortBy : false
+            })
+            
+            return false;
+        }
 
         /*if (nextProps.date != this.props.date) // todo !!!!!!!!!!!!!!!!!!!!!!
         {*/
@@ -246,9 +260,13 @@ var SortTable = React.createClass({
             {
                 var rows = data.get_current_data(nextProps.granularity);
             }
-            else
+            else if (data.chartData)
             {
                 var rows = data.chartData;
+            }
+            else
+            {
+                var rows = data; // /metrics/countries - city data
             }
 
             if (nextProps.convert_data_function)
@@ -266,17 +284,9 @@ var SortTable = React.createClass({
 
     filterFunction : function(filter)
     {
-/*
-        this.setState({
-            filter : filter
-        });
-        */
-        this.filter = filter;
-        
-        this.setState(this.make_pagination(this.state.full_rows, true));
-        
-        return true;
-        
+        this.filter = filter;        
+        this.setState(this.make_pagination(this.state.full_rows, true));        
+        return true;        
     },
 
     sort_rows_by(cellDataKey) {
@@ -415,6 +425,14 @@ var SortTable = React.createClass({
 
     make_pagination : function(full_rows, old_data)
     {
+        
+        console.log("{{{{ make_pagination }}}}}}}}}}");
+        console.log(full_rows);
+        
+        if (!old_data)
+        {
+            var original_full_rows = full_rows;
+        }
 
         var sortDir = (this.state && this.state.sortDir) ? this.state.sortDir : 'ASC';    
         var sortBy = (this.state && this.state.sortBy) ? this.state.sortBy : this.props.initial_sort; 
@@ -490,13 +508,10 @@ var SortTable = React.createClass({
                     a = a[sortBy];
                     b = b[sortBy];
                 }
-
+                                
                 return this.props.sort_functions[sortBy](a, b, sortBy, sortDir);
             });
         }
-
-        console.log("----- full_rows --------");
-        console.log(full_rows);
 
         // --------------------
 
@@ -517,11 +532,16 @@ var SortTable = React.createClass({
             pages : pages,
             //full_rows : full_rows
         }
-
+        
+        if (!old_data)
+        {
+            pagination.full_rows = original_full_rows;
+        }
+/*
         if (!old_data)
         {
             pagination.full_rows = full_rows;
-        }
+        }*/
 
         return pagination;
 

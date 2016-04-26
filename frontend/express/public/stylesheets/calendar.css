@@ -13,7 +13,7 @@
 #calendar {
   position: absolute;
   /*top         : 100px;
-		left        : 280px;*/
+    left        : 280px;*/
   top: 20px;
   left: 30px;
   z-index: 1200;
@@ -64,7 +64,7 @@
   top: 6px;
   right: 10px;
   /*margin-left : 7px;
-		margin-right : 7px;*/
+    margin-right : 7px;*/
 }
 #calendar .dates_list {
   /*position : absolute;*/
@@ -82,6 +82,7 @@
   -moz-transform: translate3d(100px, 17px, 0);
   -ms-transform: translate3d(100px, 17px, 0);
   -o-transform: translate3d(100px, 17px, 0);
+  transform: translate3d(100px, 17px, 0);
   -webkit-transition: all 0.1s 0s linear;
   -moz-transition: all 0.1s 0s linear;
   -o-transition: all 0.1s 0s linear;
@@ -105,6 +106,7 @@
   -moz-transform: translate3d(100px, 10px, 0);
   -ms-transform: translate3d(100px, 10px, 0);
   -o-transform: translate3d(100px, 10px, 0);
+  transform: translate3d(100px, 10px, 0);
   -webkit-transition: all 0.1s 0s linear;
   -moz-transition: all 0.1s 0s linear;
   -o-transition: all 0.1s 0s linear;
@@ -206,7 +208,7 @@
   position: absolute;
   top: 42px;
   left: 250px;
-  width: 420px;
+  width: 410px;
   height: 281px;
   background-color: #141821;
   opacity: 0;
@@ -230,13 +232,16 @@
   display: inline-block;
   position: absolute;
   top: 20px;
-  left: 210px;
+  left: 220px;
 }
 #calendar .calendars > div.calendar_wrapper:first-child {
   left: 20px !important;
 }
 #calendar .calendars.hidden {
   display: none;
+}
+#calendar .rw-calendar {
+  background-color: #141821 !important;
 }
 #calendar .rw-calendar > div {
   height: 20px;
@@ -252,11 +257,11 @@
   border-spacing: 0px;
   text-align: center;
   /*border-right   : 1px solid @border_color_1;
-		border-bottom  : 1px solid @border_color_1;*/
+    border-bottom  : 1px solid @border_color_1;*/
 }
 #calendar .rw-calendar table > tbody > tr > td {
   /*border-left : 1px solid @border_color_1;
-		border-top  : 1px solid @border_color_1;*/
+    border-top  : 1px solid @border_color_1;*/
   padding: 0px;
 }
 #calendar .rw-calendar table > tbody > tr > td span {
@@ -298,6 +303,9 @@
   background-color: #141821;
   font-family: Lato-Regular;
   color: #ffffff;
+}
+#calendar .rw-header .rw-btn-view {
+  background-color: #141821 !important;
 }
 #calendar thead > tr > th {
   color: white;

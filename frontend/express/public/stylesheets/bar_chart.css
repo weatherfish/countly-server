@@ -14,22 +14,14 @@
 
 .bar_chart
 {
-
     position : relative;
-
     overflow : visible;
     position : relative;
-
-
     font-family: Lato-Regular;
-
     background-color : white;
-    z-index : 5000;
-    /*border: 1px solid #eeeeee;*/
+    z-index : 5000; 
     padding-top : 30px;
-    padding-bottom : 20px;
-
-    /*margin-top : 100px;*/
+    padding-bottom : 20px;   
 }
 
 .bar_chart g {
@@ -77,63 +69,17 @@
 }
 
 .bar_chart .y_grid .tick {
-
     z-index : -1;
     stroke : #D5D5D5;
     stroke-width : 1px;
     stroke-dasharray : 5 5;
-
-  /*  stroke: 1px solid #D5D5D5;
-    stroke-dasharray: 5, 3;
-    stroke-width: 1px;
-    shape-rendering: geometricPrecision;*/
-
-    /*z-index:-1;*/
-    /*
-    stroke: 1px solid #D5D5D5;
-    stroke-dasharray: 5, 3;
-    stroke-width: 1px;
-    shape-rendering: geometricPrecision;
-    /*stroke:rgba(0,0,0,.20);*/
-/*
-
-
-    stroke-width:1px;
-    stroke-dasharray:1 1*/
 }
 
 .bar_chart .y_grid text {
     display : none;
 }
 
-/*.bar_chart .y_grid .tick{z-index:-1;stroke:rgba(0,0,0,.20);stroke-width:1px;stroke-dasharray:1 1}*/
 .bar_chart .y_grid path{fill:none;stroke:none}
-/*.bar_chart .y_ticks path{fill:none;stroke:#808080}
-.bar_chart .y_ticks text{opacity:.5;font-size:12px;pointer-events:none}
-.bar_chart .x_tick.glow .title,.rickshaw_graph .y_ticks.glow text{fill:black;color:#000;text-shadow:-1px 1px 0 rgba(255,255,255,.1),1px -1px 0 rgba(255,255,255,.1),1px 1px 0 rgba(255,255,255,.1),0px 1px 0 rgba(255,255,255,.1),0px -1px 0 rgba(255,255,255,.1),1px 0 0 rgba(255,255,255,.1),-1px 0 0 rgba(255,255,255,.1),-1px -1px 0 rgba(255,255,255,.1)}.rickshaw_graph .x_tick.inverse .title,.rickshaw_graph .y_ticks.inverse text{fill:white;color:#fff;text-shadow:-1px 1px 0 rgba(0,0,0,.8),1px -1px 0 rgba(0,0,0,.8),1px 1px 0 rgba(0,0,0,.8),0px 1px 0 rgba(0,0,0,.8),0px -1px 0 rgba(0,0,0,.8),1px 0 0 rgba(0,0,0,.8),-1px 0 0 rgba(0,0,0,.8),-1px -1px 0 rgba(0,0,0,.8)}.rickshaw_legend{font-family:Arial;font-size:12px;color:#fff;background:#404040;display:inline-block;padding:12px 5px;border-radius:2px;position:relative}.rickshaw_legend:hover{z-index:10}.rickshaw_legend .swatch{width:10px;height:10px;border:1px solid rgba(0,0,0,.2)}.rickshaw_legend .line{clear:both;line-height:140%;padding-right:15px}.rickshaw_legend .line .swatch{display:inline-block;margin-right:3px;border-radius:2px}.rickshaw_legend .label{white-space:nowrap;display:inline}.rickshaw_legend .action:hover{opacity:.6}.rickshaw_legend .action{margin-right:.2em;font-size:10px;opacity:.2;cursor:pointer;font-size:14px}.rickshaw_legend .line.disabled{opacity:.4}.rickshaw_legend ul{list-style-type:none;margin:0;padding:0;margin:2px;cursor:pointer}.rickshaw_legend li{padding:0 0 0 2px;min-width:80px;white-space:nowrap}.rickshaw_legend li:hover{background:rgba(255,255,255,.08);border-radius:3px}.rickshaw_legend li:active{background:rgba(255,255,255,.2);border-radius:3px}
-*/
-/*
-.tick {
-    width  : 16px;
-    height : 16px;
-    border : 1px solid;
-    border-radius : 3px;
-    /*position : absolute;
-    right : 0px;
-    top : 0px;*/
-/*}
-
-.tick .tick_img {
-
-    background : url('../images/tick.svg');
-    background-image: url("../images/tick.svg");
-    background-repeat   : no-repeat;
-    background-position : center;
-
-    width  : 16px;
-    height : 16px;
-
-}*/
 
 .checkbox_rect {
     cursor : pointer;
@@ -145,14 +91,14 @@
 }
 
 .bar_chart .axis {
-	  font: 10px sans-serif;
+    font: 10px sans-serif;
 }
 
 .bar_chart .axis path,
 .bar_chart .axis line {
-	  fill: none;
-	  stroke: #000;
-	  shape-rendering: crispEdges;
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
 }
 
 .bar_chart .y_axis {

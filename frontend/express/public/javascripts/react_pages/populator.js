@@ -40,20 +40,21 @@ var Populator = React.createClass({
     start_generation : function(){
         
         console.log("{{{{{{ start generation }}}}}}}}}]");
-        
+        /*
         this.settings.date_from = "2016-02-02";
         this.settings.date_to = "2016-02-04";
         
         var start_time = moment(this.settings.date_from, 'YYYY-MM-DD').unix();
         var end_time = moment(this.settings.date_to, 'YYYY-MM-DD').unix();
+        */
         
-        console.log("start time:", start_time);
-        console.log("end_time:", end_time);
+        console.log("start time:", this.settings.date_from);
+        console.log("end_time:", this.settings.date_to);
         
         //var newUnixTimeStamp = moment(value, 'YYYY-MM-DD').unix();
         
-        countlyPopulator.setStartTime(start_time);
-        countlyPopulator.setEndTime(end_time);
+        countlyPopulator.setStartTime(this.settings.date_from);
+        countlyPopulator.setEndTime(this.settings.date_to);
         countlyPopulator.generateUsers(this.settings.amount_users);
         
         this.setState({
@@ -69,6 +70,16 @@ var Populator = React.createClass({
                         
         });
     },
+    
+    date_changed : function(date){
+        
+        console.log("======== populator date_changed ========");
+        console.log(date);
+        
+        this.settings.date_from = date.period[0] / 1000;
+        this.settings.date_to = date.period[1] / 1000;
+          
+    },
 
     render : function(){
 
@@ -78,24 +89,9 @@ var Populator = React.createClass({
             "width" : elements_width
         }
  
- /*
- <InputBlock
-                            label={jQuery.i18n.map["populator.date-from"]}
-                            value={"2016-02-02"}
-                            onChange={this.on_setting_change}
-                            setting={"date_from"}                            
-                        />
-                        <InputBlock
-                            label={jQuery.i18n.map["populator.date-to"]}
-                            value={"2016-02-04"}
-                            onChange={this.on_setting_change}
-                            setting={"date_to"}                            
-                        />
- */
- 
         return (
                 <div id="populator" style={page_style}>
-                    <div className="headline">data populator</div>
+                    <div className="headline">populator</div>
                     <div className="control_block">
                     
                         <InputBlock
@@ -115,6 +111,11 @@ var Populator = React.createClass({
                             type="int"
                         />
                         
+                        <CalendarWrapper
+                            onDateChange={this.date_changed}
+                            offset_top={0}
+                            language={false}
+                        />
                         
 
                         {(() => {
@@ -122,7 +123,7 @@ var Populator = React.createClass({
                             if (!this.state.in_progress)
                             {
                                 return (<div className="generate_button" onClick={this.start_generation}>
-                                    GENERATE
+                                    generate
                                 </div>)
                             }
                             else
@@ -130,7 +131,7 @@ var Populator = React.createClass({
                                 return (<div>
                                     in progress...
                                     <div className="generate_button" onClick={this.stop_generation}>
-                                        STOP
+                                        stop
                                     </div>
                                 </div>);
                             }
@@ -185,7 +186,21 @@ var Populator = React.createClass({
                 
             </div>)
         
-        
+         
+ /*
+ <InputBlock
+                            label={jQuery.i18n.map["populator.date-from"]}
+                            value={"2016-02-02"}
+                            onChange={this.on_setting_change}
+                            setting={"date_from"}                            
+                        />
+                        <InputBlock
+                            label={jQuery.i18n.map["populator.date-to"]}
+                            value={"2016-02-04"}
+                            onChange={this.on_setting_change}
+                            setting={"date_to"}                            
+                        />
+ */
         
         /*
 

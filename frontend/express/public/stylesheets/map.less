@@ -1,9 +1,4 @@
-.background_image(@image){
-    background : url('../images/@{image}.png');
-    background-image: url("../images/@{image}.svg");
-    background-repeat   : no-repeat;
-    background-position : center;
-}
+@import "common.less";
 
 #map {
     margin-top : 40px;
@@ -15,11 +10,10 @@
 #map .city_hoverinfo {
     font-family : Lato-Regular;
     position : relative;
-    top : -120px;
-    left : -50px;
-    min-width : 100px;
+    top : -125px;
+    left : -85px;
+    min-width : 180px;
     height : 60px;
-    /*background-color : #141821;*/
     border-radius : 4px;
     padding-left : 10px;
     padding-right : 10px;
@@ -27,38 +21,64 @@
 }
 
 #map .city_hoverinfo .name {
-    
-    /*display : inline-block;
-    margin-top : 10px;
-    font-size : 18px;
-    color : white;
-   */
-    
-    background-color: #202531;
+    background-color: @bg_color_3;
     padding: 10px;
-    border-radius: 4px;
-    /* font-weight: bold; */
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
     font-family: Lato-Medium;
     font-size: 10px;
     color: #f5f5f5;
     letter-spacing: 0.69px;
     text-align: center;
-    
-    
 }
 
+/** ----------*/
+
 #map .city_hoverinfo .metric {
+    background-color: @bg_color_4;
+    
+    padding : 10px 0px 10px 0px;
+    
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
 
-    font-size : 24px;
-    font-family : Lato-Semibold;
-    color : white;
+#map .city_hoverinfo .metric .circle {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;        
+    margin-right : 10px;  
+}
 
+#map .city_hoverinfo .metric .label {
+    margin-right : 10px;    
+    font-family: Lato-Light;
+    font-size: 11px;
+    color: #E6E6E6;
+    letter-spacing: 0.76px;
+    white-space: nowrap;
+    text-transform : capitalize;
+    min-width : 60px;
+    display : inline-block;
+    text-align : left;
+
+}
+
+#map .city_hoverinfo .metric .count {   
+    display : inline-block;    
+    font-family: Lato-Regular;
+    font-size: 12px;
+    color: #FFFFFF;
+    letter-spacing: 0.83px;
 }
 
 #map .city_hoverinfo .bottom_arrow {
     position : absolute;
-    top : 60px;
-    left : 43px;
+    top : 70px;
+    left : 78px;
     width: 0;
     height: 0;
     border-style: solid;
@@ -71,29 +91,21 @@
 #map .country_hoverinfo {
     font-family : Lato-Regular;
     position : relative;
-    top : -120px;
-    left : -50px;
-    min-width : 100px;
+    top : -145px;
+    left : -75px;
+    min-width : 150px;
     /*height : 60px;*/
-    background-color : #141821;
-    border-radius : 4px;
-    /*padding-left : 10px;
-    padding-right : 10px;*/
+    background-color : @bg_color_4;
+    border-radius : 4px;   
     box-sizing : border-box;    
+    height : 100px;
 }
 
-#map .country_hoverinfo .name {
-    
-    /*display : inline-block;
-    margin-top : 10px;
-    font-size : 18px;
-    color : white;*/    
-    
-    background-color: #202531;
+#map .country_hoverinfo .name {    
+    background-color: @bg_color_3;
     padding: 10px;
     border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    /* font-weight: bold; */
+    border-top-right-radius: 4px;   
     font-family: Lato-Medium;
     font-size: 10px;
     color: #f5f5f5;
@@ -102,22 +114,64 @@
 }
 
 #map .country_hoverinfo .metric {
+    position : absolute;
+    bottom : 5px;
+    width : 100%;
+    
+    padding : 0px 0px 0px 0px;
+}
 
-    font-size : 24px;
-    font-family : Lato-Semibold;
-    color : white;
-    padding : 10px;
+#map .country_hoverinfo .metric .label {
+    margin-right : 10px;    
+    font-family: Lato-Light;
+    font-size: 11px;
+    color: #E6E6E6;
+    letter-spacing: 0.76px;
+    white-space: nowrap;
+    text-align: left;
+    text-transform : capitalize;
+}
+
+#map .country_hoverinfo .metric .count {   
+    display : inline-block;    
+    font-family: Lato-Regular;
+    font-size: 12px;
+    color: #FFFFFF;
+    letter-spacing: 0.83px;
+}
+
+#map .country_hoverinfo .metric .circle {
+    width: 8px;
+    height: 8px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;    
+    display: inline-block;
+    margin-left: 3px;    
 }
 
 #map .country_hoverinfo .bottom_arrow {
     position : absolute;
-    top : 80px;
-    left : 43px;
+    top : 100px;
+    left : 68px;
     width: 0;
     height: 0;
     border-style: solid;
     border-width: 7px 7px 0 7px;
-    border-color: #141821 transparent transparent transparent;
+    border-color: @bg_color_4 transparent transparent transparent;
+}
+
+#map .country_hoverinfo .country_chart {
+    background-color : @bg_color_4;
+    position : absolute;
+    top : 40px;
+    left : 25px;
+    overflow: visible;
+    opacity : 0.8;
+}
+
+#map .hoverinfo.return {
+    font-family : Lato-Semibold;
 }
 
 /*  ----------------------------- */
@@ -125,10 +179,8 @@
 .map_wrapper .headline_sign {
     font-family: Lato-Semibold;
     font-size: 17px;
-    color: #132737;
-    letter-spacing: 1.39px;
-    /*margin-top : 0px;
-    margin-left : 30px;*/
+    color: @bg_color_4;
+    letter-spacing: 1.39px;    
     position : absolute;
     top : 30px;
     left : 30px;

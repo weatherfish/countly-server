@@ -8,9 +8,13 @@ frontend/express/certificates
 frontend/express/public/javascripts/min
 frontend/express/public/localization/min
 frontend/express/public/stylesheets/*.min.css
+frontend/express/public/stylesheets/compiled_css*
 plugins/plugins.json
 frontend/express/public/sdk/
 **/.DS_Store
 **/node_modules
 frontend/express/public/javascripts/react_pages_compiled
 frontend/express/public/javascripts/react_components_compiled
+bin/scripts/cities1000.txt
+bin/scripts/geo_data
+bin/scripts/TM_WORLD_BORDERS-0.3.zip

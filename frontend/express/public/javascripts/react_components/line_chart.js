@@ -430,17 +430,12 @@ var LineChart = React.createClass({
             var granularity_rows = this.props.data_function().get_current_data();
         }
         
-        console.log("{{{{{{{{{{{ will check }}}}}}}}}}}}}}}}}}");
-        console.log(granularity_rows);
-
         granularity_rows.every(function(datapath){
 
             datapath.data.every(function(datapoint){
 
                 var value = datapoint[1];
                 
-                console.log("check value :", value);
-
                 if (value > 0)
                 {
                     zero_points = false;
@@ -502,27 +497,23 @@ var LineChart = React.createClass({
         /*
             todo !!! remove array indexes below
         */
-
+        
         if (granularity_rows[0] && granularity_rows[0].mode == "ghost") // todo: fix for previous time ranges
         {
             for (var i = 0; i < granularity_rows[1].data.length; i++)
             {
-/*
+
                 if (!granularity_rows[0].data[i])
                 {
+                    console.log("!!! error here !!!");
                     continue;
                 }
-*/
-                //granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0];
-                
-                //console.log("construct:", new Date(granularity_rows[0].data[i][0]));
-                
+
                 granularity_rows[0].data[i][3] = granularity_rows[0].data[i][0]; // pass real date for previous date in tooltip 
                 granularity_rows[0].data[i][0] = granularity_rows[1].data[i][0]; // projection of previous time range on current time range
                 
             }
         }
-        //_granularity = new_granularity; // todo: remove global variable
 
         if (this.props.reverse_dp)
         {            

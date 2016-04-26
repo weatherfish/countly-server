@@ -52,10 +52,10 @@
             <% } %>
 
 
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/sidebar.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/topbar.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/calendar.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/line_chart.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_sidebar.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_topbar.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_calendar.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_line_chart.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/big_number.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/radio_button.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/javascripts/visualization/rickshaw/rickshaw.min.css" />
@@ -67,25 +67,25 @@
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/javascripts/react-widgets-restored/core.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/javascripts/react-widgets-restored/react-widgets.css" />
             
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/tables.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_tables.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/dashboard.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/date_sign_block.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/map.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/applications.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_map.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_applications.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/javascripts/fixed-data-table/dist/fixed-data-table.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/bar_chart.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/horizontal_bar_chart.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/manage_users.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/configurations.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/events_page.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/crashes_page.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/selector_with_search.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/select.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/multi_select.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/crash_details.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_manage_users.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_configurations.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_events_page.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_crashes_page.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_selector_with_search.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_select.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_multi_select.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_crash_details.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/bool_pie_chart.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/average_bar.css" />
-            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/platforms.css" />
+            <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/compiled_css_platforms.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/no_data_block.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/alert.css" />
             <link rel="stylesheet" type="text/css" href="<%- cdn %>/stylesheets/populator.css" />
@@ -138,6 +138,7 @@
             <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/datamaps/country_codes.js"></script>
             <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/datamaps/topojson.min.js"></script>
             <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/datamaps/datamaps.world.min.js"></script>
+            <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/visualization/datamaps/datamaps.usa.min.js"></script>
 
             <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/countly/countly.common.js?<%= countlyVersion %>"></script>
             <script language="javascript" type="text/javascript" src="<%- cdn %>/javascripts/countly/countly.config.js?<%= countlyVersion %>"></script>
@@ -472,6 +473,15 @@
 
             render() {
                 
+                if ((initial_applications.length != 0) && this.props.location.pathname.indexOf("/manage/users") == -1 && this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1 && this.props.location.pathname.indexOf("/crashes/") == -1 && this.props.location.pathname.indexOf("/manage/populator") == -1)
+                {
+                    var show_calendar = true;   
+                }
+                else
+                {
+                    var show_calendar = false;   
+                }
+                
                 if (this.props.location.pathname.indexOf("/events") > -1)
                 {
                     var calendar_offset_top = 70;
@@ -481,7 +491,7 @@
                     var calendar_offset_top = false;
                 }
 
-                if ((initial_applications.length != 0) && this.props.location.pathname.indexOf("/manage/users") == -1 && this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1 && this.props.location.pathname.indexOf("/crashes/") == -1)
+                if (show_calendar)
                 {
 
                     var calendar = <div id="calendar_block">
@@ -544,7 +554,7 @@
                         
                         {(() => {
                             
-                            if (this.state.date)
+                            if (this.state.date || !show_calendar)
                             {
                                 return (<div id="content-container" style={container_style}>
                                     {this.props.children && React.cloneElement(this.props.children, {

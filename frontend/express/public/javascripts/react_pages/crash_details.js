@@ -249,11 +249,12 @@ var CrashDetailsPage = React.createClass({
                                   className="metric_selector"
                               />
 
+/*
         // todo !!!: REMOVE !!!!!!!
         crash_data.run.max = (crash_data.run.max / 20).toFixed(2);
         crash_data.run.total = (crash_data.run.total / 10).toFixed(2);
         // todo !!!: REMOVE !!!!!!!
-
+*/
         // todo: change ID
 
         return (
@@ -501,7 +502,7 @@ var CrashDetailsPage = React.createClass({
                                 sort_functions={this.state.sort_functions}
                                 data_function={this.table_data_function}
                                 convert_data_function={false}
-                                initial_sort={"frequency"}
+                                initial_sort={"ts"}
                                 rows_per_page={20}
                                 date={this.props.date}
                             />

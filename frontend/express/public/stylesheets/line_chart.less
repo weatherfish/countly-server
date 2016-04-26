@@ -1,25 +1,9 @@
+@import "common.less";
+
 #line_chart_wrapper {
     background-color : white;
     margin-top : 30px;
 }
-
-/*.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-  stroke-dasharray: 10, 2;
-}
-
-.x.axis path {
-  display: none;
-}
-
-.line {
-    fill: none;
-    stroke: steelblue;
-    stroke-width: 3px;
-}*/
 
 #axis_left {
     position: absolute;
@@ -40,13 +24,6 @@
     bottom: 0;
     z-index : 1500;
 }
-/*
-.rickshaw_graph .y_grid .tick {
-    stroke: 1px solid #D5D5D5;
-    stroke-dasharray: 5, 3;
-    stroke-width: 1px;
-    shape-rendering: geometricPrecision;
-}*/
 
 .rickshaw_graph .y_grid .tick.first {
     stroke-dasharray: 5, 0 !important;
@@ -286,7 +263,7 @@
 }
 
 .granularity > div > span .incomplete_star.active {
-    background-color: #FF5800;
+    background-color: @incomplete_period_star;
 }
 
 .granularity > div > span > span {
@@ -297,28 +274,15 @@
 
     display : none;
     position : absolute;
-
-    /*top: 100px;
-    left : 400px;*/
     z-index : 5000;
-
     width : 245px;
     height : 54px;
     background-color: #202231;
-/*
-    position : absolute;
-
-    top : -70px;
-    left : -50px;
-  */
     color : white;
-    font-family: Lato-Regular;
-    /*padding-top : 10px;*/
+    font-family: Lato-Regular;  
     overflow : visible;
     border-radius: 2px;
-
     font-size : 12px;
-
     text-align : center;
 }
 
@@ -344,13 +308,11 @@
     font-size: 11px;
     color: #00D150;
     letter-spacing: 0.18px;
-    cursor : pointer;
-    /*font: inherit;*/
+    cursor : pointer;   
     border-bottom:1px solid #00D150;
     display: inline-block;
     padding : 0!important;
     margin-top : 6px;
-
 }
 
 .period_extend_block .bottom_arrow {
@@ -359,7 +321,6 @@
     border-style: solid;
     border-width: 7px 7px 0 7px;
     border-color: #202231 transparent transparent transparent;
-
     position : absolute;
     bottom : -7px;
     left : 119px;
@@ -377,8 +338,7 @@
 }
 
 #no_data_wrapper .big_sign {
-    font-size : 28px;
-    /*font-weight : bold;*/
+    font-size : 28px;   
     font-family: Lato-Regular;
 }
 
@@ -393,8 +353,7 @@
     top : 0px;
     left : -1px;
     width : 2px;
-    background-color : #000000;
-    /*height : 100%;*/
+    background-color : #000000;  
     z-index : 0;
     opacity: 0.1;
     transition : none !important;

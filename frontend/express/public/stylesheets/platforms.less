@@ -1,3 +1,5 @@
+@import "common.less";
+
 .platforms_page .horizontal_chart {
     margin-top : 30px;
 }
@@ -25,54 +27,34 @@
 }
 
 .blocks_box {
-
-    /*position : relative;
-    left : -40px;*/
-    border-top: 2px solid #eeeeee;
+    border-top: 2px solid @border_color_3;
     padding-top : 2px;
-
-
-    /*border-right : 4px solid red;*/
     box-sizing: border-box;
-
 }
-/*
-.blocks_box:first-of-type {
-    border-right:1px solid red;
-}
-*/
-/*
-.blocks_box:hover {
-    background-color : #eeeeee;
-}
-*/
 
 .blocks_box.active {
     border-top : 4px solid #19CC63;
     padding-top : 0px;
-    /*cursor : pointer;*/
     border-bottom : 1px solid #f4f4f4;
 }
 
 .blocks_box:not(.active){
     background-color : #F2F2F2;
-    border-bottom: 2px solid #eeeeee;
+    border-bottom: 2px solid @border_color_3;
 }
 
 .blocks_box:not(.active):hover {
-    background-color : #eeeeee;
+    background-color : @border_color_3;
     cursor : pointer;
 }
 
 .platforms_page .load_more {
-
     position: absolute;
     bottom: 20px;
     right : 22%;
     width : 50% !important;
     width: auto !important;
     text-align: center;
-
 }
 
 .platforms_page .table_wrapper {
@@ -81,7 +63,6 @@
 
 .platforms_page .horizontal_chart_wrapper {
     box-sizing: border-box;
-    /*margin-top : 25px !important;*/
 }
 
 .platforms_page .horizontal_chart {
@@ -95,7 +76,3 @@
 .platforms_page .block_label.active {
     font-family: Lato-Semibold;
 }
-/*
-.platforms_page .chart_label {
-    padding-top : 25px !important;
-}*/

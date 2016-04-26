@@ -6,58 +6,9 @@ var Dashboard = React.createClass({
 
     getInitialState: function() {
 
-        /*
-            Settings of horizontal bar chart
-        */
-
-        var top_items_bars = [
-            {
-                "title":jQuery.i18n.map["common.bar.top-platform"],
-                "data_function":countlyDeviceDetails.getPlatformBars,
-                "help":"dashboard.top-platforms"
-            },
-            {
-                "title":jQuery.i18n.map["common.bar.top-resolution"],
-                "data_function":countlyDeviceDetails.getResolutionBars,
-                "help":"dashboard.top-resolutions"
-            },
-            {
-                "title":jQuery.i18n.map["common.bar.top-carrier"],
-                "data_function":countlyCarrier.getCarrierBars,
-                "help":"dashboard.top-carriers"
-            },
-            {
-                "title":jQuery.i18n.map["common.bar.top-users"],
-                "data_function":countlySession.getTopUserBars,
-                "help":"dashboard.top-users"
-            }
-        ];
+        var top_items_bars = this.make_top_items_bars();       
         
-        var map_metrics = [
-            {
-                "id": "total",                
-                "label":jQuery.i18n.map["common.total-sessions"],      
-                "title":jQuery.i18n.map["common.total-sessions"],                  
-                "metric": "t",
-                "type": "number",                
-                "color" : "#1B8AF3"
-            },
-            {   
-                //"id": "total",                
-                "label":jQuery.i18n.map["common.total-users"], 
-                "title":jQuery.i18n.map["common.total-users"],                    
-                "metric" : "u",
-                "color" : "#1B8AF3",
-                "type": "number",                
-            },
-            {
-                "label":jQuery.i18n.map["common.new-users"],    
-                "title":jQuery.i18n.map["common.new-users"],                               
-                "metric" : "n",
-                "color" : "#1B8AF3",
-                "type": "number",                                
-            }
-        ];
+        var map_metrics = this.make_map_metrics();
              
         return {
             "date_period" : false,
@@ -65,41 +16,13 @@ var Dashboard = React.createClass({
             "inited" : false,
             "long_text_flag" : false,
             "language" : false,
-            "map_metric" : { id: "total", title : "test", label: "Sessions", type: "number", metric: "t" },
+            "map_metric" : map_metrics[0],
             "map_metrics" : map_metrics,
             "map_radio_button" : 0
         }
 
     },
     
-    __getSessionDPTotal : function(){                          
-        return this.GetTimeRanges(countlySession.getSessionDPTotal);          
-    },
-    
-    __getUserDPActive : function(){                          
-        return this.GetTimeRanges(countlySession.getUserDPActive);          
-    },
-    
-    __getUserDPNew : function(){                          
-        return this.GetTimeRanges(countlySession.getUserDPNew);          
-    },
-    
-    __getDurationDP : function(){
-        
-        console.log("[[[[[[[ __getDurationDP ]]]]]]]]]]]");
-        console.log(countlySession.getDurationDP());
-        
-        return this.GetTimeRanges(countlySession.getDurationDP);          
-    },
-    
-    __getDurationDPAvg : function(){                          
-        return this.GetTimeRanges(countlySession.getDurationDPAvg);          
-    },
-    
-    __getEventsDPAvg : function(){
-        return this.GetTimeRanges(countlySession.getEventsDPAvg); 
-    },
-
     make_tabs : function(){
 
         var sessionData = countlySession.getSessionData();
@@ -157,6 +80,96 @@ var Dashboard = React.createClass({
         return tabs;
 
     },
+    
+    make_map_metrics : function(){
+        
+        var map_metrics = [
+            {
+                "id" : 0,           
+                "label":jQuery.i18n.map["common.total-sessions"],      
+                "title":jQuery.i18n.map["common.total-sessions"],                  
+                "metric": "t",
+                "type": "number",                
+                "color" : "#1B8AF3"
+            },
+            {   
+                "id" : 1,
+                "label":jQuery.i18n.map["common.total-users"], 
+                "title":jQuery.i18n.map["common.total-users"],                    
+                "metric" : "u",
+                "color" : "#1B8AF3",
+                "type": "number",                
+            },
+            {
+                "id" : 2,
+                "label":jQuery.i18n.map["common.new-users"],    
+                "title":jQuery.i18n.map["common.new-users"],                               
+                "metric" : "n",
+                "color" : "#1B8AF3",
+                "type": "number",                                
+            }
+        ];
+        
+        return map_metrics;
+        
+    },    
+
+    make_top_items_bars : function(){
+        
+        /*
+            Settings of horizontal bar chart
+        */
+
+        var top_items_bars = [
+            {
+                "title":jQuery.i18n.map["common.bar.top-platform"],
+                "data_function":countlyDeviceDetails.getPlatformBars,
+                "help":"dashboard.top-platforms"
+            },
+            {
+                "title":jQuery.i18n.map["common.bar.top-resolution"],
+                "data_function":countlyDeviceDetails.getResolutionBars,
+                "help":"dashboard.top-resolutions"
+            },
+            {
+                "title":jQuery.i18n.map["common.bar.top-carrier"],
+                "data_function":countlyCarrier.getCarrierBars,
+                "help":"dashboard.top-carriers"
+            },
+            {
+                "title":jQuery.i18n.map["common.bar.top-users"],
+                "data_function":countlySession.getTopUserBars,
+                "help":"dashboard.top-users"
+            }
+        ];
+        
+        return top_items_bars;
+            
+    },
+        
+    __getSessionDPTotal : function(){                          
+        return this.GetTimeRanges(countlySession.getSessionDPTotal);          
+    },
+    
+    __getUserDPActive : function(){                          
+        return this.GetTimeRanges(countlySession.getUserDPActive);          
+    },
+    
+    __getUserDPNew : function(){                          
+        return this.GetTimeRanges(countlySession.getUserDPNew);          
+    },
+    
+    __getDurationDP : function(){    
+        return this.GetTimeRanges(countlySession.getDurationDP);          
+    },
+    
+    __getDurationDPAvg : function(){                          
+        return this.GetTimeRanges(countlySession.getDurationDPAvg);          
+    },
+    
+    __getEventsDPAvg : function(){
+        return this.GetTimeRanges(countlySession.getEventsDPAvg); 
+    },
 
     init_data : function(timestamp) {
 
@@ -178,22 +191,23 @@ var Dashboard = React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
 
-        if (this.state.language != nextProps.language)
-        {
-            var tabs = this.make_tabs();
-        }
-        else
-        {
-            var tabs = this.state.graph_tabs;
+        var state_obj = {
+            "date_period" : nextProps.date,
+            "language" : nextProps.language,
         }
 
+        if (this.state.language != nextProps.language)
+        {
+            state_obj.graph_tabs = this.make_tabs();
+            
+            state_obj.top_items_bars = this.make_top_items_bars();       
+        
+            state_obj.map_metrics = this.make_map_metrics(); 
+        }
+        
         /*if (nextProps.date != this.props.date) // todo
         {*/
-            this.setState({
-                "date_period" : nextProps.date,
-                "language" : nextProps.language,
-                "graph_tabs" : tabs
-            });
+            this.setState(state_obj);
         //}
     },
 
@@ -230,9 +244,6 @@ var Dashboard = React.createClass({
         }
 
         var metric = this.state.map_metrics[id];
-
-        console.log("====== set metric ========");
-        console.log(metric);
 
         this.setState({
             map_radio_button : id,
@@ -373,7 +384,8 @@ var Dashboard = React.createClass({
                 }
                 </div>
 
-                <LineChart trend_sign={false}
+                <LineChart 
+                    trend_sign={false}
                     width={elements_width}
                     height={260}
                     sides_padding={20}
@@ -385,6 +397,7 @@ var Dashboard = React.createClass({
                     update_graph_function={countlyCommon.updateTimeGraph}
                     lines_descriptions={lines_descriptions}
                     reverse_dp={true}
+                    language={this.props.language}
                 />
 
                 <DateSign
@@ -399,6 +412,7 @@ var Dashboard = React.createClass({
                     graph_label={"DEVICES DISTRIBUTION"}
                     label_key={"device"}
                     data={this.state.top_items_bars}
+                    language={this.props.language}
                 />
 
                 <DateSign

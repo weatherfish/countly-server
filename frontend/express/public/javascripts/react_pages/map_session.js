@@ -98,18 +98,10 @@ var MapSessionPage = React.createClass({
     },
 
     chart_data_function : function(){
-
-        console.log("======= chart data map =======");
-        console.log(countlySession.getSessionDP_map(this.state.iso2));
-
         return countlySession.getSessionDP_map(this.state.iso2);
-
     },
 
     data_modificator : function(country_data){
-
-        console.log("== modoficator ==");
-        console.log(country_data);
 
         var iso3 = country_data.id;
         var selected_iso2 = false;
@@ -158,7 +150,6 @@ var MapSessionPage = React.createClass({
                     break;
                 }
             }
-
         }
 
         this.setState({
@@ -185,11 +176,6 @@ var MapSessionPage = React.createClass({
         var page_style = {
             "width" : elements_width
         }
-
-        /*
-        margin_left={40 + 20}
-        graph_width={elements_width}
-        */
 
         return(
             <div className="page" style={page_style}>

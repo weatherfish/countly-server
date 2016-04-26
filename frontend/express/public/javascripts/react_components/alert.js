@@ -140,38 +140,22 @@ var Alert = React.createClass({
 
 
         var enter_points = this.vis.selectAll('.dot')
-                      .data(this.state.points_data)
-                      .enter()
-                      .append('g')
-                      .attr("class", "dot")
-                      .attr("transform", function(d) {
-                            return "translate(" + (Math.ceil(x(d.x))) + "," + (Math.ceil(y(d.y)) + 20) + ")"; } // tode: here in library is function for cross browser transform
-                      )
-                      .append('circle')
-                      .attr("r", 4)
-                      .attr('fill', color)
-                      .style("opacity", 0)
-              /*        
-        var enter_points2 = this.vis.selectAll('.dot2')
-                      .data(this.state.points_data)
-                      .enter()
-                      .append('g')
-                      .attr("class", "dot2")
-                      .attr("transform", function(d) {
-                            return "translate(" + (Math.ceil(x(d.x))) + "," + (Math.ceil(y(d.y))) + ")"; } // tode: here in library is function for cross browser transform
-                      )
-                      .append('circle')
-                      .attr("r", 2)
-                      .attr('fill', "#ffffff")
-                      .style("opacity", 0)              
-*/
+            .data(this.state.points_data)
+            .enter()
+            .append('g')
+            .attr("class", "dot")
+            .attr("transform", function(d) {
+                return "translate(" + (Math.ceil(x(d.x))) + "," + (Math.ceil(y(d.y)) + 20) + ")"; } // tode: here in library is function for cross browser transform
+            )
+            .append('circle')
+            .attr("r", 3)
+            .attr('fill', color)
+            .style("opacity", 0)
+
         enter_points.transition()
             .duration(500)
             .style("opacity", 1)
-        /*    
-        enter_points2.transition()
-            .duration(500)
-            .style("opacity", 1)*/
+
 
 
     },

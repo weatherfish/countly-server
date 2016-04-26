@@ -41,14 +41,23 @@ new lazy(fs.createReadStream('./cities1000.txt'))
         var line = line.toString().replace(/\s+/g,'+');
 
         line = line.split("+");
-
+        
         var city = line[1].toLowerCase(); // todo: "The" city
 
         var lat  = false;
         var lon  = false;
+        var country = false;
 
         for (var i = 2; i < line.length; i++)
         {
+            
+            //console.log(line[i], "length:", line[i].length);
+            
+            if (line[i].length == 2 && !country)
+            {
+                country = line[i];
+            }
+            
             if (line[i].indexOf(".") > -1) // if something like 55.3123
             {
                 if (!lat)
@@ -58,17 +67,18 @@ new lazy(fs.createReadStream('./cities1000.txt'))
                 else
                 {
                     lon = line[i];
-                    break;
+                    //break;
                 }
-            }
+            }                        
         }
 
         var data = {
             "city" : city,
             "lat"  : lat,
             "lon"  : lon,
+            "country" : country
         }
-       
+              
         insert_queue.push(data);
 
     }

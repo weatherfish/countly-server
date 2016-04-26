@@ -88,13 +88,14 @@ module.exports = function(grunt) {
                  'frontend/express/public/javascripts/visualization/datamaps/topojson.min.js',
                  'frontend/express/public/javascripts/visualization/datamaps/country_codes.js',
                  'frontend/express/public/javascripts/visualization/datamaps/datamaps.world.hires.min.js',
+                 'frontend/express/public/javascripts/visualization/datamaps/datamaps.usa.min.js',
   			],
   			dest: 'frontend/express/public/javascripts/min/countly.visualization.concat.js'
             //dest: 'frontend/express/public/javascripts/min/countly.visualization.js'
   		},
   		lib: {
   			src: [
-  				'frontend/express/public/javascripts/countly/countly.map.helper.js',
+  				//'frontend/express/public/javascripts/countly/countly.map.helper.js',
   				'frontend/express/public/javascripts/countly/countly.event.js',
   				'frontend/express/public/javascripts/countly/countly.session.js',
   				'frontend/express/public/javascripts/countly/countly.city.js',
@@ -150,34 +151,34 @@ module.exports = function(grunt) {
     		files: {
                 'frontend/express/public/stylesheets/main.min.css': [
                 'frontend/express/public/stylesheets/main.css',      
-                'frontend/express/public/stylesheets/sidebar.css',
-                "frontend/express/public/stylesheets/topbar.css",
-                "frontend/express/public/stylesheets/calendar.css",
-                "frontend/express/public/stylesheets/line_chart.css",
+                'frontend/express/public/stylesheets/compiled_css_sidebar.css',
+                "frontend/express/public/stylesheets/compiled_css_topbar.css",
+                "frontend/express/public/stylesheets/compiled_css_calendar.css",
+                "frontend/express/public/stylesheets/compiled_css_line_chart.css",
                 "frontend/express/public/stylesheets/big_number.css",
                 "frontend/express/public/stylesheets/radio_button.css",
                 "frontend/express/public/javascripts/visualization/rickshaw/rickshaw.min.css",
                 "frontend/express/public/javascripts/react-widgets/core.css",
                 "frontend/express/public/javascripts/react-widgets/react-widgets.css",
-                "frontend/express/public/stylesheets/tables.css",
+                "frontend/express/public/stylesheets/compiled_css_tables.css",
                 "frontend/express/public/stylesheets/dashboard.css",
                 "frontend/express/public/stylesheets/date_sign_block.css",
-                "frontend/express/public/stylesheets/map.css",
-                "frontend/express/public/stylesheets/applications.css",
+                "frontend/express/public/stylesheets/compiled_css_map.css",
+                "frontend/express/public/stylesheets/compiled_css_applications.css",
                 "frontend/express/public/javascripts/fixed-data-table/dist/fixed-data-table.css",
                 "frontend/express/public/stylesheets/bar_chart.css",
                 "frontend/express/public/stylesheets/horizontal_bar_chart.css",
-                "frontend/express/public/stylesheets/manage_users.css",
-                "frontend/express/public/stylesheets/configurations.css",
-                "frontend/express/public/stylesheets/events_page.css",
+                "frontend/express/public/stylesheets/compiled_css_manage_users.css",
+                "frontend/express/public/stylesheets/compiled_css_configurations.css",
+                "frontend/express/public/stylesheets/compiled_css_events_page.css",
                 "frontend/express/public/stylesheets/crashes_page.css",
-                "frontend/express/public/stylesheets/selector_with_search.css",
-                "frontend/express/public/stylesheets/select.css",
-                "frontend/express/public/stylesheets/multi_select.css",
-                "frontend/express/public/stylesheets/crash_details.css",
+                "frontend/express/public/stylesheets/compiled_css_selector_with_search.css",
+                "frontend/express/public/stylesheets/compiled_css_select.css",
+                "frontend/express/public/stylesheets/compiled_css_multi_select.css",
+                "frontend/express/public/stylesheets/compiled_css_crash_details.css",
                 "frontend/express/public/stylesheets/bool_pie_chart.css",
                 "frontend/express/public/stylesheets/average_bar.css",
-                "frontend/express/public/stylesheets/platforms.css",
+                "frontend/express/public/stylesheets/compiled_css_platforms.css",
                 "frontend/express/public/stylesheets/no_data_block.css",
                 "frontend/express/public/stylesheets/alert.css",    
                 "frontend/express/public/stylesheets/populator.css"                   
@@ -290,7 +291,7 @@ module.exports = function(grunt) {
 
 	grunt.config('concat.plugins.src', js);
 	//grunt.config('concat.plugins.dest', 'frontend/express/public/javascripts/min/countly.plugins.concat.js');
-  grunt.config('concat.plugins.dest', 'frontend/express/public/javascripts/min/countly.plugins.js');
+    grunt.config('concat.plugins.dest', 'frontend/express/public/javascripts/min/countly.plugins.js');
 
 	grunt.config('uglify.plugins.files.frontend/express/public/javascripts/min/countly\\.plugins\\.js', 'frontend/express/public/javascripts/min/countly.plugins.concat.js');
 

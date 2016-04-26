@@ -457,12 +457,12 @@ var usage = {},
                 } else if (params.qstring.metrics && params.qstring.metrics[tmpMetric.name]) {
                     recvMetricValue = params.qstring.metrics[tmpMetric.name];
                 }
-
+/*
                 // We check if city data logging is on and user's country is the configured country of the app
                 if (tmpMetric.name == "city" && (plugins.getConfig("api").city_data === false || params.app_cc != params.user.country)) {
                     continue;
                 }
-
+*/
                 if (recvMetricValue) {
                     //making sure metrics are strings
                     escapedMetricVal = (recvMetricValue+"").replace(/^\$/, "").replace(/\./g, ":");

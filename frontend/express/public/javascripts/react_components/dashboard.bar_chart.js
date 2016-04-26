@@ -5,28 +5,10 @@ var DashboardBarChart = React.createClass({
             period : false
         };
     },
-/*
-    componentWillMount: function() {
 
-        $(event_emitter).on('date_choise', function(e, period){ // todo: rename to date_change
-
-            this.setState({
-                period : period
-            });
-
-
-        }.bind(this));
-
-        $(event_emitter).on('data_changed', function(e, data){
-
-
-        }.bind(this));
-
-    },
-*/
     componentWillReceiveProps: function(nextProps) {
 
-        this.draw("#horizontal_chart"); // todo: !!!!!!!!!!!!
+        this.draw("#horizontal_chart");
 
     },
 
@@ -180,7 +162,7 @@ var DashboardBarChart = React.createClass({
                 /*.style("left", "10px")*/
                 .style("width", function(d, i){
 
-                    return (d.percent - 15) + "%"; // todo: remove -10 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    return (d.percent) + "%";
 
                 })
                 .style("height", bar_height + "px")
@@ -206,7 +188,7 @@ var DashboardBarChart = React.createClass({
             enter_blocks.append("div")
                 .attr("class", "percent")
                 .html(function(d, i) {
-                    return (d.percent - 15) + "%";
+                    return (d.percent) + "%";
                 })
                 .style("height", bar_height + "px")
                 .style("line-height", bar_height + "px")

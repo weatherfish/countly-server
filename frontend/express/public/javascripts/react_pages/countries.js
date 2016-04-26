@@ -8,15 +8,17 @@ var CountriesPage = React.createClass({
             "t" : math_sort,
             "n" : math_sort,
             "u" : math_sort,
+            "city" : math_sort,            
             "country_flag" : natural_sort
         }
 
         return ({
             sort_functions : sort_functions,
-            metric : {id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', "short":"t", "color" : "#1B8AF3"},
+            metric : {id:0, title:$.i18n.map["common.total-sessions"], type:'number', "short":"t", "color" : "#1B8AF3"},
             radio_button : 0,
             inited : false,
-            active_app : this.props.active_app
+            active_app : this.props.active_app,
+            selected_country : false
             /*maps : maps,
             cur_map : cur_map*/
         })
@@ -47,6 +49,7 @@ var CountriesPage = React.createClass({
 
             var metrics = [
                 {
+                    "id" : 0,
                     "title":jQuery.i18n.map["common.total-sessions"],
                     "total":sessionData.usage["total-sessions"].total,
                     "trend":sessionData.usage["total-sessions"].trend,
@@ -55,6 +58,7 @@ var CountriesPage = React.createClass({
                     "color" : "#1B8AF3"
                 },
                 {
+                    "id" : 1,
                     "title":jQuery.i18n.map["common.total-users"],
                     "total":sessionData.usage["total-users"].total,
                     "trend":sessionData.usage["total-users"].trend,
@@ -63,6 +67,7 @@ var CountriesPage = React.createClass({
                     "color" : "#F2B702"
                 },
                 {
+                    "id" : 2,
                     "title":jQuery.i18n.map["common.new-users"],
                     "total":sessionData.usage["new-users"].total,
                     "trend":sessionData.usage["new-users"].trend,
@@ -163,6 +168,27 @@ var CountriesPage = React.createClass({
         });
 
     },
+    
+    select_country : function(country){
+       
+        this.setState({
+            selected_country : (country ? country.toLowerCase() : false)
+        })
+          
+    },
+    
+    onCitiesData : function(data){
+        
+        console.log("=========== onCitiesData ==============");
+        console.log(data);          
+    },
+    
+    get_city_data : function(){
+        
+        var data = countlyCity.getLocationData();
+        return data;
+          
+    },
 
     render : function(){
 
@@ -185,12 +211,22 @@ var CountriesPage = React.createClass({
 
         var table_headers = JSON.parse(JSON.stringify(this.state.metrics));
 
-        table_headers.unshift({
-            "title" : jQuery.i18n.map["countries.table.country"], // jQuery.i18n.map["countries.table.city"]
-            //"help"  : "sessions.unique-sessions", // todo: add translate
-            "short" : "country_flag",
-        })
+        if (this.state.selected_country)
+        {
+            table_headers.unshift({
+                "title" : jQuery.i18n.map["countries.table.city"], 
+                "short" : "city",
+            })
+        }
+        else
+        {
+            table_headers.unshift({
+                "title" : jQuery.i18n.map["countries.table.country"],              
+                "short" : "country_flag",
+            })
+        }
 
+        
         return (
             <div className="page" style={page_style}>
 
@@ -199,6 +235,8 @@ var CountriesPage = React.createClass({
                     metric={this.state.metric}
                     height={map_height}
                     headline_sign={jQuery.i18n.map["countries.title"]}
+                    onCountryClickAdditional={this.select_country}
+                    onCitiesData={this.onCitiesData}
                 />
 
                 <div className="radio_buttons_container">
@@ -215,21 +253,45 @@ var CountriesPage = React.createClass({
                 }
 
                 </div>
-
-                <SortTable
-                    headers={table_headers}
-                    width={elements_width}
-                    row_height={50}
-                    data_sign={"DATA"}
-                    sort_functions={this.state.sort_functions}
-                    data_function={countlyLocation.getLocationData}
-                    convert_data_function={false}
-                    date_sign={"Date"}
-                    rows_per_page={20}
-                    filter_field={"country"}
-                    date={this.props.date}
-                    initial_sort={"country_flag"}
-                />
+                
+                {(() => {
+                    
+                    if (this.state.selected_country)
+                    {
+                        return (<SortTable
+                            key="country_table"
+                            headers={table_headers}
+                            width={elements_width}
+                            row_height={50}
+                            data_sign={"DATA"}
+                            sort_functions={this.state.sort_functions}
+                            data_function={this.get_city_data}
+                            convert_data_function={false}                            
+                            rows_per_page={20}
+                            filter_field={"city"}
+                            date={this.props.date}
+                            initial_sort={"city"}
+                        />);
+                    }
+                    else
+                    {
+                        return (<SortTable
+                            key="city_table"
+                            headers={table_headers}
+                            width={elements_width}
+                            row_height={50}
+                            data_sign={"DATA"}
+                            sort_functions={this.state.sort_functions}
+                            data_function={countlyLocation.getLocationData}
+                            convert_data_function={false}                           
+                            rows_per_page={20}
+                            filter_field={"country"}
+                            date={this.props.date}
+                            initial_sort={"country_flag"}
+                        />);
+                    }
+                    
+                })()}                
 
             </div>
         );

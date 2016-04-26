@@ -29,27 +29,148 @@ var DashboardMap = React.createClass({
 
     popupTemplate : function(geography, data) {
 
+        var self = this;
+/*
+        if (data)
+        {*/
+        
         if (data)
         {
-            var html = '<div class="country_hoverinfo">';  
-            html += "<div class='name'>" + geography.properties.name + "</div>"; 
-            html += "<div class='metric'>" + data.numberOfThings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</div>"; 
-            html += "<div class='bottom_arrow'></div>";
-            html += '</div>';
+            var count = data.numberOfThings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
         else
         {
-            //var html = '<div class="country_hoverinfo">' + geography.properties.name + ' : 0</div>';
-            var html = '<div class="country_hoverinfo">';  
-            html += "<div class='name'>" + geography.properties.name + "</div>"; 
-            html += "<div class='metric'>0</div>"; 
-            html += "<div class='bottom_arrow'></div>";
-            html += '</div>';
+            var count = 0;
         }
+        
+        var html = '<div class="country_hoverinfo" id="country_hoverinfo">';  
+        html += "<div class='name'>" + geography.properties.name + "</div>"; 
+        html += "<div class='metric'><span class='label'>" + this.props.metric.title.toLowerCase() + "</span><span class='count'>" + count + "</span></div>"; 
+        html += "<div class='bottom_arrow'></div>";
+        html += '</div>';
+            
+        // <span class='circle' style='background-color':'" + this.props.metric.color + "'></span>
+            
+        setTimeout(function(){
+            self.draw_tooltip_graph(geography.id);
+        }, 0);        
 
         return html;
     },
+    
+    draw_tooltip_graph : function(iso3) {
 
+        var self = this;
+
+        var width = 100;
+        var height = 30;// document.body.clientHeight;
+
+        //var iso3 = country_data.id;
+        var selected_iso2 = false;
+
+        for (var iso2 in iso3_country_codes)
+        {
+            if (iso3_country_codes[iso2].toLocaleLowerCase() == iso3.toLocaleLowerCase())
+            {
+                selected_iso2 = iso2/*.toLocaleLowerCase()*/;
+                break;
+            }
+        }
+                
+        var data = countlySession.getSessionDP_map(selected_iso2);
+        
+        console.log(data);
+        
+        if (data.chartDP[this.props.metric.id].data.length == 0)
+        {
+            return false;
+        }
+                
+        var step_size = Math.round(data.chartDP[this.props.metric.id].data.length / 10);
+                
+        var ready_data = [];
+        var cur_y = 0;
+        var cur_s = 0;
+        
+        for (var i = 0; i < data.chartDP[this.props.metric.id].data.length; i++)
+        {
+            
+            cur_y += data.chartDP[this.props.metric.id].data[i][1];
+            cur_s++;
+            
+            if (cur_s == step_size)
+            {
+                ready_data.push([data.chartDP[this.props.metric.id].data[i][0], cur_y]);
+                
+                cur_y = 0;
+                cur_s = 0;
+            }
+        }   
+        
+        if (cur_s > 0) // add last part of data also there
+        {
+            ready_data.push([data.chartDP[this.props.metric.id].data[data.chartDP[this.props.metric.id].data.length - 1][0], cur_y]);     
+        }        
+              
+        //var metric_data = data.chartDP[0].data;
+        
+        var metric_data = [];
+        
+        for (var i = 0; i < ready_data.length; i++)
+        {
+            metric_data.push({
+                "x" : i/*ready_data[i][0]*/,
+                "y" : ready_data[i][1],
+            })
+        }
+             
+        var max_y = 0;
+        
+        for (var i = 0; i < metric_data.length; i++)
+        {
+            if (metric_data[i].y > max_y)
+            {
+                max_y = metric_data[i].y;
+            }            
+        }
+        
+        var test_data = [1];
+            
+        this.country_tooltip_svg = d3.select("#country_hoverinfo").selectAll(".country_chart").data(test_data)
+            .enter()
+            .append("svg:svg")
+            .attr("class", "country_chart")
+            .attr('width', width + "px")
+            .attr('height', (height) + "px")               
+            //.style("background-color", "#ffffff"/*"#FF6138"*/)  // #FF6138
+                
+        this.selected_iso2 = selected_iso2;
+                   
+        var x = d3.scale.linear().range([0, width]).domain([0, (metric_data.length - 1)]);
+        var y = d3.scale.linear().range([0, height]).domain([max_y, 0]);
+
+        var line = d3.svg.line()
+            .x(function(d) {                
+              return x(d.x);
+            })
+            .y(function(d) { return y(d.y); })
+            .interpolate('linear').tension(0.8);  // 'cardinal',                    
+        
+        console.log("{{{{{{{{{{{[[ metric_data }}}}}}}}}}}}}]");
+        console.log(metric_data);
+        
+        var enter_path = this.country_tooltip_svg
+            .datum(metric_data)            
+                .append("path")          
+                .attr("class", "line")
+                .attr("d", line)
+                .attr("stroke", this.props.metric.color)
+                .attr("stroke-width", "2px")
+                .attr("fill", "none")
+                .style("opacity", 1)
+
+    },
+    
     draw : function(metric) {
 
         //var ob = { id: "total", label: "Sessions", type: "number", metric: "t" };
@@ -137,6 +258,12 @@ var DashboardMap = React.createClass({
         var chartData = {cols:[], rows:[]};
 
         var _locationsDb = countlyUser.getDbObj();
+        
+        if (!_locationsDb['meta'])
+        {
+            return false;
+        }
+        
         var _countries = _locationsDb['meta']['countries'];// countlyCommon.union({}, _locationsDb['meta']['countries']);
 
         var tt = countlyCommon.extractTwoLevelData(_locationsDb, _countries, countlyLocation.clearLocationObject, [
