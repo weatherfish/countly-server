@@ -122,37 +122,15 @@
             var yold = d3.scale.linear()
                 .range([height - bars_margin_bottom, 0]);
 
-
-            /*var y = d3.scale.linear()
-                    .range([0, 100]);*/
-
-
-            //var y = d3.scale.log(10000).range([height - bars_margin_bottom, 0]);
             var y_scale_circle = d3.scale.log(10).range([0, 30]);
 
-            //var y_scale_log = d3.scale.log().range([height - bars_margin_bottom, 0]);
-
-            /*var y = d3.scale.log()
-                .base(10)
-                .domain([1, 50000])
-                .range([0, 300]);*/
-
-
-            x.domain(dataPoints.map(function(d) { return d.f; }));
-            //y.domain([0, d3.max(dataPoints, function(d) { return d.t; })]);
+            x.domain(dataPoints.map(function(d) { return d.f; }));          
             y_scale_circle.domain([1, d3.max(dataPoints, function(d) { return d.t; })]).nice();
-            //y_scale_log.domain([1, 10000, d3.max(dataPoints, function(d) { return d.t; })]).nice();
-            //yold.domain([0, d3.max(dataPoints, function(d) { return d.t; })]);
-
-
+ 
             var y_scale_log = d3.scale.log()
                 .domain([1, d3.max(dataPoints, function(d) { return d.t; })]).nice()
                 .range([height - bars_margin_bottom, 0])
-                /*.base(10)*/
-
-
-            //var chart = d3.select(".chart");
-
+      
             if (!this.chart)
             {
                 this.chart = d3.select(container)
@@ -892,14 +870,23 @@
               	formatter: function(series, x, y, x0, y0, point, is_bottom_block, parent_element) {
 
                     var previous_x = false;  
-                        
-                    for (var i = 0; i < _state_single_graph_data[1].values.length; i++)
+                    
+                    if (_state_single_graph_data[1])
+                    {
+                        var test_values = _state_single_graph_data[1].values;
+                    }
+                    else
+                    {
+                        var test_values = _state_single_graph_data[0].values;
+                    }
+                                            
+                    for (var i = 0; i < test_values.length; i++)
                     {                        
-                        if (_state_single_graph_data[1].values[i].x == x)
+                        if (test_values[i].x == x)
                         {
                             //var days_count = series.data[i].days_count;
                                                       
-                            previous_x = _state_single_graph_data[1].values[i].previous_x;
+                            previous_x = test_values[i].previous_x;
                                 
                             break;
                         }
@@ -982,6 +969,7 @@
 
                     var hover_wrapper = document.createElement('div');
                 		hover_wrapper.className = 'hover_wrapper';
+                        hover_wrapper.id = 'line_chart_tooltip';
 
                     x_label.appendChild(hover_wrapper);
 
@@ -1041,7 +1029,7 @@
                                         }
                                         else
                                         {
-                                          return true
+                                            return true
                                         }
 
                                     });
@@ -1359,18 +1347,7 @@
             {
 
                 var set_data = granularity_rows[i];
-                /*
-                if (i == 1)
-                {
-                    console.log("<<<<<< set_data >>>>>>>>>>>>");
-                    console.log(set_data.data);
-                    /*
-                    for (var j = 0; j < set_data.data.length; j++)
-                    {
-                        console.log("~~ d ~", new Date(set_data.data[j][3]));
-                    }*/
-               /* }                */
-
+     
                 if (set_data.color)
                 {
                     var color = set_data.color;
@@ -1515,17 +1492,7 @@
         }
 
         _state_single_graph_data = JSON.parse(JSON.stringify(single_graph_data)); // todo: remove
-        //initial_single_graph_data = single_graph_data;        
- /*       
-        console.log("========= update draph _state_single_graph_data============");
-        console.log(_state_single_graph_data);*/
-/*
-        for (var s = 0; s < _state_single_graph_data[1].values.length; s++){
-            
-            console.log("******** _state_single_graph_data[1].values:", new Date(_state_single_graph_data[1].values[s].previous_x));
-            
-        }
-*/
+
         /*
             add or remove graph line path element
         */
@@ -1640,8 +1607,6 @@
 
             rangeTotal = 0;
 
-//            console.log("periodObj.isSpecialPeriod:", countlyCommon.periodObj.isSpecialPeriod);
-
             if (!countlyCommon.periodObj.isSpecialPeriod || countlyCommon.periodObj.activePeriod) {
                 var tmp_x = countlyCommon.getDescendantProp(db, countlyCommon.periodObj.activePeriod + "." + propertyName);
 
@@ -1659,10 +1624,7 @@
                 }
             } else {
                 var tmpRangeTotal = 0;
-/*
-                console.log(":::::::::::::: special period :::::::::::::::");
-                console.log(countlyCommon.periodObj);
-*/
+
                 for (var i = 0; i < (countlyCommon.periodObj.uniquePeriodArr.length); i++) {
                     var tmp_x = countlyCommon.getDescendantProp(db, countlyCommon.periodObj.uniquePeriodArr[i] + "." + propertyName);
 
@@ -1708,10 +1670,7 @@
     countlyCommon.extractChartData = function (db, clearFunction, chartData, dataProperties) {
 
         countlyCommon.periodObj = getPeriodObj();
-/*
-        console.log("================= countlyCommon.periodObj =================");
-        console.log(countlyCommon.periodObj);
-*/
+
         var periodMin = countlyCommon.periodObj.periodMin,
             periodMax = (countlyCommon.periodObj.periodMax + 1),
             dataObj = {},
@@ -1759,10 +1718,7 @@
                     formattedDate = moment((activeDateArr[i]).replace(/\./g, "/"));
                     dataObj = countlyCommon.getDescendantProp(db, activeDateArr[i]);
                 }
-/*
-                console.log('}}}}}}}}}}}}}} dataObj }}}}}}}}}}}}}}');
-                console.log(dataObj);
-*/
+
                 dataObj = clearFunction(dataObj);
 
                 if (!tableData[i]) {

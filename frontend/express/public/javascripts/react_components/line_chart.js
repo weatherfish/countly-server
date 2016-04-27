@@ -14,10 +14,7 @@ var LineChart = React.createClass({
     {            
              
         var data_points = this.props.data_function();
-        
-        console.log("================= data_points =======================");
-        console.log(data_points);
-      
+              
         var line_chart_width = this.props.width - (this.props.sides_padding * 2);
 
         if (data_points.daily_granularity[0].mode == "ghost") // if previous time range in 0 index
@@ -52,8 +49,6 @@ var LineChart = React.createClass({
             {
                 var granularity = "daily";
             }
-
-            console.log("line chart init granularity:", granularity);
 
             if (granularity == "hourly")
             {
@@ -131,9 +126,6 @@ var LineChart = React.createClass({
             }
         }
         
-        console.log("{{{{{{{{{{{{ did mount granularity_rows before reverse }}}}}}}}}}}}}}}}}}}");
-        console.log(granularity_rows);
-
         if (this.props.reverse_dp)
         {
             granularity_rows.reverse();
@@ -228,21 +220,7 @@ var LineChart = React.createClass({
         this.setState(new_state)
 
     },
-/*
-    componentWillMount: function() {
 
-        $(event_emitter).off('granularity');
-        //$(event_emitter).off('date_choise');
-
-        $(event_emitter).on('granularity', function(e, granularity_type){
-
-            this.update(-1, granularity_type);
-
-        }.bind(this));
-
-    },
-
-*/
     onGranularityChange : function(granularity){
         
         this.update(-1, granularity);

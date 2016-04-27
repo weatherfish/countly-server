@@ -132,6 +132,7 @@ var DensitiesPage = React.createClass({
                     rows_per_page={20}
                     filter_field={"density"}
                     date={this.props.date}
+                    initial_sort={"density"}
                 />
 
             </div>

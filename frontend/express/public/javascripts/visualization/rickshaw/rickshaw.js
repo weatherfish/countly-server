@@ -1950,8 +1950,6 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
         
         var first_digit = parseInt(y_domain.toString()[0]);
         
-        //console.log("first digit:", first_digit);
-        
         var y_domain_string = (first_digit + 1).toString();
 
         for (var i = 0; i < y_domain.toString().length - 1; i++)
@@ -1960,9 +1958,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
         }
         
         y_domain = parseInt(y_domain_string);
-        
-        //console.log("new domain:", y_domain);
-        
+                
         var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, this.graph.height]); // todo: change to height variable
         
         var tick_values = [];
@@ -2440,7 +2436,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
         };
         
         var element = this.element = document.createElement('div');
-        element.className = 'detail';
+        element.className = 'detail line_chart_tooltip';
         
         this.visible = true;
         graph.element.appendChild(element);
@@ -2597,8 +2593,6 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
                       //this.point_focused = true;
             }
 
-            //console.log("x_distance:", Math.pow(Math.abs(graph.x(value.x) - eventX), 2));
-
             var xFormatter = series.xFormatter || this.xFormatter;
             var yFormatter = series.yFormatter || this.yFormatter;
 
@@ -2639,10 +2633,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
         var max_point = false;
         
         points.forEach(function(p){
-        
-            /*console.log("seacrh point: >>>>>>> ");
-            console.log(p.value.y);*/
-        
+                
             if (p.value.y > max_point_y)
             {
                 max_point = p;
@@ -2771,8 +2762,13 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
             clearInterval(self.transition_interval);
         }, delay);
     },
+    
+    current_x : false,    
+    tooltip_height : false,
 
 	render: function(args) {
+	   
+        var self = this;
 
         this.render_args = args;
     
@@ -2811,12 +2807,9 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
         var current_points_length = this.current_points.length;
     
         if (!this.block_height && !document.getElementsByClassName("hover_wrapper")[0]) // first initialization
-        {
-    
-            var block_height = (block_date_header_height + (block_date_header_padding * 2)) + ((datapoint_height * current_points_length) + (datapoint_padding * 2 * current_points_length)) + triangle_height + top_position; // todo: not the real block height
-    
-            this.block_height = block_height;
-    
+        {    
+            var block_height = (block_date_header_height + (block_date_header_padding * 2)) + ((datapoint_height * current_points_length) + (datapoint_padding * 2 * current_points_length)) + triangle_height + top_position; // todo: not the real block height    
+            this.block_height = block_height;    
         }
         else if (document.getElementsByClassName("hover_wrapper")[0]) // todo: this block never works
         {
@@ -2890,7 +2883,17 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
             var hover_top_position = graph.y(point.value.y) + triangle_height + top_position/*+ block_height*/;
         }   
         
-        this.element.style.top = hover_top_position + "px";
+        if (!is_bottom_block && this.current_x == point.value.y && this.tooltip_height)
+        {
+            this.element.style.top = graph.y(point.value.y) - this.tooltip_height - 28 + "px";
+            
+            var positioned = true;
+        }
+        else
+        {
+            this.current_x = point.value.y
+            this.element.style.top = hover_top_position + "px";
+        }
     
         var series = point.series;
     		var actualY = series.scale ? series.scale.invert(point.value.y) : point.value.y;
@@ -2964,7 +2967,6 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     
         this.guide_line.style.left = (tooltip_left - 1) + 'px';
 
-
 		var dot = document.createElement('div');
 
 		dot.className = 'dot';
@@ -3006,6 +3008,26 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 		if (typeof this.onRender == 'function') {
 			this.onRender(args);
 		}
+        
+        
+        if (!positioned)
+        {
+            
+            var point_y = graph.y(point.value.y);
+            
+            _.defer(function(){
+            
+                if (!is_bottom_block)
+                {                
+                    var block_height = document.getElementById('line_chart_tooltip').offsetHeight;   
+                        
+                    document.getElementsByClassName('line_chart_tooltip')[0].style.top = point_y - block_height - 25 + "px";   
+                                 
+                    self.tooltip_height = block_height;                   
+                }  
+            });
+        }        
+        
 	},
 
 	_calcLayoutError: function(alignables) {
@@ -3928,10 +3950,6 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
             })
             .attr("r", graph.circle_radius)
             .attr('fill', function(d,i){
-    /*
-                console.log("--- fill color ----");
-                console.log(d.color);
-    */
                 return d.color;
             })
 

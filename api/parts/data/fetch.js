@@ -652,7 +652,7 @@ var fetch = {},
 
             var iso2 = geo_data.iso2;
 
-            var patch = fs.readFileSync('./countries_geo_patch.json', 'utf8');
+            var patch = fs.readFileSync(__dirname + '/../../countries_geo_patch.json', 'utf8');
             patch = JSON.parse(patch);
             patch = patch[iso2];
 
