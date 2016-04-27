@@ -650,12 +650,7 @@ var fetch = {},
     fetch.countryLatLon = function (iso3, callback) {
         common.db.collection('countries_geo_data').findOne({ "iso3" : iso3 }, function (err, geo_data) {
 
-            /* new method */
-
             var iso2 = geo_data.iso2;
-
-            console.log("=============== fetch geo_data ===========");
-            console.log(geo_data);
 
             var patch = fs.readFileSync('./countries_geo_patch.json', 'utf8');
             patch = JSON.parse(patch);
@@ -751,9 +746,6 @@ var fetch = {},
 
             geo_data.lat = (geo_data.location_box.min_lat + geo_data.location_box.max_lat) / 2;
             geo_data.lon = (geo_data.location_box.min_lon + geo_data.location_box.max_lon) / 2;
-
-            //console.log("========== patch =======");
-            //console.log(patch);
 
             callback(err, geo_data);
         });

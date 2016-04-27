@@ -3,7 +3,7 @@
         "side" : "the difference in percent"
     },
     "AU" : {
-        "bottom" : -29
+        "bottom" : -20
     },
     "SD" : {
         "bottom" : -25
@@ -33,5 +33,17 @@
         "bottom" : -30,
         "left"   : 20,
         "right"  : -32
+    },
+    "DE" : {
+        "top" : 30,
+        "bottom" : 22
+    },
+    "DK" : {
+        "top" : 40,
+        "bottom" : 30
+    },
+    "DZ" : {
+        "top" : 10     
     }
+    
 }

@@ -718,10 +718,7 @@ if (cluster.isMaster) {
                                 case 'get_events':
                                     validateUserForDataReadAPI(params, countlyApi.data.fetch.fetchCollection, 'events');
                                     break;
-                                case 'country_latlon':
-                                    
-                                    console.log("--------- country_latlon ------")
-                                
+                                case 'country_latlon':                                                                    
                                     countlyApi.data.fetch.countryLatLon(params.qstring.iso3, function(error, result){
                                         common.returnOutput(params, result);
                                     });
