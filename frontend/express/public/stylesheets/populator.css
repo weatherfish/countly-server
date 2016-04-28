@@ -78,3 +78,11 @@
     margin-top : 0px;
     
 }
+
+#populator .in_progress {
+    position : absolute;
+    top : 270px;
+    left : 314px;   
+    font-family : Lato-Regular;
+    margin-top : 10px;
+}

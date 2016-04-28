@@ -66,9 +66,12 @@ var Populator = React.createClass({
     stop_generation : function(){
         console.log("[[[ click stop ]]]");
         countlyPopulator.stopGenerating(function(done){
-            console.log("- generator stop --");
-                        
+            console.log("- generator stop --");                        
         });
+        
+        this.setState({
+            in_progress : false
+        })
     },
     
     date_changed : function(date){
@@ -76,8 +79,16 @@ var Populator = React.createClass({
         console.log("======== populator date_changed ========");
         console.log(date);
         
-        this.settings.date_from = date.period[0] / 1000;
-        this.settings.date_to = date.period[1] / 1000;
+        if (date.period_timestamp)
+        {
+            this.settings.date_from = date.period_timestamp[0] / 1000;
+            this.settings.date_to = date.period_timestamp[1] / 1000;
+        }
+        else
+        {
+            this.settings.date_from = date.period[0] / 1000;
+            this.settings.date_to = date.period[1] / 1000;
+        } 
           
     },
 
@@ -128,11 +139,11 @@ var Populator = React.createClass({
                             }
                             else
                             {
-                                return (<div>
-                                    in progress...
+                                return (<div>                                    
                                     <div className="generate_button" onClick={this.stop_generation}>
                                         stop
                                     </div>
+                                    <div className="in_progress">in progress...</div>
                                 </div>);
                             }
                             

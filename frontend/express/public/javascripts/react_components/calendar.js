@@ -67,18 +67,9 @@ var CalendarWrapper = React.createClass({
 
         var date_range = countlyCommon.getDateRange();
         date_range = date_range.split(" - ");
-        
-        console.log(":::::: date_range :::::::::::");
-        console.log(date_range);
-        
-        console.log("{{{{{{{{{ initial period }}}}}}}}}}}");
-        console.log(countlyCommon.getPeriod());
-        
+
         var period_obj = countlyCommon.periodObj;
-        
-        console.log("{{{{{{{{{ initial periodObj }}}}}}}}}}}");
-        console.log(period_obj);
-        
+             
         this.props.onDateChange({ "period" : countlyCommon.getPeriod(), "period_timestamp" : [period_obj.start_of_period, period_obj.end_of_period] });
 
         // ------------
