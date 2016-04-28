@@ -33,9 +33,6 @@
                 dataType:"jsonp",
                 success:function (json) {
 
-                    console.log("====== from server =======");
-                    console.log(json);
-
                     _userDb = json;
                     setMeta();
 

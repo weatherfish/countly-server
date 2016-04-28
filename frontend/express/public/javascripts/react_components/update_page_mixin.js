@@ -4,8 +4,6 @@ var UpdatePageMixin = {
 
         var self = this;
         
-        countlyCommon.DASHBOARD_REFRESH_MS = 50000;
-
         var data_timestamp = Math.floor(Date.now());
 
         this.init_data(data_timestamp);

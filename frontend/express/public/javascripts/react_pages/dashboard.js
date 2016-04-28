@@ -264,8 +264,8 @@ var Dashboard = React.createClass({
         var elements_width = get_viewport_width();
 
         var graph_width = elements_width - 40; // todo
-        var map_width = elements_width - 260;
-        var map_height = 560;
+        var map_width = elements_width - 360;
+        var map_height = Math.round(map_width / 3 * 2.1);
 
         var dashboard_style = {
             "width" : elements_width

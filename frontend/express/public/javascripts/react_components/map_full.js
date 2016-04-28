@@ -3,6 +3,11 @@ var Map = React.createClass({
     previous_data : false,
     loaded : false,
     datamap : false,
+    
+    cityName : false,
+    
+    city_popup_left : false,
+    arrow_popup_left : false,
 
     getInitialState : function() {
 
@@ -11,8 +16,9 @@ var Map = React.createClass({
         return {
             element_id : "map",
             cityPoints : false,
+            date : this.props.date,
             selected_country  : false,
-            inited : false
+            inited : true //false
         }
 
     },
@@ -20,27 +26,40 @@ var Map = React.createClass({
     componentDidMount: function() {
 
         var self = this;
-       
+                      
+        this.draw();
+        
         this.getCitiesData(function(data){  
            
             self.setState({
                 city_data : data,
-                inited : true
-            })
-        });
-        
+                //inited : true
+            }, function(){
+                
+                if (self.state.selected_country && self.props.metric && !self.state.country_inited)
+                {                                                        
+                    self.setState({
+                        country_inited : true
+                    }, function(){ // todo: the element may not exist
+                        self.draw_country({
+                            height : 450,
+                            metric : self.props.metric,
+                            countryIso3 : self.state.selected_country
+                        });
+                    });
+                }                 
+            });
+        });        
     },
     
     componentDidUpdate : function()
     {
-
-        if (!this.state.city_data)
-        {
-            return false;
-        }
-
+        
+        var self = this;
+        
         if (!this.state.selected_country)
         {
+                      
             if (!this.datamap)
             {
                 this.draw();
@@ -51,14 +70,24 @@ var Map = React.createClass({
             }           
             
         }
-        else
+        else // country mode
         {
-            if (!this.state.inited)
+            
+            if (!this.state.city_data)
             {
-                this.draw_country({
-                    height : 450,
-                    metric : this.props.metric,
-                    countryIso3 : this.state.selected_country
+                return false;
+            }
+            
+            if (!self.state.country_inited)
+            {                
+                this.setState({
+                    country_inited : true
+                }, function(){
+                    self.draw_country({
+                        height : 450,
+                        metric : self.props.metric,
+                        countryIso3 : self.state.selected_country
+                    });
                 });
             }
         }
@@ -67,14 +96,17 @@ var Map = React.createClass({
     componentWillReceiveProps(nextProps){
                 
         var self = this;
-        
-        if (this.state.selected_country && nextProps.metric.id != this.props.metric.id)
-        {
-            _.defer(function () { // todo: _draw_country uses this.props.metric.color to change a color. this.props.metric.color contain old value now
-                self._draw_country(self.props.metric, self.zoomParams, self.chart_options, self.state.selected_country);  
-            });
-        }
-        
+                
+        if (this.state.selected_country && (nextProps.metric.id != this.props.metric.id || nextProps.date != this.state.date))
+        {            
+            this.setState({
+                date : nextProps.date
+            }, function(){
+                _.defer(function () { // todo: _draw_country uses this.props.metric.color to change a color. this.props.metric.color contain old value now
+                    self._draw_country(self.props.metric, self.zoomParams, self.chart_options, self.state.selected_country);  
+                });
+            });   
+        }        
     },
 
     world_map_popup : function(geography, data) {
@@ -221,12 +253,7 @@ var Map = React.createClass({
 
         return html;
     },
-
-    cityName : false,
     
-    city_popup_left : false,
-    arrow_popup_left : false,
-
     city_popup : function(geo, data) {
 
         var self = this;
@@ -267,8 +294,6 @@ var Map = React.createClass({
                 
                 document.getElementById("city_hoverinfo_arrow").style.left = (self.arrow_popup_left) + "px";                
                 
-                //console.log('=== tooltip width -------');
-                //console.log(width);
             });
         }                              
 
@@ -289,7 +314,7 @@ var Map = React.createClass({
         }
 
         var countryData = this.formatData(metric);
-        
+                
         this.previous_data = countryData;
 
         /*
@@ -352,7 +377,7 @@ var Map = React.createClass({
 
                 self.setState({
                     selected_country : countryIso,
-                    inited : false
+                    country_inited : false
                 })
                 
                 if (self.props.onCountryClickAdditional){
@@ -863,7 +888,7 @@ var Map = React.createClass({
     
     render : function(){
 
-        if (!this.state.inited)
+        if (this.state.selected_country && !this.state.country_inited)
         {
             return (<Loader/>);
         }

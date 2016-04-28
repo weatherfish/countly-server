@@ -177,9 +177,7 @@ var CountriesPage = React.createClass({
           
     },
     
-    onCitiesData : function(data){
-        
-        console.log("=========== onCitiesData ==============");
+    onCitiesData : function(data){        
         console.log(data);          
     },
     
@@ -202,9 +200,9 @@ var CountriesPage = React.createClass({
         var table_width = get_viewport_width();
 
         var elements_width = get_viewport_width();
-        var map_width = elements_width - 360;
-        var map_height = 480;
-        
+        var map_width = elements_width - 360;      
+        var map_height = Math.round(map_width / 3 * 2.2);
+                      
         var page_style = {
             "width" : elements_width
         }
@@ -232,11 +230,12 @@ var CountriesPage = React.createClass({
 
                 <Map
                     width={map_width}
-                    metric={this.state.metric}
                     height={map_height}
+                    metric={this.state.metric}                    
                     headline_sign={jQuery.i18n.map["countries.title"]}
                     onCountryClickAdditional={this.select_country}
                     onCitiesData={this.onCitiesData}
+                    date={this.props.date}
                 />
 
                 <div className="radio_buttons_container">

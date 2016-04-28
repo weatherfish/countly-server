@@ -171,7 +171,8 @@ var MapSessionPage = React.createClass({
         var elements_width = get_viewport_width();
         var chart_height = 300;
 
-        var map_width = elements_width - 360;
+        var map_width = elements_width - 360;      
+        var map_height = Math.round(map_width / 3 * 2.2);
 
         var page_style = {
             "width" : elements_width
@@ -183,7 +184,7 @@ var MapSessionPage = React.createClass({
                 <Map
                     width={map_width}
                     metric={{id:'total', label:$.i18n.map["sidebar.analytics.sessions"], type:'number', "short":"t", "color" : "#1B8AF3"}}
-                    height={480}
+                    height={map_height}
                     headline_sign="SELECT A COUNTRY"
                     onCountryClick={this.data_modificator}
                 />
