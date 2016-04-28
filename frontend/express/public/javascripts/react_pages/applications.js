@@ -197,7 +197,7 @@ var NewAppWindow = React.createClass({
         }
 
         var new_app_block_style = {
-            width : 440/*get_viewport_width()*/
+            width : 480/*get_viewport_width()*/
         };
 
         if (!this.props.open){
@@ -414,17 +414,12 @@ var ApplicationsPage = React.createClass({
 
     onAppCreate : function(app){
 
-        console.log("=========== on app create =======");
-
         this.props.on_app_create(app);
-
         this.selectAppClick(app.id);
 
     },
 
     selectAppClick : function(id){
-
-        console.log("selectAppClick:", id);
 
         var current_app = countlyGlobal['apps'][id];
 
@@ -472,10 +467,6 @@ var ApplicationsPage = React.createClass({
                     countlyGlobal['admin_apps'][updated_app._id][modAttr] = data[modAttr];
                 }
 
-                console.log("========= saved ==============");
-                console.log(countlyGlobal['apps'][updated_app._id]);
-                console.log(data);
-
                 self.props.on_app_edit(updated_app._id);
 
             }
@@ -487,15 +478,6 @@ var ApplicationsPage = React.createClass({
         var self = this;
 
         var current_app = this.state.current_app;
-
-        //return false;
-/*
-        CountlyHelpers.confirm(jQuery.i18n.map["management-applications.clear-confirm"], "red", function (result) {
-            
-            if (!result) {
-                return true;
-            }
-*/
 
         var _clear = function()
         {
@@ -514,9 +496,6 @@ var ApplicationsPage = React.createClass({
                 dataType:"jsonp",
                 success:function (result) {
                     
-                    console.log("{{{{{{{{{{ clear result }}}}}}}}}");
-                    console.log(result)
-
                     if(period == "all"){
                         countlySession.reset();
                         countlyLocation.reset();
@@ -560,10 +539,6 @@ var ApplicationsPage = React.createClass({
 
         var _delete = function()
         {
-
-            console.log("===== call delete =======");
-            console.log(self.state);
-            console.log(self.props);
             
             var _props = self.props;
 
@@ -710,10 +685,7 @@ var ApplicationsPage = React.createClass({
                     return false;
                 }
 
-                console.log("uploaded:", res);
-
                 var image_url = res.text;
-
                 __callback(false, image_url);
 
             })
@@ -761,19 +733,6 @@ var ApplicationsPage = React.createClass({
             });
 
         };
-/*
-        var confirm_block_style = {};
-
-        if (this.state.confirmation_waiting)
-        {
-            confirm_block_style.display = "block";
-            confirm_block_style.left = (elements_width / 2) - (300 / 2);
-        }*/
-        
-        /*
-         
-                
-        */
 
         return (
             <div id="applications_page" style={page_style}>
