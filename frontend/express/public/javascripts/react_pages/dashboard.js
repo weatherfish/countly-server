@@ -20,7 +20,6 @@ var Dashboard = React.createClass({
             "map_metrics" : map_metrics,
             "map_radio_button" : 0
         }
-
     },
     
     make_tabs : function(){
@@ -203,6 +202,12 @@ var Dashboard = React.createClass({
             state_obj.top_items_bars = this.make_top_items_bars();       
         
             state_obj.map_metrics = this.make_map_metrics(); 
+        }
+        
+        if (nextProps.date != this.state.date_period)
+        {
+            var data_timestamp = Math.floor(Date.now());            
+            this.init_data(data_timestamp);
         }
         
         /*if (nextProps.date != this.props.date) // todo

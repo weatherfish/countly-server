@@ -108,7 +108,6 @@
                 }
             }
 
-            //console.log("range_name:", range_name);
         }
 
         chartData.chartData = chart_data;

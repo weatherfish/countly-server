@@ -54,9 +54,10 @@ var LanguagePage = React.createClass({
             "labels_mapping" : labels_mapping,
             "sort_functions" : sort_functions,
             "headers" : headers,
-            "active_app" : this.props.active_app
+            "active_app" : this.props.active_app,
+            "date" : this.props.date,
+            "inited" : false
         });
-
     },
 
     init_data : function(timestamp) {
@@ -67,8 +68,7 @@ var LanguagePage = React.createClass({
 
             self.setState({
                 inited : true,
-            })
-
+            });
         });
     },
     
@@ -84,7 +84,16 @@ var LanguagePage = React.createClass({
             var data_timestamp = Math.floor(Date.now());
 
             this.init_data(data_timestamp);            
-        }    
+        }
+        else if (nextProps.date != this.state.date) 
+        {            
+            this.setState({
+                date : nextProps.date
+            }, function(){
+                var data_timestamp = Math.floor(Date.now());
+                self.init_data(data_timestamp); 
+            });  
+        }   
     },
 
     render : function(){

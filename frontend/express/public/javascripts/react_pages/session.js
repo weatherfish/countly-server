@@ -23,6 +23,11 @@ var SessionPage = React.createClass({
     init_data : function(timestamp)
     {
         var self = this;
+        
+        if (!timestamp)
+        {
+            var timestamp = Math.floor(Date.now());
+        }
 
         $.when(countlyUser.initialize()).then(function () {
             
@@ -125,6 +130,10 @@ var SessionPage = React.createClass({
         }
         else
         {
+            
+            var data_timestamp = Math.floor(Date.now());            
+            this.init_data(data_timestamp);
+            
             var big_numbers = this.make_big_numbers();
 
             this.setState({

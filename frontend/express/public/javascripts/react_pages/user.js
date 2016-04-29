@@ -117,13 +117,16 @@ var UserPage = React.createClass({
         }
         else
         {
+            
+            var data_timestamp = Math.floor(Date.now());            
+            this.init_data(data_timestamp);
+            
             var big_numbers = this.make_big_numbers();
 
             this.setState({
                 big_numbers : big_numbers
             });
-        }       
-
+        }
     },
 
     render : function(){

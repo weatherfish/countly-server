@@ -13,7 +13,8 @@ var EventsPage = React.createClass({
         return({
             sort_functions : sort_functions,
             inited : false,
-            loading : false
+            loading : false,
+            date : this.props.date
         });
 
     },
@@ -152,16 +153,24 @@ var EventsPage = React.createClass({
 
     componentWillReceiveProps : function(nextProps) {
 
-        //var self = this;
+        var new_state = {};
 
         if (!this.state.active_segmentation)
         {
             var headers = this.make_headers();
-
-            this.setState({
-                headers : headers
-            })
+            
+            new_state.headers = headers;                        
         }
+        
+        if (nextProps.date != this.state.date) 
+        {
+            var data_timestamp = Math.floor(Date.now());            
+            this.init_data(data_timestamp);
+            
+            new_state.date = nextProps.date;
+        }          
+        
+        this.setState(new_state);
 
     },
 

@@ -27,7 +27,8 @@ var DurationPage = React.createClass({
             sort_functions : sort_functions,
             headers : headers,
             inited : false,
-            active_app : this.props.active_app
+            active_app : this.props.active_app,
+            date : this.props.date
         });
 
     },
@@ -50,6 +51,8 @@ var DurationPage = React.createClass({
     },
     
     componentWillReceiveProps : function(nextProps) {
+        
+        var self = this;
                        
         if (nextProps.active_app != this.state.active_app) // active app changed
         {                                               
@@ -61,6 +64,15 @@ var DurationPage = React.createClass({
             var data_timestamp = Math.floor(Date.now());
 
             this.init_data(data_timestamp);            
+        }
+        else if (nextProps.date != this.state.date) 
+        {            
+            this.setState({
+                date : nextProps.date
+            }, function(){
+                var data_timestamp = Math.floor(Date.now());
+                self.init_data(data_timestamp); 
+            });  
         }    
     },
 

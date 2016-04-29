@@ -104,7 +104,7 @@ var NewAppWindow = React.createClass({
 
         if (!this.icon_file)
         {
-            alert("error");
+            alert("please add the icon");
             return false;
         }
 
@@ -140,20 +140,11 @@ var NewAppWindow = React.createClass({
                     "country":data.country
                 };
 
-                
-
                 // --------------------------------------------
 
                 var new_app_id = data["_id"];
 
-                //initAppManagement(new_app_id);
-
-                console.log("new_app_id:", new_app_id);
-
                 self.props.upload_icon(new_app_id, self.icon_file, function(error, result){
-
-                    console.log("--- add finish ----");
-                    console.log(result);
 
                     //initAppManagement(new_app_id);
 
@@ -369,8 +360,6 @@ var ApplicationsPage = React.createClass({
             var value = this.app_categories[key];
             this.app_categories_options[key] = value;
         }
-
-        console.log("init app id:", countlyCommon.ACTIVE_APP_ID);
 
         if (countlyCommon.ACTIVE_APP_ID)
         {

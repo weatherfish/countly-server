@@ -18,7 +18,8 @@ var CountriesPage = React.createClass({
             radio_button : 0,
             inited : false,
             active_app : this.props.active_app,
-            selected_country : false
+            selected_country : false,
+            date : this.props.date
             /*maps : maps,
             cur_map : cur_map*/
         })
@@ -115,6 +116,11 @@ var CountriesPage = React.createClass({
         }
         else
         {
+
+            var data_timestamp = Math.floor(Date.now());
+            this.init_data(data_timestamp);
+            
+            // -------------------------------
 
             var sessionData = countlySession.getSessionData();
     

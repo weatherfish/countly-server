@@ -300,6 +300,9 @@ var LineChart = React.createClass({
 
         var sessionDP = this.props.data_function();
         var big_numbers = this.state.big_numbers;
+        
+        console.log("-------- update -----------");
+        console.log(sessionDP);
 
         if (id > -1)
         {

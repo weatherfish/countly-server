@@ -44,7 +44,9 @@ var CarrierPage = React.createClass({
             "labels_mapping" : labels_mapping,
             "sort_functions" : sort_functions,
             "headers" : headers,
-            "inited" : false
+            "inited" : false,
+            "active_app" : this.props.active_app,
+            "date" : this.props.date
         });
 
     },
@@ -64,6 +66,36 @@ var CarrierPage = React.createClass({
             })
 
         });
+    },
+    
+    componentWillReceiveProps : function(nextProps) {
+                   
+        var self = this;           
+                       
+        if (nextProps.active_app != this.state.active_app) // active app changed
+        {                                               
+            this.setState({
+                active_app : nextProps.active_app,
+                inited : false
+            });
+            
+            var data_timestamp = Math.floor(Date.now());
+
+            this.init_data(data_timestamp);
+            
+        }
+        else
+        {                                    
+            var big_numbers = this.make_big_numbers();
+
+            this.setState({
+                big_numbers : big_numbers,
+                date : nextProps.date
+            }, function(){
+                var data_timestamp = Math.floor(Date.now());
+                self.init_data(data_timestamp); 
+            }); 
+        }
     },
 
     render : function(){

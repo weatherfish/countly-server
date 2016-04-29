@@ -137,7 +137,7 @@ var CrashesPage = React.createClass({
         };
 
         return {
-            "date_period" : false,
+            "date_period" : this.props.date,
             "table_headers" : table_headers,
             "inited" : false,
             "sort_functions" : sort_functions,
@@ -264,11 +264,19 @@ var CrashesPage = React.createClass({
         }
         else
         {
+            
+            if (nextProps.date != this.state.date_period)
+            {
+                var data_timestamp = Math.floor(Date.now());            
+                this.init_data(data_timestamp);
+            }
+            
             self.setState({
                 "graph_tabs" : self.make_graph_tabs(),
                 "date_period" : nextProps.date.period,
                 "loading" : false
-            });
+            });            
+            
         }        
     },
 
@@ -435,8 +443,6 @@ var CrashesPage = React.createClass({
         });
 */
         //long_text_flag = true; // todo: !remove
-
-        console.log("long_text_flag:", this.state.long_text_flag);
 
         if (this.state.long_text_flag)
         {

@@ -774,9 +774,6 @@
                 single_graph_data.push(obj);
             }
             
-            console.log("======== single_graph_data ==============");
-            console.log(single_graph_data);
-
             var series = [];
 
             single_graph_data.forEach(function(data, i){

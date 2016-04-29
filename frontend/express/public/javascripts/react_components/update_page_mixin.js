@@ -9,7 +9,7 @@ var UpdatePageMixin = {
         this.init_data(data_timestamp);
 
         this.interval = setInterval(function () {
-
+            
             var data_timestamp = Math.floor(Date.now());
 
             self.init_data(data_timestamp);
