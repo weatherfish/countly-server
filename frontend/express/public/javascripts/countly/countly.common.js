@@ -44,7 +44,7 @@
         }
     };
 
-    countlyCommon.setActiveApp = function (appId) {  
+    countlyCommon.setActiveApp = function (appId) {   
         countlyCommon.ACTIVE_APP_KEY = countlyGlobal['apps'][appId].key;
         countlyCommon.ACTIVE_APP_ID = appId;
         store.set("countly_active_app", appId);

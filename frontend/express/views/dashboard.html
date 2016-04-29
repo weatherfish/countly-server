@@ -688,8 +688,12 @@
             },
 
             on_active_app_change : function(app){
-                                                
-                app.id = app._id;
+                                
+                if (!app.id && app._id)
+                {
+                    app.id = app._id;
+                }                                                
+                
                 app.logo = app.id + ".png";
                 
                 __active_app = app;

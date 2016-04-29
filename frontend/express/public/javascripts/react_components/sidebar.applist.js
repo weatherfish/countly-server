@@ -88,14 +88,6 @@ var AppList = React.createClass({
                 <span>{app.name}</span>
             </div>)
 
-/*
-            return (
-                <div className={class_name} onClick={self.props.onAppChange.bind(self, app/*.key, app.id*/ /*)}>
-                    <img src={logo_src}/>
-                    <span>{app.name}</span>
-                </div>
-            );*/
-        //});
         }
 
         return (
