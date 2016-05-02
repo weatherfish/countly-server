@@ -145,8 +145,8 @@
 }
 
 .configurations_page .generate_api_key {    
-    border: 1px solid @green_button_type_2;
-    color: @green_button_type_2;
+    border: 1px solid @red_button;
+    color: @red_button;
     opacity : 0.8;
 }
 
@@ -157,12 +157,45 @@
 }
 
 .configurations_page .save_password_button.active {    
-    border: 1px solid @green_button_type_2;
-    color: @green_button_type_2;
+    border: 1px solid @red_button;
+    color: @red_button;
     opacity : 0.8;
 }
 
 .configurations_page .inner_link {
     position : relative;
     top : -60px;
+}
+
+.configurations_page .update_button {
+    width: 120px;
+    height: 30px;
+    line-height: 31px;    
+    cursor: pointer;    
+    text-align: center;    
+    margin-bottom : 20px;
+    display: inline-block;
+    border: 1px solid @green_button;
+    border-radius: 6px;
+    color: @green_button;    
+    opacity : 0.8;
+    position : relative;
+    left : 314px;
+}
+
+.configurations_page .update_button:hover {    
+    opacity : 1;       
+}
+
+.configurations_page .in_progress {
+    font-family : Lato-Regular;
+    width: 160px;
+    height: 30px;
+    line-height: 31px;        
+    text-align: center;    
+    margin-bottom : 20px;
+    display: block;
+    position : relative;
+    left : 314px;
+
 }

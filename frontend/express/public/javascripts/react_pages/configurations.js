@@ -25,8 +25,6 @@ var SwitchBlock = React.createClass({
 
         var state = e.target.checked;
 
-        console.log(">> state:", state);
-
         this.props.onChange(this.props.setting, state);
 
         this.setState({
@@ -53,9 +51,6 @@ var SwitchBlock = React.createClass({
         /*
         <div  onClick={this.switch_value.bind(this, true)} className={enable_button_class}>{jQuery.i18n.map["plugins.enable"]}</div>
         <div  onClick={this.switch_value.bind(this, false)} className={disable_button_class}>{jQuery.i18n.map["plugins.disable"]}</div>
-
-
-
         */
 
         if (this.state.enabled)
@@ -85,6 +80,112 @@ var SwitchBlock = React.createClass({
 */
     }
 
+});
+
+var UpdateBlock = React.createClass({
+       
+    //Private Properties
+    _data : [],
+   
+    getInitialState : function() {
+        
+        this.initialize();
+        
+        return ({
+            in_progress : false
+        });
+        
+    },
+   
+    //Public Methods
+    initialize : function() {
+		return $.ajax({
+            type:"GET",
+            url:countlyCommon.API_PARTS.data.r+"/updates",
+            data:{
+                "api_key":countlyGlobal.member.api_key,
+                "app_id":countlyCommon.ACTIVE_APP_ID
+            },
+            success:function (json) {
+                
+                console.log("------- get json data -------");
+                console.log(json);
+                
+                //_data = json;
+            }
+        });
+    },
+	
+	getData : function() {
+		return _data;
+    },
+    
+    update : function() {
+        
+        console.log("======= start update ===========");
+        
+        this.setState({
+            in_progress : true
+        })
+        
+        return false;
+                
+        return $.ajax({
+            type:"GET",
+            url:countlyCommon.API_PARTS.data.w+"/updates",
+            data:{
+                "api_key":countlyGlobal.member.api_key,
+                type: 'github',
+                id: 'HEAD'
+            }
+        });
+    },
+    
+    check : function(key) {
+		return $.ajax({
+            type:"GET",
+            url:countlyCommon.API_PARTS.data.r+"/updates/check",
+            data:{
+				"api_key":countlyGlobal.member.api_key,
+                key: key
+            }
+        });
+    },
+    
+    render : function(){
+        
+        var self = this;
+        
+        jQuery.i18n.map['updates.title'] = "updates block"; // todo
+        
+        return(        
+            <div className="category">
+                
+                    <div className="block_label">{jQuery.i18n.map['updates.title']}</div>
+                                                
+                    <div className="block_elements">
+                        <div className="update_status">{this.state.user_api_key}</div>
+                                                
+                        {(() => {
+                            
+                            if (!this.state.in_progress)
+                            {
+                                return (<div className="update_button" onClick={this.update}>
+                                    Update
+                                </div>)
+                            }
+                            else
+                            {
+                                return (<div className="in_progress">
+                                    update in progress...
+                                </div>)
+                            }                            
+                        
+                        })()}
+                        
+                    </div>
+                </div>);
+    }    
 });
 
 var ConfigurationsPage = React.createClass({
@@ -204,25 +305,18 @@ var ConfigurationsPage = React.createClass({
         
         var password_change_is_active = this.state.password_change_is_active;
         
-        console.log("------- new_config ---------");
-        console.log(new_config)
-
         if (setting[0] != "user")
         {
             this.updateConfigs(new_config, function(error, result){
 
                 if (error) console.log(error);
     
-                console.log(result);
+                //console.log(result);
     
             });
         }
         else
-        {
-            
-            console.log("------- new_config 2 ---------");
-            console.log(new_config.user)
-            
+        {           
             if (new_config.user.old_pass && (new_config.user.new_pass && this.check_pass(new_config.user.new_pass) && (new_config.user.new_pass == new_config.user.new_pass_again)))
             {
                 password_change_is_active = true;
@@ -277,7 +371,6 @@ var ConfigurationsPage = React.createClass({
                 console.log(result)
             }
         });
-
     },
     
     generate_api_key : function(){
@@ -367,7 +460,7 @@ var ConfigurationsPage = React.createClass({
                         />)
                                         
                 })()}     
-
+                                
                 <div className="category">
 
                     <div className="block_label">{jQuery.i18n.map["configs.frontend"]}</div>
@@ -542,6 +635,10 @@ var ConfigurationsPage = React.createClass({
                     </div>
                 </div>
                 
+                <h1 className="inner_link" id="updates"></h1>
+                
+                <UpdateBlock />
+                                                
             </div>
         )
       }

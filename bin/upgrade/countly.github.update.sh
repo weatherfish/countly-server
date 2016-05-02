@@ -49,7 +49,7 @@ fi
 
 rm -rf /tmp/countly-github
 
-git clone https://github.com/Countly/countly-server.git -b master /tmp/countly-github || (echo "Failed to checkout Countly core from Github" ; exit)
+git clone https://github.com/Countly/countly-server.git -b ui-v2 /tmp/countly-github || (echo "Failed to checkout Countly core from Github" ; exit)
 
 rsync -rvc --exclude='.git/' --exclude='log/' /tmp/countly-github/ $DIR/../../  || (echo "Failed to synchronize folder contents" ; exit)
 
@@ -62,6 +62,29 @@ if [ ! -f $DIR/../../plugins/plugins.json ]; then
 fi
 
 bash $DIR/../scripts/countly.install.plugins.sh
+
+#compile scripts for production
+cd $DIR/../frontend/express/public/javascripts
+rm -fr ./react_components_compiled/*
+rm -fr ./react_pages_compiled/*
+babel --presets es2015,react react_components/ --out-dir react_components_compiled/
+babel --presets es2015,react react_pages/ --out-dir react_pages_compiled/
+cd $DIR/../frontend/express/public/stylesheets
+
+lessc sidebar.less compiled_css_sidebar.css
+lessc calendar.less compiled_css_calendar.css
+lessc tables.less compiled_css_tables.css
+lessc map.less compiled_css_map.css
+lessc selector_with_search.less compiled_css_selector_with_search.css
+lessc applications.less compiled_css_applications.css
+lessc multi_select.less compiled_css_multi_select.css
+lessc select.less compiled_css_select.css
+lessc manage_users.less compiled_css_manage_users.css
+lessc topbar.less compiled_css_topbar.css
+lessc configurations.less compiled_css_configurations.css
+lessc crash_details.less compiled_css_crash_details.css
+lessc line_chart.less compiled_css_line_chart.css
+lessc platforms.less compiled_css_platforms.css
 
 cd $DIR/../.. && grunt dist-all
 
