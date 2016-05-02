@@ -9,19 +9,23 @@
         "bottom" : -25
     },
     "ZA" : {
-        "bottom" : -48,
+        "top" : 5,
+        "bottom" : -40,
         "right"  : -22
     },
     "BR" : {
         "right" : -10
     },
     "CL" : {
-        "left" : 75
+        "left" : 75,
+        "bottom" : 10,
+        "top" : -5
     },
     "ES" : {
-        "bottom" : -45,
+        "bottom" : -40,
         "left"   : 60,
-        "right"  : -10
+        "right"  : -10,
+        "top" : 15
     },
     "GB" : {
         "top" : -20
@@ -44,6 +48,21 @@
     },
     "DZ" : {
         "top" : 10     
+    },
+    "NO" : {
+        "top" : 210,
+        "bottom" : 30
+    },
+    "CN" : {
+        "top" : -40,
+        "bottom" : -70
+    },
+    "AR" : {
+        "bottom" : 20
+    },
+    "CA" : {
+        "top" : 50,
+        "bottom" : 10    
     }
-    
+        
 }

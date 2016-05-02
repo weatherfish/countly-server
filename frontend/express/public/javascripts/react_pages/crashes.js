@@ -709,6 +709,20 @@ var CrashesPage = React.createClass({
                 }
                 </div>
                 
+                <LineChart trend_sign={false}
+                    width={elements_width}
+                    height={260}
+                    sides_padding={20}
+                    graph_width={elements_width}
+                    period={countlyCommon.getPeriod()}
+                    big_numbers={false}
+                    with_granularity={true}
+                    data_function={self.graph_data_function}
+                    update_graph_function={countlyCommon.updateTimeGraph}
+                    lines_descriptions={lines_descriptions}
+                    reverse_dp={true}
+                />
+                
                 <SortTable
                     headers={this.state.table_headers}
                     width={elements_width}
@@ -729,21 +743,4 @@ var CrashesPage = React.createClass({
             </div>
         )
     },
-    
-    /*
-    <LineChart trend_sign={false}
-                    width={elements_width}
-                    height={260}
-                    sides_padding={20}
-                    graph_width={elements_width}
-                    period={countlyCommon.getPeriod()}
-                    big_numbers={false}
-                    with_granularity={true}
-                    data_function={self.graph_data_function}
-                    update_graph_function={countlyCommon.updateTimeGraph}
-                    lines_descriptions={lines_descriptions}
-                    reverse_dp={true}
-                />
-    */
-
 })
