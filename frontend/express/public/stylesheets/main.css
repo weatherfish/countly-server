@@ -95,18 +95,17 @@
        url('../fonts/Oswald-700/Oswald-700.svg#Oswald') format('svg');
 }
 
-/*
-.widget-content.help-zone-vb {
-    display : none;
-}
-*/
-
 body {
     margin:0;
     padding:0;
     background-color:#F5F5F5;
     user-select:text;
     position : relative;
+}
+
+input[type="text"] {
+    font-family : Lato-Regular;
+    font-size : 14px;
 }
 
 #content-container {

@@ -22,6 +22,131 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var HeaderLabel = React.createClass({
+
+    width : false,
+
+    getInitialState: function() {
+
+        return ({
+            width : false,
+            //email_key : this.props.email
+        })
+    },
+    
+    get_width : function()
+    {
+        /*
+        if (React.findDOMNode(this).findDOMNode() > 1)
+        {
+            console.log("React.findDOMNode(this):", React.findDOMNode(this));
+        }
+        */
+    
+        if (React.findDOMNode(this).children.length > 0)
+        {                        
+            var childrens = React.findDOMNode(React.findDOMNode(this).children[0]).children;
+            
+            if (childrens.length > 0)
+            {                                   
+                if (React.findDOMNode(childrens[0]).children.length > 0) // date type cell
+                {         
+                    /*
+                        <div>
+                            <div><span></span>/<div>
+                            <div><span></span></div>
+                        </div>                
+                    */
+                    
+                    if (React.findDOMNode(React.findDOMNode(childrens[1]).children[0]).offsetWidth > React.findDOMNode(React.findDOMNode(childrens[0]).children[0]).offsetWidth)
+                    {
+                        var width = React.findDOMNode(React.findDOMNode(childrens[1]).children[0]).offsetWidth;
+                    }
+                    else
+                    {
+                        var width = React.findDOMNode(React.findDOMNode(childrens[0]).children[0]).offsetWidth;
+                    }                        
+                }
+                else
+                {                    
+                    /*
+                        <div>
+                            <span></span>
+                            <span></span>
+                        </div>                
+                    */
+                    
+                    //if (React.findDOMNode(childrens[0]).offsetWidth)
+                    
+                    var width = React.findDOMNode(childrens[0]).offsetWidth;                    
+                }                    
+            }
+            else
+            {
+                var width = React.findDOMNode(this).offsetWidth;
+            }
+            
+            //var width = React.findDOMNode(this).offsetWidth;
+        }
+        else
+        {
+            var width = React.findDOMNode(this).offsetWidth;
+        }        
+        
+        return width;
+    },
+
+    componentDidMount : function(){
+        
+        var width = this.get_width();
+        
+        this.width = width;
+        
+        switch (this.props.type)
+        {
+            case "header":
+                this.props.onWidthChange(this.props.id, width);
+            break;
+            
+            case "cell":                           
+                this.props.onWidthChange(this.props.column_id, this.props.cell_id, width);
+            break;
+        }    
+
+    },
+
+    componentDidUpdate : function(){
+
+        var width = this.get_width();
+
+        if (width != this.width)
+        {
+            this.width = width;
+            
+            switch (this.props.type)
+            {
+                case "header":
+                    this.props.onWidthChange(this.props.id, width);
+                break;
+                
+                case "cell":                           
+                    this.props.onWidthChange(this.props.column_id, this.props.cell_id, width);
+                break;
+            } 
+        }
+
+    },
+
+    render : function(){      
+        return(
+            <span style={this.props.style}>
+                {this.props.label}
+            </span>
+        )
+    }
+
+});
+
 var TableHeader = (function (_React$Component) {
 
     _inherits(TableHeader, _React$Component);
@@ -34,8 +159,14 @@ var TableHeader = (function (_React$Component) {
     _createClass(TableHeader, [
         {
             key : 'componentDidMount',
-            value : function componentDidMount(){                
-                var width = React.findDOMNode(this).offsetWidth;                
+            value : function componentDidMount(){    
+                /*
+                var label = this.props.label.toLowerCase();                            
+                var width = this.getTextWidth(label) + 15 /*padding left*//* + 20 /* sort buttons *//*;   
+                
+                console.log("label:", label, ", width:", width);
+                                            
+                this.props.onWidthChange(this.props.id, width);*/                   
             }
         },
         {
@@ -58,25 +189,68 @@ var TableHeader = (function (_React$Component) {
             }
 
             var label = this.props.label.toLowerCase(); //.toLowerCase().replace(/\w\S*/g, function(txt){
-            /*    console.log("convert label:", txt);
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            });*/
-           
+            
+            if (this.props.adaptive)
+            {
+                label = label.split(" ");
+            
+                if (label.length > 1)
+                {
+                    
+                    var style = {
+                        "line-height" : "25px",
+                        "display" : "block",
+                        "position" : "relative"
+                    };
+                    
+                    var top_style = JSON.parse(JSON.stringify(style));
+                    var bottom_style = JSON.parse(JSON.stringify(style));
+                    
+                    top_style.top = "4px";
+                    bottom_style.top = "-4px";       
+                    /*
+                    var header_label = <div><HeaderLabel type={'header'} label={label[0]} style={top_style} id={this.props.id} onWidthChange={this.props.onWidthChange}/><HeaderLabel type={'header'} label={label[1]} style={bottom_style} id={this.props.id} onWidthChange={this.props.onWidthChange}/></div>;
+                    */
+                    
+                    var html = <div>
+                                    <div style={top_style}><span>{label[0]}</span></div>
+                                    <div style={bottom_style}><span>{label[1]}</span></div>
+                                </div>;
+                    
+                    var header_label = <HeaderLabel type={'header'} label={html} id={this.props.id} onWidthChange={this.props.onWidthChange}/>;
+                                                    
+                }
+                else
+                {
+                    var style = {};
+                    
+                    var header_label = <HeaderLabel type={'header'} label={label[0]} style={style} id={this.props.id} onWidthChange={this.props.onWidthChange}/>; 
+                                    
+                }
+            }
+            else
+            {
+                var header_label = label;
+            }
+                       
             return (
                     <div className="table_header" onClick={this.props.sort_function.bind(null, this.props.data_key)}>
-                        <a>{label}</a>
+                        <a>
+                            {header_label}
+                        </a>
                         {sort_icons}
                     </div>
             );
         }},
         {
             key : 'getTextWidth',
-            value : function componentDidMount(text){                
+            value : function getTextWidth(text){                
                 // re-use canvas object for better performance
                 var canvas = this.getTextWidth.canvas || (this.getTextWidth.canvas = document.createElement("canvas"));
                 var context = canvas.getContext("2d");
-                context.font = "Lato-Regular";
-                context['font-size'] = "13px";                
+                context.font = "Lato-Medium";
+                context['font-size'] = "14px";   
+                context['text-transform'] = "Capitalize";                
                 var metrics = context.measureText(text);
                 return metrics.width;     
             }
@@ -119,7 +293,7 @@ var TableCell = (function (_React$Component) {
 
             if (props.formatting_function)
             {
-                cell_data = props.formatting_function(cell_data);
+                cell_data = props.formatting_function(cell_data, cell_width);
             }
             else if (cell_data !== null && typeof cell_data === 'object')
             {
@@ -150,10 +324,26 @@ var TableCell = (function (_React$Component) {
             {
                 cell_data = cell_data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
-
+                        
+            //var react_data_key = cell_data + rowIndex + field;
+            //key={react_data_key}
+            
+            var react_data_key = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 10);
+            
+            //console.log("render cell:", this.props.id, " .. ", rowIndex);
+            
+            if (this.props.adaptive)
+            {
+                var cell_label = <HeaderLabel type={'cell'} label={cell_data} column_id={this.props.id} cell_id={rowIndex} onWidthChange={this.props.onCellWidthChange}/>;            
+            }
+            else
+            {
+                var cell_label = cell_data;
+            }                        
+            
             return (
-                <Cell className="table_content header_sort_button">
-                    {cell_data}
+                <Cell className="table_content header_sort_button" dataKey={react_data_key}>
+                    {cell_label}
                 </Cell>
             );
         }
@@ -164,6 +354,12 @@ var TableCell = (function (_React$Component) {
 })(React.Component);
 
 var SortTable = React.createClass({
+    
+    headers_width_rendered : [], // header labels fill this array     
+    headers_inited : false,    
+    cellWidthData : [],
+    cellMaxWidthData : [],
+    cells_inited : false,
 
     getInitialState() {
         
@@ -175,7 +371,7 @@ var SortTable = React.createClass({
         {      
             headers[i].width_px = Math.floor(this.table_width / 100 * headers[i].width_percent);
         }
-       
+              
         if (this.props.granularity)
         {
             var granularity = this.props.granularity;
@@ -275,6 +471,17 @@ var SortTable = React.createClass({
             }
 
             var pagination = this.make_pagination(rows);
+                        
+            if (nextProps.language != this.props.language){
+                
+                this.headers_width_rendered = [];
+                this.headers_inited = false;  
+                this.cellWidthData = [];
+                this.cellMaxWidthData = [];
+                this.cells_inited = false;
+                
+                pagination.headers = nextProps.headers;                
+            }            
 
             this.setState(pagination);
 
@@ -426,9 +633,6 @@ var SortTable = React.createClass({
     make_pagination : function(full_rows, old_data)
     {
         
-        console.log("{{{{ make_pagination }}}}}}}}}}");
-        console.log(full_rows);
-        
         if (!old_data)
         {
             var original_full_rows = full_rows;
@@ -529,19 +733,13 @@ var SortTable = React.createClass({
         var pagination = {
             rows : page_rows,
             active_page : active_page,
-            pages : pages,
-            //full_rows : full_rows
+            pages : pages,          
         }
         
         if (!old_data)
         {
             pagination.full_rows = original_full_rows;
         }
-/*
-        if (!old_data)
-        {
-            pagination.full_rows = full_rows;
-        }*/
 
         return pagination;
 
@@ -587,13 +785,208 @@ var SortTable = React.createClass({
         })
 
     },
+    
+    //---------------------------------------------------------------------------------------------------------------------
+           
+    calculate_template : function(){
+        
+        if (!this.headers_inited || !this.cells_inited)
+        {
+            return false;
+        }
+        
+        console.log("------ calculate template --------");
+        console.log(this.headers_width_rendered);
+        console.log("::: cellMaxWidthData ::");
+        console.log(this.cellMaxWidthData);
+        
+        var max_sizes_array = [];
+        
+        for (var i = 0; i < this.cellMaxWidthData.length; i++)
+        {
+            if (this.cellMaxWidthData[i] > this.headers_width_rendered[i])
+            {
+                max_sizes_array[i] = this.cellMaxWidthData[i];
+            }
+            else
+            {
+                max_sizes_array[i] = this.headers_width_rendered[i];
+            }
+        }
+        
+        var headers = this.state.headers;
+                
+        var sum = 0;
+        
+        for (var i = 0; i < max_sizes_array.length; i++)
+        {
+            sum += max_sizes_array[i];
+        }
+                
+        if (sum < this.table_width)
+        {
+            max_sizes_array[0] = max_sizes_array[0] + (this.table_width - sum); 
+        }
+        
+        for (var j = 0; j < headers.length; j++)
+        {
+            headers[j].width_px = max_sizes_array[j];
+        }
+                
+        this.setState({
+            headers : headers
+        }); 
+        
+        return false;
+        
+    },
+       
+    onHeaderWidthChange : function(header_id, width){
+        
+        //return false;
+        
+        console.log("onHeaderWidthChange:", header_id, " > ", width);
+        
+        if (this.headers_inited)
+        {
+            return false;
+        }
+                
+        width = width + 15 + 20; /*padding left*/ /* sort buttons */;   
+        
+        this.headers_width_rendered[parseInt(header_id)] = width;
+                                
+        if (this.headers_width_rendered.length == this.state.headers.length)
+        {            
+            //console.log(this.headers_width_rendered); 
+            
+            var new_array = [];
+            
+            // this.headers_width_rendered can be [62, 65, 81, 102, 5: 83, 6: 91, 7: 97, 8: 75]
+            
+            for (var i = 0; i < this.headers_width_rendered.length; i++)
+            {
+                
+                if (this.headers_width_rendered[i])
+                {
+                    new_array.push(this.headers_width_rendered[i]);
+                }
+                else
+                {
+                    new_array.push(this.headers_width_rendered[(i+1).toString()]);
+                }
+                
+            }
+            
+            this.headers_width_rendered = new_array;
+            
+            console.log("-- new arrray ---");
+            console.log(new_array);
+            
+            this.headers_inited = true;            
+            this.calculate_template();                
+        }                 
+    },
+        
+    onCellWidthChange : function(column_id, cell_id, width){
+        
+        //console.log("onCellWidthChange:", column_id, " > ", cell_id);
+        
+        if (this.cells_inited)
+        {
+            return false;
+        }
+        
+        var per_page = 20;
+        
+        if (!this.cellWidthData[column_id])
+        {            
+            this.cellWidthData[column_id] = [];     
+        }
+        
+        width += 15; // padding-left
+        
+        this.cellWidthData[column_id][cell_id] = width;    
+                
+        if (!this.cellMaxWidthData[column_id])
+        {
+            this.cellMaxWidthData[column_id] = width;
+        }
+        else if (width > this.cellMaxWidthData[column_id])
+        {
+            this.cellMaxWidthData[column_id] = width;
+        }
+                
+        var filled = true;
+        
+        if (this.cellWidthData.length == this.state.headers.length)
+        {            
+            for (var i = 0; i < this.cellWidthData.length; i++)
+            {
+                if (this.cellWidthData[i].length != per_page)
+                {                    
+                    filled = false;                                        
+                }
+            }               
+        }
+        else
+        {
+            filled = false;
+        }
+        
+        if (/*this.headers_width_rendered.length == this.state.headers.length && */filled)
+        {            
+            
+            console.log("[[[[[[[[[[[ cellMaxWidthData ]]]]]]]]]]]]");
+            console.log(this.cellMaxWidthData);
+                   
+            this.cells_inited = true;            
+            this.calculate_template();            
+                
+        }        
+        
+        //this.cellMaxWidthData[column_id] = width;        
+        
+        /*
+        if (!this.cellWidthData[column_id])
+        {
+            this.cellWidthData[cell_id] = {
+                ready : 1
+            };
+            
+            this.cellWidthData[cell_id].width = width;
+        }
+        else
+        {
+            if (width > this.cellWidthData[cell_id])
+            {
+                this.cellWidthData[cell_id] = {};
+                this.cellWidthData[cell_id].width = width;
+            }
+        }
+        
+        this.cellWidthData[cell_id].ready++;
+        
+        if (this.cellWidthData.length == this.state.headers.length)
+        {
+            console.log("====== table half inited =========");
+            console.log(this.cellWidthData)
+        }        
+        */
+        //console.log("cellWidthData:", this.cellWidthData);
+        
+        //cellWidthData[cell_id] = ;
+        
+        //console.log("cell width change:", cell_id, " ++ ", width);       
+            
+    },
 
     columns_render : function columns_render(headers) {
 
         var self = this;
 
         return _.map(headers, function (header, id) {
-
+            
             if (header.width_px)
             {                
                 var width = header.width_px;
@@ -608,19 +1001,25 @@ var SortTable = React.createClass({
             }
 
             return React.createElement(Column, {
-                label: header.title,
-                width: width,
-                header:React.createElement(TableHeader, {
+                label  : header.title,
+                width  : width,
+                header : React.createElement(TableHeader, {
                     label: header.title,
                     data_key : header.short,
                     sort_by : self.state.sortBy,
                     sort_dir : self.state.sortDir,
-                    sort_function : self.sort_rows_by
+                    sort_function : self.sort_rows_by,
+                    onWidthChange : self.onHeaderWidthChange,                    
+                    id : id,
+                    adaptive : self.props.adaptive
                 }),
-                cell: React.createElement(TableCell, {
-                    data: self.state.rows,
+                cell : React.createElement(TableCell, {
+                    data : self.state.rows,
                     field : header.short,
-                    formatting_function : header.formatting_function
+                    formatting_function : header.formatting_function,
+                    onCellWidthChange : self.onCellWidthChange,
+                    id : id,
+                    adaptive : self.props.adaptive
                 })
             });
         });
@@ -630,9 +1029,6 @@ var SortTable = React.createClass({
 
         var self = this;
         
-        console.log("render table ---- rows ----");
-        console.log(this.state.rows);
-
         var row_height = this.props.row_height;
         
         /*if (this.state.sortDir !== null)

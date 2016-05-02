@@ -15,7 +15,7 @@ var Dashboard = React.createClass({
             "top_items_bars" : top_items_bars,
             "inited" : false,
             "long_text_flag" : false,
-            "language" : false,
+            "language" : this.props.language,
             "map_metric" : map_metrics[0],
             "map_metrics" : map_metrics,
             "map_radio_button" : 0

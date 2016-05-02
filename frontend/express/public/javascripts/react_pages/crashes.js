@@ -8,77 +8,12 @@ var CrashesPage = React.createClass({
 
     initial_metric : "cr",
 
-    metrics : false,
-
+    metrics : false,    
+      
     getInitialState: function() {
 
-        var table_headers = [
-            {
-                "title":jQuery.i18n.map["crashes.error"],
-                "short" : "error",
-                "width_percent" : 30
-            },
-            {
-                "title":jQuery.i18n.map["crashes.users"],
-                "short" : "users",
-                "width_percent" : 10
-            },
-            {
-                "title":jQuery.i18n.map["crashes.platform"],
-                "short" : "os",
-                "width_percent" : 20
-            },
-            {
-                "title":jQuery.i18n.map["crashes.reports"],
-                "short" : "reports",
-                "width_percent" : 15
-            },
-            {
-                "title": jQuery.i18n.map["crashes.fatal"],
-                "short" : "nonfatal",
-                "width_percent" : 11,
-                formatting_function :  function(value){
-
-                    if (value != 0)
-                    {
-                        return <div>Fatal</div>;
-                    }
-                    else
-                    {
-                        return <div>Non-fatal</div>;
-                    }
-                }
-            },
-            {
-                "title":jQuery.i18n.map["crashes.resolved"],
-                "short" : "is_resolved",
-                "width_percent" : 14,
-                formatting_function :  function(value){
-
-                    if (value != 0)
-                    {
-                        return <div className="solved">Solved</div>;
-                    }
-                    else
-                    {
-                        return <div className="unresolved">Unresolved</div>;
-                    }
-                }
-            },
-            /*{
-                "title":jQuery.i18n.map["crashes.frequency"],
-                "short" : "l",
-            },*/
-            /*{
-                "title":"last_time", //jQuery.i18n.map["crashes.last_time"],
-                "short" : "lastTs",
-            },
-            {
-                "title":"latest_app", //jQuery.i18n.map["crashes.latest_app"],
-                "short" : "latest_version"
-            },*/
-            ]
-
+        var table_headers = this.make_table_headers();
+        
         var sort_functions = {
             "nonfatal" : math_sort,
             "reports" : math_sort,
@@ -86,7 +21,9 @@ var CrashesPage = React.createClass({
             "os" : math_sort,
             "error" : math_sort,
             "lastTs" : math_sort,
-            "is_resolved" : math_sort,            
+            "is_resolved" : math_sort,
+            "latest_version" : math_sort, 
+            "l" : math_sort,  
         }
 
         var crashes_types = [
@@ -151,7 +88,191 @@ var CrashesPage = React.createClass({
         }
 
     },
+    
+    make_table_headers : function(){
+        
+        var self = this;
+        
+        var table_headers = [
+            {
+                "title":jQuery.i18n.map["crashes.error"],
+                "short" : "error", // error
+                "width_percent" : 20,
+                formatting_function :  function(error, cell_width){  
+                    
+                    console.log("--- error ---");
+                    console.log(error);
+                    
+                    var error_array = error.split("\n");
+                    
+                    var substr_length = 10;
+                                        
+                    var error_start = error_array[0].substr(0, substr_length);
+                    
+                    //var test = 0;
+                    
+                    while (self.get_text_width(error_start) < cell_width && substr_length < error_array[0].length)
+                    {
+                        substr_length += 10;
+                        error_start = error_array[0].substr(0, substr_length);                                               
+                        //test++;                        
+                    }           
+                    
+                    substr_length -= 10;
+                    
+                    error_start = error_array[0].substr(0, substr_length);                  
+                    
+                    var error_end = error_array[error_array.length - 1]; 
+                    
+                    //.substr(error_array[error_array.length - 1].length - 50);                    
+                    //error_end = error_end.substr(error_end.length - 50);
+                    
+                    var style = {
+                        "line-height" : "25px",
+                        "display" : "block",
+                        "position" : "relative"
+                    };
+                    
+                    var top_style = JSON.parse(JSON.stringify(style));
+                    var bottom_style = JSON.parse(JSON.stringify(style));
+                    
+                    top_style.top = "4px";
+                    bottom_style.top = "-4px";  
+                    
+                    var gap_style = {                        
+                        "position" : "absolute",
+                        "top" : "25px",
+                        "left" : "25px"                            
+                    };                 
+                    
+                    var wrapper_style = {
+                        "position" : "relative"
+                    };
+                    
+                    // style={wrapper_style}
+                    // error_array[error_array.length - 1]
+                    
+                    return (<div style={wrapper_style}>
+                                <div style={top_style}><span>{error_start} ...</span></div>                                
+                                <div style={bottom_style}><span>... {error_end}</span></div>
+                            </div>);
+                                   
+                }
+            },
+            {
+                "title":jQuery.i18n.map["crashes.users"],
+                "short" : "users",
+                "width_percent" : 10
+            },
+            {
+                "title":jQuery.i18n.map["crashes.platform"],
+                "short" : "os",
+                "width_percent" : 10
+            },
+            {
+                "title":jQuery.i18n.map["crashes.reports"],
+                "short" : "reports",
+                "width_percent" : 10
+            },
+            {
+                "title": jQuery.i18n.map["crashes.fatal"],
+                "short" : "nonfatal",
+                "width_percent" : 10,
+                formatting_function :  function(value){
 
+                    if (value != 0)
+                    {
+                        return <div>{jQuery.i18n.map["crashes.fatal"]}</div>;
+                    }
+                    else
+                    {
+                        return <div>{jQuery.i18n.map["crashes.nonfatal"]}</div>;
+                    }
+                }
+            },
+            {
+                "title":jQuery.i18n.map["crashes.resolved"],
+                "short" : "is_resolved",
+                "width_percent" : 10,
+                formatting_function :  function(value){
+
+                    if (value != 0)
+                    {
+                        return <div className="solved">{jQuery.i18n.map["crashes.resolved"]}</div>;
+                    }
+                    else
+                    {
+                        return <div className="unresolved">{jQuery.i18n.map["crashes.unresolved"]}</div>;
+                    }
+                }
+            },
+            {
+                "title" : jQuery.i18n.map["crashes.frequency"],
+                "short" : "l",
+                "width_percent" : 10,
+                formatting_function :  function(value){
+                                       
+                    if (value == 0)
+                    {
+                        return jQuery.i18n.map["crashes.first-crash"];
+                    }
+                    else
+                    {
+                        return value + "}todo{" + jQuery.i18n.map["crashes.sessions"];
+                    }                                      
+                }                                                             
+            },
+            {
+                "title" : jQuery.i18n.map["crashes.last_time"],
+                "short" : "lastTs",
+                "width_percent" : 10,
+                formatting_function :  function(timestamp){
+                   
+                    var day_string = moment(timestamp * 1000).format('MM.DD.YYYY');
+                    var hour_string = moment(timestamp * 1000).format('h:mm:ss a');
+                    
+                    var style = {
+                        "line-height" : "25px",
+                        "display" : "block",
+                        "position" : "relative"
+                    }
+                    
+                    var top_style = JSON.parse(JSON.stringify(style));
+                    var bottom_style = JSON.parse(JSON.stringify(style));
+                    
+                    top_style.top = "4px";
+                    bottom_style.top = "-4px"; 
+
+                    return (<div>
+                                <div style={top_style}><span className="day">{day_string}</span></div>
+                                <div style={bottom_style}><span className="hour">{hour_string}</span></div>
+                            </div>);
+                
+                }
+            },
+            {
+                "title": jQuery.i18n.map["crashes.latest_app"],
+                "short" : "latest_version",
+                "width_percent" : 10,
+            },
+        ]
+        
+        return table_headers;        
+          
+    },    
+    
+    get_text_width : function(text){
+        
+        var canvas = this.get_text_width.canvas || (this.get_text_width.canvas = document.createElement("canvas"));
+        var context = canvas.getContext("2d");
+        context.font = "Lato-Regular";
+        context['font-size'] = "11px";   
+        //context['text-transform'] = "Capitalize";                
+        var metrics = context.measureText(text);
+        return metrics.width;     
+          
+    },
+    
     make_graph_tabs : function()
     {
 
@@ -217,9 +338,6 @@ var CrashesPage = React.createClass({
                 return false;
             }
 
-            //var crashData = countlyCrashes.getData();
-            //var chartData = countlyCrashes.getChartData(self.initial_metric, self.metrics[self.initial_metric]);
-
             var graph_tabs = self.make_graph_tabs();
 
             var elements_width = get_viewport_width();
@@ -271,11 +389,21 @@ var CrashesPage = React.createClass({
                 this.init_data(data_timestamp);
             }
             
-            self.setState({
+            var new_state = {
                 "graph_tabs" : self.make_graph_tabs(),
                 "date_period" : nextProps.date.period,
                 "loading" : false
-            });            
+            }
+            
+            if (nextProps.language != this.props.language)
+            {
+                new_state.table_headers = this.make_table_headers();
+                console.log("=========== crashes change language ============");
+                console.log(new_state.table_headers);
+                //new_state.language = this.props.language;
+            }
+            
+            self.setState(new_state);            
             
         }        
     },
@@ -310,9 +438,6 @@ var CrashesPage = React.createClass({
 
         var data = countlyCrashes.getData().groups;
         
-        console.log("========= crash table data ============");
-        console.log(data);
-
         if (this.state.active_crash_filter.type != "crash-all")
         {
 
@@ -336,7 +461,19 @@ var CrashesPage = React.createClass({
 
             data = filtered_data;
         }
-
+        /*
+        console.log("{{{{{{{{{ table data }}}}}}}}}]]]");
+        console.log(data);*/
+         /*               
+        for (var i = 0; i < data.length; i++)
+        {
+            data[i].error = data[i].error.replace(new RegExp("\n", 'g'), ">>");
+            data[i].error = data[i].error.replace(new RegExp(" ", 'g'), "..");
+            
+            data[i].error = data[i].error.substr(data[i].error.length - 10);
+        }   
+        */
+        
         return {
             chartData : data
         }
@@ -571,21 +708,7 @@ var CrashesPage = React.createClass({
                     })
                 }
                 </div>
-
-                <LineChart trend_sign={false}
-                    width={elements_width}
-                    height={260}
-                    sides_padding={20}
-                    graph_width={elements_width}
-                    period={countlyCommon.getPeriod()}
-                    big_numbers={false}
-                    with_granularity={true}
-                    data_function={self.graph_data_function}
-                    update_graph_function={countlyCommon.updateTimeGraph}
-                    lines_descriptions={lines_descriptions}
-                    reverse_dp={true}
-                />
-
+                
                 <SortTable
                     headers={this.state.table_headers}
                     width={elements_width}
@@ -599,10 +722,28 @@ var CrashesPage = React.createClass({
                     date={this.props.date}
                     additional_filter={additional_filter}
                     on_row_click={this.row_click}
+                    language={this.props.language}
+                    adaptive={true}
                 />
 
             </div>
         )
     },
+    
+    /*
+    <LineChart trend_sign={false}
+                    width={elements_width}
+                    height={260}
+                    sides_padding={20}
+                    graph_width={elements_width}
+                    period={countlyCommon.getPeriod()}
+                    big_numbers={false}
+                    with_granularity={true}
+                    data_function={self.graph_data_function}
+                    update_graph_function={countlyCommon.updateTimeGraph}
+                    lines_descriptions={lines_descriptions}
+                    reverse_dp={true}
+                />
+    */
 
 })

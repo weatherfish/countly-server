@@ -10,6 +10,11 @@ var UpdatePageMixin = {
 
         this.interval = setInterval(function () {
             
+            if (!self.state.inited)
+            {
+                return false;
+            }
+            
             var data_timestamp = Math.floor(Date.now());
 
             self.init_data(data_timestamp);

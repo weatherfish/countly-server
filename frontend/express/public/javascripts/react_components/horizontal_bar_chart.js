@@ -29,6 +29,9 @@ var HorizontalBarChart = React.createClass({
         /*if (nextProps.date != this.props.date) // todo !!!!!!!!!!!!!!!!!!!!!!
         {*/
 
+            console.log("[[[[[[[[ update HorizontalBarChart  data ]]]]]]]]]]]]]");
+            console.log(data);
+
             var data = this.props.data_function();
 
             data = data.chartData;
@@ -137,8 +140,17 @@ var HorizontalBarChart = React.createClass({
         for (var k = 0; k < keys.length; k++)
         {
 
+            //var sort_data = data;
+
+            data.sort(function(a, b) {                
+                return b[keys[k]] - a[keys[k]];
+            });
+            
+            console.log("{{{{{{{{ sort data }}}}}}}}}}}}");
+            console.log(data);
+
             var shown_data = data.slice(0, bars_count);
-            var other_data   = data.slice(bars_count, data.length);
+            var other_data = data.slice(bars_count, data.length);
 
             var key = keys[k];
 
@@ -154,12 +166,7 @@ var HorizontalBarChart = React.createClass({
                 other_total += elem[key];
             });
 
-            console.log("---- key --", key);
-            console.log(other_data);
-
             var other_percent = Math.round((other_total / total) * 100);
-
-            console.log("other_percent:", other_percent);
 
             if (other_data.length == 1)
             {
@@ -172,11 +179,6 @@ var HorizontalBarChart = React.createClass({
                 other_block[data_key_label] = "Other";
 
                 other_block[key] = other_total;
-
-                console.log("[[[[[[[[[[ other_block ]]]]]]]]]]");
-                console.log(other_block);
-
-                //var combined_data = current_data.concat([/*other_block*/]);
 
                 shown_data.push(other_block);
             }
@@ -320,292 +322,6 @@ var HorizontalBarChart = React.createClass({
                 .style("height", bar_height + "px")
                 .style("line-height", bar_height + "px")
 
-/*
-            enter_blocks.append("path")
-                    .attr("class", "bar_rect")
-                    .style("fill", function(d, i){
-
-                        if (i < (5) || self.state.fully_opened)
-                        {
-                            return self.colors[k];
-                        }
-                        else
-                        {
-
-                            return "#cccccc";
-                        }
-
-                    })
-                    .attr("d", function(d, i){
-
-                        var percent = Math.round((d[key] / total) * 100);
-                        var bar_width = Math.round(horizontal_scale(percent));
-
-                        if (i < (5 + 1) /*|| self.state.fully_opened*/   /*       )
-                        {
-                            var round_corner = true;
-                        }
-                        else {
-
-                            var round_corner = false;
-                        }
-
-                        var rect = self.rounded_rect(0, 0, bar_width, bar_height, 2, round_corner, false, round_corner, false);
-
-                        return rect;
-                    })
-                    .attr("x", 0)
-                    .attr("y", 0)
-                    /*.attr("rx", 2)
-                    .attr("ry", 2)*/
-
-/*
-                    var gradient = this.chart
-                        .append("defs")
-                        .append("linearGradient")
-                            .attr("id", "half_grad")
-
-                    gradient.append("stop")
-                        .attr("offset", "50%")
-                        .attr("stop-color", "yellow")
-
-                    gradient.append("stop")
-                        .attr("offset", "50%")
-                        .attr("stop-color", "red")
-                        .attr("stop-opacity", "1")*/
-/*
-            var gradients = enter_blocks
-                .append("defs")
-                .append("linearGradient")
-                .attr("id", function(d, i){
-                    return "text_gradient_" + i;
-                })
-
-            */
-/*
-            var text_labels = enter_blocks.append("g")
-                  .attr("class", "label_wrapper")
-                  .style("height", bar_height)
-                  .style("width", 20)
-                  .attr("width", 20)
-                  .append("text")
-                      .attr("class", "bar_label")
-                      .style("font-size", "13px")
-                      /*.attr("width", 10)*/
-            /*          .text(function(d, i) {
-
-                          /*console.log("==%%%%%%% == full data =======");
-                          console.log(data);*/
-/*
-                          if (i < 5 || self.state.fully_opened)
-                          {
-                              return d[data_key_label];
-                          }
-                          else if (i == data.length - 1)
-                          {
-                              return "Other";
-                          }
-                          else
-                          {
-
-                              return "";
-                          }
-
-                      })
-                      .attr("x", bar_text_margin_left)
-                      .attr("y", function(d) {
-                          var y = bar_height / 2 + this.getBBox().height / 3;
-                          return y;
-                      })
-
-
-                      var gradients = text_labels/*.append("defs")*/
-/*                          .append("linearGradient")
-                          .attr("id", function(d, i){
-                              console.log("append:", "text_gradient_" + key + "_" + i);
-                              return "text_gradient_" + key + "_" + i;
-                          })
-
-                      gradients.append("stop")
-                          .attr("offset", function(d, i){
-
-                              var text_block_width = this.parentNode.parentNode.parentNode.getBBox().width;
-
-                              if (!text_block_width)
-                              {
-                                  return "0"; // todo
-                              }
-
-                              console.log("====== append gradient =========");
-                              console.log(d.device);
-
-                              console.log("text width:", text_block_width);
-
-                              var percent = Math.round((d[key] / total) * 100);
-                              var bar_width = Math.round(horizontal_scale(percent));
-
-                              var possible_text_width = bar_width - bar_text_margin_left;
-
-                              var white_part_width = possible_text_width - text_block_width - 2;
-
-                              console.log("white_part_width:", white_part_width);
-
-                              if (white_part_width < 0)
-                              {
-                                  var white_part_percent = Math.round(possible_text_width / text_block_width * 100);
-                              }
-                              else
-                              {
-                                  var white_part_percent = 100;
-                              }
-
-                              console.log("white_part_percent:", white_part_percent);
-
-                              return white_part_percent + "%";
-
-                              /*var percent = Math.round((d[key] / total) * 100);
-                              var rect_width = Math.round(horizontal_scale(percent));
-                              return rect_width;*/
-      /*                    })
-                          .attr("stop-color", "yellow")
-
-                      gradients.append("stop")
-                          .attr("offset", function(d, i){
-
-                              var text_block_width = this.parentNode.parentNode.parentNode.getBBox().width;
-
-                              if (!text_block_width)
-                              {
-                                  return "0"; // todo
-                              }
-
-                              console.log("====== black ========== d.device:", d.device, ", text_block_width:", text_block_width);
-
-                              var percent = Math.round((d[key] / total) * 100);
-                              var bar_width = Math.round(horizontal_scale(percent));
-
-                              var possible_text_width = bar_width - bar_text_margin_left;
-
-                              var black_part_width = text_block_width - possible_text_width + 2;
-
-                              //console.log("black_part_width:", black_part_width);
-
-                              if (black_part_width > 0)
-                              {
-                                  var black_part_percent = Math.round(black_part_width / text_block_width * 100);
-                              }
-                              else
-                              {
-                                  var black_part_percent = 0;
-                              }
-
-                              console.log("black_part_percent:", black_part_percent);
-
-                              return black_part_percent + "%";
-
-                          })
-                          .attr("stop-color", "red")
-                          .attr("stop-opacity", "1")
-
-                      console.log("--- enter gradients -----------");
-                      console.log(gradients);
-
-                      gradients[0].forEach(function(gradient){
-
-                          var stops = d3.select(gradient).selectAll("stop");
-
-                          var gradient = defs.append("linearGradient")
-                              .attr("id", gradient.id)
-
-                          gradient
-                              .append("stop")
-                              .attr("offset", Math.round(stops[0][0].offset.baseVal * 100) + "%")
-                              .attr("stop-color", "white"/*stops[0][0]["stop-color"]*/ /*)
-/*
-                          gradient
-                              .append("stop")
-                              .attr("offset", Math.round(stops[0][1].offset.baseVal * 100) + "%")
-                              .attr("stop-color", "black"/*stops[0][1]["stop-color"]*/  /*)
-              /*                .attr("stop-opacity", 1/*stops[0][1]["stop-color"]*//*)
-
-                      });
-
-                  */    //.attr("mask", "url(#Mask)")
-                      //
-                      //
-                      //
-
-                      /*
-                      fill="black" clip-path="url(#myClip)"
-                      .style("clip-path", "url(#Mask)")
-                      */
-/*
-            enter_blocks.append("text")
-                    .attr("class", "percent")
-                    .style("font-size", "13px")
-                    .text(function(d, i) {
-
-                        if (i == 5)
-                        {
-                            var percent = Math.round((other_total / total) * 100);
-                            return percent + "%";
-                        }
-                        /*else if (i > 5 && self.state.fully_opened == false)
-                        {
-                            return "";
-                        }
-*//*
-                        if (!d[key])
-                        {
-                            var percent = 0;
-                        }
-                        else
-                        {
-                            var percent = Math.round((d[key] / total) * 100);
-                        }
-
-                        //console.log("percent:", percent + "%");
-
-                        return percent + "%";
-                    })
-                    .style("display", function(d, i){
-
-                        if (i > 5 && self.state.fully_opened == false)
-                        {
-                            return "none";
-                        }
-                        else
-                        {
-                            return "block";
-                        }
-
-                    })
-                    .style("fill", "black")
-                    .attr("transform", function(d, i) {
-
-                        var x = Math.round(width - this.getBBox().width) - 20;
-                        //var y = Math.round(this.getBBox().height / 2 + bar_height / 3);
-                        var y = bar_height / 2 + this.getBBox().height / 3;
-
-                        return "translate(" + x + ", " + y + ")";
-
-                    })
-                    /*.attr("x", function(d) {
-                        var x = Math.round(width - this.getBBox().width) - 20;
-                        return x;
-                    })
-                    .attr("y", function(d) {
-                        var y = Math.round(this.getBBox().height / 2 + bar_height / 3);
-                        return y;
-                    })*/
-/*
-                text_labels
-                    .style("fill", function(d, i){
-                          //return "black";
-                          //return "url(#text_gradient_1)";
-                          return "url(#text_gradient_" + key + "_" + i + ")";
-                    })
-*/
             // --- exit ---
 
             bar_block.exit()
