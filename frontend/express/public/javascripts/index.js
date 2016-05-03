@@ -1,191 +1,188 @@
 var navigation = false;
 
-window.onload=function(){
-
+var init = function(){ 
+        
     //Globalize('en-gb'); // todo: https://github.com/jquense/react-widgets/issues/98
-    
-    _.defer(function(){
-        
-        jQuery.i18n.properties({
-            name:'locale',
-            cache:true,
-            language:countlyCommon.BROWSER_LANG_SHORT,
-            path:[countlyGlobal["cdn"]+'/localization/min/'],
-            mode:'map'
-        });
-        
-        navigation = get_sidebar_data();
-                
-        var wrapComponent = function(Component, props) {
-            return React.createClass({
-                render: function() {
-                    return React.createElement(Component, props);              
-                }
-            });
-        };
-        
-        var Router = ReactRouter.Router;
-        var Route = ReactRouter.Route;
-        
-        var __active_app = false;
-        var __applications = false;
-        
-        const App = React.createClass({
-        
-            mixins: [ ReactRouter.History ],
-        
-            getInitialState : function(){
-        
-                return ({
-          		    top_bar_first : false,
-                    top_bar_second : false,
-                    top_block : false,
-                    language : false,
-                    date : false
-                    //data_timestamp : false
-                })
-            },
-        
-            componentDidMount : function(){
-                if (initial_applications.length == 0)
-                {
-                    this.history.pushState(null, "/manage/apps");
-                }
-            },
             
-            date_changed : function(new_date){
-                                        
-                this.setState({
-                    date : new_date
-                })
-            },
+    jQuery.i18n.properties({
+        name:'locale',
+        cache:true,
+        language:countlyCommon.BROWSER_LANG_SHORT,
+        path:[countlyGlobal["cdn"]+'/localization/min/'],
+        mode:'map'
+    });
         
-            path_changed : function(first, second){
-                        
-                if (!first)
-                {
-                    first = second;
-                    second = false;
-                }
-        
-                this.setState({
-          		    top_bar_first : first,
-              		top_bar_second : second
-                })
-            },            
-                    
-            change_language : function(language){
-                        
-                navigation = get_sidebar_data();
-                        
-                this.setState({
-                    language : language
-                });
-            },
-        
-            render() {
-                       
-                if ((initial_applications.length != 0) && this.props.location.pathname.indexOf("/manage/users") == -1 && this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1 && this.props.location.pathname.indexOf("/crashes/") == -1 && this.props.location.pathname.indexOf("/manage/populator") == -1)
-                {
-                    var show_calendar = true;   
-                }
-                else
-                {
-                    var show_calendar = false;   
-                }
-                        
-                if (this.props.location.pathname.indexOf("/events") > -1)
-                {
-                    var calendar_offset_top = 70;
-                }
-                else
-                {
-                    var calendar_offset_top = false;
-                }
-        
-                if (show_calendar)
-                {
-        
-                    var calendar = <div id="calendar_block">
-                                                <CalendarWrapper
-                                                    onDateChange={this.date_changed}
-                                                    offset_top={calendar_offset_top}
-                                                    language={this.state.language}
-                                                />
-                                           </div>
-        
-                            var container_style = {
-                                "border-width" : "1px"
-                            }
-                }
-                else
-                {
-        
-                    var calendar = false;
-        
-                    var container_style = {
-                        "top" : "80px",
-                        "border-width" : "0px"
-                    }
-                }
-        
-                if (this.props.location.pathname.indexOf("/events") > -1)
-                {
-                    container_style.top = "211px";
-                    container_style.zIndex = 2000;
-                }
-                        
-                if (this.state.date || !show_calendar)
-                {
-                    var content_container = <div id="content-container" style={container_style}>
-                                                {this.props.children && React.cloneElement(this.props.children, {
-                                                            language : this.state.language,
-                                                            date : this.state.date,
-                                                            active_app : __active_app             
-                                                })}
-                                            </div>;
-                }
-                else
-                {
-                    var content_container = false;
-                }
-                       
-                return (
-                    <div className="app">
-                                                    
-                        <div id="sidebar">
-                            <FullSidebar
-                                navigation={navigation}
-                                active_app={__active_app}
-                                current_location={this.props.location.pathname}
-                                applications={__applications}
-                                onChange={this.path_changed}
-                                countly_version={countly_version}
-                                language={this.state.language}
-                                on_active_app_change={this.props.route.on_active_app_change}
-                            />
-                        </div>
-        
-                        <div id="top_bar">
-                            <TopBar
-                                user_name={user_full_name}
-                                width={window.innerWidth - sidebar_width - 16}
-                                first={this.state.top_bar_first}
-                                second={this.state.top_bar_second}
-                                language={this.state.language}
-                                on_change_language={this.change_language}
-                            />
-                        </div>
-        
-                        {calendar}                        
-                        {content_container}
-        
-                    </div>
-                )
+    navigation = get_sidebar_data();
+                
+    var wrapComponent = function(Component, props) {
+        return React.createClass({
+            render: function() {
+                return React.createElement(Component, props);              
             }
-        })
+        });
+    };
         
-        var CountlyRouter = React.createClass({
+    var Router = ReactRouter.Router;
+    var Route = ReactRouter.Route;
+        
+    var __active_app = false;
+    var __applications = false;
+        
+    const App = React.createClass({
+        
+        mixins: [ ReactRouter.History ],
+        
+        getInitialState : function(){
+        
+            return ({
+      		    top_bar_first : false,
+                top_bar_second : false,
+                top_block : false,
+                language : false,
+                date : false
+                    //data_timestamp : false
+            })
+        },
+        
+        componentDidMount : function(){
+            if (initial_applications.length == 0)
+            {
+                this.history.pushState(null, "/manage/apps");
+            }
+        },
+            
+        date_changed : function(new_date){
+                                        
+            this.setState({
+                date : new_date
+            })
+        },
+        
+        path_changed : function(first, second){
+                        
+            if (!first)
+            {
+                first = second;
+                second = false;
+            }
+        
+            this.setState({
+      		    top_bar_first : first,
+          		top_bar_second : second
+            })
+        },            
+                    
+        change_language : function(language){
+                        
+            navigation = get_sidebar_data();
+                        
+            this.setState({
+                language : language
+            });
+        },
+        
+        render() {
+                       
+            if ((initial_applications.length != 0) && this.props.location.pathname.indexOf("/manage/users") == -1 && this.props.location.pathname.indexOf("/manage/configurations") == -1 && this.props.location.pathname.indexOf("/manage/apps") == -1 && this.props.location.pathname.indexOf("/manage/applications") == -1 && this.props.location.pathname.indexOf("/crashes/") == -1 && this.props.location.pathname.indexOf("/manage/populator") == -1)
+            {
+                var show_calendar = true;   
+            }
+            else
+            {
+                var show_calendar = false;   
+            }
+                        
+            if (this.props.location.pathname.indexOf("/events") > -1)
+            {
+                var calendar_offset_top = 70;
+            }
+            else
+            {
+                var calendar_offset_top = false;
+            }
+        
+            if (show_calendar)
+            {
+        
+                var calendar = <div id="calendar_block">
+                                    <CalendarWrapper
+                                        onDateChange={this.date_changed}
+                                        offset_top={calendar_offset_top}
+                                        language={this.state.language}
+                                    />
+                                </div>
+        
+                var container_style = {
+                    "border-width" : "1px"
+                }
+            }
+            else
+            {        
+                var calendar = false;
+        
+                var container_style = {
+                    "top" : "80px",
+                    "border-width" : "0px"
+                }
+            }
+        
+            if (this.props.location.pathname.indexOf("/events") > -1)
+            {
+                container_style.top = "211px";
+                container_style.zIndex = 2000;
+            }
+                        
+            if (this.state.date || !show_calendar)
+            {
+                var content_container = <div id="content-container" style={container_style}>
+                                            {this.props.children && React.cloneElement(this.props.children, {
+                                                language : this.state.language,
+                                                date : this.state.date,
+                                                active_app : __active_app             
+                                            })}
+                                        </div>;
+            }
+            else
+            {
+                var content_container = false;
+            }
+                       
+            return (
+                <div className="app">
+                                                    
+                    <div id="sidebar">
+                        <FullSidebar
+                            navigation={navigation}
+                            active_app={__active_app}
+                            current_location={this.props.location.pathname}
+                            applications={__applications}
+                            onChange={this.path_changed}
+                            countly_version={countly_version}
+                            language={this.state.language}
+                            on_active_app_change={this.props.route.on_active_app_change}
+                        />
+                    </div>
+        
+                    <div id="top_bar">
+                        <TopBar
+                            user_name={user_full_name}
+                            width={window.innerWidth - sidebar_width - 16}
+                            first={this.state.top_bar_first}
+                            second={this.state.top_bar_second}
+                            language={this.state.language}
+                            on_change_language={this.change_language}
+                        />
+                    </div>
+        
+                    {calendar}                        
+                    {content_container}
+        
+                </div>
+            )
+        }
+    })
+        
+    var CountlyRouter = React.createClass({
                                 
             getInitialState: function() {
                                         
@@ -396,6 +393,15 @@ window.onload=function(){
         
         React.render(React.createElement(CountlyRouter), document.getElementById("react_routing"));
             
-    });
-    
 }
+
+window.onload=init;
+
+if (window.production)
+{
+    window.onload=init;
+}
+else
+{
+    init();
+} 
