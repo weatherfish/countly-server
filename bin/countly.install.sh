@@ -105,6 +105,7 @@ countly update sdk-web
 cd $DIR/../frontend/express/public/javascripts
 babel --presets es2015,react react_components/ --out-dir react_components_compiled/
 babel --presets es2015,react react_pages/ --out-dir react_pages_compiled/
+babel --presets es2015,react index.js --out-file index_compiled.js
 cd $DIR/../frontend/express/public/stylesheets
 
 lessc sidebar.less compiled_css_sidebar.css

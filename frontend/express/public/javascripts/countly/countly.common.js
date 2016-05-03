@@ -3320,16 +3320,20 @@
         var now_timestamp = new Date();
         var end_of_period = new Date(now_timestamp.getFullYear(), now_timestamp.getMonth(), now_timestamp.getDate()).getTime(); // start of day
         //var timestamp = startOfDay / 1000;
-
-        switch (_period) {
+      
+        switch (_period) { // last year mode
             case "month":
-                /*activePeriod = year;
+                activePeriod = year;
                 previousPeriod = year - 1;
                 periodMax = month;
                 periodMin = 1;
                 dateString = "MMM";
-                numberOfDays = getDOY();*/
-
+                numberOfDays = getDOY();
+                
+                var start_of_period = new Date(new Date().getFullYear(), 0, 1).getTime();
+                var end_of_period = new Date().getTime();
+                
+/*
                 var now = new Date();
                 var start = new Date(now.getFullYear(), 0, 0);
                 var diff = now - start;
@@ -3339,6 +3343,7 @@
                 numberOfDays = daysInPeriod = day;
                 
                 var start_of_period = end_of_period - 30 * oneDay; // todo: not 30 days
+*/
 
                 break;
             case "day":
@@ -3454,6 +3459,12 @@
                 numberOfDays = daysInPeriod = b.diff(a, 'days') + 1;
                 rangeEndDay = _period[1];
             }
+            
+            // ---------------------------------------------
+            
+            var start_of_period = _period[0];
+            var end_of_period = _period[1];
+            
         }
 
         if (daysInPeriod != 0) {

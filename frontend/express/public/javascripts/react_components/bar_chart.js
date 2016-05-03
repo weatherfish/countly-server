@@ -2,7 +2,7 @@ var Chart = React.createClass({
 
     y_scale_log : false,
 
-    colors : ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575", "#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"],
+    colors : ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575", "#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575","#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9"],
 
     getInitialState: function() {
 
@@ -119,6 +119,9 @@ var Chart = React.createClass({
     draw_tooltip : function(element, d, i, total_count, react_element)
     {
 
+        console.log("===== draw total count ===========");
+        console.log(total_count);
+
         var self = this;
 
         var tooltip_height = 44;
@@ -130,6 +133,11 @@ var Chart = React.createClass({
         var text_height = 20;
 
         var data = react_element.state.data;
+        
+        var triangle_width = 14;
+        var triangle_height = 7;
+
+        var points = "00,00 07,07 14,00";
 
         /*var y_scale_log = d3.scale.linear()
             .domain([1, d3.max(data, function(d) { return d.t; })]).nice()
@@ -154,12 +162,7 @@ var Chart = React.createClass({
                 .style("fill", function(d) {
                     return "#141821";
                 })
-
-        var triangle_width = 14;
-        var triangle_height = 7;
-
-        var points = "00,00 07,07 14,00";
-
+        
         tooltip.append("polygon")
               .attr("points", points)
               .attr("transform", function(d, i) {
@@ -188,7 +191,7 @@ var Chart = React.createClass({
 
         tooltip.append("text")
                 .attr("class", "percent")
-                .text(function(d) {
+                .text(function(d) {                                                           
                     var percent = Math.round((d[self.props.headers[1]["short"]] / total_count) * 100);
                     return percent + "%";
                 })
@@ -222,17 +225,11 @@ var Chart = React.createClass({
         var height = this.props.height;
         var width = this.svg_style.width;
 
-        //var barWidth = width / this.state.data.length;
-        //var one_bar_width = 40;
-
         var x = d3.scale.ordinal()
                         .rangeRoundBands([0, width], .1);
 
         x.domain(data.map(function(d) { return d.f; }));
-/*
-        var y_scale_circle = d3.scale.log(10).range([0, 30]);
-        y_scale_circle.domain([1, d3.max(data, function(d) { return d.t; })]).nice();
-*/
+
         this.y_scale_log = d3.scale.linear()
             .domain([0, d3.max(data, function(d) {
                 if (!d.active) return 0;
@@ -249,7 +246,7 @@ var Chart = React.createClass({
             this.chart = d3.select(container)
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
-              .append("g")
+                .append("g")
                 //.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         }
 
@@ -257,6 +254,14 @@ var Chart = React.createClass({
 
         var total_count = 0;
         data.forEach(function(element){
+            
+            if (self.props.data_sum_key && element.active) // todo: data_sum_key using in crash details page
+            {
+                total_count += element[self.props.data_sum_key];
+                
+                return true;
+            }
+            
             if (element.active) total_count += element.t;
         });
 
@@ -292,8 +297,17 @@ var Chart = React.createClass({
 
         var i = 0;
         var ij = 0;
+        
+        if (data.length > 20)
+        {
+            var bar_width = self.props.bar_width / 2;
+        }
+        else
+        {
+            var bar_width = self.props.bar_width
+        }                
 
-        bar_block.selectAll(".bar_rect")
+        var bar_rect = bar_block.selectAll(".bar_rect")
             .transition()
             .duration(750)
             .attr("d", function(d/*, i*/){
@@ -329,7 +343,6 @@ var Chart = React.createClass({
 
                 return d.color;
             })
-
 
         var i = 0;
         var ij = 0;
@@ -390,6 +403,55 @@ var Chart = React.createClass({
                 return rect;
             })
 
+/*
+        var enter_checkbox = enter.append("rect")
+            .attr("class", "checkbox_rect")
+            .attr("transform", function(d, i) {
+                return "translate(20,310)";
+            })
+            .attr("height", 15)
+            .attr("width", 15)
+            .attr("x", -7)
+            .style("fill", function(d) {
+                return d.color;
+            })
+            .on("click", this.tick_click)
+            .attr("rx", 1)
+            .attr("ry", 1)
+            .attr("stroke-width", 1)
+            .attr("stroke", function(d) {
+                return d.color;
+            })*/
+
+/*
+        var enter_checkbox = enter.append("foreignObject")
+            .attr("transform", function(d, i) {
+                return "translate(14,310)";
+            })
+            .attr("x", "20px" )
+            .attr("y", "310px")
+            .style("width","15px")
+            .style("height","15px")*/
+/*
+        var htmlDOMs = enter_checkbox.append("xhtml:body")
+                        .style("width","15px")
+                        .style("height","15px");
+        
+        var checkbox_div = htmlDOMs.append("div")
+                .style("width","15px")
+                .style("height","15px")
+                .style("border","1px solid black");*/
+        /*
+        checkbox_div.append("image")
+            .attr("transform", function(d, i) {
+                return "translate(14,310)";
+            })
+            .style("height", 13)
+            .style("width", 13)
+            //.attr("xlink:href", "../images/tick.svg")
+            .attr("href", "../images/tick.svg")
+            .on("click", this.tick_click)*/
+
         var enter_checkbox = enter.append("rect")
             .attr("class", "checkbox_rect")
             .attr("transform", function(d, i) {
@@ -408,6 +470,7 @@ var Chart = React.createClass({
             .attr("stroke", function(d) {
                 return d.color;
             })
+            
 
         enter.append("image")
             .attr("transform", function(d, i) {
@@ -417,6 +480,7 @@ var Chart = React.createClass({
             .attr("width", 13)
             .attr("xlink:href", "../images/tick.svg")
             .on("click", this.tick_click)
+            
 
         var label = enter.append("text")
             .attr("class", "bar_text")
@@ -494,19 +558,13 @@ var Chart = React.createClass({
     {
 
         //var this.y_scale_log = d3.scale.log(1000).range([height - bars_margin_bottom, 0]);
-        var axis = d3.svg.axis().ticks(10).tickFormat(function(d) {
-            //console.log("-- draw tick ---");
-            //console.log(d);
+        var axis = d3.svg.axis().ticks(10).tickFormat(function(d) {          
             return formatValue(d).replace('0.0', '0').replace('.0', '');/* return d*/
         }).orient(orientation).scale(this.y_scale_log);
 
         //var ticks = axis.;
 
         var ticks = this.y_scale_log.ticks();
-
-        //axis.tickFormat(function(x) { return x });
-
-        //if (this.tickValues) axis.tickValues(this.tickValues);
 
         this.axis_width = 35;
 
@@ -519,16 +577,10 @@ var Chart = React.createClass({
             //var berth = this.props.height * 0.10;
             var transform = 'translate(' + (this.svg_style.width - this.axis_width) + ', ' + 0 + ')';
         }
-/*
-        if (this.element) {
-          this.vis.selectAll('*').remove();
-        }
-*/
+
         var y_domain = Math.round(this.domain.y[1]);
 
         var first_digit = parseInt(y_domain.toString()[0]);
-
-        //console.log("first digit:", first_digit);
 
         var y_domain_string = (first_digit + 1).toString();
 
@@ -539,9 +591,6 @@ var Chart = React.createClass({
 
         y_domain = parseInt(y_domain_string);
 
-        //console.log("new domain:", y_domain);
-
-        //var y_inverted = d3.scale.linear().domain([y_domain, 0]).rangeRound([0, height - bars_margin_bottom]);
         var y_inverted = this.y_scale_log;
 
         var tick_values = [];
@@ -558,9 +607,24 @@ var Chart = React.createClass({
 
             var svg = d3.select("body").transition();
 
-            svg.select(".y_axis." + orientation)
+            var y_axis = svg.select(".y_axis." + orientation)
                 .duration(750)
                 .call(axis.tickValues(tick_values))
+                .call(function(g){
+                                                           
+                    var ticks = g.selectAll(".tick");
+                    
+                    ticks = ticks[0];
+                    
+                    for (var i = 0; i < ticks.length; i++)
+                    {                        
+                        if (d3.select(ticks[i]).selectAll("text")[0][0].textContent.indexOf("m") > -1 || d3.select(ticks[i]).selectAll("text")[0][0].textContent.indexOf(".") > -1)
+                        {
+                            ticks[i].remove();
+                        }
+                    }                    
+                });
+                
         }
         else
         {
@@ -572,6 +636,18 @@ var Chart = React.createClass({
                 .call(function(g){
                     g.selectAll("path").remove();
                     g.selectAll("line").remove();
+                    
+                    var ticks = g.selectAll(".tick");
+                    
+                    ticks = ticks[0];
+                    
+                    for (var i = 0; i < ticks.length; i++)
+                    {                     
+                        if (d3.select(ticks[i]).selectAll("text")[0][0].textContent.indexOf("m") > -1)
+                        {
+                            ticks[i].remove();
+                        }
+                    }                                                                                                    
                 })
 
             if (orientation == "left")
@@ -658,6 +734,9 @@ var Chart = React.createClass({
             var y_grid = svg.select(".y_grid")
                 .duration(750)
                 .call(axis.tickSize(gridSize).tickValues(tick_values));
+                
+            //y_grid.select(".tick").select
+            
             /*
             var rect_grids = y_grid
                 .selectAll('g')

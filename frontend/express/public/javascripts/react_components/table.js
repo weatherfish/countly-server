@@ -469,9 +469,9 @@ var SortTable = React.createClass({
             {
                 rows = this.convert_data_rows(rows);
             }
-
-            var pagination = this.make_pagination(rows);
-                        
+           
+            var pagination = this.make_pagination(JSON.parse(JSON.stringify(rows)));
+                     
             if (nextProps.language != this.props.language){
                 
                 this.headers_width_rendered = [];
@@ -845,7 +845,7 @@ var SortTable = React.createClass({
         
         //return false;
         
-        console.log("onHeaderWidthChange:", header_id, " > ", width);
+        //console.log("onHeaderWidthChange:", header_id, " > ", width);
         
         if (this.headers_inited)
         {

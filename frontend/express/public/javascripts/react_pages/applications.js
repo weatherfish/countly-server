@@ -101,7 +101,7 @@ var NewAppWindow = React.createClass({
     },
 
     add : function(){
-
+        
         if (!this.icon_file)
         {
             alert("please add the icon");
@@ -234,7 +234,7 @@ var NewAppWindow = React.createClass({
                 />
 
                 <div className="setting_block upload_icon_block">
-                    <div className="setting_label">{jQuery.i18n.map["help.manage-apps.app-icon"]}</div>
+                    <div className="setting_label">{"icon"/*jQuery.i18n.map["management-applications.app-icon"]*/}</div>
                     <div className="upload_block">
 
                         <form ref="uploadForm" enctype="multipart/form-data" id="add-app-image-form">
@@ -331,7 +331,7 @@ var ApplicationsPage = React.createClass({
 
         this.app_categories = countlyCommon.getAppCategories();
         var timezones = countlyCommon.getTimeZones();
-
+        
         this.timezones_options = [];
 
         for (var key in timezones)
@@ -352,6 +352,9 @@ var ApplicationsPage = React.createClass({
 
             this.timezones_options[timezone_key] = timezone_value;
         }
+        
+        console.log("------------ this.timezones_options -------------");
+        console.log(this.timezones_options);
 
         this.app_categories_options = [];
 
@@ -434,7 +437,7 @@ var ApplicationsPage = React.createClass({
         {
             updated_app[props.save_key] = state.value;
         }
-
+        
         $.ajax({
             type:"GET",
             url:countlyCommon.API_PARTS.apps.w + '/update',
@@ -444,7 +447,7 @@ var ApplicationsPage = React.createClass({
                     name : updated_app.name,
                     category : updated_app.category,
                     timezone : updated_app.timezone,
-                    country : "CN" // todo!!!!!!!!!!!!!!!!!!
+                    country : updated_app.country,
                 }),
                 api_key:countlyGlobal['member'].api_key
             },
@@ -800,6 +803,7 @@ var ApplicationsPage = React.createClass({
                                               options_values={this.app_categories_options}
                                               on_save={this.saveApp}
                                               save_key="category"
+                                              type={"select_search"}
                                           />
 
                                           <EditableField

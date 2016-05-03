@@ -7,11 +7,7 @@ var CrashDetailsPage = React.createClass({
     pie_charts_colors : ["#1A8AF3", "#5DCBFF", "#9521B8", "#26C1B9", "#9FC126", "#0FB654", "#A63818", "#F73930", "#FD8927", "#F9BD34", "#FF7575"],
 
     getInitialState: function() {
-        
-        console.log("init crash details:");
-
-        // "00bf85dafddf7e8d0a31edb903dd1535e15b724a"
-
+               
         var crash_id = this.props.params.crash_id;
 
         var bar_chart_keys = [
@@ -487,7 +483,7 @@ var CrashDetailsPage = React.createClass({
                                 bar_width={40}
                                 date={this.props.date}
                                 additional_selector={metrics_selector}
-
+                                data_sum_key={"v"}
                             />
 
                         </div>

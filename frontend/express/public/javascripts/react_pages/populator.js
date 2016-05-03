@@ -39,14 +39,7 @@ var Populator = React.createClass({
     
     start_generation : function(){
         
-        console.log("{{{{{{ start generation }}}}}}}}}]");
-        /*
-        this.settings.date_from = "2016-02-02";
-        this.settings.date_to = "2016-02-04";
-        
-        var start_time = moment(this.settings.date_from, 'YYYY-MM-DD').unix();
-        var end_time = moment(this.settings.date_to, 'YYYY-MM-DD').unix();
-        */
+        console.log("start generation:");
         
         console.log("start time:", this.settings.date_from);
         console.log("end_time:", this.settings.date_to);

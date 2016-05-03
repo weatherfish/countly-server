@@ -99,10 +99,7 @@ var CrashesPage = React.createClass({
                 "short" : "error", // error
                 "width_percent" : 20,
                 formatting_function :  function(error, cell_width){  
-                    
-                    console.log("--- error ---");
-                    console.log(error);
-                    
+                                        
                     var error_array = error.split("\n");
                     
                     var substr_length = 10;

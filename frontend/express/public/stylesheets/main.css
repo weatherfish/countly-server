@@ -101,6 +101,7 @@ body {
     background-color:#F5F5F5;
     user-select:text;
     position : relative;
+    overflow-x : hidden;
 }
 
 input[type="text"] {

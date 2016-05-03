@@ -10,6 +10,10 @@ var AverageBar = React.createClass({
     render : function(){
 
         var width  = this.props.max - this.props.min;
+        
+        if (width > 100){ // todo: Data Populator ganerate such data
+            width = 100 - this.props.min;
+        }
 
         var bar_style = {
             "margin-left" : this.props.min + "%",

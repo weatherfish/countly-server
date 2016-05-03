@@ -28,7 +28,7 @@ var BoolPieChart = React.createClass({
         var color = d3.scale.ordinal()
           .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
-        var colors = ["#98abc5", "#ffffff"];
+        //var colors = ["#98abc5", "#ffffff"];
 
         var data = [{
                       "key" : "my_value",
@@ -40,12 +40,12 @@ var BoolPieChart = React.createClass({
                   }];
 
         var arc = d3.svg.arc()
-          .outerRadius(radius - 19 /*12*/)
-          .innerRadius(radius - 31);
+          .outerRadius(radius - 24 /*12*/)
+          .innerRadius(radius - 36);
 
         var arc2 = d3.svg.arc()
-              .outerRadius(radius - 20)
-              .innerRadius(radius - 30);
+              .outerRadius(radius - 25)
+              .innerRadius(radius - 35);
 
         var labelArc = d3.svg.arc()
               .outerRadius(radius - 40)
@@ -85,7 +85,7 @@ var BoolPieChart = React.createClass({
         _gray_circle.append("path")
                 .attr("d", arc2)
                 .style("fill", function(d, i) {
-                    return "#eeeeee";
+                    return "#FBFBFB";
                 });
 
         _gray_circle.append("text")

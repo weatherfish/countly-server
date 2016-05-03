@@ -124,41 +124,54 @@ var EditableField = React.createClass({
         if (Array.isArray(this.props.options_values))
         {
 
-            var valueLink = {
-                value: this.state.value_key,
-                requestChange: this.handleValueChange
-            }
-
-            //var input_value = (<select>);
-/*
-            for (var i = 0; i < 10; i++)
+            if (this.props.type == "select_search")
             {
-                console.log('>>> ', i);
-            }*/
-
-            var options = [];
-
-            //for (var i = 0; i < this.props.options_values.length; i++)
-            for (var key in this.props.options_values)
-            {
-                options.push({
-                    "key" : key,
-                    "label" : this.props.options_values[key]
-                })
-                //options.push(<option value={key}>{value}</option>);
-                //options.push(<option value={this.props.options_values[i].key}>{this.props.options_values[i].value}</option>);
+                                                
+                var options = [];
+               
+                for (var key in this.props.options_values)
+                {
+                    options.push({
+                        "key" : key,
+                        "label" : this.props.options_values[key]
+                    })               
+                }
+                
+                <SelectBlock
+                    label={jQuery.i18n.map["management-applications.time-zone"]}
+                    selectors={options}
+                    active_selector_key={this.props.value}
+                    onChange={this.on_setting_change}
+                    setting={["country"]}
+                    width={240}
+                />
+                
             }
-
-            //input_value += (</select>);
-
-            //var input_value = <select style={input_style} valueLink={valueLink}>{options}</select>;
-
-            var input_value = <SimpleSelectBlock
-                                  selectors={options}
-                                  onChange={this.handleValueChange}
-                                  style={input_style}
-                                  active_selector_key={this.props.value}
-                              />
+            else
+            {
+                /*
+                var valueLink = {
+                    value: this.state.value_key,
+                    requestChange: this.handleValueChange
+                }*/
+    
+                var options = [];
+               
+                for (var key in this.props.options_values)
+                {
+                    options.push({
+                        "key" : key,
+                        "label" : this.props.options_values[key]
+                    })               
+                }
+             
+                var input_value = <SimpleSelectBlock
+                                      selectors={options}
+                                      onChange={this.handleValueChange}
+                                      style={input_style}
+                                      active_selector_key={this.props.value}
+                                    />
+            }            
 
         }
         else
@@ -171,8 +184,6 @@ var EditableField = React.createClass({
 
             var input_value = <input style={input_style} valueLink={valueLink} type="text"/>;
         }
-
-        // value={this.props.value}
 
         return (
             <span className="row editable" onClick={this.edit_click} style={row_style}>
