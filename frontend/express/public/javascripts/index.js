@@ -198,9 +198,11 @@ var init = function(){
                         break;
               		}
                 }
-                        
-                //active_app.id = active_app._id;
-                active_app.logo = active_app.id + ".png";
+                                 
+                if (active_app)
+                {
+                    active_app.logo = active_app.id + ".png";
+                }  
                         
                 __applications = initial_applications;
                 __active_app = active_app;
@@ -394,8 +396,6 @@ var init = function(){
         React.render(React.createElement(CountlyRouter), document.getElementById("react_routing"));
             
 }
-
-window.onload=init;
 
 if (window.production)
 {

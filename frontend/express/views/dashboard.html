@@ -16,6 +16,10 @@
 		<link rel="stylesheet" href="<%- cdn %>/stylesheets/entypo/css/entypo.css" /-->
 		<!--link rel="stylesheet" href="<%- cdn %>/javascripts/dom/jqueryui/jquery.ui.base.css" />
 		<link rel="stylesheet" href="<%- cdn %>/javascripts/dom/jqueryui/jquery.ui.theme.css" /-->
+        
+        <script type="text/javascript">    
+            window.production = <%= production ? true : false %>;  
+        </script>                
 
         <% if (production) { %>
 
@@ -273,10 +277,8 @@
 
         <script type="text/javascript">
     
-            var sidebar_width = 240;
-    
-            window.production = <%= production ? true : false %>;
-    
+            var sidebar_width = 240;    
+                
             var initial_applications = [];
     
             <% for (var i = 0; i < userOfApps.length; i++) { %>
