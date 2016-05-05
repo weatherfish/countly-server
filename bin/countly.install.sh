@@ -131,7 +131,8 @@ apt-get install -y zip
 
 cd $DIR/scripts
 # download geo data for datamaps visualization from "themapping.org"
-if wget -q http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip;
+# if wget -q http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip;
+if wget -q https://s3.amazonaws.com/countlysetup/TM_WORLD_BORDERS-0.3.zip;
   then echo "done";
   else wget http://static.count.ly/TM_WORLD_BORDERS-0.3.zip;
 fi
@@ -140,7 +141,8 @@ unzip ./TM_WORLD_BORDERS-0.3.zip -d ./geo_data
 cd $DIR/scripts
 node ./create_country_table.js
 
-if wget -q http://download.geonames.org/export/dump/cities1000.zip;
+#if wget -q http://download.geonames.org/export/dump/cities1000.zip;
+if wget -q https://s3.amazonaws.com/countlysetup/cities1000.zip;
   then echo "done";
   else wget http://static.count.ly/cities1000.zip;
 fi
