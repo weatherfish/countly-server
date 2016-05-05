@@ -57,7 +57,7 @@ var Populator = React.createClass({
     },
     
     stop_generation : function(){
-        console.log("[[[ click stop ]]]");
+        
         countlyPopulator.stopGenerating(function(done){
             console.log("- generator stop --");                        
         });
@@ -68,9 +68,6 @@ var Populator = React.createClass({
     },
     
     date_changed : function(date){
-        
-        console.log("======== populator date_changed ========");
-        console.log(date);
         
         if (date.period_timestamp)
         {
@@ -95,7 +92,7 @@ var Populator = React.createClass({
  
         return (
                 <div id="populator" style={page_style}>
-                    <div className="headline">populator</div>
+                    <div className="headline">data populator</div>
                     <div className="control_block">
                     
                         <InputBlock
@@ -189,25 +186,5 @@ var Populator = React.createClass({
                     </div>
                 
             </div>)
-        
-         
- /*
- <InputBlock
-                            label={jQuery.i18n.map["populator.date-from"]}
-                            value={"2016-02-02"}
-                            onChange={this.on_setting_change}
-                            setting={"date_from"}                            
-                        />
-                        <InputBlock
-                            label={jQuery.i18n.map["populator.date-to"]}
-                            value={"2016-02-04"}
-                            onChange={this.on_setting_change}
-                            setting={"date_to"}                            
-                        />
- */
-        
-        /*
-
-        */
     }
 });

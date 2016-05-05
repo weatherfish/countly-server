@@ -5,7 +5,9 @@ var NewAppWindow = React.createClass({
     countries : [],
     categories : [],
 
-    app_data : {},
+    app_data : {
+        "redirect_to_populator" : true
+    },
 
     icon_file : false,
 
@@ -53,6 +55,7 @@ var NewAppWindow = React.createClass({
             "confirmation_waiting" : false,
             "confirmation_sign" : false, //jQuery.i18n.map["management-applications.delete-confirm"],
             "confirmation_function" : false,
+            "redirect_to_populator" : true
         });
 
     },
@@ -97,6 +100,10 @@ var NewAppWindow = React.createClass({
     },
 
     on_setting_change : function(key, value){
+        
+        console.log("=== setting change ==");
+        console.log(key, value);
+        
         this.app_data[key] = value;
     },
 
@@ -107,6 +114,9 @@ var NewAppWindow = React.createClass({
             alert("please add the icon");
             return false;
         }
+        
+        console.log("++++++++++++++++ add app data ++++++++++++++++");
+        console.log(this.app_data);
 
         var self = this;
 
@@ -130,15 +140,18 @@ var NewAppWindow = React.createClass({
             },
             dataType:"jsonp",
             success:function (data) {
-
+/*
                 var newAppObj = {
                     "_id":data._id,
                     "name":data.name,
                     "key":data.key,
                     "category":data.category,
                     "timezone":data.timezone,
-                    "country":data.country
+                    "country":data.country,
+                    "redirect_to_populator":self.app_data["redirect_to_populator"] ? true : false
                 };
+*/
+                data.redirect_to_populator = self.app_data["redirect_to_populator"] ? true : false;
 
                 // --------------------------------------------
 
@@ -243,6 +256,13 @@ var NewAppWindow = React.createClass({
 
                     </div>
                 </div>
+                
+                <SwitchBlock
+                            label={"redirect to data populator"}
+                            enabled={this.state.redirect_to_populator}
+                            onChange={this.on_setting_change}
+                            setting={["redirect_to_populator"]}
+                        />
 
                 <div className="buttons_block">
                     <div className="add_button" onClick={this.add}>{jQuery.i18n.map["management-applications.add-application"]}</div>
@@ -325,6 +345,8 @@ var ActionSelector = React.createClass({
 
 var ApplicationsPage = React.createClass({
 
+    mixins: [ ReactRouter.History ],
+
     app_categories : false,
 
     getInitialState: function() {
@@ -352,10 +374,7 @@ var ApplicationsPage = React.createClass({
 
             this.timezones_options[timezone_key] = timezone_value;
         }
-        
-        console.log("------------ this.timezones_options -------------");
-        console.log(this.timezones_options);
-
+     
         this.app_categories_options = [];
 
         for (var key in this.app_categories)
@@ -405,6 +424,11 @@ var ApplicationsPage = React.createClass({
     },
 
     onAppCreate : function(app){
+                
+        if (app.redirect_to_populator)
+        {
+            this.history.pushState(null, "/manage/populator");
+        }       
 
         this.props.on_app_create(app);
         this.selectAppClick(app.id);
@@ -802,8 +826,7 @@ var ApplicationsPage = React.createClass({
                                               value={this.state.current_app.category}
                                               options_values={this.app_categories_options}
                                               on_save={this.saveApp}
-                                              save_key="category"
-                                              type={"select_search"}
+                                              save_key="category"                                             
                                           />
 
                                           <EditableField
