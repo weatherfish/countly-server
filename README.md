@@ -14,7 +14,8 @@ There are two parts of Countly: the server that collects and analyzes data, and 
 ![Countly dashboard screenshot](https://s3.amazonaws.com/imgbucketdone/screen_full.png)
 ![Countly platforms screenshot](https://s3.amazonaws.com/imgbucketdone/platforms_screen.png)
 ![Countly platforms screenshot](https://s3.amazonaws.com/imgbucketdone/git_screen_1.png)
-![Countly table screenshot](https://s3.amazonaws.com/imgbucketdone/table.png)
+![Countly platforms screenshot](https://s3.amazonaws.com/countlysetup/linechart.png)
+![Countly table screenshot](https://s3.amazonaws.com/countlysetup/crash_screen.png)
 ![Countly bar_chart screenshot](https://s3.amazonaws.com/imgbucketdone/bar_chart.png)
 
 ##Supported devices
