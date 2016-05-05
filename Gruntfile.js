@@ -171,7 +171,7 @@ module.exports = function(grunt) {
                 "frontend/express/public/stylesheets/compiled_css_manage_users.css",
                 "frontend/express/public/stylesheets/compiled_css_configurations.css",
                 "frontend/express/public/stylesheets/compiled_css_events_page.css",
-                "frontend/express/public/stylesheets/crashes_page.css",
+                "frontend/express/public/stylesheets/compiled_css_crashes_page.css",
                 "frontend/express/public/stylesheets/compiled_css_selector_with_search.css",
                 "frontend/express/public/stylesheets/compiled_css_select.css",
                 "frontend/express/public/stylesheets/compiled_css_multi_select.css",
