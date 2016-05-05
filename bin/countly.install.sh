@@ -123,6 +123,7 @@ lessc crash_details.less compiled_css_crash_details.css
 lessc line_chart.less compiled_css_line_chart.css
 lessc platforms.less compiled_css_platforms.css
 lessc events_page.less compiled_css_events_page.css
+lessc crashes_page.less compiled_css_crashes_page.css
 
 cd $DIR/../ && grunt dist-all
 
