@@ -11,6 +11,8 @@ With the help of [Javascript SDK](http://github.com/countly/countly-sdk-web), Co
 
 There are two parts of Countly: the server that collects and analyzes data, and an SDK (mobile, web or desktop) that sends this data. This repository includes Countly Community Edition (server side). For more information other versions (e.g Enterprise Edition), see [comparison of different Countly editions](https://count.ly/compare)
 
+[screenshots](#screenshots)
+
 ![Countly dashboard screenshot](https://s3.amazonaws.com/imgbucketdone/screen_full.png)
 ![Countly platforms screenshot](https://s3.amazonaws.com/imgbucketdone/platforms_screen.png)
 ![Countly platforms screenshot](https://s3.amazonaws.com/imgbucketdone/git_screen_1.png)
