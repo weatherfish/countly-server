@@ -27,7 +27,7 @@
             "ConstraintDescription" : "GB"
         },
         "KeyName" : {
-            "Description" : "Your EC2 Key Pair, created in the first step",
+            "Description" : "Please, generate a key pair first, if you don't have them.",
             "Type" : "AWS::EC2::KeyPair::KeyName",
             "MinLength" : "2",
             "ConstraintDescription" : "must be the name of an existing EC2 KeyPair"
@@ -326,10 +326,6 @@
 
                     "apt-get -y install mongodb > /tmp/apt-mongo.log 2>&1\n",
 
-                    "apt-get install -y nodejs > /tmp/node_install.log 2>&1\n",
-                    "apt-get install -y npm > /tmp/npm_install.log 2>&1\n",
-                    "npm install -g forever\n",
-
                     "while [ ! -e /dev/xvdf ]; do echo waiting for /dev/xvdf to attach; sleep 2; done\n",
 
                     "mkfs -t ext4 /dev/xvdf", "\n",
@@ -552,7 +548,7 @@
                     "Revision" : {
                         "RevisionType" : "GitHub",
                         "GitHubLocation" : {
-                            "CommitId"   : "e34b0beea352502e41d9e7b62b3cc8bf6a01f475",
+                            "CommitId"   : "7a512bf5b78130aa71392fc658c4019f4e2ba89e",
                             "Repository" : "Countly/countly-server"
                         }
                     }
