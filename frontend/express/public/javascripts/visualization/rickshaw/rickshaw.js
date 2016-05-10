@@ -554,9 +554,7 @@ Rickshaw.Graph = function(args) {
         var y_domain = Math.round(domain.y[1]);
         
         var first_digit = parseInt(y_domain.toString()[0]);
-        
-        //console.log("first digit:", first_digit);
-        
+                
         var y_domain_string = (first_digit + 1).toString();
         
         for (var i = 0; i < y_domain.toString().length - 1; i++)
@@ -2702,15 +2700,31 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
     },
 
     find_top_position : function(id) {
-        var node = document.getElementById(id);
+
+        var node = $("#" + id);
+
         var curtop = 0;
         var curtopscroll = 0;
-        if (node.offsetParent) {
+
+        if (node.offsetParent()) {
+
+            var i = 0;
+
             do {
-                curtop += node.offsetTop;
-                curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
-        
-            } while (node = node.offsetParent);
+
+                if (node.is("body")) break;
+
+                curtop += node.offset().top;
+                curtopscroll += node.offsetParent() ? node.offsetParent().scrollTop() : 0;
+
+                i++;
+
+                if (i > 10)
+                {
+                    break;
+                }
+
+            } while (node = node.offsetParent());
             return (curtop - curtopscroll)
         }
     },
@@ -2829,7 +2843,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
         }
     
         point = this.current_point;
-    
+
         if ((this.find_top_position("graph_svg") + graph.y(point.value.y) - topbar_height) < block_height + 10) // 10 - extra additional place
         {
             var is_bottom_block = true;
@@ -2871,7 +2885,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
         var tooltip_left = this.graph.axis_width + Math.ceil((graph.x(point.value.x) + /*graph.circle_radius +*/ (graph.max_tick_width / 2) + this.graph.points_offset));
     
         this.element.style.left = tooltip_left + 'px';
-    
+
         if (!is_bottom_block)
         {
             var hover_top_position = graph.y(point.value.y) - block_height;
@@ -2915,7 +2929,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
         }
     
         xLabel.appendChild(triangle);
-    
+
         xLabel.style.position = "relative";
     
         if (graph.x(point.value.x) > this.graph.width / 2) // right side
