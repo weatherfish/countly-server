@@ -69,10 +69,7 @@ var CalendarWrapper = React.createClass({
         date_range = date_range.split(" - ");
 
         var period_obj = countlyCommon.periodObj;
-        
-        console.log("**************** period object *****************8");
-        console.log(period_obj);
-             
+                     
         this.props.onDateChange({ "period" : countlyCommon.getPeriod(), "period_timestamp" : [period_obj.start_of_period, period_obj.end_of_period] });
 
         // ------------
@@ -94,13 +91,12 @@ var CalendarWrapper = React.createClass({
             transition_c_open  : false,
             transition_close   : false,
             transition_c_close : false,
-            in_close           : false, // 2-step animation during both panel closing
-            //left_date      : false, // todo: now they are globals
-            //right_date     : false,
+            in_close           : false, // 2-step animation during both panel closing          
             from_string : date_values.from_string,
             to_string   : date_values.to_string,
             fast_choise : countlyCommon.getPeriod(),
-            language : this.props.language
+            language : this.props.language,
+            right_part_render_key : Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)
         };
     },
     
@@ -366,8 +362,8 @@ var CalendarWrapper = React.createClass({
     */
 
     handleFastChoise : function(choise){
-
-        //countlyCommon.setPeriod([date_from, date_to]);
+        
+        var self = this;
 
         countlyCommon.setPeriod(choise);
 
@@ -378,9 +374,6 @@ var CalendarWrapper = React.createClass({
         var date_range = countlyCommon.getDateRange();
         date_range = date_range.split(" - ");
 
-        console.log("= new getPeriod ========");
-        console.log(countlyCommon.periodObj);
-        
         var period_obj = countlyCommon.periodObj;
 
         // ----------
@@ -407,16 +400,35 @@ var CalendarWrapper = React.createClass({
             state_obj.calendars_open   = false;
         }
 
-        this.setState(state_obj);
+        /*
+            Fully re render right part after a fast  choice of a date.
+        */
+
+        this.setState(state_obj, function(){
+            
+            var reset_state = function(){
+            
+                if (self.state.transition_close || self.state.transition_c_close)
+                {      
+                    setTimeout(function(){
+                        reset_state();
+                    }, 200);
+                }
+                else
+                {
+                    self.setState({
+                        right_part_render_key : Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)
+                    });
+                }     
+            }
+            
+            reset_state();
+            
+        });                
 
         this.props.onDateChange({ "period" : choise, "state" : state_obj, "period_timestamp" : [period_obj.start_of_period, period_obj.end_of_period] });
 
-        //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
-
         $(event_emitter).trigger("date_choise_event", { "period" : choise, "period_timestamp" : [period_obj.start_of_period, period_obj.end_of_period], "state" : state_obj });
-/*
-        $(event_emitter).trigger("date_choise_test", { "period" : choise, "state" : state_obj });
-*/
 
     },
 
@@ -435,13 +447,6 @@ var CalendarWrapper = React.createClass({
 
         var date_from = left_date.date.getTime();
         var date_to   = right_date.date.getTime();
-
-        console.log("calendar from:", date_from);
-        console.log("calendar to:" , date_to);
-        
-        //date_to += ((24 * 60 * 60) - 1) * 1000; // todo
-        
-        //console.log("calendar to new:" , date_to);
 
         countlyCommon.setPeriod([date_from, date_to]);
 
@@ -474,12 +479,8 @@ var CalendarWrapper = React.createClass({
 
         this.props.onDateChange({ "period" : [date_from, date_to], "state" : state_obj });
 
-        //global_controller.date_string = state_obj.from_string + " - " + state_obj.to_string;
-
         $(event_emitter).trigger("date_choise_event", { "period" : [date_from, date_to], "state" : state_obj }); // todo: change date_fast_choise
-/*
-        $(event_emitter).trigger("date_choise_test", { "period" : [date_from, date_to], "state" : state_obj }); // todo: change date_fast_choise
-*/
+
     },
 
     componentDidUpdate : function() {
@@ -681,7 +682,7 @@ var CalendarWrapper = React.createClass({
             width : element_width,
             top : this.props.offset_top ? (70 + this.props.offset_top) + "px" : false
         };
-
+           
         return (
 
             <div className="wrapper" style={element_style}>
@@ -706,7 +707,7 @@ var CalendarWrapper = React.createClass({
                         </div>
                     </div>
 
-                    <div className={calendars_class_name}>
+                    <div className={calendars_class_name} key={this.state.right_part_render_key}>
 
                         <div className="calendar_wrapper">
                             <ReactWidgets.Calendar dayComponent={DayComponentLeft} max={right_date.date} onChange={this.handleLeftChange} defaultValue={left_date.date}  />

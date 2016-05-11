@@ -12,10 +12,7 @@ var TimeRangeMixin = {
         }
                                       
         var current_period = countlyCommon.getPeriod();
-         
-        console.log("{{{{{{{ current period }}}}}}}}}}}}]]");
-        console.log(current_period);
-                        
+                                
         if (!Array.isArray(current_period))
         {              
             var real_current_period = current_period;
@@ -29,11 +26,7 @@ var TimeRangeMixin = {
                         
         var current_period_start = current_period[0];
         var current_period_end = current_period[1];
-        
-        console.log("======= current period ==============");
-        console.log(">>", new Date(current_period_start));
-        console.log(">>", new Date(current_period_end));
-               
+                       
         var day_of_week_start = new Date(current_period[0]).getDay(); // todo: 0 is Sunday, 1 Monday
         
         if (day_of_week_start == 0)

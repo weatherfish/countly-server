@@ -155,10 +155,7 @@ var DashboardMap = React.createClass({
             })
             .y(function(d) { return y(d.y); })
             .interpolate('linear').tension(0.8);  // 'cardinal',                    
-        
-        console.log("{{{{{{{{{{{[[ metric_data }}}}}}}}}}}}}]");
-        console.log(metric_data);
-        
+
         var enter_path = this.country_tooltip_svg
             .datum(metric_data)            
                 .append("path")          
