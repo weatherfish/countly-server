@@ -54,8 +54,6 @@ var MultiSelectBlock = React.createClass({
 
         }
 
-        //var element_width = this.state.blockWidth - 20 * 2;
-
         var text_width = Math.round(this.getTextWidth(active_selectors_sign, "normal 14px Lato-Semibold"));
 
         var rows = Math.ceil(text_width / (element_width - 50)); // todo: var
@@ -83,13 +81,11 @@ var MultiSelectBlock = React.createClass({
         {
             for (var i = 0; i < nextProps.selectors.length; i++)
             {
-
                 if (nextProps.selectors[i].key == nextProps.active_selector_key)
                 {
                     active_selector = nextProps.selectors[i];
                     break;
                 }
-
             }
 
             this.setState({
@@ -97,37 +93,9 @@ var MultiSelectBlock = React.createClass({
             });
         }
 
-/*
-        var active_selectors_sign = '';
-
-        for (var i = 0; i < this.state.active_selectors.length; i++)
-        {
-            active_selectors_sign += this.state.active_selectors[i].label;
-
-            if (i == this.state.active_selectors.length - 1)
-            {
-                active_selectors_sign += "";
-            }
-            else
-            {
-                active_selectors_sign += ", ";
-            }
-
-        }
-
-        //var element_width = this.state.blockWidth - 20 * 2;
-
-        var text_width = Math.round(this.getTextWidth(active_selectors_sign, "normal 14px Lato-Semibold"));
-
-        var rows = Math.ceil(text_width / (this.state.element_width - 50)); // todo: var
-*/
         this.setState({
-            //element_width : element_width,
-            /*rows : rows,
-            active_selectors_sign : active_selectors_sign,*/
             parent_height : nextProps.parent_height
         })
-
     },
 
     shouldComponentUpdate(nextProps, nextState){
@@ -140,27 +108,20 @@ var MultiSelectBlock = React.createClass({
         if (this.props.onHeightChange) this.props.onHeightChange(this.props.label, nextState.row_height * nextState.rows + 20);
 
         return true;
-
     },
 
     show_selectors : function() {
 
         var new_open_state = !this.state.open;
 
-        console.log("new_open_state:", new_open_state);
-
         if (new_open_state)
         {
-
             var self = this;
 
             document.onclick = function(event) {
 
                 if(self.clickedOutsideElement(event, React.findDOMNode(self).getAttribute("data-reactid")))
                 {
-
-                    console.log("--- click outside ----");
-
                     document.onclick = false;
 
                     self.setState({
@@ -177,9 +138,6 @@ var MultiSelectBlock = React.createClass({
     },
 
     select : function(selector) {
-
-        console.log("--- select ---");
-        console.log(selector);
 
         var active_selectors = this.state.active_selectors;
 
@@ -217,9 +175,6 @@ var MultiSelectBlock = React.createClass({
             this.props.onChange(active_selectors_keys);
         }
 
-        console.log(":::::::::: active_selectors ::::::::::");
-        console.log(active_selectors);
-
         var active_selectors_sign = '';
 
         for (var i = 0; i < active_selectors.length; i++)
@@ -236,8 +191,6 @@ var MultiSelectBlock = React.createClass({
             }
 
         }
-
-        //var element_width = this.state.blockWidth - 20 * 2;
 
         var text_width = Math.round(this.getTextWidth(active_selectors_sign, "normal 14px Lato-Semibold"));
 
@@ -270,19 +223,7 @@ var MultiSelectBlock = React.createClass({
 
         var current_block_style = {
             width : this.state.element_width + "px",
-            //height : (this.state.row_height * this.state.rows) + 10 + "px"
         };
-
-/*
-        if (this.props.parent_height)
-        {
-            current_block_style.height = this.props.parent_height;
-        }
-        else
-        {
-            current_block_style.height = (this.state.row_height * this.state.rows) + 10 + "px";
-        }
-*/
 
         if (this.state.rows)
         {
@@ -322,8 +263,6 @@ var MultiSelectBlock = React.createClass({
             left : ((this.state.element_width / 2) - (14 / 2)) + 1 + "px", // todo: +1 here
             display : !this.state.open ? "none" : false
         }
-
-        //if (!this.state.open) selectors_style.display = "none";
 
         return(
             <div className={class_name}>
