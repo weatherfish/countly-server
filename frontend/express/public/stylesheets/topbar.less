@@ -101,7 +101,7 @@
 
 #top_bar .navigation .user_menu {
 
-    display : none;
+    /*display : none;*/
     position : absolute;
     top : 56px;
     width: 130px;
@@ -128,7 +128,78 @@
     -o-transition: all 0.1s 0s linear;
     -ms-transition: all 0.1s 0s linear;
     transition: all 0.1s 0s linear;
+}
 
+/* ------------- user_menu_animation ----------- */
+
+#top_bar .navigation .user_menu.user_menu_animation-enter {
+  opacity: 0.01;
+  top : 64px;  
+}
+
+#top_bar .navigation .user_menu.user_menu_animation-enter-active {
+  opacity: 1;
+  .transition(all, 0.1s);
+  top : 56px;  
+}
+
+#top_bar .navigation .user_menu.user_menu_animation-leave {
+  opacity: 1;
+  top : 56px;  
+}
+
+#top_bar .navigation .user_menu.user_menu_animation-leave-active {
+  opacity: 0.01;
+  .transition(all, 0.1s);
+  top : 64px;  
+}
+
+#top_bar .navigation .user_menu.user_menu_animation-appear {
+  opacity: 0.01;
+  top : 64px;  
+}
+
+#top_bar .navigation .user_menu.user_menu_animation-appear-active {
+  opacity: 1;
+  .transition(all, 0.1s);
+  top : 56px;  
+  /*top : 0px;*/
+}
+
+/* ------------ language_menu_animation ------------ */
+
+#top_bar .navigation .language_menu.language_menu_animation-enter {
+  opacity: 0.01;
+  /*top : 64px;  */
+}
+
+#top_bar .navigation .language_menu.language_menu_animation-enter-active {
+  opacity: 1;
+  .transition(all, 0.1s);
+  /*top : 56px;  */
+}
+
+#top_bar .navigation .language_menu.language_menu_animation-leave {
+  opacity: 1;
+  /*top : 56px;  */
+}
+
+#top_bar .navigation .language_menu.language_menu_animation-leave-active {
+  opacity: 0.01;
+  .transition(all, 0.1s);
+  /*top : 64px;  */
+}
+
+#top_bar .navigation .language_menu.language_menu_animation-appear {
+  opacity: 0.01;
+  /*top : 64px; */ 
+}
+
+#top_bar .navigation .language_menu.language_menu_animation-appear-active {
+  opacity: 1;
+  .transition(all, 0.1s);
+  /*top : 56px;*/  
+  /*top : 0px;*/
 }
 
 #top_bar .navigation .user_menu .top_arrow {
