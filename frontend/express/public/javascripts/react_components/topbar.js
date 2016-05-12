@@ -102,7 +102,7 @@ var TopBar = React.createClass({
                             user_menu_open : false            
                         });
                             
-                    }, 200);
+                    }, 150);
                     
                 }
             }
@@ -123,7 +123,7 @@ var TopBar = React.createClass({
                     user_menu_open : user_menu_open,                   
                 });
                     
-            }, 200);
+            }, 150);
         }
         else
         {
@@ -201,7 +201,7 @@ var TopBar = React.createClass({
                             user_menu_open : false            
                         });
                             
-                    }, 200);
+                    }, 150);
 
                     /*self.activeView.render();
                     self.pageScript();*/
