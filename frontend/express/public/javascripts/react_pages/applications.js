@@ -13,7 +13,6 @@ var NewAppWindow = React.createClass({
 
     getInitialState : function() {
 /*
-
       var userTimezone = jstz.determine().name();
 
         // Set timezone selection defaults to user's current timezone
@@ -59,24 +58,7 @@ var NewAppWindow = React.createClass({
         });
 
     },
-/*
-    componentDidMount : function(){
 
-        var self = this;
-
-        document.onclick = function(event) {
-
-            if(self.clickedOutsideElement(event, React.findDOMNode(self).getAttribute("data-reactid")))
-            {
-
-                console.log("--- click outside ----");
-
-                document.onclick = false;
-                self.props.onClose();
-            }
-        }
-    },
-*/
     componentWillReceiveProps : function(nextProps){
 
         var self = this;
@@ -99,11 +81,7 @@ var NewAppWindow = React.createClass({
         }
     },
 
-    on_setting_change : function(key, value){
-        
-        console.log("=== setting change ==");
-        console.log(key, value);
-        
+    on_setting_change : function(key, value){        
         this.app_data[key] = value;
     },
 
@@ -115,9 +93,6 @@ var NewAppWindow = React.createClass({
             return false;
         }
         
-        console.log("++++++++++++++++ add app data ++++++++++++++++");
-        console.log(this.app_data);
-
         var self = this;
 
         this.setState({
@@ -258,7 +233,7 @@ var NewAppWindow = React.createClass({
                 </div>
                 
                 <SwitchBlock
-                            label={"redirect to data populator"}
+                            label={"redirect to the data populator"}
                             enabled={this.state.redirect_to_populator}
                             onChange={this.on_setting_change}
                             setting={["redirect_to_populator"]}
@@ -271,17 +246,132 @@ var NewAppWindow = React.createClass({
     }
 });
 
+var ActionSelectorLabel = React.createClass({
+    
+    width : false,
+
+    getInitialState: function() {
+
+        return ({
+            width : false,
+            //email_key : this.props.email
+        })
+    },
+    
+    get_width : function()
+    {
+        /*
+        if (React.findDOMNode(this).findDOMNode() > 1)
+        {
+            console.log("React.findDOMNode(this):", React.findDOMNode(this));
+        }
+        */
+    
+        if (React.findDOMNode(this).children.length > 0)
+        {
+            var childrens = React.findDOMNode(React.findDOMNode(this).children[0]).children;
+
+            if (childrens.length > 0)
+            {                                   
+                if (React.findDOMNode(childrens[0]).children.length > 0) // date type cell
+                {         
+                    /*
+                        <div>
+                            <div><span></span>/<div>
+                            <div><span></span></div>
+                        </div>                
+                    */
+                    
+                    if (React.findDOMNode(React.findDOMNode(childrens[1]).children[0]).offsetWidth > React.findDOMNode(React.findDOMNode(childrens[0]).children[0]).offsetWidth)
+                    {
+                        var width = React.findDOMNode(React.findDOMNode(childrens[1]).children[0]).offsetWidth;
+                    }
+                    else
+                    {
+                        var width = React.findDOMNode(React.findDOMNode(childrens[0]).children[0]).offsetWidth;
+                    }                        
+                }
+                else
+                {                    
+                    /*
+                        <div>
+                            <span></span>
+                            <span></span>
+                        </div>                
+                    */
+                    
+                    //if (React.findDOMNode(childrens[0]).offsetWidth)
+                    
+                    var width = React.findDOMNode(childrens[0]).offsetWidth;                    
+                }                    
+            }
+            else
+            {
+                var width = React.findDOMNode(this).offsetWidth;
+            }
+            
+            //var width = React.findDOMNode(this).offsetWidth;
+        }
+        else
+        {
+            var width = React.findDOMNode(this).offsetWidth;
+        }        
+        
+        return width;
+    },
+
+    componentDidMount : function(){
+
+        var width = this.get_width();
+
+        this.width = width;
+
+        this.props.onWidthChange(width);
+
+    },
+
+    componentDidUpdate : function(){
+
+        var width = this.get_width();
+
+        if (width != this.width)
+        {
+            this.width = width;
+
+            this.props.onWidthChange(width);
+        }
+    },
+
+    render : function(){      
+        return(
+            <span style={this.props.style}>
+                {this.props.label}
+            </span>
+        )
+    }
+    
+});    
+
 var ActionSelector = React.createClass({
 
     mixins: [OutsideClickClose],
 
+    width_data : [],
+    
+    default_width : 160,
+
     getInitialState: function() {
         return ({
-            "open" : false
+            "open" : false,
+            "selectors_width" : this.default_width
         })
     },
 
     openClick : function(){
+        
+        this.width_data = [];
+        
+        var new_state = {};
 
         var new_open_state = !this.state.open;
 
@@ -303,45 +393,112 @@ var ActionSelector = React.createClass({
                 }
             }
         }
+        else
+        {
+            new_state.selectors_width = this.default_width;
+        }
+        
+        new_state.open = new_open_state;
 
-        this.setState({
-            "open" : new_open_state
-        })
+        this.setState(new_state)
 
+    },
+    
+    onWidthChange : function(width){
+        
+        this.width_data.push(width);
+        
+        if (this.width_data.length == 6) // todo
+        {            
+            var max_width = 0;
+                        
+            this.width_data.forEach(function(element){
+                
+                if (element > max_width)
+                {
+                    max_width = element;
+                }
+                    
+            });
+            
+            if (max_width > 180)
+            {
+                this.setState({
+                    selectors_width : max_width
+                })
+            }                                    
+        }       
     },
 
     render : function(){
-
+        
+        var paddings = 20;
+        
         var actions_list_style = {};
+        
+        var element_width = this.state.selectors_width + (paddings * 2) + 10;
+        
+        actions_list_style.width = element_width + "px";
+        
+        var block_style = {
+            width : element_width + "px"
+        }
+        
+        var open_button_style = {
+            width : element_width + "px"
+        };
 
         if (this.state.open)
         {
-            actions_list_style.display = "block";
+            //actions_list_style.display = "block";
+            
+            var top_arrow_style = {
+                left : (element_width - 28) + "px"
+            }
+            
+            var actions_list = <div className="actions_list" style={actions_list_style} key="action_list">
+                                    <div className="top_arrow" style={top_arrow_style}/>
+                                        <div onClick={this.props.deleteApp} style={block_style}><ActionSelectorLabel onWidthChange={this.onWidthChange} label={jQuery.i18n.map["common.delete"]}/></div>                    
+                                        <div onClick={this.props.clearData.bind(this, "all-data")} style={block_style}><ActionSelectorLabel onWidthChange={this.onWidthChange} label={jQuery.i18n.map["management-applications.clear-all-data"]}/></div>
+                                        <div onClick={this.props.clearData.bind(this, "1month-data")} style={block_style}><ActionSelectorLabel onWidthChange={this.onWidthChange} label={jQuery.i18n.map["management-applications.clear-1month-data"]}/></div>
+                                        <div onClick={this.props.clearData.bind(this, "3month-data")} style={block_style}><ActionSelectorLabel onWidthChange={this.onWidthChange}label={jQuery.i18n.map["management-applications.clear-3month-data"]}/></div>
+                                        <div onClick={this.props.clearData.bind(this, "6month-data")} style={block_style}><ActionSelectorLabel onWidthChange={this.onWidthChange}label={jQuery.i18n.map["management-applications.clear-6month-data"]}/></div>
+                                        <div onClick={this.props.clearData.bind(this, "1year-data")} style={block_style}><ActionSelectorLabel onWidthChange={this.onWidthChange} label={jQuery.i18n.map["management-applications.clear-1year-data"]}/></div>
+                                        <div onClick={this.props.clearData.bind(this, "2year-data")} style={block_style}><ActionSelectorLabel onWidthChange={this.onWidthChange} label={jQuery.i18n.map["management-applications.clear-2year-data"]}/></div>    
+                                </div>
+            
         }
         else {
-            actions_list_style.display = "none";
+            //actions_list_style.display = "none";
+            var actions_list = false;           
         }
         
-        actions_list_style.width = "270px";
+        var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
         return(<div className="action_selector">
-            <div className="open_button" onClick={this.openClick}>
+            <div className="open_button" onClick={this.openClick} style={open_button_style}>
                 <div className="sign">Action</div>
                 <div className="arrow"></div>
             </div>
-            <div className="actions_list" style={actions_list_style}>
-                <div onClick={this.props.deleteApp}>{jQuery.i18n.map["common.delete"]}</div>
-                <div onClick={this.props.clearData.bind(this, "all-data")}>{jQuery.i18n.map["management-applications.clear-all-data"]}</div>
-                <div onClick={this.props.clearData.bind(this, "1month-data")}>{jQuery.i18n.map["management-applications.clear-1month-data"]}</div>
-                <div onClick={this.props.clearData.bind(this, "3month-data")}>{jQuery.i18n.map["management-applications.clear-3month-data"]}</div>
-                <div onClick={this.props.clearData.bind(this, "6month-data")}>{jQuery.i18n.map["management-applications.clear-6month-data"]}</div>
-                <div onClick={this.props.clearData.bind(this, "1year-data")}>{jQuery.i18n.map["management-applications.clear-1year-data"]}</div>
-                <div onClick={this.props.clearData.bind(this, "2year-data")}>{jQuery.i18n.map["management-applications.clear-2year-data"]}</div>
-            </div>
+            
+            <ReactCSSTransitionGroup  transitionAppear={true}  transitionName="selector_animation" transitionEnterTimeout={0} transitionLeaveTimeout={0}>
+                {actions_list}
+            </ReactCSSTransitionGroup>
+            
         </div>)
     }
-
 });
+
+/*
+
+ <div onClick={this.props.clearData.bind(this, "all-data")}>{jQuery.i18n.map["management-applications.clear-all-data"]}</div>
+ <div onClick={this.props.clearData.bind(this, "1month-data")}>{jQuery.i18n.map["management-applications.clear-1month-data"]}</div>
+ <div onClick={this.props.clearData.bind(this, "3month-data")}>{jQuery.i18n.map["management-applications.clear-3month-data"]}</div>
+ <div onClick={this.props.clearData.bind(this, "6month-data")}>{jQuery.i18n.map["management-applications.clear-6month-data"]}</div>
+ <div onClick={this.props.clearData.bind(this, "1year-data")}>{jQuery.i18n.map["management-applications.clear-1year-data"]}</div>
+ <div onClick={this.props.clearData.bind(this, "2year-data")}>{jQuery.i18n.map["management-applications.clear-2year-data"]}</div>
+
+*/
 
 var ApplicationsPage = React.createClass({
 
@@ -492,6 +649,8 @@ var ApplicationsPage = React.createClass({
     clearData : function(period){
 
         var self = this;
+        
+        console.log("clear:", period);
 
         var current_app = this.state.current_app;
 
@@ -711,6 +870,8 @@ var ApplicationsPage = React.createClass({
     render : function(){
 
         var self = this;
+        
+        var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
         var elements_width = get_viewport_width();
 
@@ -749,7 +910,22 @@ var ApplicationsPage = React.createClass({
             });
 
         };
-
+        
+        if (this.state.new_app_open)
+        {
+            var new_app_block = <NewAppWindow
+                                    open={true}
+                                    onClose={this.new_app_close}
+                                    onCreate={self.onAppCreate}
+                                    upload_icon={this.upload_icon}
+                                    key={"new_app_block"}
+                                />
+        }
+        else
+        {
+            var new_app_block = false;
+        }       
+                
         return (
             <div id="applications_page" style={page_style}>
 
@@ -757,24 +933,19 @@ var ApplicationsPage = React.createClass({
                     <span className="sign">{jQuery.i18n.map["management-applications.title"]}</span>
                     <div className="new_app_button" onClick={this.new_app_click}>{jQuery.i18n.map["management-applications.my-new-app"]}</div>
                 </div>
-
-                <NewAppWindow
-                    open={this.state.new_app_open}
-                    onClose={this.new_app_close}
-                    onCreate={self.onAppCreate}
-                    upload_icon={this.upload_icon}
-                />
+                                              
+                <ReactCSSTransitionGroup  transitionAppear={true}  transitionName="new_app_block_animation" transitionEnterTimeout={0} transitionLeaveTimeout={0}>
+                    {new_app_block}
+                </ReactCSSTransitionGroup>
                
                 {(() => {
-                    
-                                        
+                                                            
                     if (this.state.confirmation_waiting)
                         return (<Alert 
                             sign={this.state.confirmation_sign}
                             on_cancel={this.cancel_confirmation}
                             on_confirm={this.state.confirmation_function.bind(this)}
                         />)
-                    
                     
                 })()}
 

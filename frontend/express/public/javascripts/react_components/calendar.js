@@ -401,7 +401,7 @@ var CalendarWrapper = React.createClass({
         }
 
         /*
-            Fully re render right part after a fast  choice of a date.
+            Fully re render right part after a fast choice of a date.
         */
 
         this.setState(state_obj, function(){
