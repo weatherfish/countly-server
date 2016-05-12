@@ -417,6 +417,8 @@ var ManageUsersPage = React.createClass({
 
     render : function(){
 
+        var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
         var self = this;
 
         var elements_width = get_viewport_width();
@@ -454,6 +456,15 @@ var ManageUsersPage = React.createClass({
             var cells_email_width = this.state.email_max_width;
 
         }
+        
+        if (this.state.new_user_open)
+        {
+            var new_user_block = <NewUserWindow open={true} onClose={this.new_user_close} onUserAdd={this.on_user_add} key="new_user_block"/>;
+        }
+        else
+        {
+            var new_user_block = false;
+        }       
 
         return (
             <div id="manage_users_page" style={page_style}>
@@ -462,8 +473,10 @@ var ManageUsersPage = React.createClass({
                     <span className="sign">USER ROLES MANAGEMENT</span>
                     <div className="new_user_button" onClick={this.new_user_click}>{jQuery.i18n.map["management-users.create-new-user"]}</div>
                 </div>
-
-                <NewUserWindow open={this.state.new_user_open} onClose={this.new_user_close} onUserAdd={this.on_user_add}/>
+                
+                <ReactCSSTransitionGroup  transitionAppear={true}  transitionName="new_user_block_animation" transitionEnterTimeout={0} transitionLeaveTimeout={0}>
+                    {new_user_block}
+                </ReactCSSTransitionGroup>
 
                 <div className="wrapper">
 

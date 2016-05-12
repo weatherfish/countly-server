@@ -370,6 +370,40 @@
     -moz-box-shadow: -2px 0px 6px 0px rgba(90, 90, 90, 0.5);
     box-shadow: -2px 0px 6px 0px rgba(90, 90, 90, 0.5);
 }
+
+#manage_users_page .new_user_block.new_user_block_animation-enter {
+  opacity: 0.01;
+  right : -320px;  
+}
+
+#manage_users_page .new_user_block.new_user_block_animation-enter-active {
+  opacity: 1;
+  .transition(all, 0.3s);
+  right : -20px;
+}
+
+#manage_users_page .new_user_block.new_user_block_animation-leave {
+  opacity: 1;
+}
+
+#manage_users_page .new_user_block.new_user_block_animation-leave-active {
+  opacity: 0.01;
+  .transition(all, 0.3s);
+  right : -320px;  
+}
+
+#manage_users_page .new_user_block.new_user_block_animation-appear {
+  opacity: 0.01;
+  right : -320px;  
+}
+
+#manage_users_page .new_user_block.new_user_block_animation-appear-active {
+  opacity: 1;
+  .transition(all, 0.3s);
+  right : -20px;
+  /*top : 0px;*/
+}
+
 #manage_users_page .new_user_block .setting_block {
     margin-top: 20px;
 }
@@ -393,6 +427,7 @@
 }
 #manage_users_page .new_user_block .buttons_block {
     margin-top: 20px;
+    margin-left : 150px;
 }
 #manage_users_page input {
     width: 240px;
