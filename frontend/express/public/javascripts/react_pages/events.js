@@ -68,7 +68,12 @@ var EventsPage = React.createClass({
                 })
             }
 
-            if (events_types.length > 0){
+            if (self.state.active_event)
+            {
+                var active_event = self.state.active_event;
+                
+            } else if (events_types.length > 0)
+            {
                 var active_event = events_types[0];
             }
             else
@@ -79,7 +84,7 @@ var EventsPage = React.createClass({
             self.setState({
                 inited : true,
                 events_types : events_types,
-                active_event : events_types[0],
+                active_event : active_event,
                 headers : headers,
                 segmentations : segmentations,
                 active_segmentation : active_segmentation,
