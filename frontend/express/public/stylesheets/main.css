@@ -896,8 +896,6 @@ div.datatablesubrow {display: none;}
 .small-link:hover { text-decoration:underline; }
 .password-row { display:none; }
 .user-noapps { position:absolute; left:50%; top:50%; width:460px; margin-left:-118px; font:16px Ubuntu,Helvetica,sans-serif; line-height:23px; text-shadow:0 1px white; color:#555; height:50px; margin-top:-25px; }
-.checkbox { cursor:pointer; width:16px; height:16px; float:left; margin-right:5px; background-image:url('../images/management/checkbox.png'); background-position:-16px; }
-.checkbox.checked { background-position:0; }
 /* USER MANAGEMENT END */
 
 .icon-button.light.graph-segment.active { border-color:#333; box-shadow:inset 0 0 3px #222; background-color:#3E3E3E; background-image:linear-gradient(top, #292929 40%, #3E3E3E 100%); background-image:linear-gradient(to bottom, #292929 40%, #3E3E3E 100%); }

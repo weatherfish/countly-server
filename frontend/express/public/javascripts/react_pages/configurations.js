@@ -1,3 +1,69 @@
+var CustomCheckBox = React.createClass({
+
+    getInitialState : function() {
+
+        return({
+            checked : this.props.checked
+        });
+
+    },
+    
+    handleClick : function()
+    {
+        
+        this.props.onChange(!this.state.checked);
+        
+        return this.setState({
+            checked : !this.state.checked
+        })
+    },
+    
+    render : function() {
+
+        var select_font_color = "#3d3d3d";
+        var number_font_color = "#132737";
+
+        if (this.state.checked)
+        {
+            var bg_color     = this.props.color;
+            var border_color = this.props.color;
+        }
+        else
+        {
+            var bg_color     = "white";
+            var border_color = "gray";
+
+            if (this.state.onhover)
+            {
+                select_font_color = this.props.color;
+                number_font_color = this.props.color;
+            }
+        }
+
+        var divStyle = {
+            "border-color"     : border_color,
+            "background-color" : bg_color
+        };
+
+        var select_style = {
+            "color" : select_font_color
+        }
+
+        var number_style = {
+            "color" : number_font_color
+        }
+
+        return (            
+                <div className="checkbox_wrp" onClick={this.handleClick}>
+                    <div style={divStyle} className="checkbox">
+                        <div className="checkbox_img"></div>
+                    </div>
+                </div>            
+        );
+    }
+    
+});
+
 var SwitchBlock = React.createClass({
 
     getInitialState : function() {
@@ -7,23 +73,10 @@ var SwitchBlock = React.createClass({
         });
 
     },
-/*
+
     switch_value : function(state) {
 
-        if (state && this.state.enabled) return false;
-        if (!state && !this.state.enabled) return false;
-
-        this.props.onChange(this.props.setting, !this.state.enabled);
-
-        this.setState({
-            enabled : !this.state.enabled
-        });
-
-    },
-*/
-    switch_value : function(e) {
-
-        var state = e.target.checked;
+        //var state = e.target.checked;
 
         this.props.onChange(this.props.setting, state);
 
@@ -47,19 +100,14 @@ var SwitchBlock = React.createClass({
             var enable_button_class = "button enable";
             var disable_button_class = "button disable active";
         }
-
-        /*
-        <div  onClick={this.switch_value.bind(this, true)} className={enable_button_class}>{jQuery.i18n.map["plugins.enable"]}</div>
-        <div  onClick={this.switch_value.bind(this, false)} className={disable_button_class}>{jQuery.i18n.map["plugins.disable"]}</div>
-        */
-
+    
         if (this.state.enabled)
-        {
-            var checkbox = <input type="checkbox" checked onChange={this.switch_value}/>;
+        {      
+            var checkbox = <CustomCheckBox checked={true} onChange={this.switch_value} color={"#2E3545"}/>;
         }
         else
-        {
-            var checkbox = <input type="checkbox" onChange={this.switch_value}/>;
+        {            
+            var checkbox = <CustomCheckBox checked={false} onChange={this.switch_value} color={"#2E3545"}/>;
         }
 
         return(
@@ -68,18 +116,7 @@ var SwitchBlock = React.createClass({
                 {checkbox}
             </div>
         )
-
-/*
-        return(
-            <div className="setting_block">
-                <div className="setting_label">{this.props.label}</div>
-                <div  onClick={this.switch_value.bind(this, true)} className={enable_button_class}>{jQuery.i18n.map["plugins.enable"]}</div>
-                <div  onClick={this.switch_value.bind(this, false)} className={disable_button_class}>{jQuery.i18n.map["plugins.disable"]}</div>
-            </div>
-        )
-*/
     }
-
 });
 
 var UpdateBlock = React.createClass({

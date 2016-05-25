@@ -101,23 +101,62 @@
     margin-right : 14px;
 }
 
+.configurations_page .setting_block .checkbox {
+    width  : 16px;
+    height : 16px;
+    border : 1px solid;
+    border-radius : 3px;
+    position : relative;
+    top : 3px;
+    cursor : pointer;
+}
+
+.configurations_page .setting_block .checkbox .checkbox_img {
+    background : url('../images/tick.svg');
+    background-image: url("../images/tick.svg");
+    background-repeat   : no-repeat;
+    background-position : center;
+    width  : 16px;
+    height : 16px;
+    /*position : relative;
+    top : 6px;*/
+}
+
+/*
 .configurations_page .setting_block input[type="checkbox"] {
     width : 20px;
     height : 20px;
     position : relative;
     top : 6px;
     /*left : 15px;*/
-    margin : 0px;
-    background-color : #ffffff
+  /*  margin : 0px;
+    background-color : #ff0000
+}*/
+/*
+input[type="checkbox"]:checked:focus + label:before,
+input[type="checkbox"]:not(:checked):focus + label:before {
+  border: 1px dotted blue;
 }
 
+input[type="checkbox"]:not(:checked) + label:before,
+input[type="checkbox"]:checked + label:before {
+  content: '';
+  position: absolute;
+  left:0; top: 2px;
+  width: 17px; height: 17px;
+  border: 1px solid #aaa;
+  background: #f8f8f8;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.3)
+}*/
+/*
 .configurations_page .setting_block input[type="checkbox"]:checked:after {
     background : url('../images/tick.svg');
     background-image: url("../images/tick.svg");
     background-repeat   : no-repeat;
     background-position : center;
 }
-
+*/
 .configurations_page .api_key {
     /*margin-left : 314px;
     margin-bottom : 10px;*/
