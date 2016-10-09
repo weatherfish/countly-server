@@ -34,6 +34,10 @@
         "wp":{short: "w", name: "Windows Phone"},
         "roku":{short: "r", name: "Roku"},
         "symbian":{short: "s", name: "Symbian"},
+        "chrome":{short: "c", name: "Chrome OS"},
+        "debian":{short: "d", name: "Debian"},
+        "nokia":{short: "n", name: "Nokia"},
+        "firefox":{short: "f", name: "Firefox OS"},
         "tizen":{short: "t", name: "Tizen"}
     };
 
@@ -267,10 +271,12 @@
             platformVersionTotal = _.pluck(oSVersionData.chartData, 'u'),
             chartData2 = [];
         var osName = osSegmentation;
-        if(os_mapping[osSegmentation.toLowerCase()])
-            osName = os_mapping[osSegmentation.toLowerCase()].short;
-        else
-            osName = osSegmentation.toLowerCase()[0];
+        if(osSegmentation){
+            if(os_mapping[osSegmentation.toLowerCase()])
+                osName = os_mapping[osSegmentation.toLowerCase()].short;
+            else
+                osName = osSegmentation.toLowerCase()[0];
+        }
 
         if (oSVersionData.chartData) {
             for (var i = 0; i < oSVersionData.chartData.length; i++) {

@@ -581,7 +581,7 @@ var fetch = {},
              */
             var match = {
                 _id: { $ne: "uid-sequence" },
-                ls: {$gte: common.adjustTimestampByTimezone(periodObj.start / 1000, params.appTimezone), $lte: common.adjustTimestampByTimezone(periodObj.end / 1000, params.appTimezone)}
+                ls: countlyCommon.getTimestampRangeQuery(params, true)
             };
 
             /*
@@ -620,7 +620,7 @@ var fetch = {},
                 if (shortcodesForMetrics[metric]) {
 
                     var metricChangesMatch =  {
-                        ts: {$gte: common.adjustTimestampByTimezone(periodObj.start / 1000, params.appTimezone), $lte: common.adjustTimestampByTimezone(periodObj.end / 1000, params.appTimezone)}
+                        ts: countlyCommon.getTimestampRangeQuery(params, true)
                     };
 
                     metricChangesMatch[shortcodesForMetrics[metric] + ".o"] = { "$exists": true };
@@ -646,16 +646,18 @@ var fetch = {},
                             $group: { _id: "$_id",  u: { $sum: 1 }}
                         }
                     ], { allowDiskUse:true }, function(error, metricChangesDbResult) {
-
-                        var appUsersDbResultIndex = _.pluck(appUsersDbResult, '_id');
-
-                        for (var i = 0; i < metricChangesDbResult.length; i++) {
-                            var itemIndex = appUsersDbResultIndex.indexOf(metricChangesDbResult[i]._id);
-
-                            if (itemIndex == -1) {
-                                appUsersDbResult.push(metricChangesDbResult[i])
-                            } else {
-                                appUsersDbResult[itemIndex].u += metricChangesDbResult[i].u;
+                        
+                        if(metricChangesDbResult){
+                            var appUsersDbResultIndex = _.pluck(appUsersDbResult, '_id');
+    
+                            for (var i = 0; i < metricChangesDbResult.length; i++) {
+                                var itemIndex = appUsersDbResultIndex.indexOf(metricChangesDbResult[i]._id);
+    
+                                if (itemIndex == -1) {
+                                    appUsersDbResult.push(metricChangesDbResult[i])
+                                } else {
+                                    appUsersDbResult[itemIndex].u += metricChangesDbResult[i].u;
+                                }
                             }
                         }
 
@@ -681,11 +683,12 @@ var fetch = {},
                 break;
         }
         */
-
-        for (var i = 0; i < obj.length; i++) {
-            var tmpKey = (processingFunction)? processingFunction(obj[i]["_id"]) : obj[i]["_id"];
-
-            tmpObj[tmpKey] = obj[i]["u"];
+        if(obj){
+            for (var i = 0; i < obj.length; i++) {
+                var tmpKey = (processingFunction)? processingFunction(obj[i]["_id"]) : obj[i]["_id"];
+    
+                tmpObj[tmpKey] = obj[i]["u"];
+            }
         }
 
         return tmpObj;

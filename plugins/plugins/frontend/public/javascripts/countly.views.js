@@ -108,11 +108,15 @@ window.ConfigurationsView = countlyView.extend({
             "api":jQuery.i18n.map["configs.api"],
             "apps":jQuery.i18n.map["configs.apps"],
             "logs": jQuery.i18n.map["configs.logs"],
+            "security": jQuery.i18n.map["configs.security"],
             "frontend-production":jQuery.i18n.map["configs.frontend-production"],
             "frontend-session_timeout":jQuery.i18n.map["configs.frontend-session_timeout"],
             "frontend-theme":jQuery.i18n.map["configs.frontend-theme"],
             "frontend-use_google":jQuery.i18n.map["configs.frontend-use_google"],
             "frontend-code":jQuery.i18n.map["configs.frontend-code"],
+            "security-login_tries":jQuery.i18n.map["configs.security-login_tries"],
+            "security-login_wait":jQuery.i18n.map["configs.security-login_wait"],
+            "security-dashboard_additional_headers":jQuery.i18n.map["configs.security-dashboard_additional_headers"],
             "api-domain":jQuery.i18n.map["configs.api-domain"],
             "api-safe":jQuery.i18n.map["configs.api-safe"],
             "api-session_duration_limit":jQuery.i18n.map["configs.api-session_duration_limit"],
@@ -123,6 +127,8 @@ window.ConfigurationsView = countlyView.extend({
             "api-sync_plugins":jQuery.i18n.map["configs.api-sync_plugins"],
             "api-session_cooldown":jQuery.i18n.map["configs.api-session_cooldown"],
             "api-total_users":jQuery.i18n.map["configs.api-total_users"],
+            "api-metric_limit":jQuery.i18n.map["configs.api-metric_limit"],
+            "security-api_additional_headers":jQuery.i18n.map["configs.security-api_additional_headers"],
             "apps-country":jQuery.i18n.map["configs.apps-country"],
             "apps-category":jQuery.i18n.map["configs.apps-category"]
         };
@@ -226,7 +232,7 @@ window.ConfigurationsView = countlyView.extend({
                 '</div>'+
                 '<div class="select-items square">'+
                     '<div>';
-                    
+
                 for(var i = 0; i < categories.length; i++){
                     select += '<div data-value="'+categories[i]+'" class="segmentation-option item">'+jQuery.i18n.map["configs.logs."+categories[i]]+'</div>';
                 }
@@ -236,7 +242,15 @@ window.ConfigurationsView = countlyView.extend({
             '</div>';
             return select;
         });
-        
+
+        this.registerInput("security-dashboard_additional_headers", function(value){
+            return '<textarea rows="5" style="width:100%" id="security-dashboard_additional_headers">'+(value || "")+'</textarea>';
+        });
+
+        this.registerInput("security-api_additional_headers", function(value){
+            return '<textarea rows="5" style="width:100%" id="security-api_additional_headers">'+(value || "")+'</textarea>';
+        });
+
         this.registerInput("apps-timezone", function(value){
             return null;
         });
@@ -314,6 +328,12 @@ window.ConfigurationsView = countlyView.extend({
                 var value = $(this).val();
                 if($(this).attr("type") == "number")
                     value = parseFloat(value);
+                self.updateConfig(id, value);
+            });
+            
+            $(".configs textarea").keyup(function () {
+                var id = $(this).attr("id");
+                var value = $(this).val();
                 self.updateConfig(id, value);
             });
             
@@ -537,7 +557,7 @@ window.ConfigurationsView = countlyView.extend({
     },
     getInputLabel: function(id, value){
         var ns = id.split("-")[0];
-        if(ns != "frontend" && ns != "api" && ns != "apps" && ns != "logs" && countlyGlobal["plugins"].indexOf(ns) == -1){
+        if(ns != "frontend" && ns != "api" && ns != "apps" && ns != "logs" && ns != "security" && countlyGlobal["plugins"].indexOf(ns) == -1){
             return null;
         }
         var ret = "";

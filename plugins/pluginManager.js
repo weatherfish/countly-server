@@ -2,6 +2,7 @@ var plugins = require('./plugins.json', 'dont-enclose'),
     pluginsApis = {}, 
     mongo = require('mongoskin'),
     countlyConfig = require('../frontend/express/config', 'dont-enclose'),
+    utils = require('../api/utils/utils.js'),
     fs = require('fs'),
     path = require('path'),
     cp = require('child_process'),
@@ -20,6 +21,9 @@ var pluginManager = function pluginManager(){
     var configsOnchanges = {};
     var excludeFromUI = {plugins:true};
     var finishedSyncing = true;
+    
+    this.internalEvents = [];
+    this.internalDrillEvents = ["[CLY]_session"];
 
     this.init = function(){
         for(var i = 0, l = plugins.length; i < l; i++){
@@ -336,7 +340,9 @@ var pluginManager = function pluginManager(){
     }
     
     this.isPluginEnabled = function(plugin){
-        return !!plugins[plugin];
+        if(plugins.indexOf(plugin) === -1)
+            return false;
+        return true;
     };
     
     //checking plugins on master process
@@ -583,7 +589,7 @@ var pluginManager = function pluginManager(){
         }
         
         if(config.mongodb.username && config.mongodb.password){
-            dbName = config.mongodb.username + ":" + config.mongodb.password +"@" + dbName;
+            dbName = config.mongodb.username + ":" + utils.decrypt(config.mongodb.password) +"@" + dbName;
         }
         
         if(dbName.indexOf('mongodb://') !== 0){
