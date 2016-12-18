@@ -140,11 +140,12 @@ if (cluster.isMaster) {
         "open bsd":"ob",
         "searchbot":"sb",
         "sun os":"so",
-        "solaris":"so",
+        "solaris":"so",		
         "beos":"bo",
         "mac osx":"o",
         "macos":"o",
-        "webos":"web",
+        "mac":"o",
+        "webos":"web",		
         "brew":"brew"
     };
 
@@ -767,13 +768,13 @@ if (cluster.isMaster) {
                         }
                         case '/o/ping':
                         {
-                            common.db.collection("plugins").findOne({_id:"plugins"}, function(err, result){
+                            common.db.collection("plugins").findOne({_id:"plugins"}, {_id:1}, function(err, result){
                                 if(err)
                                     common.returnMessage(params, 404, 'DB Error');
                                 else
                                     common.returnMessage(params, 200, 'Success');
                             });
-                            return false;
+                            break;
                         }
                         case '/o':
                         {
