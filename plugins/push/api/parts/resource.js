@@ -6,16 +6,18 @@ const res = require('../../../../api/parts/jobs/resource.js'),
 	  GCM = require('../parts/gcm');
 
 class Connection extends res.Resource {
-	constructor(_id, name, options) {
+	constructor(_id, name, credentials) {
 		super(_id, name);
-		if (options.platform === 'i') {
-			this.connection = new APN.ConnectionResource(options.key, options.passphrase || '', options.topic || '', options.expiration || '', options.gateway);
-		} else if (options.platform === 'a') {
-			this.connection = new GCM.ConnectionResource(options.key);
+		log.d('[%d]: Initializing push resource with %j / %j / %j', process.pid, _id, name, credentials);
+		if (credentials.platform === 'i') {
+			this.connection = new APN.ConnectionResource(credentials.key, credentials.secret || '', credentials.bundle || '', credentials.expiration || '', credentials.host);
+		} else if (credentials.platform === 'a') {
+			this.connection = new GCM.ConnectionResource(credentials.key);
 		} else {
-			log.e(`Platform ${options.platform} is not supported`);
-			throw new Error(`Platform ${options.platform} is not supported`);
+			log.e(`Platform ${credentials.platform} is not supported`);
+			throw new Error(`Platform ${credentials.platform} is not supported`);
 		}
+		log.d('[%d]: Initialized push resource', process.pid);
 	}
 
 	open () {
@@ -64,11 +66,6 @@ class Connection extends res.Resource {
 				this.stopInterval();
 			}
 		});
-	}
-
-	terminate () {
-		this.connection.terminate();
-		this.stopInterval();
 	}
 
 	send (datas, feeder, stats) {

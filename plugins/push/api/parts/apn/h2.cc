@@ -52,6 +52,7 @@ namespace apns {
 		hostname = host;
 		topic = top;
 		expiration = exp.empty() ? timestr(60 * 60 * 24 * 7) : exp;
+		max_data_size = 0;
 
 		stats = {};
 	
@@ -173,7 +174,7 @@ namespace apns {
 
 	void H2::init(const Nan::FunctionCallbackInfo<Value>& info) {
 		H2* obj = ObjectWrap::Unwrap<H2>(info.Holder());
-		LOG_DEBUG("initializing with " << obj->certificate);
+		// LOG_DEBUG("initializing with " << obj->certificate);
 
 		v8::Local<v8::Function> tpl = v8::Local<v8::Function>::Cast(info[0]);
 		obj->errorer.Reset(tpl);
@@ -192,26 +193,40 @@ namespace apns {
 			auto persistentHandle = static_cast<PeristentHandle*>(handle->data);
 			auto obj = persistentHandle->conn;
 
-			LOG_DEBUG("loading certificate from " << obj->certificate);
+			// LOG_DEBUG("loading certificate from " << obj->certificate);
 
 			STACK_OF(X509) *ca = NULL;
 			PKCS12 *p12;
 			EVP_PKEY *key;
 			X509 *cert;
-			FILE *fp = std::fopen(obj->certificate.c_str(), "r");
-			if (!fp) {
-				persistentHandle->error = "Certificate file doesn't exist";
-				LOG_ERROR(persistentHandle->error);
-				return;
-			}
+			// FILE *fp = std::fopen(obj->certificate.c_str(), "r");
+			// if (!fp) {
+			// 	persistentHandle->error = "Certificate file doesn't exist";
+			// 	LOG_ERROR(persistentHandle->error);
+			// 	return;
+			// }
+			unsigned char *buffer;
+			size_t length;
+
+			base64_decode(obj->certificate.c_str(), &buffer, &length);
+
+			BIO *bio = BIO_new_mem_buf(buffer, length);
+			// BIO *b64 = BIO_new(BIO_f_base64());
+			// bio = BIO_push(b64, bio);
+			// BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL)
+
+			// bio = BIO_new(BIO_s_mem());
+			// BIO_puts(bio, obj->certificate.c_str());
+
 
 			SSL_load_error_strings();
 			SSL_library_init();
 			OpenSSL_add_all_algorithms();
 			ERR_load_crypto_strings();
 
-			p12 = d2i_PKCS12_fp(fp, NULL);
-			std::fclose(fp);
+			p12 = d2i_PKCS12_bio(bio, NULL);
+			// p12 = d2i_PKCS12_fp(fp, NULL);
+			// std::fclose(fp);
 			
 			if (!p12) {
 				persistentHandle->error = "Error reading PKCS#12 file";
@@ -673,11 +688,12 @@ namespace apns {
 
 				v8::Local<v8::Array> array = v8::Array::New(isolate);
 				while (obj->statuses.size()) {
-					std::pair<std::string, int> pair = obj->statuses.back();
+					std::tuple<std::string, int, std::string> status = obj->statuses.back();
 
 					v8::Local<v8::Array> one = v8::Array::New(isolate);
-					one->Set(0, Nan::New<String>(pair.first.c_str()).ToLocalChecked());
-					one->Set(1, v8::Integer::New(isolate, pair.second));
+					one->Set(0, Nan::New<String>(std::get<0>(status).c_str()).ToLocalChecked());
+					one->Set(1, v8::Integer::New(isolate, std::get<1>(status)));
+					one->Set(2, Nan::New<String>(std::get<2>(status).c_str()).ToLocalChecked());
 
 					array->Set(array->Length(), one);
 

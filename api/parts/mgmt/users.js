@@ -18,7 +18,7 @@ var usersApi = {},
             common.returnMessage(params, 401, 'User is not a global administrator');
             return false;
         }
-        common.db.collection('members').find({}).toArray(function (err, members) {
+        common.db.collection('members').find({},{password:0, appSortList:0}).toArray(function (err, members) {
     
             if (!members || err) {
                 common.returnOutput(params, {});
@@ -34,19 +34,15 @@ var usersApi = {},
                 if(members[i].user_of && members[i].user_of.length > 0 && members[i].user_of[0] == ""){
                     members[i].user_of.splice(0, 1);
                 }
-                membersObj[members[i]._id] = {
-                    '_id':members[i]._id,
-                    'api_key':members[i].api_key,
-                    'full_name':members[i].full_name,
-                    'username':members[i].username,
-                    'email':members[i].email,
-                    'admin_of':((members[i].admin_of && members[i].admin_of.length > 0) ? members[i].admin_of : []),
-                    'user_of':((members[i].user_of && members[i].user_of.length > 0) ? members[i].user_of : []),
-                    'global_admin':(members[i].global_admin === true),
-                    'locked':(members[i].locked === true),
-                    'last_login':members[i].last_login || 0,
-                    'is_current_user':(members[i].api_key == params.member.api_key)
-                };
+               
+                members[i]['admin_of'] = ((members[i].admin_of && members[i].admin_of.length > 0) ? members[i].admin_of : []);
+                members[i]['user_of'] = ((members[i].user_of && members[i].user_of.length > 0) ? members[i].user_of : []);
+                members[i]['global_admin'] = (members[i].global_admin === true);
+                members[i]['locked'] = (members[i].locked === true);
+                members[i]['created_at'] = members[i].created_at || 0;
+                members[i]['last_login'] = members[i].last_login || 0;
+                members[i]['is_current_user'] = (members[i].api_key == params.member.api_key);
+                membersObj[members[i]._id] = members[i];
             }
     
             common.returnOutput(params, membersObj);
@@ -64,7 +60,7 @@ var usersApi = {},
         var argProps = {
                 'full_name':    { 'required': true, 'type': 'String' },
                 'username':     { 'required': true, 'type': 'String' },
-                'password':     { 'required': true, 'type': 'String', 'min-length': 8, 'has-number': true , 'has-char': true, 'has-special': true},
+                'password':     { 'required': true, 'type': 'String', 'min-length':plugins.getConfig("security").password_min, 'has-number': plugins.getConfig("security").password_number , 'has-upchar': plugins.getConfig("security").password_char, 'has-special': plugins.getConfig("security").password_symbol},
                 'email':        { 'required': true, 'type': 'String' },
                 'lang':         { 'required': false, 'type': 'String' },
                 'admin_of':     { 'required': false, 'type': 'Array' },
@@ -91,9 +87,11 @@ var usersApi = {},
         function createUser() {
             var passwordNoHash = newMember.password;
             newMember.password = common.sha1Hash(newMember.password);
+            newMember.password_changed = 0;
             newMember.created_at = Math.floor(((new Date()).getTime()) / 1000); //TODO: Check if UTC
             newMember.admin_of = newMember.admin_of || [];
             newMember.user_of = newMember.user_of || [];
+            newMember.locked = false;
 
             common.db.collection('members').insert(newMember, {safe: true}, function(err, member) {
                 member = member.ops;
@@ -121,7 +119,7 @@ var usersApi = {},
                 'user_id':      { 'required': true, 'type': 'String', 'min-length': 24, 'max-length': 24, 'exclude-from-ret-obj': true },
                 'full_name':    { 'required': false, 'type': 'String' },
                 'username':     { 'required': false, 'type': 'String' },
-                'password':     { 'required': false, 'type': 'String', 'min-length': 8, 'has-number': true , 'has-char': true, 'has-special': true},
+                'password':     { 'required': false, 'type': 'String', 'min-length':plugins.getConfig("security").password_min, 'has-number': plugins.getConfig("security").password_number , 'has-upchar': plugins.getConfig("security").password_char, 'has-special': plugins.getConfig("security").password_symbol},
                 'email':        { 'required': false, 'type': 'String' },
                 'lang':         { 'required': false, 'type': 'String' },
                 'admin_of':     { 'required': false, 'type': 'Array' },
@@ -146,19 +144,24 @@ var usersApi = {},
         if (updatedMember.password) {
             passwordNoHash = updatedMember.password;
             updatedMember.password = common.sha1Hash(updatedMember.password);
+            if(params.member._id !== params.qstring.args.user_id){
+                updatedMember.password_changed = 0;
+            }
         }
-
-        common.db.collection('members').update({'_id': common.db.ObjectID(params.qstring.args.user_id)}, {'$set': updatedMember}, {safe: true}, function(err, isOk) {
-            common.db.collection('members').findOne({'_id': common.db.ObjectID(params.qstring.args.user_id)}, function(err, member) {
-                if (member && !err) {
-					plugins.dispatch("/i/users/update", {params:params, data:updatedMember, member:member});
-                    if (params.qstring.args.send_notification && passwordNoHash) {
-                        mail.sendToUpdatedMember(member, passwordNoHash);
+        common.db.collection('members').findOne({'_id': common.db.ObjectID(params.qstring.args.user_id)}, function(err, memberBefore) {
+            common.db.collection('members').update({'_id': common.db.ObjectID(params.qstring.args.user_id)}, {'$set': updatedMember}, {safe: true}, function(err, isOk) {
+                common.db.collection('members').findOne({'_id': common.db.ObjectID(params.qstring.args.user_id)}, function(err, member) {
+                    if (member && !err) {
+                        updatedMember._id = params.qstring.args.user_id;
+                        plugins.dispatch("/i/users/update", {params:params, data:updatedMember, member:memberBefore});
+                        if (params.qstring.args.send_notification && passwordNoHash) {
+                            mail.sendToUpdatedMember(member, passwordNoHash);
+                        }
+                        common.returnMessage(params, 200, 'Success');
+                    } else {
+                        common.returnMessage(params, 500, 'Error updating user');
                     }
-                    common.returnMessage(params, 200, 'Success');
-                } else {
-                    common.returnMessage(params, 500, 'Error updating user');
-                }
+                });
             });
         });
 

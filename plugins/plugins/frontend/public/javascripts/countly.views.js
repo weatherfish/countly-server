@@ -18,39 +18,100 @@ window.PluginsView = countlyView.extend({
         this.templateData = {
             "page-title":jQuery.i18n.map["plugins.title"]
         };
+
         var self = this;
+
         if (!isRefresh) {
+
             $(this.el).html(this.template(this.templateData));
             $("#"+this.filter).addClass("selected").addClass("active");
+
             $.fn.dataTableExt.afnFiltering.push(function( oSettings, aData, iDataIndex ) {
-                if(!$(oSettings.nTable).hasClass("plugins-filter"))
+                if (!$(oSettings.nTable).hasClass("plugins-filter")) {
                     return true;
-                if(self.filter == "plugins-enabled") {
-                    return aData[4]
                 }
+
+                if (self.filter == "plugins-enabled") {
+                    return aData[1]
+                }
+
                 if(self.filter == "plugins-disabled") {
-                    return !aData[4]
+                    return !aData[1]
                 }
+
                 return true;
             });
 
             this.dtable = $('#plugins-table').dataTable($.extend({}, $.fn.dataTable.defaults, {
                 "aaData": pluginsData,
                 "aoColumns": [
-                    { "mData": function(row, type){return row.title;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.name"]},
-                    { "mData": function(row, type){return row.description;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.description"], "bSortable": false, "sClass": "light" },
-                    { "mData": function(row, type){return row.version;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.version"], "sClass":"center" },
-                    { "mData": function(row, type){if(!row.enabled) return jQuery.i18n.map["plugins.disabled"]; else return jQuery.i18n.map["plugins.enabled"];}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.status"], "sClass":"center" },
-                    { "mData": function(row, type){if(type == "display"){ var prepackagedClass = row.prepackaged ? 'disabled' : 'btn-plugins'; if(!row.enabled) return '<a class="icon-button green '+prepackagedClass+'" id="plugin-'+row.code+'">'+jQuery.i18n.map["plugins.enable"]+'</a>'; else return '<a class="icon-button red '+prepackagedClass+'" id="plugin-'+row.code+'">'+jQuery.i18n.map["plugins.disable"]+'</a>';}else return row.enabled;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.state"], "sClass":"shrink center"},
-                    { "mData": function(row, type){if(row.homepage != "") return '<a href="'+ row.homepage + '" target="_blank"><i class="ion-android-open"></i></a>'; else return "";}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.homepage"], "sClass":"shrink center", "bSortable": false }
+                    { "mData": function(row, type){return jQuery.i18n.map[row.code+".plugin-title"] || jQuery.i18n.map[row.code+".title"] || row.title;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.name"]},
+                    { "mData": function(row, type){
+                        if (type == "display") {
+                            var disabled = (row.prepackaged)? 'disabled' : '';
+                            var input = '<div class="on-off-switch ' + disabled + '">';
+
+                            if (row.enabled) {
+                                input += '<input type="checkbox" class="on-off-switch-checkbox" id="plugin-' + row.code + '" checked ' + disabled + '>';
+                            } else {
+                                input += '<input type="checkbox" class="on-off-switch-checkbox" id="plugin-' + row.code + '" ' + disabled + '>';
+                            }
+
+                            input += '<label class="on-off-switch-label" for="plugin-' + row.code + '"></label>';
+                            input += '<span class="text">' + jQuery.i18n.map["plugins.enable"] + '</span>';
+
+                            return input;
+                        } else {
+                            return row.enabled;
+                        }
+                    },
+                        "sType":"string", "sTitle": jQuery.i18n.map["plugins.state"], "sClass":"shrink"},
+                    { "mData": function(row, type){return jQuery.i18n.map[row.code+".plugin-description"] || jQuery.i18n.map[row.code+".description"] || row.description;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.description"], "bSortable": false, "sClass": "light" },
+                    { "mData": function(row, type){return row.version;}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.version"], "sClass":"center", "bSortable": false },
+                    { "mData": function(row, type){if(row.homepage != "") return '<a class="plugin-link" href="'+ row.homepage + '" target="_blank"><i class="ion-android-open"></i></a>'; else return "";}, "sType":"string", "sTitle": jQuery.i18n.map["plugins.homepage"], "sClass":"shrink center", "bSortable": false }
                 ]
             }));
             this.dtable.stickyTableHeaders();
             this.dtable.fnSort( [ [0,'asc'] ] );
+
+            /*
+             Make header sticky if scroll is more than the height of header
+             This is done in order to make Apply Changes button visible
+             */
+            var navigationTop = $("#sticky-plugin-header").offset().top;
+            var tableHeaderTop = $("#plugins-table").find("thead").offset().top;
+
+            $(window).on("scroll", function(e) {
+                var $fixedHeader = $("#sticky-plugin-header");
+
+                if ($(this).scrollTop() > navigationTop) {
+                    var width = $("#content-container").width();
+                    $fixedHeader.addClass("fixed");
+                    $fixedHeader.css({width: width});
+                } else {
+                    $fixedHeader.removeClass("fixed");
+                    $fixedHeader.css({width: ""});
+                }
+
+                if (($(this).scrollTop() + $fixedHeader.outerHeight()) > tableHeaderTop) {
+                    $(".sticky-header").removeClass("hide");
+                } else {
+                    $(".sticky-header").addClass("hide");
+                }
+
+            });
+
+            $(window).on("resize", function(e) {
+                var $fixedHeader = $("#sticky-plugin-header");
+
+                if ($fixedHeader.hasClass("fixed")) {
+                    var width = $("#content-container").width();
+                    $fixedHeader.css({width: width});
+                }
+            });
         }
     },
-    refresh:function (){
-    },
+    refresh:function () {},
     togglePlugin: function(plugins){
         var self = this;
         var overlay = $("#overlay").clone();
@@ -104,33 +165,6 @@ window.ConfigurationsView = countlyView.extend({
     initialize:function () {
         this.predefinedInputs = {};
         this.predefinedLabels = {
-            "frontend":jQuery.i18n.map["configs.frontend"],
-            "api":jQuery.i18n.map["configs.api"],
-            "apps":jQuery.i18n.map["configs.apps"],
-            "logs": jQuery.i18n.map["configs.logs"],
-            "security": jQuery.i18n.map["configs.security"],
-            "frontend-production":jQuery.i18n.map["configs.frontend-production"],
-            "frontend-session_timeout":jQuery.i18n.map["configs.frontend-session_timeout"],
-            "frontend-theme":jQuery.i18n.map["configs.frontend-theme"],
-            "frontend-use_google":jQuery.i18n.map["configs.frontend-use_google"],
-            "frontend-code":jQuery.i18n.map["configs.frontend-code"],
-            "security-login_tries":jQuery.i18n.map["configs.security-login_tries"],
-            "security-login_wait":jQuery.i18n.map["configs.security-login_wait"],
-            "security-dashboard_additional_headers":jQuery.i18n.map["configs.security-dashboard_additional_headers"],
-            "api-domain":jQuery.i18n.map["configs.api-domain"],
-            "api-safe":jQuery.i18n.map["configs.api-safe"],
-            "api-session_duration_limit":jQuery.i18n.map["configs.api-session_duration_limit"],
-            "api-city_data":jQuery.i18n.map["configs.api-city_data"],
-            "api-event_limit":jQuery.i18n.map["configs.api-event_limit"],
-            "api-event_segmentation_limit":jQuery.i18n.map["configs.api-event_segmentation_limit"],
-            "api-event_segmentation_value_limit":jQuery.i18n.map["configs.api-event_segmentation_value_limit"],
-            "api-sync_plugins":jQuery.i18n.map["configs.api-sync_plugins"],
-            "api-session_cooldown":jQuery.i18n.map["configs.api-session_cooldown"],
-            "api-total_users":jQuery.i18n.map["configs.api-total_users"],
-            "api-metric_limit":jQuery.i18n.map["configs.api-metric_limit"],
-            "security-api_additional_headers":jQuery.i18n.map["configs.security-api_additional_headers"],
-            "apps-country":jQuery.i18n.map["configs.apps-country"],
-            "apps-category":jQuery.i18n.map["configs.apps-category"]
         };
         this.configsData = {};
         this.cache = {};
@@ -138,6 +172,7 @@ window.ConfigurationsView = countlyView.extend({
         
         //register some common system config inputs
         this.registerInput("apps-category", function(value){
+            return null;
             var categories = app.manageAppsView.getAppCategories();
             var select = '<div class="cly-select" id="apps-category">'+
                 '<div class="select-inner">'+
@@ -196,7 +231,7 @@ window.ConfigurationsView = countlyView.extend({
             if(value && value.length)
                 select += '<div class="text">'+value+'</div>';
             else
-                select += '<div class="text">'+jQuery.i18n.map["configs.no-theme"]+'</div>';
+                select += '<div class="text" data-localize="configs.no-theme">'+jQuery.i18n.map["configs.no-theme"]+'</div>';
             
             select += '</div>'+
                     '<div class="right combo"></div>'+
@@ -206,7 +241,7 @@ window.ConfigurationsView = countlyView.extend({
                     
                 for(var i = 0; i < themes.length; i++){
                     if(themes[i] == "")
-                        select += '<div data-value="" class="segmentation-option item">'+jQuery.i18n.map["configs.no-theme"]+'</div>';
+                        select += '<div data-value="" class="segmentation-option item" data-localize="configs.no-theme">'+jQuery.i18n.map["configs.no-theme"]+'</div>';
                     else
                         select += '<div data-value="'+themes[i]+'" class="segmentation-option item">'+themes[i]+'</div>';
                 }
@@ -224,9 +259,9 @@ window.ConfigurationsView = countlyView.extend({
                 '<div class="select-inner">'+
                     '<div class="text-container">';
             if(value && value.length)
-                select += '<div class="text">'+jQuery.i18n.map["configs.logs."+value]+'</div>';
+                select += '<div class="text" data-localize="configs.logs.'+value+'">'+jQuery.i18n.map["configs.logs."+value]+'</div>';
             else
-                select += '<div class="text">'+Query.i18n.map["configs.logs.warn"]+'</div>';
+                select += '<div class="text" data-localzie="configs.logs.warn">'+Query.i18n.map["configs.logs.warn"]+'</div>';
             select += '</div>'+
                     '<div class="right combo"></div>'+
                 '</div>'+
@@ -234,7 +269,7 @@ window.ConfigurationsView = countlyView.extend({
                     '<div>';
 
                 for(var i = 0; i < categories.length; i++){
-                    select += '<div data-value="'+categories[i]+'" class="segmentation-option item">'+jQuery.i18n.map["configs.logs."+categories[i]]+'</div>';
+                    select += '<div data-value="'+categories[i]+'" class="segmentation-option item" data-localize="configs.logs.'+categories[i]+'">'+jQuery.i18n.map["configs.logs."+categories[i]]+'</div>';
                 }
 
             select += '</div>'+
@@ -274,6 +309,8 @@ window.ConfigurationsView = countlyView.extend({
         }
     },
     renderCommon:function (isRefresh) {
+        if(this.reset)
+            $("#new-install-overlay").show();
         if(this.userConfig)
             this.configsData = countlyPlugins.getUserConfigsData();
         else
@@ -294,7 +331,8 @@ window.ConfigurationsView = countlyView.extend({
             "page-title":title,
             "configs":configsHTML,
             "namespace":this.namespace,
-            "user": this.userConfig
+            "user": this.userConfig,
+            "reset": this.reset
         };
         var self = this;
         if (!isRefresh) {
@@ -309,18 +347,11 @@ window.ConfigurationsView = countlyView.extend({
                 window.history.back();
             });
 
-            $(".boolean-selector>.button").click(function () {
-                var dictionary = {"plugins.enable":true, "plugins.disable":false};
-                var cur = $(this);
-                if (cur.hasClass("selected")) {
-                    return true;
-                }
-                var prev = cur.parent(".button-selector").find(">.button.selected");
-                prev.removeClass("selected").removeClass("active");
-                cur.addClass("selected").addClass("active");
-                var id = $(this).parent(".button-selector").attr("id");
-                var value = dictionary[$(this).data("localize")];
-                self.updateConfig(id, value);
+            $('.on-off-switch input').on("change", function() {
+                var isChecked = $(this).is(":checked"),
+                    attrID = $(this).attr("id");
+
+                self.updateConfig(attrID, isChecked);
             });
             
             $(".configs input").keyup(function () {
@@ -341,6 +372,61 @@ window.ConfigurationsView = countlyView.extend({
                 var id = $(this).closest(".cly-select").attr("id");
                 var value = $(this).data("value");
                 self.updateConfig(id, value);
+            });
+            
+            $(".configs #username").off("keyup").on("keyup",_.throttle(function() {
+                if (!($(this).val().length) || $("#menu-username").text() == $(this).val()) {
+                    $(".username-check").remove();
+                    return false;
+                }
+            
+                $(this).next(".required").remove();
+            
+                var existSpan = $("<span class='username-check red-text' data-localize='management-users.username.exists'>").html(jQuery.i18n.map["management-users.username.exists"]),
+                    notExistSpan = $("<span class='username-check green-text'>").html("&#10004;"),
+                    data = {};
+                
+                data.username = $(this).val();
+                data._csrf = countlyGlobal['csrf_token'];
+            
+                var self = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: countlyGlobal["path"]+"/users/check/username",
+                    data: data,
+                    success: function(result) {
+                        $(".username-check").remove();
+                        if (result) {
+                            self.after(notExistSpan.clone());
+                        } else {
+                            self.after(existSpan.clone());
+                        }
+                    }
+                });
+            }, 300));
+            
+            $(".configs #new_pwd").off("keyup").on("keyup",_.throttle(function() {
+                $(".password-check").remove();
+                var error = CountlyHelpers.validatePassword($(this).val());
+                if (error) {
+                    var invalidSpan = $("<div class='password-check red-text'>").html(error);
+                    $(this).after(invalidSpan.clone());
+                    return false;
+                }
+            }, 300));
+            
+            $(".configs #re_new_pwd").off("keyup").on("keyup",_.throttle(function() {
+                $(".password-check").remove();
+                var error = CountlyHelpers.validatePassword($(this).val());
+                if (error) {
+                    var invalidSpan = $("<div class='password-check red-text'>").html(error);
+                    $(this).after(invalidSpan.clone());
+                    return false;
+                }
+            }, 300));
+            
+            $(".configs #usersettings_regenerate").click(function(){
+                $(".configs #api-key").val(CountlyHelpers.generatePassword(32, true)).trigger("keyup");
             });
             
             $(".configs .account-settings .input input").keyup(function () {
@@ -367,9 +453,17 @@ window.ConfigurationsView = countlyView.extend({
                         $("#configs-apply-changes").hide();
                 });
             });
-            
             $("#configs-apply-changes").click(function () {
                 if(self.userConfig){
+                    $(".username-check.green-text").remove();
+                    if ($(".red-text").length) {
+                        CountlyHelpers.notify({
+                            title: jQuery.i18n.map["user-settings.please-correct-input"],
+                            message: jQuery.i18n.map["configs.not-saved"],
+                            type: "error"
+                        });
+                        return false;
+                    }
                     var username = $(".configs #username").val(),
                         old_pwd = $(".configs #old_pwd").val(),
                         new_pwd = $(".configs #new_pwd").val(),
@@ -384,8 +478,8 @@ window.ConfigurationsView = countlyView.extend({
                     
                     if ((new_pwd.length || re_new_pwd.length) && !old_pwd.length) {
                         CountlyHelpers.notify({
-                            title: jQuery.i18n.map["user-settings.old-password-match"],
-                            message: jQuery.i18n.map["configs.not-saved"],
+                            title: jQuery.i18n.map["configs.not-saved"],
+                            message: jQuery.i18n.map["user-settings.old-password-match"],
                             type: "error"
                         });
                         return true;
@@ -393,8 +487,26 @@ window.ConfigurationsView = countlyView.extend({
     
                     if (new_pwd != re_new_pwd) {
                         CountlyHelpers.notify({
-                            title: jQuery.i18n.map["user-settings.password-match"],
-                            message: jQuery.i18n.map["configs.not-saved"],
+                            title: jQuery.i18n.map["configs.not-saved"],
+                            message: jQuery.i18n.map["user-settings.password-match"],
+                            type: "error"
+                        });
+                        return true;
+                    }
+
+                    if (new_pwd.length && new_pwd == old_pwd) {
+                        CountlyHelpers.notify({
+                            title: jQuery.i18n.map["configs.not-saved"],
+                            message: jQuery.i18n.map["user-settings.password-not-old"],
+                            type: "error"
+                        });
+                        return true;
+                    }
+                    
+                    if (api_key.length != 32) {
+                        CountlyHelpers.notify({
+                            title: jQuery.i18n.map["configs.not-saved"],
+                            message: jQuery.i18n.map["user-settings.api-key-length"],
                             type: "error"
                         });
                         return true;
@@ -415,19 +527,33 @@ window.ConfigurationsView = countlyView.extend({
     
                             if (result == "username-exists") {
                                 CountlyHelpers.notify({
-                                    title: jQuery.i18n.map["management-users.username.exists"],
-                                    message: jQuery.i18n.map["configs.not-saved"],
+                                    title: jQuery.i18n.map["configs.not-saved"],
+                                    message: jQuery.i18n.map["management-users.username.exists"],
                                     type: "error"
                                 });
                                 return true;
                             } else if (!result) {
                                 CountlyHelpers.notify({
-                                    title: jQuery.i18n.map["user-settings.alert"],
-                                    message: jQuery.i18n.map["configs.not-saved"],
+                                    title:jQuery.i18n.map["configs.not-saved"],
+                                    message: jQuery.i18n.map["user-settings.alert"],
                                     type: "error"
                                 });
                                 return true;
                             } else {
+                                if(!isNaN(parseInt(result))){
+                                    $("#new-install-overlay").fadeOut();
+                                    countlyGlobal["member"].password_changed = parseInt(result);
+                                }
+                                else if(typeof result === "string"){
+                                    CountlyHelpers.notify({
+                                        title: jQuery.i18n.map["configs.not-saved"],
+                                        message: jQuery.i18n.map[result],
+                                        type: "error"
+                                    });
+                                    return true;
+                                }
+                                $("#user-api-key").val(api_key);
+                                countlyGlobal["member"].api_key = api_key;
                                 $(".configs #old_pwd").val("");
                                 $(".configs #new_pwd").val("");
                                 $(".configs #re_new_pwd").val("");
@@ -436,24 +562,33 @@ window.ConfigurationsView = countlyView.extend({
                                 countlyGlobal["member"].username = username;
                                 countlyGlobal["member"].api_key = api_key;
                             }
-                            countlyPlugins.updateUserConfigs(self.changes, function(err, services){
-                                if(err && !ignoreError){
-                                    CountlyHelpers.notify({
-                                        title: jQuery.i18n.map["configs.not-changed"],
-                                        message: jQuery.i18n.map["configs.not-saved"],
-                                        type: "error"
-                                    });
-                                }
-                                else{
-                                    CountlyHelpers.notify({
-                                        title: jQuery.i18n.map["configs.changed"],
-                                        message: jQuery.i18n.map["configs.saved"]
-                                    });
-                                    self.configsData = JSON.parse(JSON.stringify(self.cache));
-                                    $("#configs-apply-changes").hide();
-                                    self.changes = {};
-                                }
-                            });
+                            if(Object.keys(self.changes).length){
+                                countlyPlugins.updateUserConfigs(self.changes, function(err, services){
+                                    if(err && !ignoreError){
+                                        CountlyHelpers.notify({
+                                            title: jQuery.i18n.map["configs.not-saved"],
+                                            message: jQuery.i18n.map["configs.not-changed"],
+                                            type: "error"
+                                        });
+                                    }
+                                    else{
+                                        CountlyHelpers.notify({
+                                            title: jQuery.i18n.map["configs.changed"],
+                                            message: jQuery.i18n.map["configs.saved"]
+                                        });
+                                        self.configsData = JSON.parse(JSON.stringify(self.cache));
+                                        $("#configs-apply-changes").hide();
+                                        self.changes = {};
+                                    }
+                                });
+                            }
+                            else{
+                                CountlyHelpers.notify({
+                                    title: jQuery.i18n.map["configs.changed"],
+                                    message: jQuery.i18n.map["configs.saved"]
+                                });
+                                $("#configs-apply-changes").hide();
+                            }
                         }
                     });
                 }
@@ -461,8 +596,8 @@ window.ConfigurationsView = countlyView.extend({
                     countlyPlugins.updateConfigs(self.changes, function(err, services){
                         if(err){
                             CountlyHelpers.notify({
-                                title: jQuery.i18n.map["configs.not-changed"],
-                                message: jQuery.i18n.map["configs.not-saved"],
+                                title: jQuery.i18n.map["configs.not-saved"],
+                                message: jQuery.i18n.map["configs.not-changed"],
                                 type: "error"
                             });
                         }
@@ -476,6 +611,34 @@ window.ConfigurationsView = countlyView.extend({
                             self.changes = {};
                         }
                     });
+                }
+            });
+
+            /*
+                Make header sticky if scroll is more than the height of header
+                This is done in order to make Apply Changes button visible
+             */
+            var navigationTop = $("#sticky-config-header").offset().top;
+
+            $(window).on("scroll", function(e) {
+                var $fixedHeader = $("#sticky-config-header");
+
+                if ($(this).scrollTop() > navigationTop) {
+                    var width = $("#content-container").width();
+                    $fixedHeader.addClass("fixed");
+                    $fixedHeader.css({width: width});
+                } else {
+                    $fixedHeader.removeClass("fixed");
+                    $fixedHeader.css({width: ""});
+                }
+            });
+
+            $(window).on("resize", function(e) {
+                var $fixedHeader = $("#sticky-config-header");
+
+                if ($fixedHeader.hasClass("fixed")) {
+                    var width = $("#content-container").width();
+                    $fixedHeader.css({width: width});
                 }
             });
         }
@@ -562,9 +725,13 @@ window.ConfigurationsView = countlyView.extend({
         }
         var ret = "";
         if(jQuery.i18n.map["configs.help."+id])
-            ret = "<span class='config-help'>"+jQuery.i18n.map["configs.help."+id]+"</span>";
+            ret = "<span class='config-help' data-localize='configs.help."+id+"'>"+jQuery.i18n.map["configs.help."+id]+"</span>";
         if(typeof this.predefinedLabels[id] != "undefined")
-            return "<div>"+this.predefinedLabels[id]+"</div>"+ret;
+            return "<div data-localize='"+this.predefinedLabels[id]+"'>"+jQuery.i18n.map[this.predefinedLabels[id]]+"</div>"+ret;
+        else if(jQuery.i18n.map["configs."+id])
+            return "<div data-localize='configs."+id+"'>"+jQuery.i18n.map["configs."+id]+"</div>"+ret;
+        else if(jQuery.i18n.map[id.replace("-", ".")])
+            return "<div data-localize='"+id.replace("-", ".")+"'>"+jQuery.i18n.map[id.replace("-", ".")]+"</div>"+ret;
         else
             return "<div>"+value+"</div>"+ret;
     },
@@ -573,16 +740,17 @@ window.ConfigurationsView = countlyView.extend({
             return this.predefinedInputs[id](value);
         }
         else if(typeof value == "boolean"){
-            var input = '<div id="'+id+'" class="button-selector boolean-selector">';
-            if(value){
-                input += '<div class="button active selected" data-localize="plugins.enable"></div>';
-                input += '<div class="button" data-localize="plugins.disable"></div>';
+            var input = '<div class="on-off-switch">';
+
+            if (value) {
+                input += '<input type="checkbox" name="on-off-switch" class="on-off-switch-checkbox" id="' + id + '" checked>';
+            } else {
+                input += '<input type="checkbox" name="on-off-switch" class="on-off-switch-checkbox" id="' + id + '">';
             }
-            else{
-                input += '<div class="button" data-localize="plugins.enable"></div>';
-                input += '<div class="button active selected" data-localize="plugins.disable"></div>';
-            }
-            input += '</div>';
+
+            input += '<label class="on-off-switch-label" for="' + id + '"></label>';
+            input += '<span class="text">' + jQuery.i18n.map["plugins.enable"] + '</span>';
+
             return input;
         }
         else if(typeof value == "number"){
@@ -604,6 +772,7 @@ window.ConfigurationsView = countlyView.extend({
 //register views
 app.pluginsView = new PluginsView();
 app.configurationsView = new ConfigurationsView();
+
 if(countlyGlobal["member"].global_admin){
     app.route('/manage/plugins', 'plugins', function () {
         this.renderWhenReady(this.pluginsView);
@@ -611,76 +780,78 @@ if(countlyGlobal["member"].global_admin){
     
     app.route('/manage/configurations', 'configurations', function () {
         this.configurationsView.namespace = null;
+        this.configurationsView.reset = false;
         this.configurationsView.userConfig = false;
         this.renderWhenReady(this.configurationsView);
     });
     
     app.route('/manage/configurations/:namespace', 'configurations_namespace', function (namespace) {
         this.configurationsView.namespace = namespace;
+        this.configurationsView.reset = false;
         this.configurationsView.userConfig = false;
         this.renderWhenReady(this.configurationsView);
     });
 } 
+
 app.route('/manage/user-settings', 'user-settings', function () {
     this.configurationsView.namespace = null;
+    this.configurationsView.reset = false;
     this.configurationsView.userConfig = true;
     this.renderWhenReady(this.configurationsView);
 });
 
 app.route('/manage/user-settings/:namespace', 'user-settings_namespace', function (namespace) {
-    this.configurationsView.namespace = namespace;
+    if(namespace == "reset")
+        this.configurationsView.reset = true;
+    else
+        this.configurationsView.namespace = namespace;
     this.configurationsView.userConfig = true;
     this.renderWhenReady(this.configurationsView);
 });
 
-
 app.addPageScript("/manage/plugins", function(){
-   $("#plugins-selector").find(">.button").click(function () {
+    $("#plugins-selector").find(">.button").click(function () {
         if ($(this).hasClass("selected")) {
             return true;
         }
 
         $(".plugins-selector").removeClass("selected").removeClass("active");
         var filter = $(this).attr("id");
+
         app.activeView.filterPlugins(filter);
     });
-    var plugins = countlyGlobal["plugins"].slice();
-    $("#plugins-table").on("click", ".btn-plugins", function () {
-        var show = false;
-        var plugin = this.id.toString().replace(/^plugin-/, '');
-        if($(this).hasClass("green")){
-            $(this).removeClass("green").addClass("red");
-            $(this).text(jQuery.i18n.map["plugins.disable"]);
+
+    var plugins = _.clone(countlyGlobal["plugins"]);
+
+    $("#plugins-table").on("change", ".on-off-switch input", function () {
+        var $checkBox = $(this),
+            plugin = $checkBox.attr("id").replace(/^plugin-/, '');
+
+        if ($checkBox.is(":checked")) {
             plugins.push(plugin);
+            plugins = _.uniq(plugins);
+        } else {
+            plugins = _.without(plugins, plugin);
         }
-        else if($(this).hasClass("red")){
-            $(this).removeClass("red").addClass("green");
-            $(this).text(jQuery.i18n.map["plugins.enable"]);
-            var index = $.inArray(plugin, plugins);
-            plugins.splice(index, 1);
-        }
-        if(plugins.length != countlyGlobal["plugins"].length)
-            show = true;
-        else{
-            for(var i = 0; i < plugins.length; i++){
-                if($.inArray(plugins[i], countlyGlobal["plugins"]) == -1){
-                    show = true;
-                    break;
-                }
-            }
-        }
-        if(show)
-            $(".btn-plugin-enabler").show();
-        else
+
+        if (_.difference(countlyGlobal["plugins"], plugins).length == 0 &&
+            _.difference(plugins, countlyGlobal["plugins"]).length == 0) {
             $(".btn-plugin-enabler").hide();
+        } else {
+            $(".btn-plugin-enabler").show();
+        }
     });
-    $("#plugins-selector").on("click", ".btn-plugin-enabler", function () {
+
+    $(document).on("click", ".btn-plugin-enabler", function () {
         var plugins = {};
-        $(".btn-plugins").each(function(){
-            var plugin = this.id.toString().replace(/^plugin-/, '');
-            var state = ($(this).hasClass("green")) ? false : true;
+
+        $("#plugins-table").find(".on-off-switch input").each(function() {
+            var plugin = this.id.toString().replace(/^plugin-/, ''),
+                state = ($(this).is(":checked")) ? true : false;
+
             plugins[plugin] = state;
-        })
+        });
+
         var text = jQuery.i18n.map["plugins.confirm"];
         var msg = {title:jQuery.i18n.map["plugins.processing"], message: jQuery.i18n.map["plugins.wait"], info:jQuery.i18n.map["plugins.hold-on"], sticky:true};
         CountlyHelpers.confirm(text, "red", function (result) {

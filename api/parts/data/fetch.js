@@ -454,94 +454,107 @@ var fetch = {},
 		});
     };
 	
-	fetch.fetchMetric = function(params) {
-		function getMetric(metric, totalUsersMetric){
-			fetchTimeObj(metric, params, false, function(doc) {
-				var clearMetricObject = function (obj) {
-					if (obj) {
-						if (!obj["t"]) obj["t"] = 0;
-						if (!obj["n"]) obj["n"] = 0;
-						if (!obj["u"]) obj["u"] = 0;
-					}
-					else {
-						obj = {"t":0, "n":0, "u":0};
-					}
-			
-					return obj;
-				};
-
-				if (doc['meta'] && doc['meta'][params.qstring.metric]) {
-                    getTotalUsersObj(totalUsersMetric, params, function(dbTotalUsersObj) {
-                        var data = countlyCommon.extractMetric(doc, doc['meta'][params.qstring.metric], clearMetricObject, [
-                            {
-                                name:params.qstring.metric,
-                                func:function (rangeArr, dataObj) {
-                                    return rangeArr;
-                                }
-                            },
-                            { "name":"t" },
-                            { "name":"n" },
-                            { "name":"u" }
-                        ], formatTotalUsersObj(dbTotalUsersObj));
-
-                        common.returnOutput(params, data);
-                    });
+	fetch.getMetric = function(params, metric, totalUsersMetric, callback){
+        var queryMetric = params.qstring.metric || metric;
+        countlyCommon.setTimezone(params.appTimezone);
+        if(params.qstring.period)
+            countlyCommon.setPeriod(params.qstring.period);
+		fetchTimeObj(metric, params, false, function(doc) {
+			var clearMetricObject = function (obj) {
+				if (obj) {
+					if (!obj["t"]) obj["t"] = 0;
+					if (!obj["n"]) obj["n"] = 0;
+					if (!obj["u"]) obj["u"] = 0;
 				}
-				else{
-					common.returnOutput(params, []);
+				else {
+					obj = {"t":0, "n":0, "u":0};
 				}
-			});
-		}
+		
+				return obj;
+			};
 
+			if (doc['meta'] && doc['meta'][queryMetric]) {
+                getTotalUsersObj(totalUsersMetric, params, function(dbTotalUsersObj) {
+                    var data = countlyCommon.extractMetric(doc, doc['meta'][queryMetric], clearMetricObject, [
+                        {
+                            name:queryMetric,
+                            func:function (rangeArr, dataObj) {
+                                return rangeArr;
+                            }
+                        },
+                        { "name":"t" },
+                        { "name":"n" },
+                        { "name":"u" }
+                    ], formatTotalUsersObj(dbTotalUsersObj));
+                    
+                    if(callback){
+                        callback(data);
+                    }
+                });
+			}
+			else if(callback){
+                callback([]);
+			}
+		});
+	};
+        
+    fetch.fetchMetric = function(params) {
+        var output = function(data){
+            common.returnOutput(params, data);
+        };
 		if(!params.qstring.metric) {
 			common.returnMessage(params, 400, 'Must provide metric');
         } else {
 			switch (params.qstring.metric) {
                 case 'locations':
                 case 'countries':
-                    getMetric('users', "countries");
+                    fetch.getMetric(params, 'users', "countries", output);
                     break;
                 case 'sessions':
                 case 'users':
-					getMetric('users');
+					fetch.getMetric(params, 'users', null, output);
                     break;
                 case 'app_versions':
-                    getMetric("device_details", "app_versions");
+                    fetch.getMetric(params, "device_details", "app_versions", output);
                     break;
                 case 'os':
-                    getMetric("device_details", "platforms");
+                    fetch.getMetric(params, "device_details", "platforms", output);
                     break;
                 case 'os_versions':
-                    getMetric("device_details", "platform_versions");
+                    fetch.getMetric(params, "device_details", "platform_versions", output);
                     break;
                 case 'resolutions':
-                    getMetric("device_details", "resolutions");
+                    fetch.getMetric(params, "device_details", "resolutions", output);
                     break;
                 case 'device_details':
-					getMetric('device_details');
+					fetch.getMetric(params, 'device_details', null, output);
                     break;
                 case 'cities':
                     if (plugins.getConfig("api").city_data !== false) {
-						getMetric("cities", "cities");
+						fetch.getMetric(params, "cities", "cities", output);
                     } else {
                         common.returnOutput(params, []);
                     }
                     break;
                 default:
-					getMetric(params.qstring.metric);
+					fetch.getMetric(params, params.qstring.metric, null, output);
                     break;
             }
 		}
     };
 
-    fetch.fetchTimeObj = function (collection, params, isCustomEvent) {
-        fetchTimeObj(collection, params, isCustomEvent, function(output) {
+    fetch.fetchTimeObj = function (collection, params, isCustomEvent, options) {
+        fetchTimeObj(collection, params, isCustomEvent, options, function(output) {
             common.returnOutput(params, output);
         });
     };
     
-    fetch.getTimeObj = function (collection, params, callback) {
-        fetchTimeObj(collection, params, null, callback);
+    fetch.getTimeObj = function (collection, params, options, callback) {
+        fetchTimeObj(collection, params, null, options, callback);
+    };
+
+    fetch.getTimeObjForEvents = function (collection, params, options, callback) {
+        fetchTimeObj(collection, params, true, options, callback);
     };
 
     fetch.fetchTotalUsersObj = function (metric, params) {
@@ -549,6 +562,8 @@ var fetch = {},
             common.returnOutput(params, output);
         });
     };
+
+    fetch.getTotalUsersObj = getTotalUsersObj;
 
     function getTotalUsersObj(metric, params, callback) {
         if(!plugins.getConfig("api").total_users){
@@ -672,6 +687,8 @@ var fetch = {},
         }
     }
 
+    fetch.formatTotalUsersObj = formatTotalUsersObj;
+
     function formatTotalUsersObj(obj, forMetric) {
         var tmpObj = {},
             processingFunction;
@@ -694,7 +711,31 @@ var fetch = {},
         return tmpObj;
     }
 
-    function fetchTimeObj(collection, params, isCustomEvent, callback) {
+    function fetchTimeObj(collection, params, isCustomEvent, options, callback) {
+        if(typeof options === "function"){
+            callback = options;
+            options = {};
+        }
+        
+        if(typeof options === "undefined"){
+            options = {};
+        }
+        
+        if(typeof options.unique === "undefined")
+            options.unique = common.dbMap.unique;
+        
+        if(typeof options.id === "undefined")
+            options.id = params.app_id;
+        
+        if(typeof options.levels === "undefined")
+            options.levels = {};
+        
+        if(typeof options.levels.daily === "undefined")
+            options.levels.daily = [common.dbMap.total, common.dbMap.new, common.dbEventMap.count, common.dbEventMap.sum, common.dbEventMap.duration];
+        
+        if(typeof options.levels.monthly === "undefined")
+            options.levels.monthly = [common.dbMap.total, common.dbMap.new, common.dbMap.duration, common.dbMap.events, common.dbEventMap.count, common.dbEventMap.sum, common.dbEventMap.duration];
+            
         if (params.qstring.action == "refresh") {
             var dbDateIds = common.getDateIds(params),
                 fetchFromZero = {},
@@ -702,16 +743,18 @@ var fetch = {},
 
             if (isCustomEvent) {
                 fetchFromZero['meta'] = 1;
+                fetchFromZero['meta_v2'] = 1;
                 fetchFromZero['m'] = 1;
                 fetchFromMonth["d." + params.time.day] = 1;
                 fetchFromMonth["m"] = 1;
             } else {
-                fetchFromZero["d." + common.dbMap.unique] = 1;
-                fetchFromZero["d." + params.time.month + "." + common.dbMap.unique] = 1;
+                fetchFromZero["d." + options.unique] = 1;
+                fetchFromZero["d." + params.time.month + "." + options.unique] = 1;
                 fetchFromZero['meta'] = 1;
+                fetchFromZero['meta_v2'] = 1;
                 fetchFromZero['m'] = 1;
 
-                fetchFromMonth["d.w" + params.time.weekly + "." + common.dbMap.unique] = 1;
+                fetchFromMonth["d.w" + params.time.weekly + "." + options.unique] = 1;
                 fetchFromMonth["d." + params.time.day] = 1;
                 fetchFromMonth["m"] = 1;
 
@@ -735,17 +778,20 @@ var fetch = {},
                 zeroIdToFetch = "no-segment_" + dbDateIds.zero;
                 monthIdToFetch = segment + "_" + dbDateIds.month;
             } else {
-                zeroIdToFetch = params.app_id + "_" + dbDateIds.zero;
-                monthIdToFetch = params.app_id + "_" + dbDateIds.month;
+                zeroIdToFetch = options.id + "_" + dbDateIds.zero;
+                monthIdToFetch = options.id + "_" + dbDateIds.month;
+            }
+            
+            var zeroDocs = [zeroIdToFetch];
+            var monthDocs = [monthIdToFetch];
+            for(var i = 0; i < common.base64.length; i++){
+                zeroDocs.push(zeroIdToFetch+"_"+common.base64[i]);
+                monthDocs.push(monthIdToFetch+"_"+common.base64[i]);
             }
 
-            common.db.collection(collection).findOne({'_id': zeroIdToFetch}, fetchFromZero, function(err, zeroObject) {
-                common.db.collection(collection).findOne({'_id': monthIdToFetch}, fetchFromMonth, function(err, monthObject) {
-                    var tmpDataArr = [];
-                    tmpDataArr.push(zeroObject);
-                    tmpDataArr.push(monthObject);
-
-                    callback(getMergedObj(tmpDataArr, true));
+            common.db.collection(collection).find({'_id': {$in: zeroDocs}}, fetchFromZero).toArray(function(err, zeroObject) {
+                common.db.collection(collection).find({'_id': {$in: monthDocs}}, fetchFromMonth).toArray(function(err, monthObject) {
+                    callback(getMergedObj(zeroObject.concat(monthObject), true, options.levels));
                 });
             });
         } else {
@@ -757,44 +803,72 @@ var fetch = {},
 
                 for (var i = 0; i < periodObj.reqZeroDbDateIds.length; i++) {
                     documents.push("no-segment_" + periodObj.reqZeroDbDateIds[i]);
+                    for(var m = 0; m < common.base64.length; m++){
+                        documents.push("no-segment_" + periodObj.reqZeroDbDateIds[i]+"_"+common.base64[m]);
+                    }
                 }
 
                 for (var i = 0; i < periodObj.reqMonthDbDateIds.length; i++) {
                     documents.push(segment + "_" + periodObj.reqMonthDbDateIds[i]);
+                    for(var m = 0; m < common.base64.length; m++){
+                        documents.push(segment + "_" + periodObj.reqMonthDbDateIds[i]+"_"+common.base64[m]);
+                    }
                 }
             } else {
                 for (var i = 0; i < periodObj.reqZeroDbDateIds.length; i++) {
-                    documents.push(params.app_id + "_" + periodObj.reqZeroDbDateIds[i]);
+                    documents.push(options.id + "_" + periodObj.reqZeroDbDateIds[i]);
+                    for(var m = 0; m < common.base64.length; m++){
+                        documents.push(options.id + "_" + periodObj.reqZeroDbDateIds[i]+"_"+common.base64[m]);
+                    }
                 }
 
                 for (var i = 0; i < periodObj.reqMonthDbDateIds.length; i++) {
-                    documents.push(params.app_id + "_" + periodObj.reqMonthDbDateIds[i]);
+                    documents.push(options.id + "_" + periodObj.reqMonthDbDateIds[i]);
+                    for(var m = 0; m < common.base64.length; m++){
+                        documents.push(options.id + "_" + periodObj.reqMonthDbDateIds[i]+"_"+common.base64[m]);
+                    }
                 }
             }
 
             common.db.collection(collection).find({'_id': {$in: documents}}, {}).toArray(function(err, dataObjects) {
-                callback(getMergedObj(dataObjects));
+                callback(getMergedObj(dataObjects, false, options.levels));
             });
         }
+        
+        function deepMerge(ob1, ob2){
+            for(var i in ob2){
+                if(typeof ob1[i] === "undefined"){
+                    ob1[i] = ob2[i];
+                }
+                else if(ob1[i] && typeof ob1[i] === "object"){
+                    ob1[i] = deepMerge(ob1[i], ob2[i]);
+                }
+                else{
+                    ob1[i] += ob2[i];
+                }
+            }
+            return ob1;
+        }
 
-        function getMergedObj(dataObjects, isRefresh) {
+        function getMergedObj(dataObjects, isRefresh, levels) {
             var mergedDataObj = {};
-
+        
             if(dataObjects){
                 for (var i = 0; i < dataObjects.length; i++) {
                     if (!dataObjects[i] || !dataObjects[i].m) {
                         continue;
                     }
-    
+        
                     var mSplit = dataObjects[i].m.split(":"),
                         year = mSplit[0],
                         month = mSplit[1];
-    
+        
                     if (!mergedDataObj[year]) {
                         mergedDataObj[year] = {};
                     }
-    
+        
                     if (month == 0) {
+                        //old meta merge
                         if (mergedDataObj['meta']) {
                             for (var metaEl in dataObjects[i]['meta']) {
                                 if (mergedDataObj['meta'][metaEl]) {
@@ -804,55 +878,56 @@ var fetch = {},
                                 }
                             }
                         } else {
-                            mergedDataObj['meta'] = dataObjects[i]['meta'] || [];
+                            mergedDataObj['meta'] = dataObjects[i]['meta'] || {};
                         }
-    
-                        if (mergedDataObj[year]) {
-                            for (var prop in dataObjects[i]['d']) {
-                                if(mergedDataObj[year][prop]){
-                                    _.extend(mergedDataObj[year][prop], dataObjects[i]['d'][prop]) 
-                                }
-                                else{
-                                    mergedDataObj[year][prop] = dataObjects[i]['d'][prop];
+                        
+                        //new meta merge as hash tables
+                        if(dataObjects[i]['meta_v2']){
+                            for (var metaEl in dataObjects[i]['meta_v2']) {
+                                if (mergedDataObj['meta'][metaEl]) {
+                                    mergedDataObj['meta'][metaEl] = union(mergedDataObj['meta'][metaEl], Object.keys(dataObjects[i]['meta_v2'][metaEl]));
+                                } else {
+                                    mergedDataObj['meta'][metaEl] = Object.keys(dataObjects[i]['meta_v2'][metaEl]);
                                 }
                             }
+                        }
+        
+                        if (mergedDataObj[year]) {
+                            mergedDataObj[year] = deepMerge(mergedDataObj[year], dataObjects[i]['d']);
                         } else {
                             mergedDataObj[year] = dataObjects[i]['d'] || {};
                         }
                     } else {
                         if (mergedDataObj[year][month]) {
-                            for (var prop in dataObjects[i]['d']) {
-                                mergedDataObj[year][month][prop] = dataObjects[i]['d'][prop];
-                            }
+                            mergedDataObj[year][month] = deepMerge(mergedDataObj[year][month], dataObjects[i]['d']);
                         } else {
                             mergedDataObj[year][month] = dataObjects[i]['d'] || {};
                         }
-    
+        
                         if (!isRefresh) {
                             for (var day in dataObjects[i]['d']) {
                                 for (var prop in dataObjects[i]['d'][day]) {
                                     if ((collection == 'users' || dataObjects[i]['s'] == 'no-segment') && prop <= 23 && prop >= 0) {
                                         continue;
                                     }
-    
-                                    if (typeof dataObjects[i]['d'][day][prop] === 'object') {
+        
+                                    if (typeof dataObjects[i]['d'][day][prop] === 'object') { 
                                         for (var secondLevel in dataObjects[i]['d'][day][prop]) {
-                                            if (secondLevel == common.dbMap.total || secondLevel == common.dbMap.new ||
-                                                secondLevel == common.dbEventMap.count || secondLevel == common.dbEventMap.sum || secondLevel == common.dbEventMap.duration) {
+                                            if (levels.daily.indexOf(secondLevel) !== -1) {
                                                 if (!mergedDataObj[year][month][prop]) {
                                                     mergedDataObj[year][month][prop] = {};
                                                 }
-    
+        
                                                 if (mergedDataObj[year][month][prop][secondLevel]) {
                                                     mergedDataObj[year][month][prop][secondLevel] += dataObjects[i]['d'][day][prop][secondLevel];
                                                 } else {
                                                     mergedDataObj[year][month][prop][secondLevel] = dataObjects[i]['d'][day][prop][secondLevel];
                                                 }
-    
+        
                                                 if (!mergedDataObj[year][prop]) {
                                                     mergedDataObj[year][prop] = {};
                                                 }
-    
+        
                                                 if (mergedDataObj[year][prop][secondLevel]) {
                                                     mergedDataObj[year][prop][secondLevel] += dataObjects[i]['d'][day][prop][secondLevel];
                                                 } else {
@@ -860,16 +935,14 @@ var fetch = {},
                                                 }
                                             }
                                         }
-                                    } else if (prop == common.dbMap.total || prop == common.dbMap.new ||
-                                        prop == common.dbMap.duration || prop == common.dbMap.events ||
-                                        prop == common.dbEventMap.count || prop == common.dbEventMap.sum || prop == common.dbEventMap.duration) {
-    
+                                    } else if (levels.monthly.indexOf(prop) !== -1) {
+        
                                         if (mergedDataObj[year][month][prop]) {
                                             mergedDataObj[year][month][prop] += dataObjects[i]['d'][day][prop];
                                         } else {
                                             mergedDataObj[year][month][prop] = dataObjects[i]['d'][day][prop];
                                         }
-    
+        
                                         if (mergedDataObj[year][prop]) {
                                             mergedDataObj[year][prop] += dataObjects[i]['d'][day][prop];
                                         } else {
@@ -882,7 +955,7 @@ var fetch = {},
                     }
                 }
             }
-
+        
             return mergedDataObj;
         }
     }

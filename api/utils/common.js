@@ -5,6 +5,7 @@ var common = {},
     mongo = require('mongoskin'),
     logger = require('./log.js'),
     escape_html = require('escape-html'),
+    mcc_mnc_list = require('mcc-mnc-list'),
     plugins = require('../../plugins/pluginManager.js'),
     countlyConfig = require('./../config', 'dont-enclose');
 
@@ -12,32 +13,32 @@ var common = {},
 
     var log = logger('common');
     
-    function escape_html_entities(key, value) {
-        if(typeof value === 'object' && value){
-            if(Array.isArray(value)){
-                var replacement = [];
-                for (var k = 0; k < value.length; k++) {
-                    if(typeof value[k] === "string")
-                    replacement[k] = escape_html(value[k]);
-                    else
-                    replacement[k] = value[k];
-                }
-                return replacement;
-            }
-            else{
-                var replacement = {};
-                for (var k in value) {
-                    if (Object.hasOwnProperty.call(value, k)) {
-                        if(typeof value[k] === "string")
-                            replacement[escape_html(k)] = escape_html(value[k]);
-                        else
-                            replacement[escape_html(k)] = value[k];
-                    }
-                }
-                return replacement;
-            }
-        }
-        return value;
+    function escape_html_entities(key, value) {		
+        if(typeof value === 'object' && value){		
+            if(Array.isArray(value)){		
+                var replacement = [];		
+                for (var k = 0; k < value.length; k++) {		
+                    if(typeof value[k] === "string")		
+                    replacement[k] = escape_html(value[k]);		
+                    else		
+                    replacement[k] = value[k];		
+                }		
+                return replacement;		
+            }		
+            else{		
+                var replacement = {};		
+                for (var k in value) {		
+                    if (Object.hasOwnProperty.call(value, k)) {		
+                        if(typeof value[k] === "string")		
+                            replacement[escape_html(k)] = escape_html(value[k]);		
+                        else		
+                            replacement[escape_html(k)] = value[k];		
+                    }		
+                }		
+                return replacement;		
+            }		
+        }		
+        return value;		
     }
 
     common.log = logger;
@@ -98,6 +99,29 @@ var common = {},
     common.moment = moment;
 
     common.crypto = crypto;
+    
+    common.os_mapping = {
+        "unknown":"unk",
+        "undefined":"unk",
+        "tvos":"atv",
+        "watchos":"wos",
+        "unity editor":"uty",
+        "qnx":"qnx",
+        "os/2":"os2",
+        "windows":"mw",
+        "open bsd":"ob",
+        "searchbot":"sb",
+        "sun os":"so",
+        "solaris":"so",		
+        "beos":"bo",
+        "mac osx":"o",
+        "macos":"o",
+        "mac":"o",
+        "webos":"web",		
+        "brew":"brew"
+    };
+    
+    common.base64 = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","+","/"];
 
     common.dbPromise = function() {
         var args = Array.prototype.slice.call(arguments);
@@ -105,10 +129,18 @@ var common = {},
             var collection = common.db.collection(args[0]),
                 method = args[1];
 
-            collection[method].apply(collection, args.slice(2).concat([function(err, result){
-                if (err) { reject(err); }
-                else { resolve(result); }
-            }]));
+            if (method === 'find') {
+                collection[method].apply(collection, args.slice(2)).toArray(function(err, result){
+                    if (err) { reject(err); }
+                    else { resolve(result); }
+                });
+            } else {
+                collection[method].apply(collection, args.slice(2).concat([function(err, result){
+                    if (err) { reject(err); }
+                    else { resolve(result); }
+                }]));
+            }
+
         });
     };
 
@@ -244,7 +276,7 @@ var common = {},
         if (reqTimestamp && (Math.round(parseFloat(reqTimestamp, 10)) + "").length === 10 && common.isNumber(reqTimestamp)) {
             // If the received timestamp is greater than current time use the current time as timestamp
             currTimestamp = ( parseInt(reqTimestamp, 10) > time.time()) ? time.time() : parseInt(reqTimestamp, 10);
-            curMsTimestamp = ( parseInt(reqTimestamp, 10) > time.time()) ? time.time() : parseFloat(reqTimestamp, 10)*1000;
+            curMsTimestamp = ( parseInt(reqTimestamp, 10) > time.time()) ? time.time()*1000 : parseFloat(reqTimestamp, 10)*1000;
             currDate = new Date(currTimestamp * 1000);
         } else if (reqTimestamp && (reqTimestamp + "").length === 13 && common.isNumber(reqTimestamp)) {
             var tmpTimestamp = Math.round(parseInt(reqTimestamp, 10) / 1000);
@@ -373,7 +405,7 @@ var common = {},
                             return false;
                         }
                     } else if (argProperties[arg].type === 'Object') {
-                        if (toString.call(args[arg]) !== '[object ' + argProperties[arg].type + ']') {
+                        if (toString.call(args[arg]) !== '[object ' + argProperties[arg].type + ']' && !(!argProperties[arg].required && args[arg] === null)) {
                             return false;
                         }
                     } 
@@ -416,6 +448,12 @@ var common = {},
                     }
                 }
                 
+                if (argProperties[arg]['has-upchar']) {
+                    if (!/[A-Z]/.test(args[arg])) {
+                        return false;
+                    }
+                }
+                
                 if (argProperties[arg]['has-special']) {
                     if (!/[^A-Za-z\d]/.test(args[arg])) {
                         return false;
@@ -452,7 +490,7 @@ var common = {},
     common.returnMessage = function (params, returnCode, message) {
         //set provided in configuration headers
         var headers = {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin':'*'};
-        var add_headers = plugins.getConfig("security").api_additional_headers.replace(/\r\n|\r|\n|\/n/g, "\n").split("\n");
+        var add_headers = (plugins.getConfig("security").api_additional_headers || "").replace(/\r\n|\r|\n|\/n/g, "\n").split("\n");
         var parts;
         for(var i = 0; i < add_headers.length; i++){
             if(add_headers[i] && add_headers[i].length){
@@ -474,11 +512,12 @@ var common = {},
         }
     };
 
-    common.returnOutput = function (params, output) {
+    common.returnOutput = function (params, output, noescape) {
         //set provided in configuration headers
         var headers = {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin':'*'};
-        var add_headers = plugins.getConfig("security").api_additional_headers.replace(/\r\n|\r|\n|\/n/g, "\n").split("\n");
+        var add_headers = (plugins.getConfig("security").api_additional_headers || "").replace(/\r\n|\r|\n|\/n/g, "\n").split("\n");
         var parts;
+        var escape = noescape ? undefined : escape_html_entities;
         for(var i = 0; i < add_headers.length; i++){
             if(add_headers[i] && add_headers[i].length){
                 parts = add_headers[i].split(/:(.+)?/);
@@ -490,20 +529,35 @@ var common = {},
         if (params && params.res && !params.blockResponses) {
             params.res.writeHead(200, headers);
             if (params.qstring.callback) {
-                params.res.write(params.qstring.callback + '(' + JSON.stringify(output, escape_html_entities) + ')');
+                params.res.write(params.qstring.callback + '(' + JSON.stringify(output, escape) + ')');
             } else {
-                params.res.write(JSON.stringify(output, escape_html_entities));
+                params.res.write(JSON.stringify(output, escape));
             }
 
             params.res.end();
         }
     };
-    
+    var ipLogger = common.log('ip:api');
     common.getIpAddress = function(req) {
         var ipAddress = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection.remoteAddress || req.socket.remoteAddress || (req.connection.socket ? req.connection.socket.remoteAddress : '');
-    
         /* Since x-forwarded-for: client, proxy1, proxy2, proxy3 */
-        return ipAddress.split(',')[0];
+        var ips = ipAddress.split(',');
+        
+        //if ignoreProxies not setup, use outmost left ip address
+        if(!countlyConfig.ignoreProxies || !countlyConfig.ignoreProxies.length){
+            ipLogger.d("From %s found ip %s", ipAddress, ips[0]);
+            return ips[0];
+        }
+        //search for the outmost right ip address ignoring provided proxies
+        var ip = "";
+        for(var i = ips.length-1; i >= 0; i--){
+            if(ips[i].trim() != "127.0.0.1" && (!countlyConfig.ignoreProxies || countlyConfig.ignoreProxies.indexOf(ips[i].trim()) === -1)){
+                ip = ips[i].trim();
+                break;
+            }
+        }
+        ipLogger.d("From %s found ip %s", ipAddress, ip);
+        return ip;
     };
 
     common.fillTimeObjectZero = function (params, object, property, increment) {
@@ -617,7 +671,7 @@ var common = {},
                     }
             
                     if (lastTimestamp < (params.time.timestamp - secInYear)) {
-                        updateUsersZero['d.' + '.' + metric] = 1;
+                        updateUsersZero['d.' + metric] = 1;
                     }
                 }
                 else{
@@ -852,153 +906,56 @@ var common = {},
         });
     };
     
-    //extend object including checking sub objects
-    common.extendDeep = function(target, source) {
-        for (var prop in source) {
-            if (source.hasOwnProperty(prop)) {
-                if (target[prop] && typeof source[prop] === 'object') {
-                    common.extendDeep(target[prop], source[prop]);
-                }
-                else {
-                    target[prop] = source[prop];
-                }
-            }
-        }
-        return target;
-    };
-    
-    //access flatten property
-    function updateFlattenValue(key, ob, command, val){
-        var parts = key.split(".");
-        for(var i = 0; i < parts.length-1; i++){
-            ob = ob[parts[i]] || {};
-        }
-        key = parts.pop();
-        switch(command){
-            case "$set":
-                ob[key] = val;
-                break;
-            case "$unset":
-                if(val)
-                    delete ob[key];
-                break;
-            case "$inc":
-                if(!ob[key])
-                    ob[key] = 0;
-                ob[key] += val;
-                break;
-            case "$mul":
-                if(!ob[key])
-                    ob[key] = 0;
-                ob[key] *= val;
-                break;
-            case "$max":
-                if(typeof ob[key] === "undefined")
-                    ob[key] = val;
-                else if(val > ob[key])
-                    ob[key] = val;
-                break;
-            case "$min":
-                if(typeof ob[key] === "undefined")
-                    ob[key] = val;
-                else if(update[i][key] < ob[key])
-                    ob[key] = val;
-                break;
-            case "$push":
-                if(typeof ob[key] === "undefined")
-                    ob[key] = [];
-                ob[key].push(val);
-                break;
-            case "$addToSet":
-                if(typeof ob[key] === "undefined")
-                    ob[key] = [];
-                if(ob[key].indexOf(val) === -1)
-                    ob[key].push(val);
-                break;
-            case "$pull":
-                if(typeof ob[key] === "undefined")
-                    ob[key] = [];
-                var index = ob[key].indexOf(val);
-                if(index > -1)
-                    ob[key].splice(val, 1);
-                break;
-            case "$rename":
-                //todo
-                break;
-            case "$setOnInsert":
-                //todo
-                break;
-        }
-    }
-    
-    //update object MongoDB Style
-    common.updateMongoObject = function(ob, update){
-        ob = ob || {};
-        update = update || {};
-        for(var i in update){
-            for(var key in update[i]){
-                updateFlattenValue(key, ob, i, update[i][key]);
-            }
-        }
-    };
-    
-    common.updateAppUser = function(params, update, commit, callback){
+    common.updateAppUser = function(params, update, callback){
         if(Object.keys(update).length){
-            if(!params._app_user_fallback)
-                params._app_user_fallback = {};
-            common.updateMongoObject(params.app_user, update);
-            common.updateMongoObject(params._app_user_fallback, update);
-            if(!params._app_user_changes)
-                params._app_user_changes = {};
-            params._app_user_changes = common.extendDeep(params._app_user_changes, update)
-        }
-        if(commit && params._app_user_changes && Object.keys(params._app_user_changes).length){
-            var update = JSON.parse(JSON.stringify(params._app_user_changes));
-            params._app_user_changes = {};
-            common.db.collection('app_users' + params.app_id).update({'_id': params.app_user_id}, update, {'upsert':true}, function(err, res) {
-                if(err){
-                    console.log("Error commiting app_user changes", params.app_user, update, err);
-                    console.log("Falling back to", params._app_user_fallback);
-                    if(Object.keys(params._app_user_fallback).length){
-                        common.db.collection('app_users' + params.app_id).update({'_id': params.app_user_id}, {$set:common.flattenObject(params._app_user_fallback)}, {'upsert':true}, function(err, res) {
-                            if(err){
-                                console.log("Error commiting fallback", {$set:common.flattenObject(params._app_user_fallback)}, err);
-                            }
-                            if(callback)
-                                callback(err, res)
-                        });
-                    }
+            for(var i in update){
+                if(i.indexOf("$") !== 0){
+                    var err = "Unkown modifier " + i + " in " + update + " for " + params.href
+                    console.log(err);
+                    if(callback)
+                        callback(err);
+                    return;
                 }
-                else if(callback)
+            }
+            common.db.collection('app_users' + params.app_id).findAndModify({'_id': params.app_user_id},{}, update, {new:true, upsert:true}, function(err, res) {
+                if(!err && res && res.value)
+                    params.app_user = res.value;
+                if(callback)
                     callback(err, res);
             });
         }
+        else if(callback)
+            callback();
     };
     
-    common.flattenObject = function(ob, prefix) {
-        if(prefix){
-            prefix += ".";
-        }
-        else{
-            prefix = "";
-        }
-        var toReturn = {};
-        
-        for (var i in ob) {
-            if (!ob.hasOwnProperty(i)) continue;
+    common.processCarrier = function(metrics){
+        if(metrics && metrics._carrier){
+            var carrier = metrics._carrier+"";
             
-            if ((typeof ob[i]) == 'object' && ob[i] != null) {
-                var flatObject = common.flattenObject(ob[i]);
-                for (var x in flatObject) {
-                    if (!flatObject.hasOwnProperty(x)) continue;
-                    
-                    toReturn[prefix + i + '.' + x] = flatObject[x];
-                }
-            } else {
-                toReturn[prefix + i] = ob[i];
+            //random hash without spaces
+            if(carrier.length === 16 && carrier.indexOf(" ") === -1){
+                delete metrics._carrier;
+                return;
             }
+            
+            //random code
+            if((carrier.length === 5 || carrier.length === 6) && /^[0-9]+$/.test(carrier)){
+                //check if mcc and mnc match some operator
+                var arr = mcc_mnc_list.filter({ mccmnc: carrier });
+                if(arr && arr.length && (arr[0].brand || arr[0].operator)){
+                    carrier = arr[0].brand || arr[0].operator;
+                }
+                else{
+                    delete metrics._carrier
+                    return;
+                }
+            }
+            
+            carrier = carrier.replace(/\w\S*/g, function (txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+            metrics._carrier = carrier;
         }
-        return toReturn;
     };
 }(common));
 

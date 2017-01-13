@@ -4,6 +4,7 @@ var plugin = {},
     plugins = require('../../pluginManager.js');
 
 (function (plugin) {
+    plugins.appTypes.push("web");
     plugins.register("/sdk", function(ob){
         var params = ob.params;
         if(params.app.type == "web"){
@@ -39,7 +40,13 @@ var plugin = {},
             }
             
             //check of any crash segments can be updated
-            if(params.qstring.crash){
+            if (typeof params.qstring.crash == "string") {
+                try {
+                    params.qstring.crash = JSON.parse(params.qstring.crash);
+                } catch (SyntaxError) {
+                    console.log('Parse crash JSON failed');
+                    return false;
+                }
                 if(!params.qstring.crash._os)
                    params.qstring.crash._os = data.os;
                
@@ -48,6 +55,9 @@ var plugin = {},
                
                 if(!params.qstring.crash._browser)
                    params.qstring.crash._browser = agent.family;
+               
+               if(!params.qstring.crash._device)
+                   params.qstring.crash._device = (agent.device.family == "Other") ? "Unknown" : agent.device.family;
             }
         }
 	});

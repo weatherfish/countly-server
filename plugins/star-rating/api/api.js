@@ -9,6 +9,7 @@ var plugin = {},
      *    register internalEvent
      */
     plugins.internalEvents.push('[CLY]_star_rating');
+    plugins.internalDrillEvents.push("[CLY]_star_rating");
 
     /**
      *  register for process new  rating event data.
@@ -20,7 +21,7 @@ var plugin = {},
     var ratingEventProcess = function (ob) {
         var params = ob.params;
         var events = (params.qstring && params.qstring.events);
-        if (events) {
+        if (events && events.length && Array.isArray(events)) {
             events.forEach(function (event) {
                 if (event.key === '[CLY]_star_rating') {
                     event.segmentation['platform_version_rate'] =
@@ -82,6 +83,9 @@ var plugin = {},
             var documents = [];
             for (var i = 0; i < periodObj.reqZeroDbDateIds.length; i++) {
                 documents.push("no-segment_" + periodObj.reqZeroDbDateIds[i]);
+                for(var m = 0; m < common.base64.length; m++){
+                        documents.push("no-segment_" + periodObj.reqZeroDbDateIds[i]+"_"+common.base64[m]);
+                    }
             }
 
             common.db.collection(collectionName).find({'_id': {$in: documents}}).toArray(
@@ -89,6 +93,13 @@ var plugin = {},
                     if (!err) {
                         var result = {};
                         docs.forEach(function (doc) {
+                            if(!doc.meta)
+                                doc.meta = {};
+                            if(!doc.meta.platform_version_rate)
+                                doc.meta.platform_version_rate = [];
+                            if(doc.meta_v2 && doc.meta_v2.platform_version_rate){
+                                common.arrayAddUniq(doc.meta.platform_version_rate, Object.keys(doc.meta_v2.platform_version_rate));
+                            }
                             doc.meta.platform_version_rate.forEach(function (item) {
                                 var data = item.split('**');
                                 if (result[data[0]] === undefined)
@@ -96,7 +107,7 @@ var plugin = {},
                                 if (result[data[0]].indexOf(data[1]) === -1) {
                                     result[data[0]].push(data[1]);
                                 }
-                            })
+                            });
                         });
                         common.returnOutput(params, result);
                         return true;

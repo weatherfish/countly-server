@@ -11,7 +11,7 @@
             data:{
                 "api_key":countlyGlobal.member.api_key,
                 "app_id":countlyCommon.ACTIVE_APP_ID,
-                "method":"systemlogs"
+                "method":"systemlogs_meta"
             },
             success:function (json) {
                 _data = json;
@@ -19,7 +19,7 @@
         });
     };
 	
-	countlySystemLogs.getData = function () {
+	countlySystemLogs.getMetaData = function () {
 		return _data;
     };
 	

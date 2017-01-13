@@ -17,45 +17,34 @@ echo "
 "
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-#install nodejs & mongodb
+#install nginx
 yum -y install wget openssl-devel gcc-c++ make
-if [ "$(rpm -qa \*-release | grep -Ei "oracle|redhat|centos" | cut -d"-" -f3)" -eq "6" ]; then
-	echo "[mongodb-org-3.2]
-name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/redhat/6/mongodb-org/3.2/x86_64/
-gpgcheck=0
-enabled=1" > /etc/yum.repos.d/mongodb-org-3.2.repo
+if grep -q -i "release 6" /etc/redhat-release ; then
 	echo "[nginx]
 name=nginx repo
 baseurl=http://nginx.org/packages/rhel/6/x86_64/
 gpgcheck=0
 enabled=1" > /etc/yum.repos.d/nginx.repo
-else
-	echo "[mongodb-org-3.2]
-name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/redhat/7/mongodb-org/3.2/x86_64/
-gpgcheck=0
-enabled=1" > /etc/yum.repos.d/mongodb-org-3.2.repo
+elif grep -q -i "release 7" /etc/redhat-release ; then
 	echo "[nginx]
 name=nginx repo
 baseurl=http://nginx.org/packages/rhel/7/x86_64/
 gpgcheck=0
 enabled=1" > /etc/yum.repos.d/nginx.repo
+else
+    echo "Unsupported OS version, only support RHEL/Centos 7 and 6" 
+    exit 1
 fi
 
-curl -sL https://rpm.nodesource.com/setup_5.x | bash -
-yum install -y nodejs mongodb-org
+#install nodejs
+curl -sL https://rpm.nodesource.com/setup_6.x | bash -
+yum install -y nodejs
 
 set +e
 NODE_JS_CMD=$(which nodejs)
 set -e
 if [[ -z $NODE_JS_CMD ]]; then
 	ln -s `which node` /usr/bin/nodejs
-fi
-if [ "$(rpm -qa \*-release | grep -Ei "oracle|redhat|centos" | cut -d"-" -f3)" -eq "6" ]; then
-    service mongod start
-else
-    systemctl restart mongod
 fi
 
 #install nginx
@@ -82,8 +71,22 @@ easy_install supervisor
 yum -y install sendmail
 service sendmail start
 
-#install grunt
-( cd $DIR/.. ; npm install -g grunt-cli --unsafe-perm )
+#install new gcc
+if grep -q -i "release 6" /etc/redhat-release ; then
+    echo "updating gcc to devtoolset-2..."
+    sudo rpm --import http://ftp.scientificlinux.org/linux/scientific/5x/x86_64/RPM-GPG-KEYs/RPM-GPG-KEY-cern
+    yum install -y wget 
+    wget -O /etc/yum.repos.d/slc6-devtoolset.repo http://linuxsoft.cern.ch/cern/devtoolset/slc6-devtoolset.repo
+    yum install -y devtoolset-2-gcc devtoolset-2-gcc-c++ devtoolset-2-binutils
+    source /opt/rh/devtoolset-2/enable
+    export CC=`which gcc` CXX=`which g++`
+fi
+
+#install grunt & npm modules
+( cd $DIR/.. ; npm install -g grunt-cli --unsafe-perm ; npm install )
+
+#install mongodb
+bash $DIR/scripts/mongodb.install.sh
 
 #configure and start nginx
 cp $DIR/config/nginx.server.conf /etc/nginx/conf.d/default.conf
@@ -111,21 +114,6 @@ if [ ! -f $DIR/../plugins/plugins.json ]; then
 	cp $DIR/../plugins/plugins.default.json $DIR/../plugins/plugins.json
 fi
 
-if [ "$(rpm -qa \*-release | grep -Ei "oracle|redhat|centos" | cut -d"-" -f3)" -eq "6" ]; then
-    echo "updating gcc to devtoolset-2..."
-    rpm --import http://ftp.scientificlinux.org/linux/scientific/5x/x86_64/RPM-GPG-KEYs/RPM-GPG-KEY-cern
-    yum install -y wget 
-    wget -O /etc/yum.repos.d/slc6-devtoolset.repo http://linuxsoft.cern.ch/cern/devtoolset/slc6-devtoolset.repo
-    yum install -y devtoolset-2-gcc devtoolset-2-gcc-c++ devtoolset-2-binutils
-    source /opt/rh/devtoolset-2/enable
-
-    # and then install dependencies for sharp
-    curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | bash -
-    source /opt/rh/devtoolset-2/enable
-    export CC=`which gcc` CXX=`which g++`
-fi
-cd $DIR/.. && npm install
-
 #install nghttp2
 bash $DIR/scripts/install.nghttp2.sh
 
@@ -139,7 +127,7 @@ countly update sdk-web
 cd $DIR/.. && grunt dist-all
 
 # disable transparent huge pages
-countly thp
+#countly thp
 
 #finally start countly api and dashboard
 countly start

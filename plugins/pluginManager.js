@@ -9,6 +9,10 @@ var plugins = require('./plugins.json', 'dont-enclose'),
     async = require("async"),
     _ = require('underscore'),
     cluster = require('cluster'),
+    Promise = require("bluebird"),
+    log = require('../api/utils/log.js'),
+    logDbRead = log('db:read'),
+    logDbWrite = log('db:write'),
     exec = cp.exec;
     
 var pluginManager = function pluginManager(){
@@ -22,6 +26,7 @@ var pluginManager = function pluginManager(){
     var excludeFromUI = {plugins:true};
     var finishedSyncing = true;
     
+    this.appTypes = [];
     this.internalEvents = [];
     this.internalDrillEvents = ["[CLY]_session"];
 
@@ -212,56 +217,37 @@ var pluginManager = function pluginManager(){
     } 
     
     this.dispatch = function(event, params, callback){
-        if(callback){
-            if(events[event]){
-                function runEvent(item, callback){
-                    var ran = false,
-                        timeout = null;
-                    function pluginCallback(){
-                        if(timeout){
-                            clearTimeout(timeout);
-                            timeout = null;
-                        }
-                        if(!ran){
-                            ran = true;
-                            callback(null, null);
-                        }
-                    }
-                    try{
-                        if(!item.call(null, params, pluginCallback)){
-                            //don't wait for callback
-                            pluginCallback();
-                        }
-                    } catch (ex) {
-                        console.error(ex.stack);
-                        //if there was an error, call callback just in case
-                        pluginCallback();
-                    }
-                    //set time out if there is no response from plugin for some time
-                    timeout = setTimeout(pluginCallback, 1000);
+        var used = false,
+            promises = [];
+        var promise;
+        if(events[event]){
+            try{
+                for(var i = 0, l = events[event].length; i < l; i++){
+                    promise = events[event][i].call(null, params)
+                    if(promise)
+                        used = true;
+                    promises.push(promise);
                 }
-                async.map(events[event], runEvent, function(){
-                    callback();
-                });
+            } catch (ex) {
+                console.error(ex.stack);
             }
-            else{
-                callback();
+            //should we create a promise for this dispatch
+            if(params && params.params && params.params.promises){
+                params.params.promises.push(new Promise(function(resolve, reject){
+                    function resolver(){
+                        resolve();
+                        if(callback){
+                            callback();
+                        }
+                    }
+                    Promise.all(promises).then(resolver, resolver);
+                }));
+            }
+            else if(callback){
+                Promise.all(promises).then(callback, callback);
             }
         }
-        else{
-            var used = false;
-            if(events[event]){
-                try{
-                    for(var i = 0, l = events[event].length; i < l; i++){
-                        if(events[event][i].call(null, params))
-                            used = true;
-                    }
-                } catch (ex) {
-                    console.error(ex.stack);
-                }
-            }
-            return used;
-        }
+        return used;
     }
     
     this.loadAppStatic = function(app, countlyDb, express){
@@ -549,14 +535,19 @@ var pluginManager = function pluginManager(){
     };
     
     this.dbConnection = function(config) {
+        if (process.argv[1].endsWith('executor.js') && (!config || !config.mongodb || config.mongodb.max_pool_size !== 1)) {
+            console.log('************************************ executor.js common.db ***********************************', process.argv);
+            return this.singleDefaultConnection();
+        }
+            
         var db;
         if(typeof config == "string"){
             db = config;
-            config = countlyConfig;
+            config = JSON.parse(JSON.stringify(countlyConfig));
         }
         else
-            config = config || countlyConfig;
-            
+            config = config || JSON.parse(JSON.stringify(countlyConfig));
+
         var dbName;
         var dbOptions = {
             server:{poolSize: config.mongodb.max_pool_size, reconnectInterval: 100, socketOptions: { autoReconnect:true, noDelay:true, keepAlive: 1, connectTimeoutMS: 0, socketTimeoutMS: 0 }},
@@ -600,7 +591,227 @@ var pluginManager = function pluginManager(){
         countlyDb._emitter.setMaxListeners(0);
         if(!countlyDb.ObjectID)
             countlyDb.ObjectID = mongo.ObjectID;
+        countlyDb.encode = function(str){
+            return str.replace(/^\$/g, "&#36;").replace(/\./g, '&#46;');
+        };
         
+        countlyDb.decode = function(str){
+            return str.replace(/^&#36;/g, "$").replace(/&#46;/g, '.');
+        };
+        countlyDb.on('error', console.log);
+        
+        //overwrite some methods
+        countlyDb._collection = countlyDb.collection;
+        countlyDb.collection = function(collection, options, callback){
+            
+            function copyArguments(arg, name){
+                var data = {};
+                data.name = name || arg.callee;
+                data.args = [];
+                for(var i = 0; i < arg.length; i++){
+                    data.args.push(arg[i]);
+                }
+                return data;
+            }
+            
+            //get original collection object
+            var ob = this._collection(collection, options, callback);
+            
+            //overwrite with retry policy
+            var retryifNeeded = function(callback, retry, e, data){
+                return function(err, res){
+                    if(err){
+                        if(retry && err.code == 11000){
+                            if(typeof retry === "function"){
+                                logDbWrite.d("Retrying writing "+collection+" %j", data);
+                                retry();
+                            }
+                            else{
+                                logDbWrite.e("Error writing "+collection+" %j %s %j", data, err, err);
+                                if(e)
+                                    logDbWrite.e(e.stack)
+                                if(callback){
+                                    callback(err, res);
+                                }
+                            }
+                        }
+                        else{
+                            logDbWrite.e("Error writing "+collection+" %j %s %j", data, err, err);
+                            if(e)
+                                logDbWrite.e(e.stack)
+                            if(callback){
+                                callback(err, res);
+                            }
+                        }
+                    }
+                    else if(callback){
+                        callback(err, res);
+                    }
+                };
+            };
+            ob._findAndModify = ob.findAndModify;
+            ob.findAndModify = function(query, sort, doc, options, callback){
+                var e;
+                var at = "";
+                if(log.getLevel("db") === "debug" || log.getLevel("db") === "info"){
+                    e = new Error();
+                    at += e.stack.replace(/\r\n|\r|\n|\/n/g, "\n").split("\n")[2];
+                }
+                if(typeof options === "function"){
+                    //options was not passed, we have callback
+                    logDbWrite.d("findAndModify "+collection+" %j %j %j"+at, query, sort, doc);
+                    this._findAndModify(query, sort, doc, retryifNeeded(options, null, e, copyArguments(arguments, "findAndModify")));
+                }
+                else{
+                    //we have options
+                    logDbWrite.d("findAndModify "+collection+" %j %j %j %j"+at, query, sort, doc, options);
+                    if(options.upsert){
+                        var self = this;
+                        
+                        this._findAndModify(query, sort, doc, options, retryifNeeded(callback, function(){
+                            logDbWrite.d("retrying findAndModify "+collection+" %j %j %j %j"+at, query, sort, doc, options);
+                            self._findAndModify(query, sort, doc, options, retryifNeeded(callback, null, e, copyArguments(arguments, "findAndModify")));
+                        }, e, copyArguments(arguments, "findAndModify")));
+                    }
+                    else{
+                        this._findAndModify(query, sort, doc, options, retryifNeeded(callback, null, e, copyArguments(arguments, "findAndModify")));
+                    }
+                }
+            };
+            
+            var overwriteRetryWrite = function(ob, name){
+                ob["_"+name] = ob[name];
+                ob[name] = function(selector, doc, options, callback){
+                    var e;
+                    var at = "";
+                    if(log.getLevel("db") === "debug" || log.getLevel("db") === "info"){
+                        e = new Error();
+                        at += e.stack.replace(/\r\n|\r|\n|\/n/g, "\n").split("\n")[2];
+                    }
+                    if(typeof options === "function"){
+                        //options was not passed, we have callback
+                        logDbWrite.d(name+" "+collection+" %j %j"+at, selector, doc);
+                        this["_"+name](selector, doc, retryifNeeded(options, null, e, copyArguments(arguments, name)));
+                    }
+                    else{
+                        //we have options
+                        logDbWrite.d(name+" "+collection+" %j %j %j"+at, selector, doc, options);
+                        if(options.upsert){
+                            var self = this;
+                            
+                            this["_"+name](selector, doc, options, retryifNeeded(callback, function(){
+                                logDbWrite.d("retrying "+name+" "+collection+" %j %j %j"+at, selector, doc, options);
+                                self["_"+name](selector, doc, options, retryifNeeded(callback, null, e, copyArguments(arguments, name)));
+                            }, e, copyArguments(arguments, name)));
+                        }
+                        else{
+                            this["_"+name](selector, doc, options, retryifNeeded(callback, null, e, copyArguments(arguments, name)));
+                        }
+                    }
+                };
+            }
+            
+            overwriteRetryWrite(ob, "update");
+            overwriteRetryWrite(ob, "updateOne");
+            
+            //overwrite with write logging
+            var logForWrites = function(callback, e, data){
+                return function(err, res){
+                    if(err){
+                        logDbWrite.e("Error writing "+collection+" %j %s %j", data, err, err);
+                        if(e)
+                            logDbWrite.e(e.stack)
+                    }
+                    if(callback)
+                        callback(err, res);
+                };
+            };
+            
+            var overwriteDefaultWrite = function(ob, name){
+                ob["_"+name] = ob[name];
+                ob[name] = function(selector, options, callback){
+                    var e;
+                    var at = "";
+                    if(log.getLevel("db") === "debug" || log.getLevel("db") === "info"){
+                        e = new Error();
+                        at += e.stack.replace(/\r\n|\r|\n|\/n/g, "\n").split("\n")[2];
+                    }
+                    if(typeof options === "function"){
+                        //options was not passed, we have callback
+                        logDbWrite.d(name+" "+collection+" %j"+at, selector);
+                        this["_"+name](selector, logForWrites(options, e, copyArguments(arguments, name)));
+                    }
+                    else{
+                        //we have options
+                        logDbWrite.d(name+" "+collection+" %j %j"+at, selector, options);
+                        this["_"+name](selector, options, logForWrites(callback, e, copyArguments(arguments, name)));
+                    }
+                };
+            };
+            overwriteDefaultWrite(ob, "remove");
+            overwriteDefaultWrite(ob, "insert");
+            overwriteDefaultWrite(ob, "save");
+            overwriteDefaultWrite(ob, "deleteMany");
+            
+            //overwrite with read logging
+            var logForReads = function(callback, e, data){
+                return function(err, res){
+                    if(err){
+                        logDbRead.e("Error reading "+collection+" %j %s %j", data, err, err);
+                        if(e)
+                            logDbRead.e(e.stack)
+                    }
+                    if(callback)
+                        callback(err, res);
+                };
+            };
+            
+            var overwriteDefaultRead = function(ob, name){
+                ob["_"+name] = ob[name];
+                ob[name] = function(query, options, callback){
+                    var e;
+                    var at = "";
+                    if(log.getLevel("db") === "debug" || log.getLevel("db") === "info"){
+                        e = new Error();
+                        at += e.stack.replace(/\r\n|\r|\n|\/n/g, "\n").split("\n")[2];
+                    }
+                    if(typeof options === "function"){
+                        //options was not passed, we have callback
+                        logDbRead.d(name+" "+collection+" %j"+at, query);
+                        this["_"+name](query, logForReads(options, e, copyArguments(arguments, name)));
+                    }
+                    else{
+                        //we have options
+                        logDbRead.d(name+" "+collection+" %j %j"+at, query, options);
+                        this["_"+name](query, options, logForReads(callback, e, copyArguments(arguments, name)));
+                    }
+                };
+            };
+            
+            overwriteDefaultRead(ob, "findOne");
+            overwriteDefaultRead(ob, "aggregate");
+            
+            ob._find = ob.find;
+            ob.find = function(query, options){
+                var e;
+                var cursor;
+                var at = "";
+                if(log.getLevel("db") === "debug" || log.getLevel("db") === "info"){
+                    e = new Error();
+                    at += e.stack.replace(/\r\n|\r|\n|\/n/g, "\n").split("\n")[2];
+                }
+                logDbRead.d("find "+collection+" %j %j"+at, query, options);
+                var cursor = this._find(query, options);
+                cursor._toArray = cursor.toArray;
+                cursor.toArray = function(callback){
+                    cursor._toArray(logForReads(callback, e, copyArguments(arguments, "find")));
+                };
+                return cursor;
+            };
+            
+            //return original collection object
+            return ob;
+        };
         return countlyDb;
     };
 

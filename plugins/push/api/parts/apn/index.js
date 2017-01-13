@@ -42,19 +42,15 @@ class ConnectionResource {
 	}
 
 	close_connection() {
-		let e = new Error();
-		console.log(e.stack);
-		console.log('%j', e.stack);
+		// let e = new Error();
+		// console.log(e.stack);
+		// console.log('%j', e.stack);
 		return this.connection.close_connection().then(() => {
 			this._connected = false;
 		}, (error) => {
 			this._connected = false;
 			throw error;
 		});
-	}
-
-	terminate() {
-		this.connection.terminate();
 	}
 }
 

@@ -2,13 +2,12 @@
 
 const log = require('../../../../../api/utils/log.js')('push:gcm'),
 	  config = require('../../../../../api/config.js'),
-	  http = require('http'),
 	  https = require('https'),
 	  EventEmitter = require('events');
 
 
 const MAX_QUEUE = 10000,
-	  MAX_BATCH = 200;
+	  MAX_BATCH = 500;
 
 class ConnectionResource extends EventEmitter {
 	constructor(key) {
@@ -18,14 +17,14 @@ class ConnectionResource extends EventEmitter {
 		this.devices = [];
 		this.ids = [];
 		this.inFlight = 0;
-		this.requestCount = 0;
 
 		this.onSocket = (s) => {
 			this.socket = s;
 		};
 
 		this.onError = (e) => {
-			log.e('socket error %j', e);
+			log.e('socket error %j', e, arguments);
+			this.rejectAndClose(e)
 		};
 	}
 
@@ -42,7 +41,13 @@ class ConnectionResource extends EventEmitter {
 			},
 		};
 
-		this.agent = new https.Agent(this.options);
+		if (config.api.push_proxy) {
+			console.log('initializing special agent');
+			var Agent = require('./agent.js');
+			this.agent = new Agent({proxyHost: config.api.push_proxy.host, proxyPort: config.api.push_proxy.port});
+		} else {
+			this.agent = new https.Agent(this.options);
+		}
 		this.agent.maxSockets = 1;
 
 		this.options.agent = this.agent;
@@ -55,21 +60,7 @@ class ConnectionResource extends EventEmitter {
 	}
 
 	init_connection() {
-		if (config.api.push_proxy) {
-			return new Promise((resolve, reject) => {
-				this.connectionRequest = http.request({ // establishing a tunnel
-					host: config.api.push_proxy.host,
-					port: config.api.push_proxy.port,
-					method: 'CONNECT',
-					path: this.options.hostname + ':' + this.options.port,
-				}).on('connect', function(res, socket) {
-					this.socket = socket;
-					resolve();
-				}).on('error', reject).end();
-			});
-		} else {
-			return Promise.resolve();
-		}	
+		return Promise.resolve();
 	}
 
 	feed (array) {
@@ -86,6 +77,7 @@ class ConnectionResource extends EventEmitter {
 	}
 
 	send(msgs, feeder, status) {
+		log.d('[%d]: send', process.pid);
 		this.messages = msgs;
 		this.devices = msgs.map(_ => []);
 		this.ids = msgs.map(_ => []);
@@ -121,7 +113,7 @@ class ConnectionResource extends EventEmitter {
 
 		this._servicing = false;
 	
-		if ((this.agent === null && !config.api.push_proxy) || (this.socket === null && config.api.push_proxy) || this._closed) {
+		if (this.agent === null || this._closed) {
 			return;
 		}
 
@@ -140,34 +132,20 @@ class ConnectionResource extends EventEmitter {
 			ids = this.ids[dataIndex].splice(0, MAX_BATCH),
 			message = this.messages[dataIndex];
 			
+		log.d('dataIndex %j', dataIndex);
+
 		if (devices.length) {
 			message.registration_ids = devices;
 
-			log.d('[%d]: sending %d', process.pid, this.requestCount);
+			console.log('[%d]: sending %d', process.pid, this.requestCount);
 			this.requestCount++;
-			// log.d('with %j', ids);
+			// console.log('with %j', ids);
 			
 			let content = JSON.stringify(message);
 
 			this.options.headers['Content-length'] = Buffer.byteLength(content, 'utf8');
 
-			var opts = this.options;
-			if (config.api.push_proxy) {
-				opts = {
-					hostname: 'android.googleapis.com',
-					port: 443,
-					path: '/gcm/send',
-					method: 'POST',
-					headers: {
-						'Accept': 'application/json',
-						'Content-Type': 'application/json',
-						'Authorization': 'key=' + this._key,
-					},
-					agent: false
-				};
-			}
-
-			let req = https.request(opts, (res) => {
+			let req = https.request(this.options, (res) => {
 				res.reply = '';
 				res.on('data', d => { res.reply += d; });
 				res.on('end', this.handle.bind(this, req, res, ids, devices));
@@ -196,7 +174,8 @@ class ConnectionResource extends EventEmitter {
 		let code = res.statusCode,
 			data = res.reply;
 
-		log.d('[%d]: GCM handling %d: %d', process.pid, this.requestCount, code, data);
+		log.d('[%d]: GCM handling %d', process.pid, code);
+		log.d('[%d]: GCM data %j', process.pid, data);
 
 		if (code >= 500) {
 			this.rejectAndClose(code + ': GCM Unavailable');
@@ -214,40 +193,53 @@ class ConnectionResource extends EventEmitter {
 				}
 				var obj = JSON.parse(data);
 				if (obj.failure === 0 && obj.canonical_ids === 0) {
+					ids.forEach(id => id[1] = 200);
 					this.statuser(ids);
 				} else if (obj.results) {
 
+					var messageErrorCode, messageError;
+
 					obj.results.forEach((result, i) => {
-                    	if (result.message_id && result.registration_id) {
-                    		ids[i][1] = 2;
-                    		ids[i][2] = result.registration_id;
-						} else if (result.error === 'MessageTooBig') {
-							this.rejectAndClose(code + ': GCM Message Too Big');
-						} else if (result.error === 'InvalidDataKey') {
-							this.rejectAndClose(code + ': Invalid Data Key');
-						} else if (result.error === 'InvalidTtl') {
-							this.rejectAndClose(code + ': Invalid Time To Live');
-						} else if (result.error === 'InvalidTtl') {
-							this.rejectAndClose(code + ': Invalid Time To Live');
-						} else if (result.error === 'InvalidPackageName') {
-							this.rejectAndClose(code + ': Invalid Package Name');
-						} else if (result.error === 'Unavailable') {
-							ids[i] = -496; 
-						} else if (result.error === 'InternalServerError') {
-							ids[i] = -499; 
-							// ids.splice(i, 1);
-							// devices.splice(i, 1);
-						} else if (result.error === 'MismatchSenderId') {
-							ids[i][1] = -498;
-						} else if (result.error === 'NotRegistered' || result.error === 'InvalidRegistration') {
-							ids[i][1] = 0;
+						if (result.message_id) {
+							if (result.registration_id) {
+								ids[i][1] = -200;
+								ids[i][3] = result.registration_id;
+							} else {
+								ids[i][1] = 200;
+							}
+						} else if (result.error === 'InvalidRegistration') {
+							ids[i][1] = -200;
+							ids[i][2] = result.error;
+						} else if (result.error === 'NotRegistered') {
+							ids[i][1] = -200;
+						} else if (result.error === 'MessageTooBig' || result.error === 'InvalidDataKey' || result.error === 'InvalidTtl' ||
+								result.error === 'InvalidTtl' || result.error === 'InvalidPackageName') {
+							messageErrorCode = code;
+							messageError = result.error;
+						} else if (result.error === 'Unavailable' || result.error === 'InternalServerError') {
+							if (!ids[i][3]) {
+								ids[i][3] = 0;
+							}
+							ids[i][3]++;
+							// allow up to 5 InternalServerError's for a single token, then stop sending
+							if (ids[i][3] > 5) {
+								messageErrorCode = code;
+								messageError = result.error;
+							} else {
+								ids.splice(i, 1);
+								devices.splice(i, 1);
+							}
 						} else if (result.error) {
-							log.w('Unknown GCM error: %j', process.pid, result.error);
-							ids[i][1] = -497;
+							ids[i][1] = code;
+							ids[i][2] = result.error;
 						}
 					});
 
 					this.statuser(ids);
+
+					if (messageError) {
+						this.rejectAndClose(messageError);
+					}
 				}
 
 				this.serviceImmediate();
@@ -264,7 +256,7 @@ class ConnectionResource extends EventEmitter {
 	close_connection() {
 		log.i('[%d]: Closing GCM connection', process.pid);
 		this._closed = true;
-		if (this.socket && !config.api.push_proxy) {
+		if (this.socket) {
 			this.socket.emit('agentRemove');
 			this.socket = null;
 		}

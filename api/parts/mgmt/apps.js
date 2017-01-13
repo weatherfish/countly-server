@@ -61,13 +61,42 @@ var appsApi = {},
 
         return true;
     };
+    
+    appsApi.getAppsDetails = function (params) {
+        if(params.app.owner)
+            params.app.owner = common.db.ObjectID(params.app.owner+"");
+        common.db.collection('app_users'+params.qstring.app_id).find({}, {ls:1, _id:0}).sort({ls:-1}).limit(1).toArray(function(err, last) {
+            common.db.collection('members').findOne({ _id: params.app.owner }, {full_name:1, username:1}, function(err, owner) {
+                if(owner){
+                    if(owner.full_name && owner.full_name != "")
+                        params.app.owner = owner.full_name;
+                    else if(owner.username && owner.username != "")
+                        params.app.owner = owner.username;
+                }
+                common.db.collection('members').find({ global_admin: true }, {full_name:1, username:1}).toArray(function(err, global_admins) {
+                    common.db.collection('members').find({ admin_of: params.qstring.app_id }, {full_name:1, username:1}).toArray(function(err, admins) {
+                        common.db.collection('members').find({ user_of: params.qstring.app_id }, {full_name:1, username:1}).toArray(function(err, users) {
+                            common.returnOutput(params, {
+                                app: {
+                                    owner: params.app.owner || "",
+                                    created_at: params.app.created_at || 0,
+                                    edited_at: params.app.edited_at || 0,
+                                    last_data: (typeof last !== "undefined" && last.length) ? last[0].ls : 0,
+                                },
+                                global_admin: global_admins || [],
+                                admin: admins || [],
+                                user: users || []
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        return true;
+    };
 
     appsApi.createApp = function (params) {
-        if (!(params.member.global_admin)) {
-            common.returnMessage(params, 401, 'User is not a global administrator');
-            return false;
-        }
-
         var argProps = {
                 'name':     { 'required': true, 'type': 'String' },
                 'country':  { 'required': false, 'type': 'String' },
@@ -84,6 +113,10 @@ var appsApi = {},
         }
 
         processAppProps(newApp);
+        
+        newApp.created_at = Math.floor(((new Date()).getTime()) / 1000);
+        newApp.edited_at = newApp.created_at;
+        newApp.owner = params.member._id+"";
 
         common.db.collection('apps').insert(newApp, function(err, app) {
             var appKey = common.sha1Hash(app.ops[0]._id, true);
@@ -94,7 +127,9 @@ var appsApi = {},
             newApp.key = appKey;
 
             common.db.collection('app_users' + app.ops[0]._id).insert({_id:"uid-sequence", seq:0},function(err,res){});
-			plugins.dispatch("/i/apps/create", {params:params, appId:app.ops[0]._id, data:app.ops[0]});
+            common.db.collection('app_users' + app.ops[0]._id).ensureIndex({ls:-1},function(err,res){});
+            common.db.collection('metric_changes' + app.ops[0]._id).ensureIndex({ts:-1},function(err,res){});
+			plugins.dispatch("/i/apps/create", {params:params, appId:app.ops[0]._id, data:newApp});
             common.returnOutput(params, newApp);
         });
     };
@@ -123,20 +158,22 @@ var appsApi = {},
         }
 
         processAppProps(updatedApp);
+        
+        updatedApp.edited_at = Math.floor(((new Date()).getTime()) / 1000);
 
-		common.db.collection('apps').findOne(common.db.ObjectID(params.qstring.args.app_id), function(err, app){
-            if (err || !app) common.returnMessage(params, 404, 'App not found');
+		common.db.collection('apps').findOne(common.db.ObjectID(params.qstring.args.app_id), function(err, appBefore){
+            if (err || !appBefore) common.returnMessage(params, 404, 'App not found');
             else {
 				if (params.member && params.member.global_admin) {
 					common.db.collection('apps').update({'_id': common.db.ObjectID(params.qstring.args.app_id)}, {$set: updatedApp}, function(err, app) {
-						plugins.dispatch("/i/apps/update", {params:params, appId:params.qstring.args.app_id, data:updatedApp});
+						plugins.dispatch("/i/apps/update", {params:params, appId:params.qstring.args.app_id, data:{app:appBefore, update:updatedApp}});
 						common.returnOutput(params, updatedApp);
 					});
 				} else {
 					common.db.collection('members').findOne({'_id': params.member._id}, {admin_of: 1}, function(err, member){
 						if (member.admin_of && member.admin_of.indexOf(params.qstring.args.app_id) !== -1) {
 							common.db.collection('apps').update({'_id': common.db.ObjectID(params.qstring.args.app_id)}, {$set: updatedApp}, function(err, app) {
-								plugins.dispatch("/i/apps/update", {params:params, appId:params.qstring.args.app_id, data:updatedApp});
+								plugins.dispatch("/i/apps/update", {params:params, appId:params.qstring.args.app_id, data:{app:appBefore, update:updatedApp}});
 								common.returnOutput(params, updatedApp);
 							});
 						} else {
@@ -151,10 +188,6 @@ var appsApi = {},
     };
 
     appsApi.deleteApp = function (params) {
-        if (!(params.member.global_admin)) {
-            common.returnMessage(params, 401, 'User is not a global administrator');
-            return false;
-        }
 
         var argProps = {
                 'app_id': { 'required': true, 'type': 'String', 'min-length': 24, 'max-length': 24 }
@@ -166,26 +199,41 @@ var appsApi = {},
             return false;
         }
 		common.db.collection('apps').findOne({'_id': common.db.ObjectID(appId)}, function(err, app){
-			if(!err && app)
-				common.db.collection('apps').remove({'_id': common.db.ObjectID(appId)}, {safe: true}, function(err, result) {
-		
-					if (err) {
-						common.returnMessage(params, 500, 'Error deleting app');
-						return false;
-					}
-		
-					var iconPath = __dirname + '/public/appimages/' + appId + '.png';
-					fs.unlink(iconPath, function() {});
-		
-					common.db.collection('members').update({}, {$pull: {'apps': appId, 'admin_of': appId, 'user_of': appId}}, {multi: true}, function(err, app) {});
-		
-					deleteAppData(appId, true, params, app);
-					common.returnMessage(params, 200, 'Success');
-					return true;
-				});
+			if(!err && app){
+                if (params.member && params.member.global_admin) {
+                    removeApp(app)
+                }
+                else{
+                    common.db.collection('members').findOne({'_id': params.member._id}, {admin_of: 1}, function(err, member){
+						if (member.admin_of && member.admin_of.indexOf(params.qstring.args.app_id) !== -1) {
+							removeApp(app)
+						} else {
+							common.returnMessage(params, 401, 'User does not have admin rights for this app');
+						}
+					});
+                }
+            }
 			else
 				common.returnMessage(params, 500, 'Error deleting app');
 		});
+        
+        function removeApp(app){
+            common.db.collection('apps').remove({'_id': common.db.ObjectID(appId)}, {safe: true}, function(err, result) {
+				if (err) {
+					common.returnMessage(params, 500, 'Error deleting app');
+					return false;
+				}
+		
+				var iconPath = __dirname + '/public/appimages/' + appId + '.png';
+				fs.unlink(iconPath, function() {});
+		
+				common.db.collection('members').update({}, {$pull: {'apps': appId, 'admin_of': appId, 'user_of': appId}}, {multi: true}, function(err, app) {});
+		
+				deleteAppData(appId, true, params, app);
+				common.returnMessage(params, 200, 'Success');
+				return true;
+			});
+        }
 
         return true;
     };
@@ -222,7 +270,7 @@ var appsApi = {},
     };
     
     function deleteAppData(appId, fromAppDelete, params, app) {
-        if(fromAppDelete || !params.qstring.args.period || params.qstring.args.period == "all"){
+        if(fromAppDelete || !params.qstring.args.period || params.qstring.args.period == "all" || params.qstring.args.period == "reset"){
             deleteAllAppData(appId, fromAppDelete, params, app);
         }
         else{
@@ -240,6 +288,8 @@ var appsApi = {},
         function deleteEvents(){
             common.db.collection('events').findOne({'_id': common.db.ObjectID(appId)}, function(err, events) {
                 if (!err && events && events.list) {
+                    
+                    common.arrayAddUniq(events.list, plugins.internalEvents);
                     for (var i = 0; i < events.list.length; i++) {
                         var collectionNameWoPrefix = crypto.createHash('sha1').update(events.list[i] + appId).digest('hex');
                         common.db.collection("events" + collectionNameWoPrefix).drop(function(){});
@@ -253,8 +303,12 @@ var appsApi = {},
             if (!fromAppDelete) {
                 common.db.collection('app_users' + appId).insert({_id:"uid-sequence", seq:0},function(){});
             }
-            if (!fromAppDelete)
-                plugins.dispatch("/i/apps/reset", {params:params, appId:appId, data:app}, deleteEvents);
+            if (!fromAppDelete){
+                if(params.qstring.args.period == "reset")
+                    plugins.dispatch("/i/apps/reset", {params:params, appId:appId, data:app}, deleteEvents);
+                else
+                    plugins.dispatch("/i/apps/clear_all", {params:params, appId:appId, data:app}, deleteEvents);
+            }
             else
                 plugins.dispatch("/i/apps/delete", {params:params, appId:appId, data:app}, deleteEvents);
         });
@@ -279,12 +333,26 @@ var appsApi = {},
         var dates = {};
         var now = moment();
         skip[appId+"_"+now.format('YYYY:M')] = true;
+        skip[appId+"_"+now.format('YYYY')+":0"] = true;
         dates[now.format('YYYY:M')] = true;
+        dates[now.format('YYYY')+":0"] = true;
+        for(var i = 0; i < common.base64.length; i++){
+            skip[appId+"_"+now.format('YYYY:M')+"_"+common.base64[i]] = true;
+            skip[appId+"_"+now.format('YYYY')+":0"+"_"+common.base64[i]] = true;
+            dates[now.format('YYYY:M')+"_"+common.base64[i]] = true;
+            dates[now.format('YYYY')+":0"+"_"+common.base64[i]] = true;
+        }
         for(var i = 0; i < back; i++){
             skip[appId+"_"+now.subtract("months", 1).format('YYYY:M')] = true;
             skip[appId+"_"+now.format('YYYY')+":0"] = true;
             dates[now.format('YYYY:M')] = true;
             dates[now.format('YYYY')+":0"] = true;
+            for(var i = 0; i < common.base64.length; i++){
+                skip[appId+"_"+now.format('YYYY:M')+"_"+common.base64[i]] = true;
+                skip[appId+"_"+now.format('YYYY')+":0"+"_"+common.base64[i]] = true;
+                dates[now.format('YYYY:M')+"_"+common.base64[i]] = true;
+                dates[now.format('YYYY')+":0"+"_"+common.base64[i]] = true;
+            }
         }
 
         /*
@@ -303,6 +371,7 @@ var appsApi = {},
         
         common.db.collection('events').findOne({'_id': common.db.ObjectID(appId)}, function(err, events) {
             if (!err && events && events.list) {
+                common.arrayAddUniq(events.list, plugins.internalEvents);
                 for (var i = 0; i < events.list.length; i++) {
                     var segments = [];
                     
@@ -385,9 +454,8 @@ var appsApi = {},
     }
     
     function isValidType(type) {
-        var types = ["mobile","web","iot"];
         //check if valid app type and it's plugin is enabled
-        return types.indexOf(type) !== -1 && plugins.isPluginEnabled(type);
+        return plugins.appTypes.indexOf(type) !== -1 && plugins.isPluginEnabled(type);
     }
 
     function isValidCountry(country) {

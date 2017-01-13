@@ -6,14 +6,14 @@ const common = require('../../../../api/utils/common.js'),
 	  log = common.log('push:streamer');
 
 class Streamer {
-	constructor (pushly, app) {
-		this.pushly = pushly;
-		this.app = app;
-		this.field = this.pushly.credentials.id.split('.')[0];
+	constructor (appsubnote) {
+		this.anote = appsubnote;
+		this.field = this.anote.creds.field;
 		this.projection = {
+			tz: {$ifNull: ['$tz', this.anote.creds.app_timezone.offset]},
 			_id: 1, 
 			[credentials.DB_USER_MAP.tokens + this.field]: '$' + credentials.DB_USER_MAP.tokens + '.' + this.field, 
-			'la': 1
+			la: 1
 		};
 	}
 
@@ -22,191 +22,218 @@ class Streamer {
 	}
 
 	collection () {
-		return 'push_' + common.crypto.createHash('sha1').update(this.pushly.key()).digest('hex');
+		return 'push_' + common.crypto.createHash('sha1').update(this.anote.id).digest('hex');
 	}
 
 	clear (db) {
-		log.d('Clearing streamer for %j', this.pushly.id, this.built);
-		if (this.built) {
-			return new Promise((resolve, reject) => {
-				db.collection(this.built).drop((err) => {
-					log.d('Dropped streamer collection %j', err);
-					if (err) { reject(err); }
-					else { resolve(); }
-				});
+		log.d('[%d:%s]: Clearing streamer for %s', process.pid, this.anote.id, this.collection());
+		return new Promise((resolve, reject) => {
+			// resolve();
+			db.collection(this.collection()).drop((err) => {
+				log.d('Dropped streamer collection, error %j', err);
+				if (err) { 
+					if (this.anote.nobuild) {
+						log.d('[%d:%s]: Ignoring drop error for %s since nobuild is set', process.pid, this.anote.id, this.collection(), err);
+						resolve();
+					} else {
+						reject(err); 
+					}
+				}
+				else { resolve(); }
 			});
-		} else {
-			return Promise.resolve();
-		}
+		});
 	}
 
 	build (db) {
-		log.d('Building streamer for %j', this.pushly.id);
+		log.d('[%d:%s]: Building streamer', process.pid, this.anote.id);
 		return new Promise((resolve, reject) => {
-			if (this.pushly.devices || this.built) {
-				resolve(this.pushly.devices || this.built);
-			} else {
-				db.collection(this.collection()).count((err, count) => {
-					log.d('First count returned %j / %j for %j', err, count, this.pushly.id);
-					if (!err && count) {
-						this.built = this.collection();
-						log.d('Already built collection %j', this.built);
-						resolve(this.built);
-					} else {
-						var query;
-						log.d('building audience for %s (%s)', this.pushly.id, this.pushly.credentials.id);
-						
-						if (typeof this.pushly.devicesQuery === 'string') {
-							try {
-								this.pushly.devicesQuery = JSON.parse(this.pushly.devicesQuery);
-							} catch (e) {
-								log.e('Error while parsing devicesQuery', e, e.stack);
-							}
+			db.collection(this.collection()).count((err, count) => {
+				log.d('[%d:%s]: First %s.count() returned %j / %j', process.pid, this.anote.id, this.collection(), err, count);
+				if (!err && count) {
+					this.built = this.collection();
+					log.d('[%d:%s]: Already built collection %j', process.pid, this.anote.id, this.built);
+					resolve(this.built);
+				} else if (this.anote.nobuild) {
+					this.built = this.collection();
+					log.d('[%d:%s]: No build for collection %j', process.pid, this.anote.id, this.built);
+					resolve(this.built);
+				} else {
+					var query;
+					log.d('[%d:%s]: Building audience for %j', process.pid, this.anote.id, this.anote);
+					
+					if (this.anote.query && this.anote.query.drill) {
+						if (!this.drill()) {
+							return reject('[%s]: Drill is not enabled while message has drill conditions', this.anote.id);
 						}
 
-						if (this.pushly.devicesQuery.drill) {
-							if (!this.drill()) {
-								return reject('Drill is not enabled while pushly has drill conditions');
-							}
+						this.drill().openDrillDb();
 
-							this.drill().openDrillDb();
+						var params = {
+							time: common.initTimeObj(this.anote.creds.app_timezone.tz, Date.now()),
+							qstring: Object.assign({app_id: this.anote.creds.app_id.toString()}, this.anote.query.drill)
+						};
 
-							var params = {
-								time: common.initTimeObj(this.app.timezone, Date.now()),
-								qstring: Object.assign({app_id: this.app._id.toString()}, this.pushly.devicesQuery.drill)
-							};
+						log.i('[%s]: Drilling: %j', process.pid, this.anote.id, params);
 
-							log.i('Drilling: %j', params);
-
-							this.drill().drill.fetchUsers(params, (err, uids) => {
-								query = this.pushly.devicesQuery.user;
-								query[common.dbUserMap.tokens + this.field] = true;
-
-								log.i('Counting with drill of %d users: %j', uids.length, query);
-								query.uid = {$in: uids};
-
-								db.collection('app_users' + this.app._id).aggregate([
-									{$match: query}, 
-									{$project: this.projection},
-									{$sort: {_id: 1}},
-									{$out: this.collection()}
-								], {allowDiskUse:true}, (err) => {
-									log.d('Aggregation done: %j', arguments);
-									if (err) {
-										reject(err);
-									} else {
-										this.built = this.collection();
-										log.d('Just built collection %j after drilling', this.built);
-										resolve(this.built);
-									}
-								});
-							});
-						} else {
-							query = this.pushly.devicesQuery.user;
+						this.drill().drill.fetchUsers(params, (err, uids) => {
+							query = this.anote.query.user || {};
 							query[common.dbUserMap.tokens + this.field] = true;
 
-							log.d('Not drilling %j for %j', [{$match: query}, {$out: this.collection()}], this.pushly.id);
-							db.collection('app_users' + this.app._id).aggregate([
-								{$match: query},
+							log.i('[%s]: Counting with drill of %d users: %j', process.pid, this.anote.id, uids.length, query);
+							query.uid = {$in: uids};
+
+							db.collection('app_users' + this.anote.creds.app_id).aggregate([
+								{$match: query}, 
 								{$project: this.projection},
 								{$sort: {_id: 1}},
 								{$out: this.collection()}
 							], {allowDiskUse:true}, (err) => {
+								log.d('[%d:%s]: Aggregation done: %j', process.pid, this.anote.id, arguments);
 								if (err) {
-									reject(err);
+									log.d('[%d:%s]: >>>>>>>>>>>>>>>> Running aggregation second time!!!1111 <<<<<<<<<<<<<<<<<<', process.pid, this.anote.id);
+									db.collection('app_users' + this.anote.creds.app_id).aggregate([
+										{$match: query}, 
+										{$project: this.projection},
+										{$sort: {_id: 1}},
+										{$out: this.collection()}
+									], {allowDiskUse:true}, (err) => {
+										log.d('[%d:%s]: 2nd Aggregation done: %j', process.pid, this.anote.id, arguments);
+										if (err) {
+											reject(err);
+										} else {
+											this.built = this.collection();
+											log.d('[%d:%s]: 2nd Just built collection %j after drilling', process.pid, this.anote.id, this.built);
+											resolve(this.built);
+										}
+									});
 								} else {
 									this.built = this.collection();
-									log.d('Just built collection %j', this.built);
+									log.d('[%d:%s]: Just built collection %j after drilling', process.pid, this.anote.id, this.built);
 									resolve(this.built);
 								}
 							});
-						}
+						});
+					} else {
+						query = this.anote.query ? this.anote.query.user || {} : {};
+						query[common.dbUserMap.tokens + this.field] = true;
+
+						log.d('[%d:%s]: Not drilling %j to %s', process.pid, this.anote.id, {$match: query}, this.collection());
+						db.collection('app_users' + this.anote.creds.app_id).aggregate([
+							{$match: query},
+							{$project: this.projection},
+							{$sort: {_id: 1}},
+							{$out: this.collection()}
+						], {allowDiskUse:true}, (err) => {
+							log.d('[%d:%s]: Aggregation done: %j', process.pid, this.anote.id, arguments);
+							if (err) {
+								log.d('[%d:%s]: >>>>>>>>>>>>>>>> Running aggregation second time!!!1111 <<<<<<<<<<<<<<<<<<', process.pid, this.anote.id);
+								db.collection('app_users' + this.anote.creds.app_id).aggregate([
+									{$match: query},
+									{$project: this.projection},
+									{$sort: {_id: 1}},
+									{$out: this.collection()}
+								], {allowDiskUse:true}, (err) => {
+									log.d('[%d:%s]: 2nd Aggregation done: %j', process.pid, this.anote.id, arguments);
+									if (err) {
+										reject(err);
+									} else {
+										this.built = this.collection();
+										log.d('[%d:%s]: 2nd Just built collection %j', process.pid, this.anote.id, this.built);
+										resolve(this.built);
+									}
+								});
+							} else {
+								this.built = this.collection();
+								log.d('[%d:%s]: Just built collection %j', process.pid, this.anote.id, this.built);
+								resolve(this.built);
+							}
+						});
 					}
-				});
-			}
+				}
+			});
 		});
 	}
 
 	count (db) {
-		log.d('Counting streamer for %j', this.pushly.id);
+		log.d('[%d:%s]: Counting streamer', process.pid, this.anote.id);
 		return new Promise((resolve, reject) => {
-			this.build(db).then((devices) => {
-				if (typeof devices === 'string') {
-					log.d('Counting collection %j for %j', this.collection(), this.pushly.id);
-					db.collection(this.built).count((err, count) => {
-						log.d('Counted collection %j for %j: %j', this.collection(), this.pushly.id, count);
-						if (err) { reject(err); }
-						else { resolve(count); }
-					});
-				} else {
-					resolve(devices.length);
-				}
-			});
+			this.build(db).then(() => {
+				log.d('[%d:%s]: Counting collection %j', process.pid, this.anote.id, this.collection());
+				db.collection(this.built).count((err, count) => {
+					log.d('[%d:%s]: Counted collection %j: %j', process.pid, this.anote.id, this.collection(), count);
+					if (err) { reject(err); }
+					else { resolve(count); }
+				});
+			}, reject);
 		});
 	}
 
 	audience (db) {
-		log.d('Audiencing streamer for %j', this.pushly.id);
+		log.d('[%d:%s]: Audiencing streamer', process.pid, this.anote.id);
 		return new Promise((resolve, reject) => {
-			this.build(db).then((devices) => {
-				if (typeof devices === 'string') {
-					log.d('Counting collection %j for %j', this.collection(), this.pushly.id);
-					db.collection(this.built).aggregate([{$match: {}}, {$group: {_id: '$la', count: {$sum: 1}}}], (err, count) => {
-						log.d('Counted collection %j for %j: %j', this.collection(), this.pushly.id, count);
-						if (err) { reject(err); }
-						else { resolve(count); }
-					});
+			this.build(db).then(() => {
+				log.d('[%d:%s]: Counting grouping by lang collection %j', process.pid, this.anote.id, this.collection());
+				db.collection(this.built).aggregate([{$match: {}}, {$group: {_id: '$la', count: {$sum: 1}}}], (err, count) => {
+					log.d('[%d:%s]: Counted grouping by lang collection %j: %j', process.pid, this.anote.id, this.collection(), count);
+					if (err) { reject(err); }
+					else { 
+						if (this.anote.tz !== false) {
+							this.loadTzs(db).then(resolve.bind(null, count), reject);
+						} else {
+							resolve(count); 
+						}
+					}
+				});
+			}, reject);
+		});
+	}
+
+	loadTzs (db) {
+		return new Promise((resolve, reject) => {
+			db.collection(this.collection()).distinct('tz', (err, tzs) => {
+				if (err) {
+					reject(err);
 				} else {
-					resolve(devices.length);
+					this.anote.tzs = tzs || [];
+					this.anote.tzs.sort((a, b) => b - a);
+					resolve();
 				}
 			});
 		});
 	}
 
-	// load (db) {
-	// 	return this.build().then((devices) => {
-	// 		if (typeof devices === 'string') {
-	// 			db.collection(this.built).find().toArray((err, devices) => {
-	// 				if (err) { reject(err); }
-	// 				else { resolve(devices); }
-	// 			});
-	// 		} else {
-	// 			resolve(devices);
-	// 		}
-	// 	});
-	// }
-
-	load (db, first, last, count) {
-		log.d('Loading streamer for %j from %s to %s, totalling %d', this.pushly.id, first, last, count);
+	load (db, first, last, count, tz) {
+		log.d('[%d:%s]: Loading streamer for %j from %s to %s, totalling %d', process.pid, this.anote.id, first, last, count);
 		return new Promise((resolve, reject) => {
-			this.build(db).then((devices) => {
-				if (typeof devices === 'string') {
-					let q = {};
-					if (first) { q._id = {$gte: first}; }
-					if (last) { 
-						if (!q._id) { q._id = {}; }
-						q._id.$lte = last;
-					}
-					db.collection(this.built).find(q).sort({_id: 1}).limit(count || 100000).toArray((err, devices) => {
-						if (err) { reject(err); }
-						else { resolve(devices); }
-					});
-				} else {
-					log.d('DEVICES: %j', devices);
-					let start = -1, end = -1;
-					devices.forEach((d, i) => {
-						if (first && d._id >= first) { start = i; }
-					});
-					if (start !== -1) { devices = devices.slice(start); }
-
-					for (let i = devices.length - 1; i >= 0; i--) {
-						if (last && devices[i]._id <= last ) { end = i; }
-					}
-					if (start !== -1) { devices = devices.slice(0, end + 1); }
-
-					resolve(devices);
+			this.build(db).then(() => {
+				let q = {};
+				if (first) { q._id = {$gte: first}; }
+				if (last) { 
+					if (!q._id) { q._id = {}; }
+					q._id.$lte = last;
 				}
+				if (tz) {
+					q.tz = tz;
+				}
+				db.collection(this.built).find(q).sort({_id: 1}).limit(count || 100000).toArray((err, devices) => {
+					if (err) { reject(err); }
+					else { resolve(devices); }
+				});
 			}, reject);
+		});
+	}
+
+	unload (db, ids) {
+		return new Promise((resolve, reject) => {
+			log.d('[%d:%s]: Removing users from collection %s [%j ... %j]', process.pid, this.anote.id, this.built, ids[0], ids[ids.length - 1]);
+			// resolve();
+			db.collection(this.built).remove({_id: {$in: ids}}, (err, ok) => {
+				if (err) { reject(err); }
+				else { 
+					log.d('[%d:%s]: Removed %j users from collection %s', process.pid, this.anote.id, ok, this.built);
+					resolve(); 
+				}
+			});
 		});
 	}
 }
