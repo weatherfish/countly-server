@@ -1,15 +1,31 @@
+## Version 16.12.2
+
+* Fix: Push - send badge data to Android
+* Fix: Loading code.count.ly for https servers
+* Fix: using unencrypted password for MongoDB
+* Fix: displaying bar data in external/shared crashes
+* Fix: installing g++ 4.8 specifically
+* Fix: Checking if crash plugin enabled in reports
+* Fix: Star rating time series data visualization
+* Fix: Sort crash bars in descending order
+* Fix: Do not load large meta on refresh
+* Fix: Optimize merging unique values from arrays
+* Fix: Enterprise Geo plugin UI
+* Fix: Enterprise Taking correct attribution campaign names in drill graphs
+* Fix: Enterprise Recording campaign data before processing data in drill
+* Fix: Enterprise Push Maker Aproover plugin
+
 ## Version 16.12.1
 
 * Fix: Getting email report data correctly
 * Fix: Bug with recording custom metric functionality
 * Fix: Correct weekly buckets when year is changing
 * Fix: Correct titles to weekly buckets
-* Fix: Showing custom properties in user profiles
+* Fix: Enterprise Showing custom properties in user profiles
 * Fix: Do not refresh dashboard for past periods
 * Fix: Push - decreasing amount of concurrent streams
 * Fix: Push - remove scheduled job on message deletion
 * Fix: Push - certificate parsing
-* Fix: Push - send badge data to Android
 * Fix: Add uid even if uid-sequence was not created
 * Fix: Sorting data in bars
 * Fix: Milisecond timestamp not recorded in some cases

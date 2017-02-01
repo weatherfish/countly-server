@@ -1,6 +1,9 @@
-#Countly [![Build Status](https://api.travis-ci.org/Countly/countly-server.png?branch=master)](https://travis-ci.org/Countly/countly-server) [![Install Countly on DigitalOcean](http://do.count.ly/button.svg?v2)](http://do.count.ly)
+![header](http://count.ly/wp-content/uploads/2017/01/1500x500.jpg)
 
-* **We're hiring:** Countly is looking for Android SDK developers, full stack devs, devops and growth hackers (remote work). [Click this link for job description](https://count.ly/full-stack-node-js-developer)
+
+#Countly Analytics [![Build Status](https://api.travis-ci.org/Countly/countly-server.png?branch=master)](https://travis-ci.org/Countly/countly-server) [![Install Countly on DigitalOcean](http://do.count.ly/button.svg?v2)](http://do.count.ly)
+
+* **We're hiring:** Countly is looking for full stack devs (remote work). [Click this link for job description](https://count.ly/full-stack-node-js-developer)
 * **Slack user?** [Join our Slack community](http://slack.count.ly:3000/)
 * **Questions?** [Ask in our Community forum](http://community.count.ly)
 
@@ -11,7 +14,24 @@ With the help of [Javascript SDK](http://github.com/countly/countly-sdk-web), Co
 
 There are two parts of Countly: the server that collects and analyzes data, and an SDK (mobile, web or desktop) that sends this data. This repository includes Countly Community Edition (server side). For more information other versions (e.g Enterprise Edition), see [comparison of different Countly editions](https://count.ly/compare)
 
-![Countly dashboard screenshot](http://count.ly/wp-content/uploads/2016/12/countly_dashboard_community_16_12.png)
+Click on the below image for a 1 minute video introduction to Countly (opens Youtube);
+
+[![Countly Community Edition - Video](https://count.ly/wp-content/uploads/2017/01/countly-ce-1min-video.png)](https://youtu.be/htKeh9bsZwA)
+
+
+##What is included? 
+
+This repository includes server-side part of Countly, with following features: 
+
+* Complete dashboard user interface
+* User, application and permission management
+* Read / write APIs
+* Plugin based system
+* Analytics features for [mobile](http://count.ly/features), [web](http://count.ly/web-analytics) and desktop
+* [Crash reporting](http://count.ly/crash-reports) for iOS & Android and error reporting for Javascript
+* [Push notifications](http://count.ly/push-notifications) for iOS & Android
+* Email reporting
+
 
 ##What can Countly track? 
 
@@ -32,7 +52,9 @@ We take security very seriously at Countly. Community Edition code is 100% open 
 
 ##What makes Countly unique? 
 
-Countly is a unique, security-focused and 360-degree analytics approach with several, unique values:
+![header2](http://count.ly/wp-content/uploads/2017/02/github_v4.png)
+
+Countly is a privacy-focused and 360-degree analytics approach with several, unique values:
 
 * Real-time mobile analytics, web analytics and push notifications.
 * Your data, your rules - since you can install Countly on your own server, or let us do the private cloud installations for you.
@@ -49,7 +71,7 @@ There are several ways to install Countly:
 
 1. The following command will download and install Countly on your **Ubuntu** or **CentOS** server. 
 
-    wget -qO- http://c.ly/install | bash
+    `wget -qO- http://c.ly/install | bash`
 
 2. If you have a Digital Ocean account, [click here and install on Digital Ocean](http://do.count.ly) with a single click.
 
@@ -90,8 +112,9 @@ And, if you liked Countly, [why not use one of our badges](https://count.ly/bran
 
 * [General product information](http://count.ly/product)
 * [Questions? Ask our forum](http://community.count.ly)
+* [Watch training videos on Youtube](https://www.youtube.com/user/GoCountly)
 * [Slack user? Come chat with us](http://slack.count.ly:3000)
 * [Documentation & API reference guide](http://resources.count.ly)
 * [Comparison of Countly editions](https://count.ly/compare)
 * [White labeling & rebranding options](https://count.ly/whitelabel-analytics/)
-* [Extended list of Enterprise Edition features](https://count.ly/enterprise-edition-features), including crash reports, referral analytics, user profiles, geolocations with push, detailed segmentation, funnels, real-time dashboard and more.
+* [Extended list of Enterprise Edition features](https://count.ly/enterprise-edition-features), including referral analytics, user profiles, geolocations with push, detailed segmentation, funnels, real-time dashboard and more.
