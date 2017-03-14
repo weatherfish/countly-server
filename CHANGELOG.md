@@ -1,5 +1,7 @@
 ## Version 16.12.3
 
+This is a bugfix release.
+
 * Fix: Estimated data for full buckets
 * Fix: Changing password validation on server side
 * Fix: Push - Audience calculation when sending to multiple platforms
@@ -8,17 +10,24 @@
 * Fix: Server Stats - counting extend sessions as new sessions
 * Fix: Populator - fixing typos in generated data
 * Fix: timestamp data range starting from January for period year
+* Fix: setting amount of failed logins from configs ui
+* Fix: stripping surrounding quotes in csv exports
+* Fix: Optimized event summary generation with lots of segment values
 * Do not record old property for device_id changes with merges
 * Do google services check upon installation and disable them if not usable
+* Added password rotation amount to prevent reusing same passwords
 * Fix: Enterprise User profiles: accept 0 and false as valid custom property values
 * Fix: Enterprise User profiles: internal events as crashes or views were not displayed if there are no custom events
 * Fix: Enterprise User profiles: do not reload userprofiles table if previous request is not yet finished
 * Fix: Enterprise Attribution: do not reattribute if user is older than 5 minutes and have a session
 * Fix: Enterprise Drill: do not count session extends as separate sessions
 * Fix: Enterprise Drill: bug in displaying Monthly data in beginning of the year
-* Fix: Enterprise Push: skip approve for API-originated messages
+* Fix: Enterprise Push: allow some users to skip approve for push messages
+* Fix: Restrict: export also allowed sections for user management exports
 
 ## Version 16.12.2
+
+This is a bugfix release.
 
 * Fix: Push - send badge data to Android
 * Fix: Loading code.count.ly for https servers
@@ -36,6 +45,8 @@
 * Fix: Enterprise Push Maker Aproover plugin
 
 ## Version 16.12.1
+
+This is a bugfix release.
 
 * Fix: Getting email report data correctly
 * Fix: Bug with recording custom metric functionality
