@@ -6,7 +6,7 @@
 /** @lends module:api/parts/data/exports */
 var exports = {},
     common = require('./../../utils/common.js'),
-    moment = require("moment"),
+    moment = require('moment-timezone'),
     json2csv = require('json2csv'),
     json2xls = require('json2xls'),
     request = require("request");
@@ -101,7 +101,7 @@ var exports = {},
         var headers = {};
         if(type && contents[type])
             headers["Content-Type"] = contents[type];
-        headers["Content-Disposition"] = "attachment;filename="+filename+"."+type;
+        headers["Content-Disposition"] = "attachment;filename="+encodeURIComponent(filename)+"."+type;
         params.res.writeHead(200, headers);
         if(type === "xls")
             params.res.write(new Buffer(data, 'binary'));

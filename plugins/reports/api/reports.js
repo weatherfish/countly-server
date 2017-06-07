@@ -1,6 +1,6 @@
 var reports = {},
     async = require("async"),
-    moment = require("moment"),
+    moment = require('moment-timezone'),
     ejs = require("ejs"),
     fs = require('fs'),
     path = require('path'),
@@ -314,11 +314,12 @@ var metrics = {
                     html: message
                 };
                 if(mail.sendPoolMail)
-                    mail.sendPoolMail(msg, callback);
+                    mail.sendPoolMail(msg);
                 else
-                    mail.sendMail(msg, callback);
+                    mail.sendMail(msg);
             }
         }
+        callback();
     };
     
     function metricsToCollections(metrics, events){

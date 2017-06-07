@@ -24,7 +24,7 @@ const assistantJob = {},
                             const anc = assistant.prepareNotificationSpecificFields(apc, "assistant.star-rating-integration", assistant.NOTIF_TYPE_QUICK_TIPS, 1, NOTIFICATION_VERSION);
                             const no_star_rating = (typeof events_result === "undefined") || (events_result === null) || (typeof events_result.list === "undefined") || (typeof events_result.list !== "undefined" && events_result.list.indexOf("[CLY]_star") === -1);
                             const star_rating_not_enabled = !plugins.isPluginEnabled("star-rating");
-                            const max_show_time_not_exceeded = anc.valueSet.showAmount < 3;
+                            const max_show_time_not_exceeded = anc.showAmount < 3;
                             const data = [];
 
                             assistant.createNotificationIfRequirementsMet(4, 15, ((no_star_rating || star_rating_not_enabled) && apc.is_mobile && max_show_time_not_exceeded), data, anc);

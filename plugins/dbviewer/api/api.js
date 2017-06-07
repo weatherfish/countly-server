@@ -3,7 +3,8 @@ var plugin = {},
 	async = require('async'),
 	crypto = require('crypto'),
     plugins = require('../../pluginManager.js'),
-	connections = {};
+	connections = {},
+    _ = require('underscore');
 
 (function (plugin) {
 	plugins.register("/o/db", function(ob){
@@ -235,16 +236,35 @@ var plugin = {},
 		}
 		var name = coll_parts.join('.');
         var pretty = name;
-        
-        for(var i in apps){
-            if(name.indexOf(i, name.length - i.length) !== -1){
-                pretty = name.replace(i, "("+apps[i]+")");
-            }
+
+        let isEvent = false;
+        let eventHash = null;
+        if(name.indexOf("events") === 0) {
+            eventHash = name.substring(6);
+            isEvent = true;
+        } else if(name.indexOf("drill_events") === 0) {
+            eventHash = name.substring(12);
+            isEvent = true;
         }
-        
-        for(var i in events){
-            if(name.indexOf(i, name.length - i.length) !== -1){
-                pretty = name.replace(i, events[i]);
+
+        if(!isEvent) {
+            let finished = false;
+            for (var i in apps) {
+                if (name.indexOf(i, name.length - i.length) !== -1) {
+                    pretty = name.replace(i, "(" + apps[i] + ")");
+                    finished = true;
+                    break;
+                }
+            }
+        } else {
+            if(eventHash.length === 0) {
+                //this is the "events" collection
+                pretty = name;
+            } else {
+                const targetEntry = events[eventHash];
+                if(!_.isUndefined(targetEntry)) {
+                    pretty = name.replace(eventHash, targetEntry)
+                }
             }
         }
            
